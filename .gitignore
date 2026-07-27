@@ -1,0 +1,28 @@
+# Gradle & Build outputs
+.gradle/
+.kotlin/
+.build-outputs/
+build/
+app/build/
+
+# Android Studio & IDE
+.idea/
+*.iml
+.navigation/
+captures/
+.externalNativeBuild
+.cxx/
+
+# Local configuration & secrets
+.env.local
+
+# Keystores & sensitive keys
+*.jks
+*.p12
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log

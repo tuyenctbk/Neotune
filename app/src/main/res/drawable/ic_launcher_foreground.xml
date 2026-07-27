@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Outer Signal Waves (Shortened & centered within safe zone Y=22) -->
+    <path
+        android:strokeWidth="2.5"
+        android:strokeColor="#00E5FF"
+        android:strokeLineCap="round"
+        android:pathData="M 33,26 C 29,22 29,18 33,14" />
+    <path
+        android:strokeWidth="2.5"
+        android:strokeColor="#7C4DFF"
+        android:strokeLineCap="round"
+        android:pathData="M 39,28 C 36,24 36,20 39,16" />
+
+    <!-- Radio Antenna (Shorter, stylish angled stem) -->
+    <path
+        android:strokeWidth="3.5"
+        android:strokeColor="#FFFFFF"
+        android:strokeLineCap="round"
+        android:pathData="M 48,38 L 38,24" />
+
+    <!-- Antenna Tip Knob -->
+    <path
+        android:fillColor="#00E5FF"
+        android:pathData="M 38,24 m -3,0 a 3,3 0 1,0 6,0 a 3,3 0 1,0 -6,0" />
+
+    <!-- Main Radio Body Frame (Larger 54dp width x 38dp height, centered at X=54, Y=57) -->
+    <path
+        android:fillColor="#00E5FF"
+        android:pathData="M 33,38 h 42 a 7,7 0 0 1 7,7 v 24 a 7,7 0 0 1 -7,7 h -42 a 7,7 0 0 1 -7,-7 v -24 a 7,7 0 0 1 7,-7 z" />
+
+    <!-- Speaker Circle Grille (Left Side) -->
+    <path
+        android:fillColor="#0F1424"
+        android:pathData="M 45,57 m -11,0 a 11,11 0 1,0 22,0 a 11,11 0 1,0 -22,0" />
+    <path
+        android:fillColor="#00E5FF"
+        android:pathData="M 45,57 m -6,0 a 6,6 0 1,0 12,0 a 6,6 0 1,0 -12,0" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M 45,57 m -2.5,0 a 2.5,2.5 0 1,0 5,0 a 2.5,2.5 0 1,0 -5,0" />
+
+    <!-- Display Screen Cutout (Right Top) -->
+    <path
+        android:fillColor="#0F1424"
+        android:pathData="M 59,44 h 16 a 3,3 0 0 1 3,3 v 10 a 3,3 0 0 1 -3,3 h -16 a 3,3 0 0 1 -3,-3 v -10 a 3,3 0 0 1 3,-3 z" />
+
+    <!-- Tuner Dial Gauge Lines -->
+    <path
+        android:fillColor="#7C4DFF"
+        android:pathData="M 62,50 h 10 v 2 h -10 z" />
+    <path
+        android:fillColor="#FF2A85"
+        android:pathData="M 66,46 h 2 v 8 h -2 z" />
+
+    <!-- Control Knobs (Right Bottom) -->
+    <path
+        android:fillColor="#0F1424"
+        android:pathData="M 61,65 m -2.5,0 a 2.5,2.5 0 1,0 5,0 a 2.5,2.5 0 1,0 -5,0" />
+    <path
+        android:fillColor="#0F1424"
+        android:pathData="M 71,65 m -2.5,0 a 2.5,2.5 0 1,0 5,0 a 2.5,2.5 0 1,0 -5,0" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M 61,65 m -1,0 a 1,1 0 1,0 2,0 a 1,1 0 1,0 -2,0" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M 71,65 m -1,0 a 1,1 0 1,0 2,0 a 1,1 0 1,0 -2,0" />
+
+</vector>

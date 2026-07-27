@@ -1,0 +1,8 @@
+{
+  "name": "Neotune",
+  "description": "Global Live Radio & Chill Beats",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
