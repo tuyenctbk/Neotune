@@ -17,6 +17,14 @@
     <uses-feature android:name="android.hardware.type.television" android:required="false" />
     <uses-feature android:name="android.software.leanback" android:required="false" />
     <uses-feature android:name="android.hardware.touchscreen" android:required="false" />
+    <!-- Required by Leanback store rules: must declare microphone as not required -->
+    <uses-feature android:name="android.hardware.microphone" android:required="false" />
+
+    <!-- Android Auto / Automotive OS -->
+    <uses-feature android:name="android.hardware.type.automotive" android:required="false" />
+
+    <!-- Wear OS -->
+    <uses-feature android:name="android.hardware.type.watch" android:required="false" />
 
     <application
         android:name=".EaseAudioApp"
@@ -33,14 +41,17 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
 
+        <!-- Bug #10: Provider authority must use the full package name, not a relative path.
+             A relative authority like ".mobileadsinitprovider" is ambiguous and causes
+             ProviderConflict crashes on debug builds with an applicationIdSuffix. -->
         <provider
             android:name="com.google.android.gms.ads.MobileAdsInitProvider"
-            android:authorities=".mobileadsinitprovider"
+            android:authorities="${applicationId}.mobileadsinitprovider"
             tools:node="remove" />
 
         <provider
             android:name="com.google.firebase.provider.FirebaseInitProvider"
-            android:authorities=".firebaseinitprovider"
+            android:authorities="${applicationId}.firebaseinitprovider"
             tools:node="remove" />
 
         <activity
@@ -55,10 +66,21 @@
             </intent-filter>
         </activity>
 
-        <!-- Sample AdMob App ID for testing -->
+        <!-- AdMob App ID (test ID — replace with production ID before release) -->
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
             android:value="ca-app-pub-3940256099942544~3347511713"/>
+
+        <!-- Android Auto: declares this app as a media source for Auto.
+             Requires res/xml/automotive_app_desc.xml -->
+        <meta-data
+            android:name="com.google.android.gms.car.application"
+            android:resource="@xml/automotive_app_desc" />
+
+        <!-- Wear OS: standalone app (does not require a paired phone app) -->
+        <meta-data
+            android:name="com.google.android.wearable.standalone"
+            android:value="true" />
 
         <service
             android:name=".service.RadioPlaybackService"

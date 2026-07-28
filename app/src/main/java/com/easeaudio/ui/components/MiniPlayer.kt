@@ -115,7 +115,7 @@ fun MiniPlayer(
                             Spacer(modifier = Modifier.width(6.dp))
                             // Badge
                             Text(
-                                text = "LIVE",
+                                text = stringResource(R.string.live_badge),
                                 style = MaterialTheme.typography.labelMedium,
                                 color = DarkBackground,
                                 fontWeight = FontWeight.Bold,

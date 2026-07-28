@@ -11,9 +11,10 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -44,13 +45,14 @@ import com.easeaudio.ui.screens.ScreensaverScreen
 import com.easeaudio.ui.theme.TuneveTheme
 import com.easeaudio.ui.theme.AppThemeState
 import com.easeaudio.viewmodel.RadioViewModel
+import kotlin.time.Duration.Companion.seconds
 
 class MainActivity : ComponentActivity() {
 
     private val viewModel: RadioViewModel by viewModels()
 
     private val requestPermissionLauncher = registerForActivityResult(
-        ActivityResultContracts.RequestPermission()
+        ActivityResultContracts.RequestPermission(),
     ) { isGranted ->
         Log.d("MainActivity", "Notification permission granted: $isGranted")
     }
@@ -111,7 +113,7 @@ fun MainAppContent(viewModel: RadioViewModel) {
     val showEqualizerDialog by viewModel.showEqualizerDialog.collectAsState()
     val showAddStationDialog by viewModel.showAddStationDialog.collectAsState()
 
-    var isFullPlayerVisible by remember { mutableStateOf(false) }
+    var isFullPlayerVisible by remember { mutableStateOf(value = false) }
     val snackbarHostState = remember { SnackbarHostState() }
 
     // Network notification banner state
@@ -125,15 +127,15 @@ fun MainAppContent(viewModel: RadioViewModel) {
         if (previousConnected != null) {
             if (!connected) {
                 activeBanner = NetworkBannerType.OFFLINE
-            } else if (connected && previousConnected == false) {
+            } else if (previousConnected == false) {
                 activeBanner = NetworkBannerType.BACK_ONLINE
-                kotlinx.coroutines.delay(3000)
+                kotlinx.coroutines.delay(3.seconds)
                 if (activeBanner == NetworkBannerType.BACK_ONLINE) {
                     activeBanner = NetworkBannerType.NONE
                 }
-            } else if (connected && quality == QualityLevel.SAVER_SMOOTH) {
+            } else if (quality == QualityLevel.SAVER_SMOOTH) {
                 activeBanner = NetworkBannerType.WEAK_CONNECTION
-                kotlinx.coroutines.delay(3000)
+                kotlinx.coroutines.delay(3.seconds)
                 if (activeBanner == NetworkBannerType.WEAK_CONNECTION) {
                     activeBanner = NetworkBannerType.NONE
                 }
@@ -160,6 +162,7 @@ fun MainAppContent(viewModel: RadioViewModel) {
     Box(modifier = Modifier.fillMaxSize()) {
         Scaffold(
             snackbarHost = { SnackbarHost(snackbarHostState) },
+            contentWindowInsets = WindowInsets(0, 0, 0, 0),
             bottomBar = {
                 if (!isFullPlayerVisible) {
                     BottomNavBar(
@@ -172,7 +175,7 @@ fun MainAppContent(viewModel: RadioViewModel) {
                                 launchSingleTop = true
                                 restoreState = true
                             }
-                        }
+                        },
                     )
                 }
             }
@@ -316,28 +319,29 @@ fun MainAppContent(viewModel: RadioViewModel) {
         // Floating Network Status Overlay Banner (Graceful overlay)
         AnimatedVisibility(
             visible = activeBanner != NetworkBannerType.NONE,
-            enter = androidx.compose.animation.fadeIn() + androidx.compose.animation.slideInVertically { -it },
-            exit = androidx.compose.animation.fadeOut() + androidx.compose.animation.slideOutVertically { -it },
+            enter = fadeIn() + slideInVertically { -it },
+            exit = fadeOut() + slideOutVertically { -it },
             modifier = Modifier
                 .align(Alignment.TopCenter)
-                .padding(top = 56.dp)
-                .zIndex(99f)
+                .statusBarsPadding()
+                .padding(top = 16.dp)
+                .zIndex(99f),
         ) {
             val config = when (activeBanner) {
                 NetworkBannerType.OFFLINE -> BannerUIConfig(
-                    text = "You're Offline",
+                    text = stringResource(R.string.banner_offline),
                     bgColor = Color(0xFFD32F2F),
                     icon = Icons.Filled.WifiOff,
                     iconColor = Color.White
                 )
                 NetworkBannerType.BACK_ONLINE -> BannerUIConfig(
-                    text = "Back Online",
+                    text = stringResource(R.string.banner_back_online),
                     bgColor = Color(0xFF388E3C),
                     icon = Icons.Filled.Wifi,
                     iconColor = Color.White
                 )
                 NetworkBannerType.WEAK_CONNECTION -> BannerUIConfig(
-                    text = "Weak Connection",
+                    text = stringResource(R.string.banner_weak_connection),
                     bgColor = Color(0xFFF57C00),
                     icon = Icons.Filled.Warning,
                     iconColor = Color.White

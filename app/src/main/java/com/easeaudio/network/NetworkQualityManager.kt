@@ -112,6 +112,9 @@ class NetworkQualityManager(private val context: Context) {
                         25000
                     )
                 }
+                // Bug #9: Check bandwidth BEFORE isMetered so that fast 5G on a metered
+                // plan is not incorrectly downgraded. On most phones all cellular is metered,
+                // so the old isMetered branch would always fire first, overriding the fast-path.
                 linkDownstreamKbps > 5000 -> {
                     Quadruple(
                         QualityLevel.BEST_QUALITY_HD,
@@ -120,7 +123,16 @@ class NetworkQualityManager(private val context: Context) {
                         35000
                     )
                 }
-                isMetered || linkDownstreamKbps in 1000..5000 -> {
+                linkDownstreamKbps in 1000..5000 -> {
+                    Quadruple(
+                        QualityLevel.BALANCED_ADAPTIVE,
+                        "Cellular (Smooth Buffer)",
+                        20000,
+                        50000
+                    )
+                }
+                isMetered -> {
+                    // Slow metered connection
                     Quadruple(
                         QualityLevel.BALANCED_ADAPTIVE,
                         "Cellular (Smooth Buffer)",

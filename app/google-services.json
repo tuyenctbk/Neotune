@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "770166560462",
+    "project_id": "sentry-hub",
+    "storage_bucket": "sentry-hub.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:770166560462:android:e8a4f23f857caa3aa9229f",
+        "android_client_info": {
+          "package_name": "com.neotune.radio"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDLnK-r8GRpjlWGbwQw-PNzNBAv5umcKTc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -7,38 +7,38 @@
 
     <!-- Outer Tuner Dial Ring -->
     <path
-        android:strokeWidth="2.5"
+        android:strokeWidth="2.0"
         android:strokeColor="#33FFFFFF"
         android:strokeLineCap="round"
-        android:pathData="M 96,96 m -68,0 a 68,68 0 1,0 136,0 a 68,68 0 1,0 -136,0" />
+        android:pathData="M 96,96 m -54,0 a 54,54 0 1,0 108,0 a 54,54 0 1,0 -108,0" />
 
     <!-- Radio / Tuner Fine Graduation Ticks (Dashed Ring) -->
     <path
-        android:strokeWidth="2.0"
+        android:strokeWidth="1.6"
         android:strokeColor="#22FFFFFF"
         android:strokeLineCap="round"
-        android:pathData="M 96,96 m -59,0 a 59,59 0 1,0 118,0 a 59,59 0 1,0 -118,0" />
+        android:pathData="M 96,96 m -47,0 a 47,47 0 1,0 94,0 a 47,47 0 1,0 -94,0" />
 
     <!-- Top Accent Pointer (Orange Tuner Needle at 12 o'clock) -->
     <path
-        android:strokeWidth="4.5"
+        android:strokeWidth="3.6"
         android:strokeColor="#FFA726"
         android:strokeLineCap="round"
-        android:pathData="M 96,21 L 96,33" />
+        android:pathData="M 96,36 L 96,45" />
 
     <!-- Right Accent Pointer (Cyan Tuner Needle at 3 o'clock) -->
     <path
-        android:strokeWidth="4.5"
+        android:strokeWidth="3.6"
         android:strokeColor="#00F0FF"
         android:strokeLineCap="round"
-        android:pathData="M 159,96 L 171,96" />
+        android:pathData="M 147,96 L 156,96" />
 
     <!-- Central Sleek Bold Letter 'N' (Drawn as a single continuous line for perfect joints) -->
     <path
-        android:strokeWidth="15.0"
+        android:strokeWidth="12.0"
         android:strokeColor="#FFFFFF"
         android:strokeLineCap="round"
         android:strokeLineJoin="round"
-        android:pathData="M 71,125 L 71,67 L 121,125 L 121,67" />
+        android:pathData="M 76,119.2 L 76,72.8 L 116,119.2 L 116,72.8" />
 
 </vector>

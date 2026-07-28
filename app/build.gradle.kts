@@ -17,7 +17,7 @@ android {
         applicationId = "com.neotune.radio"
         minSdk = 24
         targetSdk = 35
-        versionCode = 1
+        versionCode = 3
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -54,8 +54,10 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 
-    kotlinOptions {
-        jvmTarget = "17"
+    kotlin {
+        compilerOptions {
+            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
+        }
     }
 
     buildFeatures {
@@ -84,8 +86,12 @@ dependencies {
     implementation(libs.androidx.room.ktx)
     ksp(libs.androidx.room.compiler)
 
-    // Media3 ExoPlayer
+    // Media3 ExoPlayer — all stream-format extensions must be declared explicitly;
+    // DefaultMediaSourceFactory resolves them via reflection at runtime and will throw
+    // ClassNotFoundException if the module is absent from the APK.
     implementation(libs.androidx.media3.exoplayer)
+    implementation(libs.androidx.media3.exoplayer.hls)   // HLS (.m3u8) streams
+    implementation(libs.androidx.media3.exoplayer.dash)  // DASH (.mpd) streams
     implementation(libs.androidx.media3.session)
     implementation(libs.androidx.media3.ui)
 
@@ -97,13 +103,13 @@ dependencies {
     implementation(libs.kotlinx.coroutines.android)
 
     // AndroidX Splash Screen
-    implementation("androidx.core:core-splashscreen:1.0.1")
+    implementation(libs.androidx.core.splashscreen)
 
     // Google Play Services Ads (AdMob)
-    implementation("com.google.android.gms:play-services-ads:23.6.0")
+    implementation(libs.play.services.ads)
 
     // Firebase Remote Config & Analytics
-    implementation(platform("com.google.firebase:firebase-bom:33.9.0"))
+    implementation(platform(libs.firebase.bom))
     implementation("com.google.firebase:firebase-config-ktx")
     implementation("com.google.firebase:firebase-analytics-ktx")
 

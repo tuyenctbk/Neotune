@@ -424,7 +424,7 @@ fun HomeScreen(
                             ) {
                                 Column(modifier = Modifier.weight(1f)) {
                                     Text(
-                                        text = "FEATURED STATION",
+                                        text = stringResource(R.string.featured_station),
                                         style = MaterialTheme.typography.labelMedium,
                                         color = TextMuted,
                                         fontWeight = FontWeight.Bold
@@ -770,7 +770,7 @@ fun AppearanceSelectionScreen(
                             color = TextPrimary
                         )
                         Text(
-                            text = "Giao diện & Tông màu ấm cúng cho không gian của bạn",
+                            text = stringResource(R.string.appearance_subtitle),
                             style = MaterialTheme.typography.bodyMedium,
                             color = TextSecondary
                         )
@@ -791,13 +791,13 @@ fun AppearanceSelectionScreen(
                     item {
                         Column {
                             Text(
-                                text = "☕ CAFE & NHÀ HÀNG (TÔNG ẤM, SANG)",
+                                text = stringResource(R.string.theme_section_cafe),
                                 style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold, letterSpacing = 0.5.sp),
                                 color = NeonPink,
                                 modifier = Modifier.padding(bottom = 4.dp)
                             )
                             Text(
-                                text = "Giao diện tông ấm dịu mắt, không gây chói cho thực khách, lý tưởng làm nhạc nền",
+                                text = stringResource(R.string.theme_section_cafe_desc),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = TextMuted,
                                 modifier = Modifier.padding(bottom = 12.dp)
@@ -812,13 +812,13 @@ fun AppearanceSelectionScreen(
                     item {
                         Column {
                             Text(
-                                text = "✨ TỐI GIẢN & TINH TẾ (STANDARD)",
+                                text = stringResource(R.string.theme_section_standard),
                                 style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold, letterSpacing = 0.5.sp),
                                 color = NeonCyan,
                                 modifier = Modifier.padding(top = 12.dp, bottom = 4.dp)
                             )
                             Text(
-                                text = "Thiết kế chuẩn mực, thanh lịch cho mọi nhu cầu thưởng thức âm nhạc hàng ngày",
+                                text = stringResource(R.string.theme_section_standard_desc),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = TextMuted,
                                 modifier = Modifier.padding(bottom = 12.dp)
@@ -833,13 +833,13 @@ fun AppearanceSelectionScreen(
                     item {
                         Column {
                             Text(
-                                text = "⚡ TRẺ TRUNG & CÁ TÍNH (YOUTH)",
+                                text = stringResource(R.string.theme_section_youth),
                                 style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold, letterSpacing = 0.5.sp),
                                 color = NeonPurple,
                                 modifier = Modifier.padding(top = 12.dp, bottom = 4.dp)
                             )
                             Text(
-                                text = "Năng động, đậm chất nghệ thuật, phá cách cho không gian trẻ trung",
+                                text = stringResource(R.string.theme_section_youth_desc),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = TextMuted,
                                 modifier = Modifier.padding(bottom = 12.dp)
@@ -902,7 +902,7 @@ fun ThemeSelectionCard(
                                 .padding(horizontal = 6.dp, vertical = 2.dp)
                         ) {
                             Text(
-                                text = "Đang dùng",
+                                text = stringResource(R.string.in_use),
                                 style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
                                 color = theme.primary
                             )

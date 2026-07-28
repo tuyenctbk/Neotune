@@ -3,7 +3,6 @@ package com.easeaudio.service
 import android.app.PendingIntent
 import android.content.Context
 import com.easeaudio.R
-import android.content.Intent
 import android.net.Uri
 import android.util.Log
 import androidx.annotation.OptIn
@@ -18,21 +17,16 @@ import androidx.media3.exoplayer.DefaultLoadControl
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.session.MediaSession
 import androidx.media3.session.SessionError
-import androidx.media3.session.SessionResult
 import com.easeaudio.data.RadioStation
 import com.easeaudio.firebase.FirebaseConfigManager
 import com.easeaudio.network.NetworkQualityManager
 import com.easeaudio.network.NetworkStatus
-import com.easeaudio.network.QualityLevel
+import android.os.Build
+import kotlin.random.Random
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-
-import android.net.wifi.WifiManager
-import android.os.PowerManager
-import android.os.Build
-import androidx.core.content.ContextCompat
 
 class RadioPlayerManager(private val context: Context) {
     private val attributionContext: Context by lazy {
@@ -165,7 +159,10 @@ class RadioPlayerManager(private val context: Context) {
                         _isPlaying.value = isPlayingNow
                         _isLoading.value = false
                         if (isPlayingNow) {
-                            startForegroundService()
+                            // Bug #3/#5: Do NOT call startForegroundService() here.
+                            // MediaSessionService owns the foreground notification lifecycle.
+                            // Calling startService() from inside the manager bypasses that,
+                            // creating a foreground-service-without-notification window (ANR risk).
                             acquireLocks()
                             startWaveAnimation()
                             _currentStation.value?.let { current ->
@@ -286,7 +283,7 @@ class RadioPlayerManager(private val context: Context) {
                 Log.d(TAG, "Network condition updated: ${status.label}")
                 // If currently playing and network recovers or changes, ensure continuity
                 if (_isPlaying.value && !status.isConnected) {
-                    _playbackError.value = "Waiting for network reconnection..."
+                    _playbackError.value = context.getString(R.string.waiting_network_reconnect)
                 } else if (_isPlaying.value && status.isConnected && _playbackError.value != null) {
                     _playbackError.value = null
                 }
@@ -299,7 +296,8 @@ class RadioPlayerManager(private val context: Context) {
         _playbackError.value = null
         _isLoading.value = true
         _streamTitle.value = station.name
-        startForegroundService()
+        // Bug #5: Removed startForegroundService() call. MediaSessionService handles
+        // starting itself when the MediaSession becomes active via ExoPlayer.play().
 
         exoPlayer?.let { player ->
             val mediaMetadata = MediaMetadata.Builder()
@@ -324,7 +322,10 @@ class RadioPlayerManager(private val context: Context) {
             if (player.isPlaying) {
                 player.pause()
             } else {
-                if (player.playbackState == Player.STATE_ENDED || player.mediaItemCount == 0 || _playbackError.value != null) {
+                // Bug #6: mediaItemCount is always >= 1 after the first playStation() call
+                // because ExoPlayer retains the last item. The correct sentinel for
+                // "nothing has ever been played" is _currentStation.value == null.
+                if (_currentStation.value == null || player.playbackState == Player.STATE_ENDED || _playbackError.value != null) {
                     _currentStation.value?.let { playStation(it) }
                 } else {
                     player.play()
@@ -369,13 +370,16 @@ class RadioPlayerManager(private val context: Context) {
                 remainingSeconds--
                 _sleepTimerMinutesRemaining.value = (remainingSeconds + 59) / 60
             }
-            // Timer expired -> fade out and stop playback
+            // Timer expired -> fade out and stop playback.
+            // Bug #7: Capture a local reference to avoid accessing a released exoPlayer
+            // across suspension points (delay) if release() is called concurrently.
+            val player = exoPlayer ?: return@launch
             for (i in 10 downTo 0) {
-                exoPlayer?.volume = (_volume.value * (i / 10.0f))
+                player.volume = (_volume.value * (i / 10.0f))
                 delay(150L)
             }
-            exoPlayer?.pause()
-            exoPlayer?.volume = _volume.value
+            player.pause()
+            player.volume = _volume.value
             _sleepTimerMinutesRemaining.value = null
         }
     }
@@ -390,9 +394,8 @@ class RadioPlayerManager(private val context: Context) {
         waveAnimationJob = scope.launch {
             while (isActive && _isPlaying.value) {
                 delay(400L)
-                val newAmplitudes = List(8) {
-                    (0.15f + Math.random().toFloat() * 0.8f)
-                }
+                // Bug #8: Use Kotlin Random instead of Java Math.random()
+                val newAmplitudes = List(8) { 0.15f + Random.nextFloat() * 0.8f }
                 _waveAmplitudes.value = newAmplitudes
             }
         }
@@ -403,14 +406,11 @@ class RadioPlayerManager(private val context: Context) {
         _waveAmplitudes.value = List(8) { 0.15f }
     }
 
-    private fun startForegroundService() {
-        try {
-            val serviceIntent = Intent(context, RadioPlaybackService::class.java)
-            context.startService(serviceIntent)
-        } catch (e: Exception) {
-            Log.e(TAG, "Failed to start RadioPlaybackService: ${e.message}")
-        }
-    }
+    // startForegroundService() removed (bug #3/#5).
+    // MediaSessionService (RadioPlaybackService) starts itself when the MediaSession
+    // becomes active and manages its own foreground notification via ExoPlayer's
+    // DefaultMediaNotificationProvider. Manually calling startService() here bypassed
+    // that, creating a foreground-service-without-notification ANR window on API 26+.
 
     private fun acquireLocks() {
         // Handled by ExoPlayer C.WAKE_MODE_NETWORK
@@ -499,22 +499,43 @@ class RadioPlayerManager(private val context: Context) {
         }
     }
 
+    /**
+     * Bug #4: The previous implementation used GET, which causes the server to start
+     * streaming the audio body. For radio streams (infinite body), this hangs until the
+     * readTimeout fires on every single check — effectively always waiting 3 seconds.
+     *
+     * Fix: Try HEAD first (no body transferred). Fall back to GET with a tiny readTimeout
+     * for servers that reject HEAD (some ICY/Shoutcast servers return 400/405 for HEAD).
+     */
     private suspend fun checkStreamUrlReachable(urlStr: String): Boolean = withContext(Dispatchers.IO) {
-        var connection: java.net.HttpURLConnection? = null
-        try {
-            val url = java.net.URL(urlStr)
-            connection = url.openConnection() as java.net.HttpURLConnection
-            connection.requestMethod = "GET"
-            connection.connectTimeout = 3000
-            connection.readTimeout = 3000
-            
-            val responseCode = connection.responseCode
-            responseCode in 200..399
-        } catch (e: Exception) {
-            Log.d(TAG, "Silent check failed for $urlStr: ${e.message}")
-            false
-        } finally {
-            connection?.disconnect()
+        fun tryMethod(method: String): Int? {
+            var connection: java.net.HttpURLConnection? = null
+            return try {
+                val url = java.net.URL(urlStr)
+                connection = url.openConnection() as java.net.HttpURLConnection
+                connection.requestMethod = method
+                connection.connectTimeout = 5000
+                // HEAD: no body; GET: read nothing (just need response code)
+                connection.readTimeout = if (method == "HEAD") 5000 else 1000
+                connection.instanceFollowRedirects = true
+                connection.responseCode
+            } catch (e: Exception) {
+                Log.d(TAG, "Silent check [$method] failed for $urlStr: ${e.message}")
+                null
+            } finally {
+                connection?.disconnect()
+            }
+        }
+
+        val headCode = tryMethod("HEAD")
+        return@withContext when {
+            headCode != null && headCode in 200..399 -> true
+            // Server rejected HEAD (400/405) — fall back to GET with minimal read
+            headCode == null || headCode == 400 || headCode == 405 -> {
+                val getCode = tryMethod("GET")
+                getCode != null && getCode in 200..399
+            }
+            else -> false
         }
     }
 

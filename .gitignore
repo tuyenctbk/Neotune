@@ -15,10 +15,20 @@ captures/
 
 # Local configuration & secrets
 .env.local
+local.properties
+gradlew
+gradlew.bat
+gradle/wrapper/
 
 # Keystores & sensitive keys
 *.jks
 *.p12
+
+# Agent artifacts
+.artifacts/
+
+# Project utility scripts
+*.py
 
 # OS files
 .DS_Store

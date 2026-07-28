@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Android Auto media app descriptor.
+  This file declares Neotune as a media (audio) application for Android Auto.
+  The MediaBrowserServiceCompat / MediaSessionService wiring in RadioPlaybackService
+  means Auto will automatically discover and connect to the app's MediaSession.
+
+  Reference: https://developer.android.com/training/cars/media
+-->
+<automotiveApp>
+    <uses name="media" />
+</automotiveApp>
