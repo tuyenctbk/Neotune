@@ -9,19 +9,28 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material.icons.filled.Wifi
+import androidx.compose.material.icons.filled.WifiOff
+import androidx.compose.material.icons.filled.SignalCellularAlt
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.easeaudio.network.QualityLevel
 import com.easeaudio.service.FirebaseManager
 import com.easeaudio.ui.components.*
 import com.easeaudio.ui.screens.FavoritesScreen
@@ -78,7 +87,9 @@ fun MainAppContent(viewModel: RadioViewModel) {
     val activeEqPreset by viewModel.activeEqPreset.collectAsState()
 
     val isLoadingMore by viewModel.isLoadingMore.collectAsState()
+    val isDiscoveringOnline by viewModel.isDiscoveringOnline.collectAsState()
     val canLoadMore by viewModel.canLoadMore.collectAsState()
+    val failedStationIds by viewModel.failedStationIds.collectAsState()
 
     val showSleepTimerDialog by viewModel.showSleepTimerDialog.collectAsState()
     val showEqualizerDialog by viewModel.showEqualizerDialog.collectAsState()
@@ -86,6 +97,42 @@ fun MainAppContent(viewModel: RadioViewModel) {
 
     var isFullPlayerVisible by remember { mutableStateOf(false) }
     val snackbarHostState = remember { SnackbarHostState() }
+
+    // Network notification banner state
+    var previousConnected by remember { mutableStateOf<Boolean?>(null) }
+    var activeBanner by remember { mutableStateOf(NetworkBannerType.NONE) }
+
+    LaunchedEffect(networkStatus) {
+        val connected = networkStatus.isConnected
+        val quality = networkStatus.qualityLevel
+        
+        if (previousConnected != null) {
+            if (!connected) {
+                activeBanner = NetworkBannerType.OFFLINE
+            } else if (connected && previousConnected == false) {
+                activeBanner = NetworkBannerType.BACK_ONLINE
+                kotlinx.coroutines.delay(3000)
+                if (activeBanner == NetworkBannerType.BACK_ONLINE) {
+                    activeBanner = NetworkBannerType.NONE
+                }
+            } else if (connected && quality == QualityLevel.SAVER_SMOOTH) {
+                activeBanner = NetworkBannerType.WEAK_CONNECTION
+                kotlinx.coroutines.delay(3000)
+                if (activeBanner == NetworkBannerType.WEAK_CONNECTION) {
+                    activeBanner = NetworkBannerType.NONE
+                }
+            } else {
+                if (activeBanner == NetworkBannerType.WEAK_CONNECTION) {
+                    activeBanner = NetworkBannerType.NONE
+                }
+            }
+        } else {
+            if (!connected) {
+                activeBanner = NetworkBannerType.OFFLINE
+            }
+        }
+        previousConnected = connected
+    }
 
     // Show error toast/snackbar if stream error occurs
     LaunchedEffect(playbackError) {
@@ -129,6 +176,9 @@ fun MainAppContent(viewModel: RadioViewModel) {
                             recentStations = recentStations,
                             currentStation = currentStation,
                             isPlaying = isPlaying,
+                            isLoading = isLoading,
+                            isDiscoveringOnline = isDiscoveringOnline,
+                            failedStationIds = failedStationIds,
                             searchQuery = searchQuery,
                             selectedGenre = selectedGenre,
                             availableGenres = viewModel.availableGenres,
@@ -144,7 +194,8 @@ fun MainAppContent(viewModel: RadioViewModel) {
                             onOpenAddStation = { viewModel.setShowAddStationDialog(true) },
                             onOpenSleepTimer = { viewModel.setShowSleepTimerDialog(true) },
                             onOpenEqualizer = { viewModel.setShowEqualizerDialog(true) },
-                            onLoadMore = { viewModel.loadMoreStations() }
+                            onLoadMore = { viewModel.loadMoreStations() },
+                            onRefresh = { viewModel.refreshStations() }
                         )
                     }
 
@@ -153,6 +204,8 @@ fun MainAppContent(viewModel: RadioViewModel) {
                             favoriteStations = favoriteStations,
                             currentStation = currentStation,
                             isPlaying = isPlaying,
+                            isLoading = isLoading,
+                            failedStationIds = failedStationIds,
                             onStationSelect = { station -> viewModel.playStation(station) },
                             onToggleFavorite = { station -> viewModel.toggleFavorite(station) }
                         )
@@ -205,11 +258,15 @@ fun MainAppContent(viewModel: RadioViewModel) {
                 volume = volume,
                 sleepTimerRemaining = sleepTimerRemaining,
                 activeEqPreset = activeEqPreset,
+                playbackError = playbackError,
                 onTogglePlay = { viewModel.togglePlayPause() },
                 onToggleFavorite = { currentStation?.let { viewModel.toggleFavorite(it) } },
                 onVolumeChange = { viewModel.playerManager.setVolume(it) },
                 onOpenSleepTimer = { viewModel.setShowSleepTimerDialog(true) },
                 onOpenEqualizer = { viewModel.setShowEqualizerDialog(true) },
+                onRetryStream = { viewModel.retryCurrentStation() },
+                onPlayNextStation = { viewModel.playNextStation() },
+                onPlayPreviousStation = { viewModel.playPreviousStation() },
                 onBack = { isFullPlayerVisible = false }
             )
         }
@@ -239,5 +296,79 @@ fun MainAppContent(viewModel: RadioViewModel) {
                 onDismiss = { viewModel.setShowAddStationDialog(false) }
             )
         }
+
+        // Floating Network Status Overlay Banner (Graceful overlay)
+        AnimatedVisibility(
+            visible = activeBanner != NetworkBannerType.NONE,
+            enter = androidx.compose.animation.fadeIn() + androidx.compose.animation.slideInVertically { -it },
+            exit = androidx.compose.animation.fadeOut() + androidx.compose.animation.slideOutVertically { -it },
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .padding(top = 56.dp)
+                .zIndex(99f)
+        ) {
+            val config = when (activeBanner) {
+                NetworkBannerType.OFFLINE -> BannerUIConfig(
+                    text = "You're Offline",
+                    bgColor = Color(0xFFD32F2F),
+                    icon = Icons.Filled.WifiOff,
+                    iconColor = Color.White
+                )
+                NetworkBannerType.BACK_ONLINE -> BannerUIConfig(
+                    text = "Back Online",
+                    bgColor = Color(0xFF388E3C),
+                    icon = Icons.Filled.Wifi,
+                    iconColor = Color.White
+                )
+                NetworkBannerType.WEAK_CONNECTION -> BannerUIConfig(
+                    text = "Weak Connection",
+                    bgColor = Color(0xFFF57C00),
+                    icon = Icons.Filled.Warning,
+                    iconColor = Color.White
+                )
+                else -> BannerUIConfig("", Color.Transparent, Icons.Filled.Wifi, Color.White)
+            }
+
+            if (config.text.isNotEmpty()) {
+                Card(
+                    colors = CardDefaults.cardColors(containerColor = config.bgColor),
+                    shape = RoundedCornerShape(24.dp),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
+                    modifier = Modifier
+                        .padding(horizontal = 24.dp)
+                        .testTag("network_status_overlay_pill")
+                ) {
+                    Row(
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Icon(
+                            imageVector = config.icon,
+                            contentDescription = null,
+                            tint = config.iconColor,
+                            modifier = Modifier.size(16.dp)
+                        )
+                        Text(
+                            text = config.text,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = Color.White,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
+                }
+            }
+        }
     }
 }
+
+enum class NetworkBannerType {
+    OFFLINE, BACK_ONLINE, WEAK_CONNECTION, NONE
+}
+
+private data class BannerUIConfig(
+    val text: String,
+    val bgColor: Color,
+    val icon: androidx.compose.ui.graphics.vector.ImageVector,
+    val iconColor: Color
+)

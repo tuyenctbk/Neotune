@@ -56,4 +56,9 @@
     <string name="close">Close</string>
     <string name="add_station_prompt">Couldn\'t find what you\'re looking for? Add your custom stream below.</string>
     <string name="loading_more_stations">Loading more stations...</string>
+    <string name="buffering_stream">Buffering stream...</string>
+    <string name="stream_unreachable">Stream Unreachable</string>
+    <string name="stream_offline_notice">Station stream is currently unreachable.</string>
+    <string name="retry_stream">Retry</string>
+    <string name="next_station">Next Station</string>
 </resources>

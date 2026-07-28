@@ -21,20 +21,19 @@ object RadioBrowserService {
     ): List<RadioStation> = withContext(Dispatchers.IO) {
         val stations = mutableListOf<RadioStation>()
         try {
-            val urlString = when {
-                searchQuery.isNotBlank() -> {
-                    val encoded = URLEncoder.encode(searchQuery, "UTF-8")
-                    "$BASE_URL/byname/$encoded?offset=$offset&limit=$limit&order=clickcount&reverse=true&hidebroken=true"
-                }
-                genreTag.isNotBlank() && genreTag != "All" -> {
-                    val encoded = URLEncoder.encode(genreTag.lowercase(), "UTF-8")
-                    "$BASE_URL/bytag/$encoded?offset=$offset&limit=$limit&order=clickcount&reverse=true&hidebroken=true"
-                }
-                else -> {
-                    "$BASE_URL/search?offset=$offset&limit=$limit&order=clickcount&reverse=true&hidebroken=true"
-                }
+            val mappedTag = mapGenreToTag(genreTag)
+            val urlBuilder = StringBuilder("$BASE_URL/search?offset=$offset&limit=$limit&order=clickcount&reverse=true&hidebroken=true")
+            
+            if (searchQuery.isNotBlank()) {
+                val encodedQuery = URLEncoder.encode(searchQuery.trim(), "UTF-8")
+                urlBuilder.append("&name=").append(encodedQuery)
+            }
+            if (mappedTag.isNotBlank()) {
+                val encodedTag = URLEncoder.encode(mappedTag, "UTF-8")
+                urlBuilder.append("&tag=").append(encodedTag)
             }
 
+            val urlString = urlBuilder.toString()
             val url = URL(urlString)
             val connection = (url.openConnection() as HttpURLConnection).apply {
                 requestMethod = "GET"
@@ -81,6 +80,20 @@ object RadioBrowserService {
             Log.e(TAG, "Failed to fetch online radio stations: ${e.message}")
         }
         return@withContext stations
+    }
+
+    private fun mapGenreToTag(genreTag: String): String {
+        return when (genreTag) {
+            "News & Reports" -> "news"
+            "Lo-Fi & Chill" -> "chill"
+            "Jazz" -> "jazz"
+            "Rock" -> "rock"
+            "Classical" -> "classical"
+            "Ambient" -> "ambient"
+            "EDM" -> "edm"
+            "All", "Custom" -> ""
+            else -> genreTag.lowercase().replace("&", "").trim()
+        }
     }
 
     private fun getRandomDefaultImage(tags: String): String {

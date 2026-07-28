@@ -56,4 +56,9 @@
     <string name="close">Đóng</string>
     <string name="add_station_prompt">Không tìm thấy đài mong muốn? Thêm link phát trực tiếp của bạn bên dưới.</string>
     <string name="loading_more_stations">Đang tải thêm đài radio...</string>
+    <string name="buffering_stream">Đang tải bộ đệm...</string>
+    <string name="stream_unreachable">Không kết nối được</string>
+    <string name="stream_offline_notice">Tín hiệu đài hiện tạm thời gián đoạn.</string>
+    <string name="retry_stream">Thử lại</string>
+    <string name="next_station">Đài tiếp</string>
 </resources>

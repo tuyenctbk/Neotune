@@ -1,6 +1,7 @@
 package com.easeaudio.ui.screens
 
 import androidx.compose.animation.core.*
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -42,11 +43,15 @@ fun PlayerScreen(
     volume: Float,
     sleepTimerRemaining: Int?,
     activeEqPreset: String,
+    playbackError: String? = null,
     onTogglePlay: () -> Unit,
     onToggleFavorite: () -> Unit,
     onVolumeChange: (Float) -> Unit,
     onOpenSleepTimer: () -> Unit,
     onOpenEqualizer: () -> Unit,
+    onRetryStream: () -> Unit = {},
+    onPlayNextStation: () -> Unit = {},
+    onPlayPreviousStation: () -> Unit = {},
     onBack: () -> Unit
 ) {
     if (station == null) {
@@ -122,7 +127,9 @@ fun PlayerScreen(
 
             Column(
                 modifier = Modifier
-                    .fillMaxSize()
+                    .fillMaxHeight()
+                    .widthIn(max = 500.dp)
+                    .align(Alignment.TopCenter)
                     .padding(horizontal = 24.dp)
                     .verticalScroll(rememberScrollState()),
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -149,10 +156,23 @@ fun PlayerScreen(
                         Box(
                             modifier = Modifier
                                 .fillMaxSize()
-                                .background(DarkBackground.copy(alpha = 0.6f)),
+                                .background(DarkBackground.copy(alpha = 0.65f)),
                             contentAlignment = Alignment.Center
                         ) {
-                            CircularProgressIndicator(color = NeonCyan)
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                CircularProgressIndicator(
+                                    color = NeonCyan,
+                                    strokeWidth = 3.dp,
+                                    modifier = Modifier.size(36.dp)
+                                )
+                                Spacer(modifier = Modifier.height(8.dp))
+                                Text(
+                                    text = stringResource(R.string.buffering_stream),
+                                    color = NeonCyan,
+                                    style = MaterialTheme.typography.labelLarge,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
                         }
                     }
                 }
@@ -174,7 +194,7 @@ fun PlayerScreen(
                     Spacer(modifier = Modifier.height(4.dp))
 
                     Text(
-                        text = streamTitle ?: station.genre,
+                        text = if (isLoading) stringResource(R.string.buffering_stream) else (streamTitle ?: station.genre),
                         style = MaterialTheme.typography.titleSmall,
                         color = NeonCyan,
                         textAlign = TextAlign.Center,
@@ -250,23 +270,119 @@ fun PlayerScreen(
                     )
                 }
 
+                if (playbackError != null) {
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Surface(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(12.dp)),
+                        color = Color(0x22FF5252),
+                        border = BorderStroke(1.dp, Color(0xFFFF5252))
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(12.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(
+                                    imageVector = Icons.Filled.Warning,
+                                    contentDescription = null,
+                                    tint = Color(0xFFFF5252),
+                                    modifier = Modifier.size(18.dp)
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(
+                                    text = stringResource(R.string.stream_offline_notice),
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = TextPrimary,
+                                    textAlign = TextAlign.Center
+                                )
+                            }
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                Button(
+                                    onClick = onRetryStream,
+                                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF5252)),
+                                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp),
+                                    shape = RoundedCornerShape(8.dp),
+                                    modifier = Modifier.height(32.dp)
+                                ) {
+                                    Icon(Icons.Filled.Refresh, contentDescription = null, modifier = Modifier.size(14.dp))
+                                    Spacer(modifier = Modifier.width(4.dp))
+                                    Text(stringResource(R.string.retry_stream), fontSize = 12.sp)
+                                }
+                                OutlinedButton(
+                                    onClick = onPlayNextStation,
+                                    colors = ButtonDefaults.outlinedButtonColors(contentColor = NeonCyan),
+                                    border = BorderStroke(1.dp, NeonCyan),
+                                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp),
+                                    shape = RoundedCornerShape(8.dp),
+                                    modifier = Modifier.height(32.dp)
+                                ) {
+                                    Icon(Icons.Filled.SkipNext, contentDescription = null, modifier = Modifier.size(14.dp))
+                                    Spacer(modifier = Modifier.width(4.dp))
+                                    Text(stringResource(R.string.next_station), fontSize = 12.sp)
+                                }
+                            }
+                        }
+                    }
+                }
+
                 Spacer(modifier = Modifier.height(12.dp))
 
-                // Play / Pause Transport Button
-                FloatingActionButton(
-                    onClick = onTogglePlay,
-                    containerColor = NeonCyan,
-                    contentColor = DarkBackground,
-                    shape = CircleShape,
-                    modifier = Modifier
-                        .size(68.dp)
-                        .testTag("btn_player_toggle_play")
+                // Transport Row (Previous, Play/Pause, Next)
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(24.dp)
                 ) {
-                    Icon(
-                        imageVector = if (isPlaying) Icons.Filled.Pause else Icons.Filled.PlayArrow,
-                        contentDescription = if (isPlaying) "Pause" else "Play",
-                        modifier = Modifier.size(36.dp)
-                    )
+                    IconButton(
+                        onClick = onPlayPreviousStation,
+                        modifier = Modifier.size(48.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.SkipPrevious,
+                            contentDescription = "Previous Station",
+                            tint = TextPrimary,
+                            modifier = Modifier.size(32.dp)
+                        )
+                    }
+
+                    // Play / Pause Transport Button
+                    FloatingActionButton(
+                        onClick = onTogglePlay,
+                        containerColor = NeonCyan,
+                        contentColor = DarkBackground,
+                        shape = CircleShape,
+                        modifier = Modifier
+                            .size(68.dp)
+                            .testTag("btn_player_toggle_play")
+                    ) {
+                        if (isLoading) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(30.dp),
+                                color = DarkBackground,
+                                strokeWidth = 3.dp
+                            )
+                        } else {
+                            Icon(
+                                imageVector = if (isPlaying) Icons.Filled.Pause else Icons.Filled.PlayArrow,
+                                contentDescription = if (isPlaying) "Pause" else "Play",
+                                modifier = Modifier.size(36.dp)
+                            )
+                        }
+                    }
+
+                    IconButton(
+                        onClick = onPlayNextStation,
+                        modifier = Modifier.size(48.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.SkipNext,
+                            contentDescription = "Next Station",
+                            tint = TextPrimary,
+                            modifier = Modifier.size(32.dp)
+                        )
+                    }
                 }
 
                 Spacer(modifier = Modifier.height(12.dp))

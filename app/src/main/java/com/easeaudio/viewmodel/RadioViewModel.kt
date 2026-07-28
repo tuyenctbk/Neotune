@@ -14,8 +14,8 @@ import java.util.UUID
 
 class RadioViewModel(application: Application) : AndroidViewModel(application) {
 
-    val repository: RadioRepository
-    val playerManager: RadioPlayerManager
+    val repository: RadioRepository = RadioRepository(RadioDatabase.getDatabase(application).radioDao())
+    val playerManager: RadioPlayerManager = RadioPlayerManager(application)
 
     private val _searchQuery = MutableStateFlow("")
     val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()
@@ -47,31 +47,6 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
     val canLoadMore: StateFlow<Boolean> = _canLoadMore.asStateFlow()
 
     private val pageSize = 40
-
-    // Equalizer state
-    private val _activeEqPreset = MutableStateFlow("Balanced")
-    val activeEqPreset: StateFlow<String> = _activeEqPreset.asStateFlow()
-
-    val eqPresets = listOf("Balanced", "Bass Boost", "Chill Lounge", "Acoustic", "Vocal Focus")
-
-    // UI Dialog visibility states
-    private val _showSleepTimerDialog = MutableStateFlow(false)
-    val showSleepTimerDialog: StateFlow<Boolean> = _showSleepTimerDialog.asStateFlow()
-
-    private val _showEqualizerDialog = MutableStateFlow(false)
-    val showEqualizerDialog: StateFlow<Boolean> = _showEqualizerDialog.asStateFlow()
-
-    private val _showAddStationDialog = MutableStateFlow(false)
-    val showAddStationDialog: StateFlow<Boolean> = _showAddStationDialog.asStateFlow()
-
-    init {
-        val database = RadioDatabase.getDatabase(application)
-        repository = RadioRepository(database.radioDao())
-        playerManager = RadioPlayerManager(application)
-
-        // Trigger initial online discovery for top global working stations
-        discoverStationsOnline("", "All")
-    }
 
     @OptIn(FlowPreview::class)
     val stations: StateFlow<List<RadioStation>> = combine(
@@ -111,14 +86,55 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
             val matchesGenre = when (genre) {
                 "All" -> true
                 "Custom" -> station.isCustom
-                "News & Reports" -> station.genre.contains("News", ignoreCase = true) || station.genre.contains("Report", ignoreCase = true) || station.genre.contains("Talk", ignoreCase = true)
-                "Lo-Fi & Chill" -> station.genre.contains("Lo-Fi", ignoreCase = true) || station.genre.contains("Chill", ignoreCase = true)
+                "News & Reports" -> station.genre.contains("News", ignoreCase = true) ||
+                        station.genre.contains("Report", ignoreCase = true) ||
+                        station.genre.contains("Talk", ignoreCase = true) ||
+                        station.genre.contains("Info", ignoreCase = true) ||
+                        station.genre.contains("Politic", ignoreCase = true) ||
+                        station.genre.contains("Speech", ignoreCase = true)
+                "Lo-Fi & Chill" -> station.genre.contains("Lo-Fi", ignoreCase = true) ||
+                        station.genre.contains("Chill", ignoreCase = true) ||
+                        station.genre.contains("Lofi", ignoreCase = true) ||
+                        station.genre.contains("Lounge", ignoreCase = true) ||
+                        station.genre.contains("Ambient", ignoreCase = true)
+                "Jazz" -> station.genre.contains("Jazz", ignoreCase = true)
+                "Rock" -> station.genre.contains("Rock", ignoreCase = true)
+                "Classical" -> station.genre.contains("Classic", ignoreCase = true) || station.genre.contains("Piano", ignoreCase = true)
+                "Ambient" -> station.genre.contains("Ambient", ignoreCase = true) || station.genre.contains("Drone", ignoreCase = true)
+                "EDM" -> station.genre.contains("EDM", ignoreCase = true) || station.genre.contains("Dance", ignoreCase = true) || station.genre.contains("House", ignoreCase = true) || station.genre.contains("Techno", ignoreCase = true)
                 else -> station.genre.contains(genre, ignoreCase = true)
             }
 
             matchesQuery && matchesGenre
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    // Equalizer state
+    private val _activeEqPreset = MutableStateFlow("Balanced")
+    val activeEqPreset: StateFlow<String> = _activeEqPreset.asStateFlow()
+
+    val eqPresets = listOf("Balanced", "Bass Boost", "Chill Lounge", "Acoustic", "Vocal Focus")
+
+    // UI Dialog visibility states
+    private val _showSleepTimerDialog = MutableStateFlow(false)
+    val showSleepTimerDialog: StateFlow<Boolean> = _showSleepTimerDialog.asStateFlow()
+
+    private val _showEqualizerDialog = MutableStateFlow(false)
+    val showEqualizerDialog: StateFlow<Boolean> = _showEqualizerDialog.asStateFlow()
+
+    private val _showAddStationDialog = MutableStateFlow(false)
+    val showAddStationDialog: StateFlow<Boolean> = _showAddStationDialog.asStateFlow()
+
+    init {
+        // Trigger initial online discovery for top global working stations
+        discoverStationsOnline("", "All")
+
+        viewModelScope.launch {
+            stations.collect { list ->
+                playerManager.updateStationList(list)
+            }
+        }
+    }
 
     val favoriteStations: StateFlow<List<RadioStation>> = repository.getFavoriteStations()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
@@ -136,10 +152,15 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
         discoverStationsOnline(_searchQuery.value, genre)
     }
 
+    fun refreshStations() {
+        discoverStationsOnline(_searchQuery.value, _selectedGenre.value)
+    }
+
     private fun discoverStationsOnline(query: String, genre: String) {
         viewModelScope.launch {
             _isDiscoveringOnline.value = true
             _canLoadMore.value = true
+            _onlineDiscoveredStations.value = emptyList()
             try {
                 val results = repository.discoverOnlineStations(
                     query = query,
@@ -223,6 +244,22 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
 
     val networkStatus = playerManager.networkStatus
     val remoteConfig = playerManager.remoteConfig
+    val failedStationIds = playerManager.failedStationIds
+    val playbackError = playerManager.playbackError
+
+    fun retryCurrentStation() {
+        playerManager.retryCurrentStation()
+    }
+
+    fun playNextStation() {
+        val currentList = stations.value
+        playerManager.playNextStation(currentList)
+    }
+
+    fun playPreviousStation() {
+        val currentList = stations.value
+        playerManager.playPreviousStation(currentList)
+    }
 
     fun toggleSimulatedAds(enabled: Boolean) {
         playerManager.firebaseConfigManager.toggleSimulatedAds(enabled)

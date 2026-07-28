@@ -26,6 +26,8 @@ fun FavoritesScreen(
     favoriteStations: List<RadioStation>,
     currentStation: RadioStation?,
     isPlaying: Boolean,
+    isLoading: Boolean = false,
+    failedStationIds: Set<String> = emptySet(),
     onStationSelect: (RadioStation) -> Unit,
     onToggleFavorite: (RadioStation) -> Unit,
     modifier: Modifier = Modifier
@@ -34,11 +36,17 @@ fun FavoritesScreen(
         modifier = modifier.fillMaxSize(),
         containerColor = DarkBackground
     ) { innerPadding ->
-        Column(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding)
+                .padding(innerPadding),
+            contentAlignment = Alignment.TopCenter
         ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .widthIn(max = 800.dp)
+            ) {
             // Header
             Row(
                 modifier = Modifier
@@ -99,10 +107,13 @@ fun FavoritesScreen(
                 ) {
                     items(favoriteStations, key = { it.id }) { station ->
                         val isSelected = currentStation?.id == station.id
+                        val isUnreachable = failedStationIds.contains(station.id)
                         StationCard(
                             station = station,
                             isSelected = isSelected,
                             isPlaying = isSelected && isPlaying,
+                            isLoading = isSelected && isLoading,
+                            isUnreachable = isUnreachable,
                             onSelect = { onStationSelect(station) },
                             onToggleFavorite = { onToggleFavorite(station) }
                         )
@@ -111,4 +122,5 @@ fun FavoritesScreen(
             }
         }
     }
+}
 }

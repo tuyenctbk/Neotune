@@ -23,6 +23,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
+import com.easeaudio.R
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -110,9 +112,9 @@ fun MiniPlayer(
                         }
 
                         Text(
-                            text = streamTitle ?: station.genre,
+                            text = if (isLoading) stringResource(R.string.buffering_stream) else (streamTitle ?: station.genre),
                             style = MaterialTheme.typography.bodyMedium,
-                            color = TextSecondary,
+                            color = if (isLoading) NeonCyan else TextSecondary,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )

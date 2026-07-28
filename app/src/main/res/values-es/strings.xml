@@ -56,4 +56,9 @@
     <string name="close">Cerrar</string>
     <string name="add_station_prompt">¿No encuentras lo que buscas? Añade tu transmisión personalizada.</string>
     <string name="loading_more_stations">Cargando más emisoras...</string>
+    <string name="buffering_stream">Cargando búfer...</string>
+    <string name="stream_unreachable">Emisora no disponible</string>
+    <string name="stream_offline_notice">La señal de la emisora no está disponible por el momento.</string>
+    <string name="retry_stream">Reintentar</string>
+    <string name="next_station">Siguiente emisora</string>
 </resources>

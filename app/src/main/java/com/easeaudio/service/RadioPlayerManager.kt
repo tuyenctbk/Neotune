@@ -16,6 +16,8 @@ import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.DefaultLoadControl
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.session.MediaSession
+import androidx.media3.session.SessionError
+import androidx.media3.session.SessionResult
 import com.easeaudio.data.RadioStation
 import com.easeaudio.firebase.FirebaseConfigManager
 import com.easeaudio.network.NetworkQualityManager
@@ -31,6 +33,11 @@ import android.os.PowerManager
 import androidx.core.content.ContextCompat
 
 class RadioPlayerManager(private val context: Context) {
+
+    companion object {
+        @Volatile
+        var sharedMediaSession: MediaSession? = null
+    }
 
     private val TAG = "RadioPlayerManager"
     private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
@@ -59,6 +66,23 @@ class RadioPlayerManager(private val context: Context) {
     private val _playbackError = MutableStateFlow<String?>(null)
     val playbackError: StateFlow<String?> = _playbackError.asStateFlow()
 
+    private val _failedStationIds = MutableStateFlow<Set<String>>(emptySet())
+    val failedStationIds: StateFlow<Set<String>> = _failedStationIds.asStateFlow()
+
+    private var currentStationList: List<RadioStation> = emptyList()
+
+    private val stationFailureCounts = mutableMapOf<String, Int>()
+    private val nextCheckTime = mutableMapOf<String, Long>()
+    private val knownStations = mutableMapOf<String, RadioStation>()
+    private var silentCheckJob: Job? = null
+
+    fun updateStationList(list: List<RadioStation>) {
+        currentStationList = list
+        list.forEach { station ->
+            knownStations[station.id] = station
+        }
+    }
+
     private val _streamTitle = MutableStateFlow<String?>("Live Audio Stream")
     val streamTitle: StateFlow<String?> = _streamTitle.asStateFlow()
 
@@ -80,6 +104,7 @@ class RadioPlayerManager(private val context: Context) {
     init {
         setupPlayer()
         observeNetworkChanges()
+        startSilentChecking()
     }
 
     @OptIn(UnstableApi::class)
@@ -121,6 +146,11 @@ class RadioPlayerManager(private val context: Context) {
                             acquireLocks()
                             startWaveAnimation()
                             startForegroundService()
+                            _currentStation.value?.let { current ->
+                                if (_failedStationIds.value.contains(current.id)) {
+                                    _failedStationIds.value = _failedStationIds.value - current.id
+                                }
+                            }
                         } else {
                             releaseLocks()
                             stopWaveAnimation()
@@ -136,6 +166,11 @@ class RadioPlayerManager(private val context: Context) {
                             Player.STATE_READY -> {
                                 _isLoading.value = false
                                 _playbackError.value = null
+                                _currentStation.value?.let { current ->
+                                    if (_failedStationIds.value.contains(current.id)) {
+                                        _failedStationIds.value = _failedStationIds.value - current.id
+                                    }
+                                }
                             }
                             Player.STATE_ENDED -> {
                                 _isPlaying.value = false
@@ -162,7 +197,15 @@ class RadioPlayerManager(private val context: Context) {
                         Log.e(TAG, "Playback error: ${error.message}", error)
                         _isLoading.value = false
                         _isPlaying.value = false
-                        _playbackError.value = "Unable to connect to stream. Please check network or try another station."
+                        val isConnected = networkStatus.value.isConnected
+                        if (isConnected) {
+                            _currentStation.value?.let { current ->
+                                _failedStationIds.value = _failedStationIds.value + current.id
+                            }
+                            _playbackError.value = "Unable to connect to stream. Please try retrying or switch station."
+                        } else {
+                            _playbackError.value = "No internet connection. Please check your network."
+                        }
                         stopWaveAnimation()
                     }
                 })
@@ -170,12 +213,50 @@ class RadioPlayerManager(private val context: Context) {
 
         exoPlayer?.let { player ->
             try {
-                mediaSession = MediaSession.Builder(context, player).build()
+                val intent = Intent(context, com.easeaudio.MainActivity::class.java).apply {
+                    flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
+                }
+                val pendingIntent = PendingIntent.getActivity(
+                    context,
+                    0,
+                    intent,
+                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                )
+
+                val mediaSessionCallback = object : MediaSession.Callback {
+                    override fun onPlayerCommandRequest(
+                        session: MediaSession,
+                        controller: MediaSession.ControllerInfo,
+                        playerCommand: Int
+                    ): Int {
+                        if (playerCommand == Player.COMMAND_SEEK_TO_NEXT) {
+                            scope.launch(Dispatchers.Main) {
+                                playNextStation(currentStationList)
+                            }
+                            return SessionError.ERROR_NOT_SUPPORTED
+                        }
+                        if (playerCommand == Player.COMMAND_SEEK_TO_PREVIOUS) {
+                            scope.launch(Dispatchers.Main) {
+                                playPreviousStation(currentStationList)
+                            }
+                            return SessionError.ERROR_NOT_SUPPORTED
+                        }
+                        return super.onPlayerCommandRequest(session, controller, playerCommand)
+                    }
+                }
+
+                mediaSession = MediaSession.Builder(context, player)
+                    .setSessionActivity(pendingIntent)
+                    .setCallback(mediaSessionCallback)
+                    .build().also {
+                        sharedMediaSession = it
+                    }
             } catch (e: Exception) {
                 Log.e(TAG, "Failed to create MediaSession: ${e.message}", e)
             }
         }
     }
+
 
     private fun observeNetworkChanges() {
         scope.launch {
@@ -220,13 +301,33 @@ class RadioPlayerManager(private val context: Context) {
             if (player.isPlaying) {
                 player.pause()
             } else {
-                if (player.playbackState == Player.STATE_ENDED || player.mediaItemCount == 0) {
+                if (player.playbackState == Player.STATE_ENDED || player.mediaItemCount == 0 || _playbackError.value != null) {
                     _currentStation.value?.let { playStation(it) }
                 } else {
                     player.play()
                 }
             }
         }
+    }
+
+    fun retryCurrentStation() {
+        _currentStation.value?.let { playStation(it) }
+    }
+
+    fun playNextStation(stationList: List<RadioStation>) {
+        if (stationList.isEmpty()) return
+        val current = _currentStation.value ?: return playStation(stationList.first())
+        val currentIndex = stationList.indexOfFirst { it.id == current.id }
+        val nextIndex = if (currentIndex >= 0 && currentIndex < stationList.size - 1) currentIndex + 1 else 0
+        playStation(stationList[nextIndex])
+    }
+
+    fun playPreviousStation(stationList: List<RadioStation>) {
+        if (stationList.isEmpty()) return
+        val current = _currentStation.value ?: return playStation(stationList.last())
+        val currentIndex = stationList.indexOfFirst { it.id == current.id }
+        val prevIndex = if (currentIndex > 0) currentIndex - 1 else stationList.size - 1
+        playStation(stationList[prevIndex])
     }
 
     fun setVolume(newVolume: Float) {
@@ -282,7 +383,7 @@ class RadioPlayerManager(private val context: Context) {
     private fun startForegroundService() {
         try {
             val serviceIntent = Intent(context, RadioPlaybackService::class.java)
-            ContextCompat.startForegroundService(context, serviceIntent)
+            context.startService(serviceIntent)
         } catch (e: Exception) {
             Log.e(TAG, "Failed to start RadioPlaybackService: ${e.message}")
         }
@@ -323,12 +424,95 @@ class RadioPlayerManager(private val context: Context) {
         releaseLocks()
         stopWaveAnimation()
         sleepTimerJob?.cancel()
+        silentCheckJob?.cancel()
         networkQualityManager.unregister()
         scope.cancel()
         mediaSession?.release()
         mediaSession = null
+        sharedMediaSession = null
         exoPlayer?.release()
         exoPlayer = null
+    }
+
+    private fun startSilentChecking() {
+        silentCheckJob?.cancel()
+        silentCheckJob = scope.launch(Dispatchers.Default) {
+            val baseIntervalMs = 30_000L // 30 seconds base
+            val maxIntervalMs = 15 * 60 * 1000L // 15 minutes max
+            val checkIntervalMs = 15_000L // check every 15 seconds
+            
+            while (isActive) {
+                delay(checkIntervalMs)
+                
+                // 1. Weak/No internet check protection: skip if completely offline
+                if (!networkStatus.value.isConnected) {
+                    Log.d(TAG, "No internet connection. Skipping silent checking.")
+                    continue
+                }
+                
+                val failedIds = _failedStationIds.value
+                if (failedIds.isEmpty()) continue
+                
+                val currentTime = System.currentTimeMillis()
+                val idsToVerify = failedIds.filter { id ->
+                    currentTime >= (nextCheckTime[id] ?: 0L)
+                }
+                
+                if (idsToVerify.isEmpty()) continue
+                
+                // 2. Handle many failed stations safely: limit to a maximum batch of 3 per check
+                // and stagger with a 1-second delay between checks to avoid congestion.
+                val batchToVerify = idsToVerify.take(3)
+                
+                for (stationId in batchToVerify) {
+                    if (!isActive) break
+                    
+                    val station = currentStationList.find { it.id == stationId } ?: knownStations[stationId] ?: continue
+                    
+                    Log.d(TAG, "Starting silent connectivity check for station: ${station.name}")
+                    val isReachable = checkStreamUrlReachable(station.streamUrl)
+                    
+                    if (isReachable) {
+                        Log.i(TAG, "Station ${station.name} is now reachable silently. Removing from failed set.")
+                        withContext(Dispatchers.Main) {
+                            _failedStationIds.value = _failedStationIds.value - stationId
+                            stationFailureCounts.remove(stationId)
+                            nextCheckTime.remove(stationId)
+                        }
+                    } else {
+                        val currentFailureCount = (stationFailureCounts[stationId] ?: 0) + 1
+                        stationFailureCounts[stationId] = currentFailureCount
+                        
+                        val multiplier = Math.min(10, 1 shl (currentFailureCount - 1))
+                        val interval = Math.min(maxIntervalMs, baseIntervalMs * multiplier)
+                        nextCheckTime[stationId] = currentTime + interval
+                        Log.d(TAG, "Station ${station.name} still failing (count: $currentFailureCount). Next check in ${interval / 1000}s.")
+                    }
+                    
+                    // Small delay between checks in the batch
+                    delay(1000L)
+                }
+            }
+        }
+    }
+
+    private suspend fun checkStreamUrlReachable(urlStr: String): Boolean = withContext(Dispatchers.IO) {
+        var connection: java.net.HttpURLConnection? = null
+        try {
+            val url = java.net.URL(urlStr)
+            connection = url.openConnection() as java.net.HttpURLConnection
+            connection.requestMethod = "GET"
+            connection.connectTimeout = 3000
+            connection.readTimeout = 3000
+            
+            val responseCode = connection.responseCode
+            responseCode in 200..399
+        } catch (e: Exception) {
+            Log.d(TAG, "Silent check failed for $urlStr: ${e.message}")
+            false
+        } finally {
+            connection?.disconnect()
+        }
     }
 
     private fun CharSequence?.isNull_Blank(): Boolean = this == null || this.isBlank()

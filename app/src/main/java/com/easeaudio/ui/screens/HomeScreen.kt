@@ -22,14 +22,18 @@ import androidx.compose.material.icons.filled.CellTower
 import androidx.compose.material.icons.filled.CloudDone
 import androidx.compose.material.icons.filled.Equalizer
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Radio
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material.icons.filled.Wifi
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.*
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -47,6 +51,7 @@ import androidx.compose.ui.res.stringResource
 import com.easeaudio.R
 import com.easeaudio.ads.AdMobBanner
 import com.easeaudio.data.RadioStation
+import com.easeaudio.ui.components.AttributionDialog
 import com.easeaudio.firebase.AppRemoteConfig
 import com.easeaudio.network.NetworkStatus
 import com.easeaudio.ui.theme.*
@@ -58,6 +63,9 @@ fun HomeScreen(
     recentStations: List<RadioStation>,
     currentStation: RadioStation?,
     isPlaying: Boolean,
+    isLoading: Boolean = false,
+    isDiscoveringOnline: Boolean = false,
+    failedStationIds: Set<String> = emptySet(),
     searchQuery: String,
     selectedGenre: String,
     availableGenres: List<String>,
@@ -75,20 +83,22 @@ fun HomeScreen(
     onOpenEqualizer: () -> Unit,
     onOpenNetworkConfig: () -> Unit = {},
     onLoadMore: () -> Unit = {},
+    onRefresh: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val listState = rememberLazyListState()
+    var showAttributionDialog by remember { mutableStateOf(false) }
     val isFabVisible by remember(searchQuery, stations) {
         derivedStateOf {
-            searchQuery.isNotBlank() && stations.isEmpty()
+            searchQuery.isNotBlank() && stations.isEmpty() && !isDiscoveringOnline
         }
     }
 
-    val shouldLoadMore by remember {
+    val shouldLoadMore by remember(listState) {
         derivedStateOf {
             val totalItemsCount = listState.layoutInfo.totalItemsCount
             val lastVisibleItemIndex = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
-            totalItemsCount > 0 && lastVisibleItemIndex >= totalItemsCount - 4
+            totalItemsCount > 0 && lastVisibleItemIndex >= totalItemsCount - 3
         }
     }
 
@@ -122,13 +132,21 @@ fun HomeScreen(
             }
         }
     ) { innerPadding ->
-        LazyColumn(
-            state = listState,
+        PullToRefreshBox(
+            isRefreshing = isDiscoveringOnline,
+            onRefresh = onRefresh,
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding),
-            contentPadding = PaddingValues(bottom = 80.dp)
+                .padding(innerPadding)
         ) {
+            LazyColumn(
+                state = listState,
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .widthIn(max = 800.dp)
+                    .align(Alignment.TopCenter),
+                contentPadding = PaddingValues(bottom = 80.dp)
+            ) {
             // AdMob Banner (Configured via Firebase Remote Config)
             if (remoteConfig.adsEnabled) {
                 item {
@@ -174,36 +192,80 @@ fun HomeScreen(
                             )
                         }
 
-                        // Action Icons (Equalizer, Sleep Timer)
-                        Row(
-                            horizontalArrangement = Arrangement.spacedBy(8.dp),
-                            verticalAlignment = Alignment.CenterVertically
+                        // Dropdown overflow menu button for multiple secondary actions (Solution 1)
+                        var showMenu by remember { mutableStateOf(false) }
+
+                        Box(
+                            modifier = Modifier.wrapContentSize(Alignment.TopEnd)
                         ) {
                             IconButton(
-                                onClick = onOpenEqualizer,
+                                onClick = { showMenu = true },
                                 modifier = Modifier
                                     .clip(CircleShape)
                                     .background(DarkSurfaceVariant)
-                                    .testTag("btn_open_equalizer")
+                                    .testTag("btn_open_overflow_menu")
                             ) {
                                 Icon(
-                                    imageVector = Icons.Filled.Equalizer,
-                                    contentDescription = stringResource(R.string.equalizer),
+                                    imageVector = Icons.Filled.MoreVert,
+                                    contentDescription = "More Options",
                                     tint = NeonCyan
                                 )
                             }
 
-                            IconButton(
-                                onClick = onOpenSleepTimer,
-                                modifier = Modifier
-                                    .clip(CircleShape)
-                                    .background(if (sleepTimerRemaining != null) ActivePill else DarkSurfaceVariant)
-                                    .testTag("btn_open_sleep_timer")
-                                ) {
-                                Icon(
-                                    imageVector = Icons.Filled.Bedtime,
-                                    contentDescription = stringResource(R.string.sleep_timer),
-                                    tint = if (sleepTimerRemaining != null) NeonPurple else TextMuted
+                            DropdownMenu(
+                                expanded = showMenu,
+                                onDismissRequest = { showMenu = false },
+                                modifier = Modifier.background(DarkSurfaceVariant)
+                            ) {
+                                DropdownMenuItem(
+                                    text = { Text("Equalizer", color = TextPrimary) },
+                                    leadingIcon = {
+                                        Icon(
+                                            imageVector = Icons.Filled.Equalizer,
+                                            contentDescription = "Equalizer",
+                                            tint = NeonCyan
+                                        )
+                                    },
+                                    onClick = {
+                                        showMenu = false
+                                        onOpenEqualizer()
+                                    },
+                                    modifier = Modifier.testTag("menu_item_equalizer")
+                                )
+
+                                DropdownMenuItem(
+                                    text = {
+                                        val label = if (sleepTimerRemaining != null) "Sleep Timer (Active)" else "Sleep Timer"
+                                        Text(label, color = TextPrimary)
+                                    },
+                                    leadingIcon = {
+                                        Icon(
+                                            imageVector = Icons.Filled.Bedtime,
+                                            contentDescription = "Sleep Timer",
+                                            tint = if (sleepTimerRemaining != null) NeonPurple else TextMuted
+                                        )
+                                    },
+                                    onClick = {
+                                        showMenu = false
+                                        onOpenSleepTimer()
+                                    },
+                                    modifier = Modifier.testTag("menu_item_sleep_timer")
+                                )
+
+                                DropdownMenuItem(
+                                    text = { Text("Info", color = TextPrimary) },
+                                    leadingIcon = {
+                                        Icon(
+                                            imageVector = Icons.Filled.Info,
+                                            contentDescription = "Info",
+                                            tint = NeonCyan
+                                        )
+                                    },
+                                    onClick = {
+                                        showMenu = false
+                                        showAttributionDialog = true
+                                    },
+                                    modifier = Modifier.testTag("menu_item_attribution")
                                 )
                             }
                         }
@@ -338,11 +400,20 @@ fun HomeScreen(
                                     color = NeonCyan
                                 ) {
                                     Box(contentAlignment = Alignment.Center) {
-                                        Icon(
-                                            imageVector = if (currentStation?.id == featured.id && isPlaying) Icons.Filled.Pause else Icons.Filled.PlayArrow,
-                                            contentDescription = "Play Featured",
-                                            tint = DarkBackground
-                                        )
+                                        val isFeaturedSelected = currentStation?.id == featured.id
+                                        if (isFeaturedSelected && isLoading) {
+                                            CircularProgressIndicator(
+                                                modifier = Modifier.size(24.dp),
+                                                color = DarkBackground,
+                                                strokeWidth = 2.5.dp
+                                            )
+                                        } else {
+                                            Icon(
+                                                imageVector = if (isFeaturedSelected && isPlaying) Icons.Filled.Pause else Icons.Filled.PlayArrow,
+                                                contentDescription = "Play Featured",
+                                                tint = DarkBackground
+                                            )
+                                        }
                                     }
                                 }
                             }
@@ -361,7 +432,7 @@ fun HomeScreen(
                 )
             }
 
-            // Empty State
+            // Empty or Initial Loading State
             if (stations.isEmpty()) {
                 item {
                     Box(
@@ -370,10 +441,26 @@ fun HomeScreen(
                             .padding(32.dp),
                         contentAlignment = Alignment.Center
                     ) {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text(stringResource(R.string.no_stations_found), style = MaterialTheme.typography.titleMedium, color = TextSecondary)
-                            Spacer(modifier = Modifier.height(6.dp))
-                            Text(stringResource(R.string.add_station_prompt), style = MaterialTheme.typography.bodyMedium, color = TextMuted)
+                        if (isDiscoveringOnline) {
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                CircularProgressIndicator(
+                                    color = NeonCyan,
+                                    modifier = Modifier.size(32.dp),
+                                    strokeWidth = 3.dp
+                                )
+                                Spacer(modifier = Modifier.height(12.dp))
+                                Text(
+                                    text = stringResource(R.string.loading_more_stations),
+                                    style = MaterialTheme.typography.titleMedium,
+                                    color = TextSecondary
+                                )
+                            }
+                        } else {
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                Text(stringResource(R.string.no_stations_found), style = MaterialTheme.typography.titleMedium, color = TextSecondary)
+                                Spacer(modifier = Modifier.height(6.dp))
+                                Text(stringResource(R.string.add_station_prompt), style = MaterialTheme.typography.bodyMedium, color = TextMuted)
+                            }
                         }
                     }
                 }
@@ -382,10 +469,13 @@ fun HomeScreen(
             // Station Cards List
             items(stations, key = { it.id }) { station ->
                 val isSelected = currentStation?.id == station.id
+                val isUnreachable = failedStationIds.contains(station.id)
                 StationCard(
                     station = station,
                     isSelected = isSelected,
                     isPlaying = isSelected && isPlaying,
+                    isLoading = isSelected && isLoading,
+                    isUnreachable = isUnreachable,
                     onSelect = { onStationSelect(station) },
                     onToggleFavorite = { onToggleFavorite(station) }
                 )
@@ -418,11 +508,18 @@ fun HomeScreen(
     }
 }
 
+    if (showAttributionDialog) {
+        AttributionDialog(onDismiss = { showAttributionDialog = false })
+    }
+}
+
 @Composable
 fun StationCard(
     station: RadioStation,
     isSelected: Boolean,
     isPlaying: Boolean,
+    isLoading: Boolean = false,
+    isUnreachable: Boolean = false,
     onSelect: () -> Unit,
     onToggleFavorite: () -> Unit
 ) {
@@ -462,14 +559,22 @@ fun StationCard(
                     Box(
                         modifier = Modifier
                             .fillMaxSize()
-                            .background(DarkBackground.copy(alpha = 0.4f)),
+                            .background(DarkBackground.copy(alpha = 0.5f)),
                         contentAlignment = Alignment.Center
                     ) {
-                        Icon(
-                            imageVector = if (isPlaying) Icons.Filled.Pause else Icons.Filled.PlayArrow,
-                            contentDescription = null,
-                            tint = NeonCyan
-                        )
+                        if (isLoading) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(24.dp),
+                                color = NeonCyan,
+                                strokeWidth = 2.5.dp
+                            )
+                        } else {
+                            Icon(
+                                imageVector = if (isPlaying) Icons.Filled.Pause else Icons.Filled.PlayArrow,
+                                contentDescription = null,
+                                tint = NeonCyan
+                            )
+                        }
                     }
                 }
             }
@@ -486,18 +591,43 @@ fun StationCard(
                     overflow = TextOverflow.Ellipsis
                 )
                 Spacer(modifier = Modifier.height(2.dp))
-                Row(verticalAlignment = Alignment.CenterVertically) {
+                if (isSelected && isLoading) {
                     Text(
-                        text = station.genre,
+                        text = stringResource(R.string.buffering_stream),
                         style = MaterialTheme.typography.bodyMedium,
-                        color = TextSecondary
+                        color = NeonCyan,
+                        fontWeight = FontWeight.Bold
                     )
-                    Text(" • ", color = TextMuted)
-                    Text(
-                        text = station.country,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = TextMuted
-                    )
+                } else if (isUnreachable) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            imageVector = Icons.Filled.Warning,
+                            contentDescription = null,
+                            tint = Color(0xFFFFB74D),
+                            modifier = Modifier.size(13.dp)
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            text = stringResource(R.string.stream_unreachable),
+                            style = MaterialTheme.typography.labelSmall,
+                            color = Color(0xFFFFB74D),
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
+                } else {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            text = station.genre,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = TextSecondary
+                        )
+                        Text(" • ", color = TextMuted)
+                        Text(
+                            text = station.country,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = TextMuted
+                        )
+                    }
                 }
             }
 
