@@ -15,6 +15,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
+import com.easeaudio.R
 import com.easeaudio.ui.theme.*
 
 @Composable
@@ -35,12 +37,12 @@ fun EqualizerDialog(
                     tint = NeonCyan,
                     modifier = Modifier.padding(end = 8.dp)
                 )
-                Text("Sound Equalizer", color = TextPrimary)
+                Text(stringResource(R.string.equalizer), color = TextPrimary)
             }
         },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                Text("Select Audio Tuning Profile:", color = TextSecondary, style = MaterialTheme.typography.bodyMedium)
+                Text(stringResource(R.string.select_tuning_profile), color = TextSecondary, style = MaterialTheme.typography.bodyMedium)
 
                 // Presets
                 presets.forEach { preset ->
@@ -79,7 +81,7 @@ fun EqualizerDialog(
         },
         confirmButton = {
             TextButton(onClick = onDismiss) {
-                Text("Done", color = NeonCyan)
+                Text(stringResource(R.string.done), color = NeonCyan)
             }
         }
     )

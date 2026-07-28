@@ -224,11 +224,11 @@ fun HomeScreen(
                                 modifier = Modifier.background(DarkSurfaceVariant)
                             ) {
                                 DropdownMenuItem(
-                                    text = { Text("Equalizer", color = TextPrimary) },
+                                    text = { Text(stringResource(R.string.equalizer), color = TextPrimary) },
                                     leadingIcon = {
                                         Icon(
                                             imageVector = Icons.Filled.Equalizer,
-                                            contentDescription = "Equalizer",
+                                            contentDescription = stringResource(R.string.equalizer),
                                             tint = NeonCyan
                                         )
                                     },
@@ -259,11 +259,11 @@ fun HomeScreen(
                                 )
 
                                 DropdownMenuItem(
-                                    text = { Text("Appearance", color = TextPrimary) },
+                                    text = { Text(stringResource(R.string.appearance), color = TextPrimary) },
                                     leadingIcon = {
                                         Icon(
                                             imageVector = Icons.Filled.Language,
-                                            contentDescription = "Appearance",
+                                            contentDescription = stringResource(R.string.appearance),
                                             tint = NeonCyan
                                         )
                                     },
@@ -275,11 +275,11 @@ fun HomeScreen(
                                 )
 
                                 DropdownMenuItem(
-                                    text = { Text("Info", color = TextPrimary) },
+                                    text = { Text(stringResource(R.string.info), color = TextPrimary) },
                                     leadingIcon = {
                                         Icon(
                                             imageVector = Icons.Filled.Info,
-                                            contentDescription = "Info",
+                                            contentDescription = stringResource(R.string.info),
                                             tint = NeonCyan
                                         )
                                     },
@@ -755,7 +755,7 @@ fun AppearanceSelectionScreen(
                     Spacer(modifier = Modifier.width(12.dp))
                     Column {
                         Text(
-                            text = "Appearance",
+                            text = stringResource(R.string.appearance),
                             style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
                             color = TextPrimary
                         )

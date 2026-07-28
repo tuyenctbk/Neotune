@@ -1,21 +1,19 @@
 package com.easeaudio.ui.components
 
-import android.content.Intent
-import android.net.Uri
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.Language
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
+import com.easeaudio.R
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import com.easeaudio.ui.theme.*
 
@@ -43,7 +41,7 @@ fun AttributionDialog(
                     modifier = Modifier.size(28.dp)
                 )
                 Text(
-                    text = "Data Provider Info",
+                    text = stringResource(id = R.string.data_provider_info),
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold
                 )
@@ -55,67 +53,15 @@ fun AttributionDialog(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
-                    text = "This application uses the open-source and community-driven database of Radio Browser to stream radio stations from all over the world.",
+                    text = stringResource(id = R.string.data_provider_desc),
                     style = MaterialTheme.typography.bodyLarge,
                     color = TextPrimary
                 )
-
                 Text(
-                    text = "We are grateful to the Radio Browser community for making this global directory of streams freely available to everyone.",
+                    text = stringResource(id = R.string.data_provider_gratitude),
                     style = MaterialTheme.typography.bodyMedium,
                     color = TextSecondary
                 )
-
-                Spacer(modifier = Modifier.height(4.dp))
-
-                // Interactive link card
-                Card(
-                    onClick = {
-                        try {
-                            val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://www.radio-browser.info/"))
-                            context.startActivity(intent)
-                        } catch (e: Exception) {
-                            // Safe fallback if browser intent fails
-                        }
-                    },
-                    shape = RoundedCornerShape(12.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = DarkSurfaceVariant
-                    ),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .border(1.dp, CardBorder, RoundedCornerShape(12.dp))
-                        .testTag("btn_visit_radio_browser")
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Filled.Language,
-                            contentDescription = null,
-                            tint = NeonPurple,
-                            modifier = Modifier.size(24.dp)
-                        )
-                        Column(modifier = Modifier.weight(1f)) {
-                            Text(
-                                text = "Visit Website",
-                                style = MaterialTheme.typography.bodyMedium,
-                                fontWeight = FontWeight.SemiBold,
-                                color = TextPrimary
-                            )
-                            Text(
-                                text = "radio-browser.info",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = NeonCyan,
-                                textDecoration = TextDecoration.Underline
-                            )
-                        }
-                    }
-                }
             }
         },
         confirmButton = {
@@ -131,7 +77,7 @@ fun AttributionDialog(
                     .testTag("btn_close_attribution_dialog")
             ) {
                 Text(
-                    text = "Dismiss",
+                    text = stringResource(id = R.string.dismiss),
                     fontWeight = FontWeight.Bold
                 )
             }

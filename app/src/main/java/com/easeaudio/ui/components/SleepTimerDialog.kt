@@ -77,7 +77,7 @@ fun SleepTimerDialog(
                                     contentColor = TextPrimary
                                 )
                             ) {
-                                Text("$mins m")
+                                Text(stringResource(R.string.mins_abbreviation, mins))
                             }
                         }
                     }

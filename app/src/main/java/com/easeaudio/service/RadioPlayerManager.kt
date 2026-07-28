@@ -2,6 +2,7 @@ package com.easeaudio.service
 
 import android.app.PendingIntent
 import android.content.Context
+import com.easeaudio.R
 import android.content.Intent
 import android.net.Uri
 import android.util.Log
@@ -30,9 +31,18 @@ import kotlinx.coroutines.flow.asStateFlow
 
 import android.net.wifi.WifiManager
 import android.os.PowerManager
+import android.os.Build
 import androidx.core.content.ContextCompat
 
 class RadioPlayerManager(private val context: Context) {
+    private val attributionContext: Context by lazy {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            context.createAttributionContext("default_attribution")
+        } else {
+            context
+        }
+    }
+
 
     companion object {
         @Volatile
@@ -51,8 +61,8 @@ class RadioPlayerManager(private val context: Context) {
     private val TAG = "RadioPlayerManager"
     private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
 
-    private var wakeLock: PowerManager.WakeLock? = null
-    private var wifiLock: WifiManager.WifiLock? = null
+
+
 
     val networkQualityManager = NetworkQualityManager(context)
     val firebaseConfigManager = FirebaseConfigManager(context)
@@ -129,7 +139,6 @@ class RadioPlayerManager(private val context: Context) {
         val minBuf = if (netStatus.isWifi) 8000 else cfg.minBufferMsCellular.toInt()
         val maxBuf = if (netStatus.isWifi) 25000 else cfg.maxBufferMsCellular.toInt()
 
-        // Configure adaptive buffering load control to maintain playback continuity
         val loadControl = DefaultLoadControl.Builder()
             .setBufferDurationsMs(
                 minBuf,
@@ -140,7 +149,7 @@ class RadioPlayerManager(private val context: Context) {
             .setPrioritizeTimeOverSizeThresholds(true)
             .build()
 
-        exoPlayer = ExoPlayer.Builder(context)
+        exoPlayer = ExoPlayer.Builder(attributionContext)
             .setAudioAttributes(audioAttributes, true)
             .setWakeMode(C.WAKE_MODE_NETWORK)
             .setLoadControl(loadControl)
@@ -198,7 +207,7 @@ class RadioPlayerManager(private val context: Context) {
                             !title.isNull_Blank() && !artist.isNull_Blank() -> "$artist - $title"
                             !title.isNull_Blank() -> title
                             !artist.isNull_Blank() -> artist
-                            else -> _currentStation.value?.name ?: "Live Audio Stream"
+                            else -> _currentStation.value?.name ?: context.getString(R.string.live_audio_stream)
                         }
                     }
 
@@ -211,9 +220,9 @@ class RadioPlayerManager(private val context: Context) {
                             _currentStation.value?.let { current ->
                                 _failedStationIds.value = _failedStationIds.value + current.id
                             }
-                            _playbackError.value = "Unable to connect to stream. Please try retrying or switch station."
+                            _playbackError.value = context.getString(R.string.unable_connect_error)
                         } else {
-                            _playbackError.value = "No internet connection. Please check your network."
+                            _playbackError.value = context.getString(R.string.no_internet_error)
                         }
                         stopWaveAnimation()
                     }
@@ -254,7 +263,7 @@ class RadioPlayerManager(private val context: Context) {
                     }
                 }
 
-                mediaSession = MediaSession.Builder(context, player)
+                mediaSession = MediaSession.Builder(attributionContext, player)
                     .setSessionActivity(pendingIntent)
                     .setCallback(mediaSessionCallback)
                     .build().also {
@@ -400,34 +409,11 @@ class RadioPlayerManager(private val context: Context) {
     }
 
     private fun acquireLocks() {
-        try {
-            if (wakeLock == null) {
-                val pm = context.getSystemService(Context.POWER_SERVICE) as? PowerManager
-                wakeLock = pm?.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "Tunora:RadioPlaybackWakeLock")
-            }
-            if (wakeLock?.isHeld == false) {
-                wakeLock?.acquire(3 * 60 * 60 * 1000L)
-            }
-
-            if (wifiLock == null) {
-                val wm = context.applicationContext.getSystemService(Context.WIFI_SERVICE) as? WifiManager
-                wifiLock = wm?.createWifiLock(WifiManager.WIFI_MODE_FULL_HIGH_PERF, "Tunora:RadioPlaybackWifiLock")
-            }
-            if (wifiLock?.isHeld == false) {
-                wifiLock?.acquire()
-            }
-        } catch (e: Exception) {
-            Log.e(TAG, "Error acquiring wake/wifi lock: ${e.message}")
-        }
+        // Handled by ExoPlayer C.WAKE_MODE_NETWORK
     }
 
     private fun releaseLocks() {
-        try {
-            if (wakeLock?.isHeld == true) wakeLock?.release()
-            if (wifiLock?.isHeld == true) wifiLock?.release()
-        } catch (e: Exception) {
-            Log.e(TAG, "Error releasing locks: ${e.message}")
-        }
+        // Handled by ExoPlayer
     }
 
     fun release() {

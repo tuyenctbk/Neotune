@@ -49,7 +49,7 @@ fun AddStationDialog(
                     },
                     label = { Text(stringResource(R.string.stream_url)) },
                     isError = isError,
-                    supportingText = if (isError) { { Text("Please enter a valid HTTP/HTTPS URL") } } else null,
+                    supportingText = if (isError) { { Text(stringResource(R.string.invalid_url_error)) } } else null,
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedBorderColor = NeonCyan,
                         unfocusedBorderColor = TextMuted,

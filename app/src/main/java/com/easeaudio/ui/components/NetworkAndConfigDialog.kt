@@ -20,6 +20,8 @@ import androidx.compose.ui.unit.sp
 import com.easeaudio.firebase.AppRemoteConfig
 import com.easeaudio.network.NetworkStatus
 import com.easeaudio.ui.theme.*
+import androidx.compose.ui.res.stringResource
+import com.easeaudio.R
 
 @Composable
 fun NetworkAndConfigDialog(
@@ -43,7 +45,7 @@ fun NetworkAndConfigDialog(
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = "Adaptive Engine & Firebase",
+                    text = stringResource(R.string.adaptive_engine_firebase),
                     fontWeight = FontWeight.Bold,
                     fontSize = 18.sp
                 )
@@ -72,7 +74,7 @@ fun NetworkAndConfigDialog(
                             )
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
-                                text = "Network: ${networkStatus.label}",
+                                text = stringResource(R.string.network_label, networkStatus.label),
                                 color = TextPrimary,
                                 fontWeight = FontWeight.SemiBold,
                                 fontSize = 14.sp
@@ -80,7 +82,7 @@ fun NetworkAndConfigDialog(
                         }
                         Spacer(modifier = Modifier.height(6.dp))
                         Text(
-                            text = "Auto-adaptive buffer: ${networkStatus.minBufferMs / 1000}s - ${networkStatus.maxBufferMs / 1000}s capacity to guarantee continuous streaming without buffering stalls.",
+                            text = stringResource(R.string.auto_adaptive_buffer, networkStatus.minBufferMs / 1000, networkStatus.maxBufferMs / 1000),
                             color = TextSecondary,
                             fontSize = 12.sp
                         )
@@ -97,14 +99,14 @@ fun NetworkAndConfigDialog(
                 ) {
                     Column {
                         Text(
-                            text = "Firebase Remote Config",
+                            text = stringResource(R.string.firebase_remote_config),
                             color = NeonPurple,
                             fontWeight = FontWeight.SemiBold,
                             fontSize = 14.sp
                         )
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
-                            text = "Source: ${remoteConfig.configSource}",
+                            text = stringResource(R.string.source_label, remoteConfig.configSource),
                             color = TextMuted,
                             fontSize = 11.sp
                         )
@@ -117,13 +119,13 @@ fun NetworkAndConfigDialog(
                         ) {
                             Column {
                                 Text(
-                                    text = "AdMob Advertisements",
+                                    text = stringResource(R.string.admob_advertisements),
                                     color = TextPrimary,
                                     fontSize = 13.sp,
                                     fontWeight = FontWeight.Medium
                                 )
                                 Text(
-                                    text = "Always 100% silent (Muted video/audio)",
+                                    text = stringResource(R.string.always_silent_ad),
                                     color = TextMuted,
                                     fontSize = 11.sp
                                 )
@@ -151,7 +153,7 @@ fun NetworkAndConfigDialog(
                 colors = ButtonDefaults.buttonColors(containerColor = NeonCyan, contentColor = DarkBackground),
                 shape = RoundedCornerShape(12.dp)
             ) {
-                Text("Close", fontWeight = FontWeight.Bold)
+                Text(stringResource(R.string.close), fontWeight = FontWeight.Bold)
             }
         }
     )

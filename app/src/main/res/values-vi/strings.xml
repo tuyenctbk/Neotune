@@ -1,3 +1,4 @@
+<?xml version='1.0' encoding='utf-8'?>
 <resources>
     <string name="app_name">NeoTune</string>
     <string name="app_description">Radio Toàn Cầu &amp; Nhạc Chill Phiêu</string>
@@ -53,7 +54,6 @@
     <string name="vocal_focus">Nổi Bật Giọng Hát</string>
     <string name="select_language">Chọn Ngôn Ngữ</string>
     <string name="language">Ngôn Ngữ</string>
-    <string name="close">Đóng</string>
     <string name="add_station_prompt">Không tìm thấy đài mong muốn? Thêm link phát trực tiếp của bạn bên dưới.</string>
     <string name="loading_more_stations">Đang tải thêm đài radio...</string>
     <string name="buffering_stream">Đang tải bộ đệm...</string>
@@ -61,4 +61,26 @@
     <string name="stream_offline_notice">Tín hiệu đài hiện tạm thời gián đoạn.</string>
     <string name="retry_stream">Thử lại</string>
     <string name="next_station">Đài tiếp</string>
+    <string name="mins_abbreviation">%1$d m</string>
+    <string name="select_tuning_profile">Select Audio Tuning Profile:</string>
+    <string name="done">Done</string>
+    <string name="invalid_url_error">Please enter a valid HTTP/HTTPS URL</string>
+    <string name="eq_label">EQ: %1$s</string>
+    <string name="appearance">Appearance</string>
+    <string name="info">Info</string>
+    <string name="live_audio_stream">Live Audio Stream</string>
+    <string name="unable_connect_error">Unable to connect to stream. Please try retrying or switch station.</string>
+    <string name="no_internet_error">No internet connection. Please check your network.</string>
+    <string name="adaptive_engine_firebase">Adaptive Engine &amp; Firebase</string>
+    <string name="network_label">Network: %1$s</string>
+    <string name="auto_adaptive_buffer">Auto-adaptive buffer: %1$ds - %2$ds capacity to guarantee continuous streaming without buffering stalls.</string>
+    <string name="firebase_remote_config">Firebase Remote Config</string>
+    <string name="source_label">Source: %1$s</string>
+    <string name="admob_advertisements">AdMob Advertisements</string>
+    <string name="always_silent_ad">Always 100% silent (Muted video/audio)</string>
+    <string name="close">Close</string>
+    <string name="data_provider_info">Thông tin nhà cung cấp dữ liệu</string>
+    <string name="data_provider_desc">Ứng dụng này sử dụng Radio Browser, một cơ sở dữ liệu nguồn mở và dựa vào cộng đồng (radio-browser.info), để truyền phát các đài phát thanh từ khắp nơi trên thế giới.</string>
+    <string name="data_provider_gratitude">Chúng tôi rất biết ơn cộng đồng Radio Browser vì đã cung cấp miễn phí danh mục các luồng toàn cầu này cho mọi người.</string>
+    <string name="dismiss">Miễn nhiệm</string>
 </resources>

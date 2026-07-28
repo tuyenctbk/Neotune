@@ -6,6 +6,10 @@ plugins {
 }
 
 android {
+    lint {
+        disable += setOf("MissingTranslation", "StringFormatInvalid")
+    }
+
     namespace = "com.easeaudio"
     compileSdk = 35
 

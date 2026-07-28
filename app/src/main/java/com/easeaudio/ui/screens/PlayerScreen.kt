@@ -433,7 +433,7 @@ fun PlayerScreen(
                                 modifier = Modifier.size(16.dp)
                             )
                         },
-                        label = { Text("EQ: $activeEqPreset", color = if (isEqFocused) DarkBackground else TextPrimary, fontSize = 12.sp) },
+                        label = { Text(stringResource(R.string.eq_label, activeEqPreset), color = if (isEqFocused) DarkBackground else TextPrimary, fontSize = 12.sp) },
                         colors = AssistChipDefaults.assistChipColors(
                             containerColor = if (isEqFocused) NeonCyan else DarkSurfaceVariant
                         ),
