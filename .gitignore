@@ -3,36 +3,49 @@
 .kotlin/
 .build-outputs/
 build/
-app/build/
+**/build/
+*.apk
+*.aab
+*.ap_
+*.dex
+*.class
 
-# Android Studio & IDE
+# Android Studio, IDE & Editor files
 .idea/
 *.iml
 .navigation/
 captures/
 .externalNativeBuild
 .cxx/
+cmake-build-*/
+.vscode/
 
-# Local configuration & secrets
+# Local configuration, environment & secrets
+.env
 .env.local
+.env.*.local
+!*.env.example
 local.properties
 gradlew
 gradlew.bat
 gradle/wrapper/
 
-# Keystores & sensitive keys
+# Keystores & sensitive credentials
 *.jks
 *.p12
 
-# Agent artifacts
-.artifacts/
+# Memory dumps, profiling & logs
+*.hprof
+*.log
+*.log.*
 
-# Project utility scripts
+# Agent & project artifacts
+.artifacts/
 *.py
 
-# OS files
+# OS generated files
 .DS_Store
 Thumbs.db
+*.swp
+*~
 
-# Logs
-*.log

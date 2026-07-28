@@ -2,6 +2,7 @@ package com.easeaudio.data
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 
 class RadioRepository(private val dao: RadioDao) {
 
@@ -39,15 +40,28 @@ class RadioRepository(private val dao: RadioDao) {
     )
 
     fun getAllStations(): Flow<List<RadioStation>> {
-        val favoritesFlow = dao.getFavoriteStations()
-        val customFlow = dao.getCustomStations()
-
-        return combine(favoritesFlow, customFlow) { favorites, customList ->
-            val favSet = favorites.map { it.id }.toSet()
-            val baseList = defaultStations.map { station ->
-                station.copy(isFavorite = favSet.contains(station.id))
+        return dao.getAllStations().map { dbList ->
+            val dbMap = dbList.associateBy { it.id }
+            val mergedList = mutableListOf<RadioStation>()
+            
+            // Add default stations first, updating their properties from DB if present (such as isFavorite)
+            defaultStations.forEach { default ->
+                val dbStation = dbMap[default.id]
+                if (dbStation != null) {
+                    mergedList.add(dbStation)
+                } else {
+                    mergedList.add(default)
+                }
             }
-            baseList + customList
+            
+            // Add all other stations from database (which includes custom and cached online stations)
+            dbList.forEach { dbStation ->
+                if (defaultStations.none { it.id == dbStation.id }) {
+                    mergedList.add(dbStation)
+                }
+            }
+            
+            mergedList
         }
     }
 
@@ -63,6 +77,9 @@ class RadioRepository(private val dao: RadioDao) {
             searchQuery = query,
             genreTag = genre
         )
+        if (onlineList.isNotEmpty()) {
+            dao.saveStationsToCache(onlineList)
+        }
         return onlineList
     }
 

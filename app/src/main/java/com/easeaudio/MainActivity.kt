@@ -28,6 +28,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
@@ -93,6 +94,7 @@ fun MainAppContent(viewModel: RadioViewModel) {
     val isPlaying by viewModel.playerManager.isPlaying.collectAsState()
     val isLoading by viewModel.playerManager.isLoading.collectAsState()
     val playbackError by viewModel.playerManager.playbackError.collectAsState()
+    val playbackErrorDetails by viewModel.playerManager.playbackErrorDetails.collectAsState()
     val streamTitle by viewModel.playerManager.streamTitle.collectAsState()
     val waveAmplitudes by viewModel.playerManager.waveAmplitudes.collectAsState()
     val volume by viewModel.playerManager.volume.collectAsState()
@@ -155,7 +157,10 @@ fun MainAppContent(viewModel: RadioViewModel) {
     }
 
     // Show error toast/snackbar if stream error occurs
-    LaunchedEffect(playbackError) {
+    LaunchedEffect(playbackError, playbackErrorDetails) {
+        playbackErrorDetails?.let { details ->
+            Log.e("MainActivity", "Stream Error Captured: ${details.toUserSummary()} (Code: ${details.errorCodeName}, HTTP: ${details.httpStatusCode ?: "N/A"})")
+        }
         playbackError?.let { err ->
             snackbarHostState.showSnackbar(err)
         }

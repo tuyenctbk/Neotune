@@ -191,6 +191,14 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
                 _isDiscoveryError.value = results.isEmpty() && query.isBlank() && genre == "All"
             } catch (e: Exception) {
                 _isDiscoveryError.value = _onlineDiscoveredStations.value.isEmpty()
+                try {
+                    val crashlytics = com.google.firebase.crashlytics.FirebaseCrashlytics.getInstance()
+                    crashlytics.setCustomKey("viewmodel_query", query)
+                    crashlytics.setCustomKey("viewmodel_genre", genre)
+                    crashlytics.recordException(e)
+                } catch (ce: Exception) {
+                    // Ignore if Crashlytics is not active
+                }
             } finally {
                 _isDiscoveringOnline.value = false
             }

@@ -13,9 +13,13 @@ import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
 import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
+import androidx.media3.common.Tracks
 import androidx.media3.common.util.UnstableApi
+import androidx.media3.datasource.DefaultHttpDataSource
+import androidx.media3.datasource.HttpDataSource
 import androidx.media3.exoplayer.DefaultLoadControl
 import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 import androidx.media3.session.MediaSession
 import androidx.media3.session.SessionError
 import com.easeaudio.data.RadioStation
@@ -29,20 +33,42 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-class RadioPlayerManager(private val context: Context) {
-    private val attributionContext: Context by lazy {
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
-            context.createAttributionContext("audio_playback")
-        } else {
-            context
-        }
+data class PlaybackErrorDetails(
+    val stationName: String,
+    val stationId: String,
+    val streamUrl: String,
+    val resolvedUrl: String?,
+    val errorCode: Int,
+    val errorCodeName: String,
+    val errorMessage: String?,
+    val causeMessage: String?,
+    val httpStatusCode: Int? = null,
+    val timestamp: Long = System.currentTimeMillis()
+) {
+    fun toFormattedLog(): String {
+        return """
+            |========== MEDIA3 STREAM PLAYBACK FAILURE ==========
+            | Timestamp   : ${java.util.Date(timestamp)}
+            | Station Name: $stationName
+            | Station ID  : $stationId
+            | Original URL: $streamUrl
+            | Resolved URL: ${resolvedUrl ?: "N/A"}
+            | Error Code  : $errorCode ($errorCodeName)
+            | Error Msg   : ${errorMessage ?: "N/A"}
+            | Cause Msg   : ${causeMessage ?: "N/A"}
+            | HTTP Status : ${httpStatusCode ?: "N/A"}
+            |====================================================
+        """.trimMargin()
     }
 
+    fun toUserSummary(): String {
+        val codeStr = if (errorCodeName.isNotBlank()) errorCodeName else "Code $errorCode"
+        val httpStr = if (httpStatusCode != null) " [HTTP $httpStatusCode]" else ""
+        return "Failed to load $stationName ($codeStr$httpStr)"
+    }
+}
 
-
-
-
-
+class RadioPlayerManager(private val context: Context) {
 
     companion object {
         @Volatile
@@ -72,6 +98,7 @@ class RadioPlayerManager(private val context: Context) {
 
     private var exoPlayer: ExoPlayer? = null
     private var mediaSession: MediaSession? = null
+    private var wifiLock: android.net.wifi.WifiManager.WifiLock? = null
 
     private val _currentStation = MutableStateFlow<RadioStation?>(null)
     val currentStation: StateFlow<RadioStation?> = _currentStation.asStateFlow()
@@ -84,6 +111,9 @@ class RadioPlayerManager(private val context: Context) {
 
     private val _playbackError = MutableStateFlow<String?>(null)
     val playbackError: StateFlow<String?> = _playbackError.asStateFlow()
+
+    private val _playbackErrorDetails = MutableStateFlow<PlaybackErrorDetails?>(null)
+    val playbackErrorDetails: StateFlow<PlaybackErrorDetails?> = _playbackErrorDetails.asStateFlow()
 
     private val _failedStationIds = MutableStateFlow<Set<String>>(emptySet())
     val failedStationIds: StateFlow<Set<String>> = _failedStationIds.asStateFlow()
@@ -126,12 +156,30 @@ class RadioPlayerManager(private val context: Context) {
         startSilentChecking()
     }
 
+    private var isFallbackAttempt = false
+
     @OptIn(UnstableApi::class)
     private fun setupPlayer() {
         val audioAttributes = AudioAttributes.Builder()
             .setUsage(C.USAGE_MEDIA)
             .setContentType(C.AUDIO_CONTENT_TYPE_MUSIC)
             .build()
+
+        val wifiManager = context.applicationContext.getSystemService(Context.WIFI_SERVICE) as? android.net.wifi.WifiManager
+        if (wifiManager != null) {
+            @Suppress("DEPRECATION")
+            val wifiLockMode = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                android.net.wifi.WifiManager.WIFI_MODE_FULL_LOW_LATENCY
+            } else {
+                android.net.wifi.WifiManager.WIFI_MODE_FULL_HIGH_PERF
+            }
+            wifiLock = wifiManager.createWifiLock(
+                wifiLockMode,
+                "EaseAudio:WifiLock"
+            ).apply {
+                setReferenceCounted(false)
+            }
+        }
 
         val netStatus = networkStatus.value
         val cfg = remoteConfig.value
@@ -149,10 +197,21 @@ class RadioPlayerManager(private val context: Context) {
             .setPrioritizeTimeOverSizeThresholds(true)
             .build()
 
-        exoPlayer = ExoPlayer.Builder(attributionContext)
+        val httpDataSourceFactory = DefaultHttpDataSource.Factory()
+            .setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
+            .setAllowCrossProtocolRedirects(true)
+            .setConnectTimeoutMs(10000)
+            .setReadTimeoutMs(10000)
+
+        val mediaSourceFactory = DefaultMediaSourceFactory(context)
+            .setDataSourceFactory(httpDataSourceFactory)
+
+        exoPlayer = ExoPlayer.Builder(context)
+            .setMediaSourceFactory(mediaSourceFactory)
             .setAudioAttributes(audioAttributes, true)
             .setLoadControl(loadControl)
             .setHandleAudioBecomingNoisy(true)
+            .setWakeMode(C.WAKE_MODE_NETWORK)
             .build().apply {
                 volume = _volume.value
                 addListener(object : Player.Listener {
@@ -205,6 +264,11 @@ class RadioPlayerManager(private val context: Context) {
                     override fun onMediaMetadataChanged(mediaMetadata: MediaMetadata) {
                         val title = mediaMetadata.title?.toString()
                         val artist = mediaMetadata.artist?.toString()
+                        val albumTitle = mediaMetadata.albumTitle?.toString()
+                        val genre = mediaMetadata.genre?.toString()
+
+                        Log.d(TAG, "MediaMetadata updated -> Station: ${_currentStation.value?.name}, Title: $title, Artist: $artist, Album: $albumTitle, Genre: $genre")
+
                         _streamTitle.value = when {
                             !title.isNull_Blank() && !artist.isNull_Blank() -> "$artist - $title"
                             !title.isNull_Blank() -> title
@@ -213,16 +277,82 @@ class RadioPlayerManager(private val context: Context) {
                         }
                     }
 
+                    override fun onTracksChanged(tracks: Tracks) {
+                        for (group in tracks.groups) {
+                            if (group.type == C.TRACK_TYPE_AUDIO) {
+                                for (i in 0 until group.length) {
+                                    if (group.isTrackSelected(i)) {
+                                        val format = group.getTrackFormat(i)
+                                        Log.d(TAG, "Audio Stream Track Active -> Format: ${format.sampleMimeType}, SampleRate: ${format.sampleRate}Hz, Channels: ${format.channelCount}, Bitrate: ${format.bitrate}")
+                                    }
+                                }
+                            }
+                        }
+                    }
+
                     override fun onPlayerError(error: PlaybackException) {
-                        Log.e(TAG, "Playback error: ${error.message}", error)
+                        var httpCode: Int? = null
+                        var currentCause: Throwable? = error.cause
+                        while (currentCause != null) {
+                            if (currentCause is HttpDataSource.InvalidResponseCodeException) {
+                                httpCode = currentCause.responseCode
+                                break
+                            }
+                            currentCause = currentCause.cause
+                        }
+
+                        val current = _currentStation.value
+                        val currentUrl = exoPlayer?.currentMediaItem?.localConfiguration?.uri?.toString() ?: current?.streamUrl
+
+                        val details = PlaybackErrorDetails(
+                            stationName = current?.name ?: "Unknown Station",
+                            stationId = current?.id ?: "",
+                            streamUrl = current?.streamUrl ?: "",
+                            resolvedUrl = currentUrl,
+                            errorCode = error.errorCode,
+                            errorCodeName = error.errorCodeName,
+                            errorMessage = error.message,
+                            causeMessage = error.cause?.message,
+                            httpStatusCode = httpCode
+                        )
+
+                        Log.e(TAG, details.toFormattedLog(), error)
+
+                        try {
+                            val crashlytics = com.google.firebase.crashlytics.FirebaseCrashlytics.getInstance()
+                            crashlytics.setCustomKey("station_name", current?.name ?: "Unknown")
+                            crashlytics.setCustomKey("station_id", current?.id ?: "")
+                            crashlytics.setCustomKey("stream_url", current?.streamUrl ?: "")
+                            crashlytics.setCustomKey("error_code_name", error.errorCodeName)
+                            crashlytics.setCustomKey("error_message", error.message ?: "")
+                            crashlytics.setCustomKey("http_status_code", httpCode ?: -1)
+                            crashlytics.recordException(error)
+                        } catch (e: Exception) {
+                            // Firebase Crashlytics not configured or initialized yet
+                        }
+
+                        if (current != null && !isFallbackAttempt) {
+                            val fallbackUrl = when {
+                                currentUrl != null && currentUrl.startsWith("https://", ignoreCase = true) -> currentUrl.replaceFirst("https://", "http://", ignoreCase = true)
+                                currentUrl != null && currentUrl.startsWith("http://", ignoreCase = true) -> currentUrl.replaceFirst("http://", "https://", ignoreCase = true)
+                                else -> null
+                            }
+                            if (fallbackUrl != null && fallbackUrl != currentUrl) {
+                                Log.w(TAG, "Stream failed with ${error.errorCodeName}. Retrying station '${current.name}' with fallback URL: $fallbackUrl")
+                                playStationWithUrl(current, fallbackUrl, isFallback = true)
+                                return
+                            }
+                        }
+
+                        _playbackErrorDetails.value = details
                         _isLoading.value = false
                         _isPlaying.value = false
                         val isConnected = networkStatus.value.isConnected
                         if (isConnected) {
-                            _currentStation.value?.let { current ->
-                                _failedStationIds.value = _failedStationIds.value + current.id
+                            _currentStation.value?.let { st ->
+                                _failedStationIds.value = _failedStationIds.value + st.id
                             }
-                            _playbackError.value = context.getString(R.string.unable_connect_error)
+                            _playbackError.value = "${context.getString(R.string.unable_connect_error)} [${error.errorCodeName}]"
                         } else {
                             _playbackError.value = context.getString(R.string.no_internet_error)
                         }
@@ -265,7 +395,7 @@ class RadioPlayerManager(private val context: Context) {
                     }
                 }
 
-                mediaSession = MediaSession.Builder(attributionContext, player)
+                mediaSession = MediaSession.Builder(context, player)
                     .setSessionActivity(pendingIntent)
                     .setCallback(mediaSessionCallback)
                     .build().also {
@@ -292,29 +422,112 @@ class RadioPlayerManager(private val context: Context) {
         }
     }
 
+    private suspend fun resolveDirectStreamUrl(rawUrl: String): String = withContext(Dispatchers.IO) {
+        if (rawUrl.isBlank()) return@withContext rawUrl
+        var currentUrl = rawUrl.trim()
+        
+        // Rewrite old/broken VOV (Voice of Vietnam) stream URLs on audio-lss.vov.vn to their working, live formats
+        if (currentUrl.contains("audio-lss.vov.vn", ignoreCase = true)) {
+            val vovMatch = Regex("""\b(vov\d+)\b""", RegexOption.IGNORE_CASE).find(currentUrl)
+            if (vovMatch != null) {
+                val channel = vovMatch.groupValues[1].lowercase()
+                currentUrl = "https://audio-lss.vov.vn/live/$channel.m3u8"
+                Log.d(TAG, "Rewrote old VOV stream URL to active live URL: $currentUrl")
+            }
+        }
+
+        try {
+            var redirectCount = 0
+            while (redirectCount < 3) {
+                val lower = currentUrl.lowercase()
+                val isPlaylist = lower.endsWith(".m3u") || lower.endsWith(".pls") || 
+                                 lower.contains(".m3u?") || lower.contains(".pls?") || 
+                                 lower.endsWith(".m3u8") || lower.contains(".m3u8?")
+
+                val connection = (java.net.URL(currentUrl).openConnection() as java.net.HttpURLConnection).apply {
+                    connectTimeout = 5000
+                    readTimeout = 5000
+                    instanceFollowRedirects = false
+                    setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
+                }
+                val responseCode = connection.responseCode
+                if (responseCode in 300..399) {
+                    val location = connection.getHeaderField("Location")
+                    connection.disconnect()
+                    if (!location.isNull_Blank()) {
+                        currentUrl = location.trim()
+                        redirectCount++
+                        continue
+                    }
+                }
+
+                if (responseCode in 200..299) {
+                    if (isPlaylist) {
+                        val content = connection.inputStream.bufferedReader().use { it.readText() }
+                        connection.disconnect()
+                        if (lower.contains(".pls") || content.contains("[playlist]", ignoreCase = true)) {
+                            val match = Regex("""File\d+=(http[s]?://[^\s\r\n]+)""", RegexOption.IGNORE_CASE).find(content)
+                            if (match != null) {
+                                return@withContext match.groupValues[1].trim()
+                            }
+                        }
+                        val firstHttpLine = content.lines().firstOrNull { line ->
+                            val trimmed = line.trim()
+                            !trimmed.startsWith("#") && (trimmed.startsWith("http://", ignoreCase = true) || trimmed.startsWith("https://", ignoreCase = true))
+                        }
+                        if (firstHttpLine != null) {
+                            return@withContext firstHttpLine.trim()
+                        }
+                    } else {
+                        connection.disconnect()
+                    }
+                    return@withContext currentUrl
+                }
+                connection.disconnect()
+                break
+            }
+        } catch (e: Exception) {
+            Log.w(TAG, "Failed to resolve playlist URL $rawUrl: ${e.message}")
+        }
+        return@withContext currentUrl
+    }
+
     fun playStation(station: RadioStation) {
+        playStationWithUrl(station, station.streamUrl, isFallback = false)
+    }
+
+    private fun playStationWithUrl(station: RadioStation, targetUrl: String, isFallback: Boolean) {
         _currentStation.value = station
         _playbackError.value = null
         _isLoading.value = true
         _streamTitle.value = station.name
-        // Bug #5: Removed startForegroundService() call. MediaSessionService handles
-        // starting itself when the MediaSession becomes active via ExoPlayer.play().
+        isFallbackAttempt = isFallback
 
-        exoPlayer?.let { player ->
-            val mediaMetadata = MediaMetadata.Builder()
-                .setTitle(station.name)
-                .setArtist(station.genre)
-                .setArtworkUri(Uri.parse(station.imageUrl))
-                .build()
+        try {
+            val intent = Intent(context, RadioPlaybackService::class.java)
+            context.startService(intent)
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to start RadioPlaybackService", e)
+        }
 
-            val mediaItem = MediaItem.Builder()
-                .setUri(station.streamUrl)
-                .setMediaMetadata(mediaMetadata)
-                .build()
+        scope.launch {
+            val resolvedUrl = resolveDirectStreamUrl(targetUrl)
+            exoPlayer?.let { player ->
+                val mediaMetadata = MediaMetadata.Builder()
+                    .setTitle(station.name)
+                    .setArtist(station.genre)
+                    .setArtworkUri(Uri.parse(station.imageUrl))
+                    .build()
 
-            player.setMediaItem(mediaItem)
-            player.prepare()
-            player.play()
+                val mediaItem = MediaItem.Builder()
+                    .setUri(resolvedUrl)
+                    .setMediaMetadata(mediaMetadata)
+                    .build()
+
+                player.setMediaItem(mediaItem)
+                player.prepare()
+                player.play()
+            }
         }
     }
 
@@ -329,6 +542,12 @@ class RadioPlayerManager(private val context: Context) {
                 if (_currentStation.value == null || player.playbackState == Player.STATE_ENDED || _playbackError.value != null) {
                     _currentStation.value?.let { playStation(it) }
                 } else {
+                    try {
+                        val intent = Intent(context, RadioPlaybackService::class.java)
+                        context.startService(intent)
+                    } catch (e: Exception) {
+                        Log.e(TAG, "Failed to start RadioPlaybackService on resume", e)
+                    }
                     player.play()
                 }
             }
@@ -414,11 +633,29 @@ class RadioPlayerManager(private val context: Context) {
     // that, creating a foreground-service-without-notification ANR window on API 26+.
 
     private fun acquireLocks() {
-        // Handled by ExoPlayer C.WAKE_MODE_NETWORK
+        try {
+            wifiLock?.let { lock ->
+                if (!lock.isHeld) {
+                    lock.acquire()
+                    Log.d(TAG, "WifiLock acquired to prevent WiFi sleep")
+                }
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to acquire WifiLock", e)
+        }
     }
 
     private fun releaseLocks() {
-        // Handled by ExoPlayer
+        try {
+            wifiLock?.let { lock ->
+                if (lock.isHeld) {
+                    lock.release()
+                    Log.d(TAG, "WifiLock released")
+                }
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to release WifiLock", e)
+        }
     }
 
     fun release() {
@@ -433,6 +670,7 @@ class RadioPlayerManager(private val context: Context) {
         sharedMediaSession = null
         exoPlayer?.release()
         exoPlayer = null
+        wifiLock = null
         synchronized(RadioPlayerManager::class.java) {
             instance = null
         }
