@@ -39,7 +39,11 @@
     <string name="favorites">Favorites</string>
     <string name="no_saved_favorites">No saved favorite stations</string>
     <string name="custom">Custom</string>
-    <string name="all">All</string>
+    <string name="genre_all">All</string>
+    <string name="pop">Pop</string>
+    <string name="hip_hop">Hip Hop</string>
+    <string name="house">House</string>
+    <string name="country_genre">Country</string>
     <string name="news_reports">News &amp; Reports</string>
     <string name="lofi_chill">Lo-Fi &amp; Chill</string>
     <string name="jazz">Jazz</string>
@@ -107,4 +111,7 @@
 
     <!-- Network reconnection message (previously hardcoded in RadioPlayerManager.kt) -->
     <string name="waiting_network_reconnect">Waiting for network reconnection…</string>
+    <!-- Discovery error messages -->
+    <string name="network_error_title">Network error or API limit reached.</string>
+    <string name="retry_discovery">Retry Discovery</string>
 </resources>

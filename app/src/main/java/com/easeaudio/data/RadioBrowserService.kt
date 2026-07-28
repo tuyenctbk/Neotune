@@ -11,7 +11,7 @@ import java.net.URLEncoder
 object RadioBrowserService {
 
     private const val TAG = "RadioBrowserService"
-    private const val BASE_URL = "https://de1.api.radio-browser.info/json/stations"
+    private const val BASE_URL = "https://all.api.radio-browser.info/json/stations"
 
     suspend fun fetchTopStations(
         limit: Int = 40,
@@ -37,8 +37,8 @@ object RadioBrowserService {
             val url = URL(urlString)
             val connection = (url.openConnection() as HttpURLConnection).apply {
                 requestMethod = "GET"
-                connectTimeout = 5000
-                readTimeout = 5000
+                connectTimeout = 10000
+                readTimeout = 10000
                 setRequestProperty("User-Agent", "EaseAudioApp/1.0")
             }
 

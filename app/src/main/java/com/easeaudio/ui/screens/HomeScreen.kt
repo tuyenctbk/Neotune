@@ -60,6 +60,7 @@ import com.easeaudio.ui.components.AttributionDialog
 import com.easeaudio.firebase.AppRemoteConfig
 import com.easeaudio.network.NetworkStatus
 import com.easeaudio.ui.theme.*
+import com.easeaudio.viewmodel.GenreDisplay
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -73,12 +74,13 @@ fun HomeScreen(
     failedStationIds: Set<String> = emptySet(),
     searchQuery: String,
     selectedGenre: String,
-    availableGenres: List<String>,
+    availableGenres: List<GenreDisplay>,
     sleepTimerRemaining: Int?,
     networkStatus: NetworkStatus = NetworkStatus(),
     remoteConfig: AppRemoteConfig = AppRemoteConfig(),
     isLoadingMore: Boolean = false,
     canLoadMore: Boolean = true,
+    isDiscoveryError: Boolean = false,
     onSearchQueryChange: (String) -> Unit,
     onGenreSelect: (String) -> Unit,
     onStationSelect: (RadioStation) -> Unit,
@@ -89,6 +91,7 @@ fun HomeScreen(
     onOpenNetworkConfig: () -> Unit = {},
     onLoadMore: () -> Unit = {},
     onRefresh: () -> Unit = {},
+    onRetryDiscovery: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val listState = rememberLazyListState()
@@ -344,7 +347,7 @@ fun HomeScreen(
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     items(availableGenres) { genre ->
-                        val isSelected = genre == selectedGenre
+                        val isSelected = genre.key == selectedGenre
                         var isPillFocused by remember { mutableStateOf(false) }
                         Box(
                             modifier = Modifier
@@ -360,13 +363,13 @@ fun HomeScreen(
                                     color = if (isPillFocused) NeonCyan else if (isSelected) Color.Transparent else CardBorder,
                                     shape = CircleShape
                                 )
-                                .clickable { onGenreSelect(genre) }
+                                .clickable { onGenreSelect(genre.key) }
                                 .padding(horizontal = 18.dp, vertical = 8.dp)
-                                .testTag("genre_chip_$genre"),
+                                .testTag("genre_chip_${genre.key}"),
                             contentAlignment = Alignment.Center
                         ) {
                             Text(
-                                text = genre,
+                                text = stringResource(genre.labelResId),
                                 style = MaterialTheme.typography.bodyMedium.copy(
                                     fontWeight = if (isSelected || isPillFocused) FontWeight.Bold else FontWeight.Medium
                                 ),
@@ -503,6 +506,29 @@ fun HomeScreen(
                                     style = MaterialTheme.typography.titleMedium,
                                     color = TextSecondary
                                 )
+                            }
+                        } else if (isDiscoveryError) {
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                Icon(
+                                    imageVector = Icons.Filled.Warning,
+                                    contentDescription = null,
+                                    tint = TextMuted,
+                                    modifier = Modifier.size(48.dp)
+                                )
+                                Spacer(modifier = Modifier.height(12.dp))
+                                Text(
+                                    text = stringResource(R.string.network_error_title),
+                                    style = MaterialTheme.typography.titleMedium,
+                                    color = TextSecondary
+                                )
+                                Spacer(modifier = Modifier.height(8.dp))
+                                Button(
+                                    onClick = onRetryDiscovery,
+                                    colors = ButtonDefaults.buttonColors(containerColor = NeonCyan),
+                                    shape = RoundedCornerShape(12.dp)
+                                ) {
+                                    Text(stringResource(R.string.retry_discovery), color = DarkBackground)
+                                }
                             }
                         } else {
                             Column(horizontalAlignment = Alignment.CenterHorizontally) {

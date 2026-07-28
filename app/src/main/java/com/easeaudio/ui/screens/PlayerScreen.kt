@@ -34,6 +34,7 @@ import androidx.compose.ui.res.stringResource
 import com.easeaudio.R
 import com.easeaudio.data.RadioStation
 import com.easeaudio.ui.theme.*
+import com.easeaudio.viewmodel.EqPresetDisplay
 
 @Composable
 fun PlayerScreen(
@@ -45,6 +46,7 @@ fun PlayerScreen(
     volume: Float,
     sleepTimerRemaining: Int?,
     activeEqPreset: String,
+    eqPresets: List<EqPresetDisplay> = emptyList(),
     playbackError: String? = null,
     onTogglePlay: () -> Unit,
     onToggleFavorite: () -> Unit,
@@ -456,6 +458,7 @@ fun PlayerScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     var isEqFocused by remember { mutableStateOf(false) }
+                    val activePresetLabel = eqPresets.find { it.key == activeEqPreset }?.labelResId?.let { stringResource(it) } ?: activeEqPreset
                     AssistChip(
                         onClick = onOpenEqualizer,
                         leadingIcon = {
@@ -466,7 +469,7 @@ fun PlayerScreen(
                                 modifier = Modifier.size(16.dp)
                             )
                         },
-                        label = { Text(stringResource(R.string.eq_label, activeEqPreset), color = if (isEqFocused) DarkBackground else TextPrimary, fontSize = 12.sp) },
+                        label = { Text(stringResource(R.string.eq_label, activePresetLabel), color = if (isEqFocused) DarkBackground else TextPrimary, fontSize = 12.sp) },
                         colors = AssistChipDefaults.assistChipColors(
                             containerColor = if (isEqFocused) NeonCyan else DarkSurfaceVariant
                         ),

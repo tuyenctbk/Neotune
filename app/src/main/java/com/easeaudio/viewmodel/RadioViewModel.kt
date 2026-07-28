@@ -7,6 +7,7 @@ import com.easeaudio.data.RadioDatabase
 import com.easeaudio.data.RadioRepository
 import com.easeaudio.data.RadioStation
 import com.easeaudio.service.RadioPlayerManager
+import com.easeaudio.R
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -24,25 +25,28 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
     val selectedGenre: StateFlow<String> = _selectedGenre.asStateFlow()
 
     val availableGenres = listOf(
-        "All",
-        "News & Reports",
-        "Lo-Fi & Chill",
-        "Pop",
-        "Jazz",
-        "Rock",
-        "Hip Hop",
-        "Classical",
-        "Ambient",
-        "EDM",
-        "House",
-        "Country",
-        "Custom"
+        GenreDisplay("All", R.string.genre_all),
+        GenreDisplay("News & Reports", R.string.news_reports),
+        GenreDisplay("Lo-Fi & Chill", R.string.lofi_chill),
+        GenreDisplay("Pop", R.string.pop),
+        GenreDisplay("Jazz", R.string.jazz),
+        GenreDisplay("Rock", R.string.rock),
+        GenreDisplay("Hip Hop", R.string.hip_hop),
+        GenreDisplay("Classical", R.string.classical),
+        GenreDisplay("Ambient", R.string.ambient),
+        GenreDisplay("EDM", R.string.edm),
+        GenreDisplay("House", R.string.house),
+        GenreDisplay("Country", R.string.country_genre),
+        GenreDisplay("Custom", R.string.custom),
     )
 
     // Online discovered radio streams state
     private val _onlineDiscoveredStations = MutableStateFlow<List<RadioStation>>(emptyList())
     private val _isDiscoveringOnline = MutableStateFlow(false)
     val isDiscoveringOnline: StateFlow<Boolean> = _isDiscoveringOnline.asStateFlow()
+
+    private val _isDiscoveryError = MutableStateFlow(false)
+    val isDiscoveryError: StateFlow<Boolean> = _isDiscoveryError.asStateFlow()
 
     private val _isLoadingMore = MutableStateFlow(false)
     val isLoadingMore: StateFlow<Boolean> = _isLoadingMore.asStateFlow()
@@ -117,7 +121,13 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
     private val _activeEqPreset = MutableStateFlow("Balanced")
     val activeEqPreset: StateFlow<String> = _activeEqPreset.asStateFlow()
 
-    val eqPresets = listOf("Balanced", "Bass Boost", "Chill Lounge", "Acoustic", "Vocal Focus")
+    val eqPresets = listOf(
+        EqPresetDisplay("Balanced", R.string.balanced),
+        EqPresetDisplay("Bass Boost", R.string.bass_boost),
+        EqPresetDisplay("Chill Lounge", R.string.chill_lounge),
+        EqPresetDisplay("Acoustic", R.string.acoustic),
+        EqPresetDisplay("Vocal Focus", R.string.vocal_focus),
+    )
 
     // UI Dialog visibility states
     private val _showSleepTimerDialog = MutableStateFlow(false)
@@ -160,11 +170,15 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
         discoverStationsOnline(_searchQuery.value, _selectedGenre.value)
     }
 
+    fun retryDiscovery() {
+        discoverStationsOnline(_searchQuery.value, _selectedGenre.value)
+    }
+
     private fun discoverStationsOnline(query: String, genre: String) {
         viewModelScope.launch {
             _isDiscoveringOnline.value = true
+            _isDiscoveryError.value = false
             _canLoadMore.value = true
-            _onlineDiscoveredStations.value = emptyList()
             try {
                 val results = repository.discoverOnlineStations(
                     query = query,
@@ -174,8 +188,9 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
                 )
                 _onlineDiscoveredStations.value = results
                 _canLoadMore.value = results.size >= pageSize
+                _isDiscoveryError.value = results.isEmpty() && query.isBlank() && genre == "All"
             } catch (e: Exception) {
-                // Keep existing list on network glitch
+                _isDiscoveryError.value = _onlineDiscoveredStations.value.isEmpty()
             } finally {
                 _isDiscoveringOnline.value = false
             }

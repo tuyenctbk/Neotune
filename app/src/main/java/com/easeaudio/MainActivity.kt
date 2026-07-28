@@ -31,6 +31,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import androidx.compose.ui.res.stringResource
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -106,6 +107,7 @@ fun MainAppContent(viewModel: RadioViewModel) {
 
     val isLoadingMore by viewModel.isLoadingMore.collectAsState()
     val isDiscoveringOnline by viewModel.isDiscoveringOnline.collectAsState()
+    val isDiscoveryError by viewModel.isDiscoveryError.collectAsState()
     val canLoadMore by viewModel.canLoadMore.collectAsState()
     val failedStationIds by viewModel.failedStationIds.collectAsState()
 
@@ -206,6 +208,7 @@ fun MainAppContent(viewModel: RadioViewModel) {
                             remoteConfig = remoteConfig,
                             isLoadingMore = isLoadingMore,
                             canLoadMore = canLoadMore,
+                            isDiscoveryError = isDiscoveryError,
                             onSearchQueryChange = { viewModel.setSearchQuery(it) },
                             onGenreSelect = { viewModel.setSelectedGenre(it) },
                             onStationSelect = { station -> viewModel.playStation(station) },
@@ -214,7 +217,8 @@ fun MainAppContent(viewModel: RadioViewModel) {
                             onOpenSleepTimer = { viewModel.setShowSleepTimerDialog(true) },
                             onOpenEqualizer = { viewModel.setShowEqualizerDialog(true) },
                             onLoadMore = { viewModel.loadMoreStations() },
-                            onRefresh = { viewModel.refreshStations() }
+                            onRefresh = { viewModel.refreshStations() },
+                            onRetryDiscovery = { viewModel.retryDiscovery() }
                         )
                     }
 
@@ -277,6 +281,7 @@ fun MainAppContent(viewModel: RadioViewModel) {
                 volume = volume,
                 sleepTimerRemaining = sleepTimerRemaining,
                 activeEqPreset = activeEqPreset,
+                eqPresets = viewModel.eqPresets,
                 playbackError = playbackError,
                 onTogglePlay = { viewModel.togglePlayPause() },
                 onToggleFavorite = { currentStation?.let { viewModel.toggleFavorite(it) } },

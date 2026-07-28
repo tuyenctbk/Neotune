@@ -18,11 +18,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.res.stringResource
 import com.easeaudio.R
 import com.easeaudio.ui.theme.*
+import com.easeaudio.viewmodel.EqPresetDisplay
 
 @Composable
 fun EqualizerDialog(
     activePreset: String,
-    presets: List<String>,
+    presets: List<EqPresetDisplay>,
     onSelectPreset: (String) -> Unit,
     onDismiss: () -> Unit
 ) {
@@ -46,13 +47,13 @@ fun EqualizerDialog(
 
                 // Presets
                 presets.forEach { preset ->
-                    val isSelected = preset == activePreset
+                    val isSelected = preset.key == activePreset
                     Surface(
                         modifier = Modifier
                             .fillMaxWidth()
                             .clip(RoundedCornerShape(12.dp))
-                            .clickable { onSelectPreset(preset) }
-                            .testTag("eq_preset_$preset"),
+                            .clickable { onSelectPreset(preset.key) }
+                            .testTag("eq_preset_${preset.key}"),
                         color = if (isSelected) ActivePill else DarkSurfaceVariant
                     ) {
                         Row(
@@ -62,7 +63,7 @@ fun EqualizerDialog(
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
                             Text(
-                                text = preset,
+                                text = stringResource(preset.labelResId),
                                 color = if (isSelected) DarkBackground else TextPrimary,
                                 fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
                             )
