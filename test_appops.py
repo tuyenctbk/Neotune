@@ -1,17 +1,3 @@
-import urllib.request
-import json
-import ssl
-
-ctx = ssl.create_default_context()
-ctx.check_hostname = False
-ctx.verify_mode = ssl.CERT_NONE
-
-req = urllib.request.Request(
-    'https://html.duckduckgo.com/html/?q=attributionTag+not+declared+in+manifest+Media3+WakeLock',
-    headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'}
-)
-try:
-    with urllib.request.urlopen(req, context=ctx) as response:
-        print(response.read().decode('utf-8')[:2000])
-except Exception as e:
-    print(e)
+import urllib.request, json, urllib.parse
+res=urllib.request.urlopen('https://html.duckduckgo.com/html/?q=' + urllib.parse.quote('\"attributionTag not declared in manifest\" \"AppOps\"')).read().decode('utf-8')
+print(res[:2000])

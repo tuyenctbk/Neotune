@@ -35,13 +35,11 @@ import android.os.Build
 import androidx.core.content.ContextCompat
 
 class RadioPlayerManager(private val context: Context) {
-    private val attributionContext: Context by lazy {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            context.createAttributionContext("default_attribution")
-        } else {
-            context
-        }
-    }
+
+
+
+
+
 
 
     companion object {
@@ -149,9 +147,8 @@ class RadioPlayerManager(private val context: Context) {
             .setPrioritizeTimeOverSizeThresholds(true)
             .build()
 
-        exoPlayer = ExoPlayer.Builder(attributionContext)
+        exoPlayer = ExoPlayer.Builder(context)
             .setAudioAttributes(audioAttributes, true)
-            .setWakeMode(C.WAKE_MODE_NETWORK)
             .setLoadControl(loadControl)
             .setHandleAudioBecomingNoisy(true)
             .build().apply {
@@ -263,7 +260,7 @@ class RadioPlayerManager(private val context: Context) {
                     }
                 }
 
-                mediaSession = MediaSession.Builder(attributionContext, player)
+                mediaSession = MediaSession.Builder(context, player)
                     .setSessionActivity(pendingIntent)
                     .setCallback(mediaSessionCallback)
                     .build().also {
@@ -385,7 +382,7 @@ class RadioPlayerManager(private val context: Context) {
         waveAnimationJob?.cancel()
         waveAnimationJob = scope.launch {
             while (isActive && _isPlaying.value) {
-                delay(120L)
+                delay(400L)
                 val newAmplitudes = List(8) {
                     (0.15f + Math.random().toFloat() * 0.8f)
                 }

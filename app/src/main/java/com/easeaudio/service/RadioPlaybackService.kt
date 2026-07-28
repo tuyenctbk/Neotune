@@ -4,7 +4,6 @@ import androidx.media3.session.MediaSession
 import androidx.media3.session.MediaSessionService
 
 class RadioPlaybackService : MediaSessionService() {
-
     override fun onCreate() {
         super.onCreate()
         val playerManager = RadioPlayerManager.getInstance(this)
@@ -23,4 +22,3 @@ class RadioPlaybackService : MediaSessionService() {
         super.onDestroy()
     }
 }
-

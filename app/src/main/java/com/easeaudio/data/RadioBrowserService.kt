@@ -22,7 +22,7 @@ object RadioBrowserService {
         val stations = mutableListOf<RadioStation>()
         try {
             val mappedTag = mapGenreToTag(genreTag)
-            val urlBuilder = StringBuilder("$BASE_URL/search?offset=$offset&limit=$limit&order=clickcount&reverse=true&hidebroken=true")
+            val urlBuilder = StringBuilder("$BASE_URL/search?offset=$offset&limit=$limit&order=clickcount&reverse=true&hidebroken=true&is_https=true")
             
             if (searchQuery.isNotBlank()) {
                 val encodedQuery = URLEncoder.encode(searchQuery.trim(), "UTF-8")
@@ -55,9 +55,14 @@ object RadioBrowserService {
                     val country = item.optString("country", "Global")
                     val tags = item.optString("tags", "General")
                     val bitrateVal = item.optInt("bitrate", 128)
-                    val codec = item.optString("codec", "MP3").uppercase()
+                                        val codec = item.optString("codec", "MP3").uppercase()
 
-                    if (name.isNotBlank() && streamUrl.isNotBlank() && (streamUrl.startsWith("http://") || streamUrl.startsWith("https://"))) {
+                    // Filter out adult/nsfw content to keep the app safe
+                    val isAdult = tags.contains("adult", ignoreCase = true) || 
+                                  tags.contains("nsfw", ignoreCase = true) || 
+                                  tags.contains("explicit", ignoreCase = true)
+                    
+                    if (!isAdult && name.isNotBlank() && streamUrl.isNotBlank() && (streamUrl.startsWith("http://") || streamUrl.startsWith("https://"))) {
                         val imageUrl = if (favicon.startsWith("http")) favicon else getRandomDefaultImage(tags)
                         val formattedGenre = tags.split(",").firstOrNull()?.replaceFirstChar { it.uppercase() } ?: "Music"
 
@@ -91,6 +96,10 @@ object RadioBrowserService {
             "Classical" -> "classical"
             "Ambient" -> "ambient"
             "EDM" -> "edm"
+            "Pop" -> "pop"
+            "Hip Hop" -> "hip hop"
+            "House" -> "house"
+            "Country" -> "country"
             "All", "Custom" -> ""
             else -> genreTag.lowercase().replace("&", "").trim()
         }

@@ -40,6 +40,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -123,13 +124,20 @@ fun HomeScreen(
                 exit = scaleOut() + fadeOut(),
                 modifier = Modifier.imePadding()
             ) {
+                var isFabFocused by remember { mutableStateOf(false) }
                 FloatingActionButton(
                     onClick = onOpenAddStation,
-                    containerColor = NeonCyan,
+                    containerColor = if (isFabFocused) Color.White else NeonCyan,
                     contentColor = DarkBackground,
                     shape = CircleShape,
                     modifier = Modifier
                         .navigationBarsPadding()
+                        .onFocusChanged { isFabFocused = it.isFocused }
+                        .border(
+                            width = if (isFabFocused) 3.dp else 0.dp,
+                            color = if (isFabFocused) NeonCyan else Color.Transparent,
+                            shape = CircleShape
+                        )
                         .testTag("fab_add_station")
                 ) {
                     Icon(imageVector = Icons.Filled.Add, contentDescription = "Add Custom Station")
@@ -689,7 +697,9 @@ fun StationCard(
             // Favorite Button
             IconButton(
                 onClick = onToggleFavorite,
-                modifier = Modifier.testTag("favorite_button_${station.id}")
+                modifier = Modifier
+                    .focusProperties { canFocus = false }
+                    .testTag("favorite_button_${station.id}")
             ) {
                 Icon(
                     imageVector = if (station.isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,

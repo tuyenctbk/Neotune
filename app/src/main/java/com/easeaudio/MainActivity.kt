@@ -49,7 +49,12 @@ class MainActivity : ComponentActivity() {
 
     private val viewModel: RadioViewModel by viewModels()
 
-    @android.annotation.SuppressLint("InvalidFragmentVersionForActivityResult")
+    private val requestPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        Log.d("MainActivity", "Notification permission granted: $isGranted")
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
         super.onCreate(savedInstanceState)
@@ -57,9 +62,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
-                Log.d("MainActivity", "Notification permission granted: $isGranted")
-            }.launch(Manifest.permission.POST_NOTIFICATIONS)
+            requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
         }
 
         // Safe Firebase Initializer

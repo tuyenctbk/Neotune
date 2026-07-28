@@ -27,11 +27,15 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
         "All",
         "News & Reports",
         "Lo-Fi & Chill",
+        "Pop",
         "Jazz",
         "Rock",
+        "Hip Hop",
         "Classical",
         "Ambient",
         "EDM",
+        "House",
+        "Country",
         "Custom"
     )
 

@@ -23,6 +23,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.focus.focusProperties
+import androidx.compose.foundation.border
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import com.easeaudio.R
@@ -52,12 +59,19 @@ fun MiniPlayer(
         modifier = modifier
     ) {
         if (station != null) {
+            var isFocused by remember { mutableStateOf(false) }
             Surface(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 12.dp, vertical = 6.dp)
+                    .onFocusChanged { isFocused = it.isFocused }
                     .clip(RoundedCornerShape(16.dp))
                     .clickable { onOpenFullPlayer() }
+                    .border(
+                        width = if (isFocused) 2.5.dp else 0.dp,
+                        color = if (isFocused) NeonCyan else Color.Transparent,
+                        shape = RoundedCornerShape(16.dp)
+                    )
                     .testTag("mini_player_bar"),
                 color = DarkSurfaceVariant,
                 tonalElevation = 8.dp,
@@ -144,9 +158,14 @@ fun MiniPlayer(
                     }
 
                     // Favorite Button
+                    var isFavFocused by remember { mutableStateOf(false) }
                     IconButton(
                         onClick = onToggleFavorite,
-                        modifier = Modifier.testTag("mini_player_favorite")
+                        modifier = Modifier
+                            .onFocusChanged { isFavFocused = it.isFocused }
+                            .clip(CircleShape)
+                            .background(if (isFavFocused) NeonPink else Color.Transparent)
+                            .testTag("mini_player_favorite")
                     ) {
                         Icon(
                             imageVector = if (station.isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
@@ -156,12 +175,14 @@ fun MiniPlayer(
                     }
 
                     // Play/Pause Button
+                    var isPlayFocused by remember { mutableStateOf(false) }
                     IconButton(
                         onClick = onTogglePlay,
                         modifier = Modifier
                             .size(40.dp)
+                            .onFocusChanged { isPlayFocused = it.isFocused }
                             .clip(CircleShape)
-                            .background(Color.White)
+                            .background(if (isPlayFocused) NeonCyan else Color.White)
                             .testTag("mini_player_play_pause")
                     ) {
                         if (isLoading) {

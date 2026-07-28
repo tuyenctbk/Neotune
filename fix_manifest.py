@@ -1,15 +1,8 @@
-import re
-
-path = 'app/src/main/AndroidManifest.xml'
-with open(path, 'r') as f:
+with open('app/src/main/AndroidManifest.xml', 'r') as f:
     content = f.read()
 
-# Add attribution tag before application
-attr_tag = '    <attribution android:tag="default_attribution" android:label="@string/app_name" />\n'
-content = content.replace('    <application\n', attr_tag + '    <application\n')
+content = content.replace('    <attribution android:tag="default_attribution" android:label="@string/app_name" />\n', '')
+content = content.replace('        android:attributionTags="default_attribution"\n', '')
 
-# Add android:attributionTags to application
-content = content.replace('    <application\n', '    <application\n        android:attributionTags="default_attribution"\n')
-
-with open(path, 'w') as f:
+with open('app/src/main/AndroidManifest.xml', 'w') as f:
     f.write(content)

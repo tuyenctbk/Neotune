@@ -1,4 +1,6 @@
-<?xml version="1.0" encoding="utf-8"?>
+import re
+
+manifest_content = '''<?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
@@ -60,3 +62,48 @@
         </service>
     </application>
 </manifest>
+'''
+
+with open('app/src/main/AndroidManifest.xml', 'w') as f:
+    f.write(manifest_content)
+
+with open('app/src/main/java/com/easeaudio/service/RadioPlayerManager.kt', 'r') as f:
+    rpm_content = f.read()
+
+rpm_content = re.sub(r'    private val attributionContext: Context by lazy \{.*?\n    \}\n', '', rpm_content, flags=re.DOTALL)
+rpm_content = rpm_content.replace('ExoPlayer.Builder(attributionContext)', 'ExoPlayer.Builder(context)')
+rpm_content = rpm_content.replace('MediaSession.Builder(attributionContext, player)', 'MediaSession.Builder(context, player)')
+
+with open('app/src/main/java/com/easeaudio/service/RadioPlayerManager.kt', 'w') as f:
+    f.write(rpm_content)
+
+service_content = '''package com.easeaudio.service
+
+import androidx.media3.session.MediaSession
+import androidx.media3.session.MediaSessionService
+
+class RadioPlaybackService : MediaSessionService() {
+    override fun onCreate() {
+        super.onCreate()
+        val playerManager = RadioPlayerManager.getInstance(this)
+        RadioPlayerManager.sharedMediaSession?.let { session ->
+            addSession(session)
+        }
+    }
+
+    override fun onGetSession(controllerInfo: MediaSession.ControllerInfo): MediaSession? {
+        RadioPlayerManager.getInstance(this)
+        return RadioPlayerManager.sharedMediaSession
+    }
+
+    override fun onDestroy() {
+        RadioPlayerManager.getInstance(this).release()
+        super.onDestroy()
+    }
+}
+'''
+
+with open('app/src/main/java/com/easeaudio/service/RadioPlaybackService.kt', 'w') as f:
+    f.write(service_content)
+
+print("Cleaned up attribution and restored standard context handling.")
