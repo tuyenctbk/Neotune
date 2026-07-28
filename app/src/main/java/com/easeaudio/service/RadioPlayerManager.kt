@@ -35,6 +35,13 @@ import android.os.Build
 import androidx.core.content.ContextCompat
 
 class RadioPlayerManager(private val context: Context) {
+    private val attributionContext: Context by lazy {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+            context.createAttributionContext("audio_playback")
+        } else {
+            context
+        }
+    }
 
 
 
@@ -147,7 +154,7 @@ class RadioPlayerManager(private val context: Context) {
             .setPrioritizeTimeOverSizeThresholds(true)
             .build()
 
-        exoPlayer = ExoPlayer.Builder(context)
+        exoPlayer = ExoPlayer.Builder(attributionContext)
             .setAudioAttributes(audioAttributes, true)
             .setLoadControl(loadControl)
             .setHandleAudioBecomingNoisy(true)
@@ -260,7 +267,7 @@ class RadioPlayerManager(private val context: Context) {
                     }
                 }
 
-                mediaSession = MediaSession.Builder(context, player)
+                mediaSession = MediaSession.Builder(attributionContext, player)
                     .setSessionActivity(pendingIntent)
                     .setCallback(mediaSessionCallback)
                     .build().also {
