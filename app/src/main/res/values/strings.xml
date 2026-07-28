@@ -40,6 +40,7 @@
     <string name="no_saved_favorites">No saved favorite stations</string>
     <string name="custom">Custom</string>
     <string name="genre_all">All</string>
+    <string name="all">All</string>
     <string name="pop">Pop</string>
     <string name="hip_hop">Hip Hop</string>
     <string name="house">House</string>
