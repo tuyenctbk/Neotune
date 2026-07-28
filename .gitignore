@@ -32,7 +32,6 @@ gradle/wrapper/
 
 # Keystores & sensitive credentials
 *.jks
-*.p12
 
 # Memory dumps, profiling & logs
 *.hprof

@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -5,6 +7,13 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.gms.google.services)
     alias(libs.plugins.firebase.crashlytics)
+}
+
+val localProperties = Properties().apply {
+    val file = rootProject.file("local.properties")
+    if (file.exists()) {
+        file.inputStream().use { load(it) }
+    }
 }
 
 android {
@@ -16,7 +25,7 @@ android {
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.neotune.radioapp"
+        applicationId = "com.neotune.radio"
         minSdk = 24
         targetSdk = 35
         versionCode = 6
@@ -27,23 +36,17 @@ android {
 
     signingConfigs {
         create("release") {
-            storeFile = rootProject.file("release.keystore")
-            storePassword = "easeaudio123"
-            keyAlias = "easeaudio"
-            keyPassword = "easeaudio123"
-            storeType = "pkcs12"
+            storeFile = rootProject.file("common_release_key.jks")
+            storePassword = localProperties.getProperty("RELEASE_STORE_PASSWORD")
+            keyAlias = localProperties.getProperty("RELEASE_KEY_ALIAS")
+            keyPassword = localProperties.getProperty("RELEASE_KEY_PASSWORD")
         }
     }
 
     buildTypes {
         release {
             isMinifyEnabled = false
-            val releaseKeystore = rootProject.file("release.keystore")
-            signingConfig = if (releaseKeystore.exists()) {
-                signingConfigs.getByName("release")
-            } else {
-                signingConfigs.getByName("debug")
-            }
+            signingConfig = signingConfigs.getByName("release")
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
