@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Neotune</string>
+    <string name="app_name">NeoTune</string>
     <string name="app_description">Radio Global en Vivo y Chill Beats</string>
     <string name="nav_tuner">Sintonizador</string>
     <string name="nav_favorites">Favoritos</string>

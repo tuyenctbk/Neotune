@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="36dp"
+    android:height="36dp"
+    android:viewportWidth="36"
+    android:viewportHeight="36">
+
+    <!-- Left Pillar of 'N' (Glowing Neon Cyan) -->
+    <path
+        android:strokeWidth="3.6"
+        android:strokeColor="#00E5FF"
+        android:strokeLineCap="round"
+        android:pathData="M 10,11 L 10,29" />
+
+    <!-- Right Pillar of 'N' / Stem of 'T' (Glowing Violet/Magenta) -->
+    <path
+        android:strokeWidth="3.6"
+        android:strokeColor="#7C4DFF"
+        android:strokeLineCap="round"
+        android:pathData="M 26,11 L 26,29" />
+
+    <!-- Diagonal Line of 'N' (Glowing Pure White) -->
+    <path
+        android:strokeWidth="3.0"
+        android:strokeColor="#FFFFFF"
+        android:strokeLineCap="round"
+        android:pathData="M 10,11 L 26,29" />
+
+    <!-- Crossbar of 'T' (Glowing Audio Equalizer Double-Peak Wavy Gull-wing) -->
+    <path
+        android:strokeWidth="3.2"
+        android:strokeColor="#FF4081"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M 17,11 Q 21.5,5 26,11 Q 30.5,5 35,11" />
+
+</vector>

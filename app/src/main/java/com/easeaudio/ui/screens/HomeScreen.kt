@@ -172,12 +172,12 @@ fun HomeScreen(
                         Column(modifier = Modifier.weight(1f, fill = false)) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Icon(
-                                    imageVector = Icons.Filled.Radio,
-                                    contentDescription = null,
-                                    tint = NeonCyan,
-                                    modifier = Modifier.size(28.dp)
+                                    painter = androidx.compose.ui.res.painterResource(id = R.drawable.ic_favicon),
+                                    contentDescription = "NeoTune Logo",
+                                    tint = Color.Unspecified,
+                                    modifier = Modifier.size(32.dp)
                                 )
-                                Spacer(modifier = Modifier.width(8.dp))
+                                Spacer(modifier = Modifier.width(10.dp))
                                 Text(
                                     text = stringResource(R.string.app_name),
                                     style = MaterialTheme.typography.headlineLarge,
@@ -185,10 +185,12 @@ fun HomeScreen(
                                     fontWeight = FontWeight.Bold
                                 )
                             }
+                            Spacer(modifier = Modifier.height(4.dp))
                             Text(
                                 text = stringResource(R.string.app_description),
                                 style = MaterialTheme.typography.bodyMedium,
-                                color = TextSecondary
+                                color = TextSecondary,
+                                modifier = Modifier.padding(start = 2.dp)
                             )
                         }
 

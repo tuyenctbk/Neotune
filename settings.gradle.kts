@@ -13,5 +13,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Neotune"
+rootProject.name = "NeoTune"
 include(":app")

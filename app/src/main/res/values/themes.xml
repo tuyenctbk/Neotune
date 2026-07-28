@@ -7,7 +7,7 @@
 
     <!-- Starting Theme for AndroidX Splash Screen -->
     <style name="Theme.EaseAudio.Starting" parent="Theme.SplashScreen">
-        <item name="windowSplashScreenBackground">#0F1424</item>
+        <item name="windowSplashScreenBackground">#0A0C16</item>
         <item name="windowSplashScreenAnimatedIcon">@drawable/ic_splash_logo</item>
         <item name="postSplashScreenTheme">@style/Theme.EaseAudio</item>
     </style>
