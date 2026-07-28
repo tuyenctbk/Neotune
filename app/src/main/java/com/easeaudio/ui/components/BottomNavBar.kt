@@ -47,9 +47,9 @@ fun BottomNavBar(
 
     NavigationBar(
         modifier = Modifier
-            .background(DarkSurface)
+            .background(com.easeaudio.ui.theme.DarkBackground)
             .windowInsetsPadding(WindowInsets.navigationBars),
-        containerColor = DarkSurface,
+        containerColor = com.easeaudio.ui.theme.DarkBackground,
         tonalElevation = NavigationBarDefaults.Elevation
     ) {
         items.forEach { item ->

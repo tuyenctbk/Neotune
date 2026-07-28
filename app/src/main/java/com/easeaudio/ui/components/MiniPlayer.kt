@@ -21,6 +21,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
@@ -122,6 +123,7 @@ fun MiniPlayer(
 
                     // Mini Wave Visualizer
                     if (isPlaying) {
+                        val visualizerColors = listOf(NeonCyan, NeonPurple, NeonPink)
                         Row(
                             modifier = Modifier
                                 .height(20.dp)
@@ -129,13 +131,13 @@ fun MiniPlayer(
                             horizontalArrangement = Arrangement.spacedBy(2.dp),
                             verticalAlignment = Alignment.Bottom
                         ) {
-                            waveAmplitudes.take(5).forEach { amp ->
+                            waveAmplitudes.take(5).forEachIndexed { index, amp ->
                                 Box(
                                     modifier = Modifier
                                         .width(3.dp)
                                         .fillMaxHeight(amp.coerceIn(0.2f, 1.0f))
                                         .clip(CircleShape)
-                                        .background(NeonCyan)
+                                        .background(visualizerColors[index % visualizerColors.size])
                                 )
                             }
                         }
@@ -159,11 +161,7 @@ fun MiniPlayer(
                         modifier = Modifier
                             .size(40.dp)
                             .clip(CircleShape)
-                            .background(
-                                Brush.linearGradient(
-                                    listOf(NeonCyan, NeonPurple)
-                                )
-                            )
+                            .background(Color.White)
                             .testTag("mini_player_play_pause")
                     ) {
                         if (isLoading) {

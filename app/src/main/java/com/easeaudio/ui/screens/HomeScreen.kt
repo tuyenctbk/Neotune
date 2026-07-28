@@ -31,6 +31,7 @@ import androidx.compose.material.icons.filled.Radio
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material.icons.filled.Wifi
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.*
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
@@ -38,6 +39,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -46,6 +48,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import coil.compose.AsyncImage
 import androidx.compose.ui.res.stringResource
 import com.easeaudio.R
@@ -88,6 +92,7 @@ fun HomeScreen(
 ) {
     val listState = rememberLazyListState()
     var showAttributionDialog by remember { mutableStateOf(false) }
+    var showAppearanceScreen by remember { mutableStateOf(false) }
     val isFabVisible by remember(searchQuery, stations) {
         derivedStateOf {
             searchQuery.isNotBlank() && stations.isEmpty() && !isDiscoveringOnline
@@ -169,28 +174,25 @@ fun HomeScreen(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Column(modifier = Modifier.weight(1f, fill = false)) {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Icon(
-                                    painter = androidx.compose.ui.res.painterResource(id = R.drawable.ic_favicon),
-                                    contentDescription = "NeoTune Logo",
-                                    tint = Color.Unspecified,
-                                    modifier = Modifier.size(32.dp)
-                                )
-                                Spacer(modifier = Modifier.width(10.dp))
-                                Text(
-                                    text = stringResource(R.string.app_name),
-                                    style = MaterialTheme.typography.headlineLarge,
-                                    color = TextPrimary,
-                                    fontWeight = FontWeight.Bold
-                                )
-                            }
-                            Spacer(modifier = Modifier.height(4.dp))
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Icon(
+                                painter = androidx.compose.ui.res.painterResource(id = R.drawable.ic_favicon),
+                                contentDescription = "NeoTune Logo",
+                                tint = NeonCyan,
+                                modifier = Modifier.size(36.dp)
+                            )
+                            Spacer(modifier = Modifier.width(10.dp))
                             Text(
-                                text = stringResource(R.string.app_description),
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = TextSecondary,
-                                modifier = Modifier.padding(start = 2.dp)
+                                text = stringResource(R.string.app_name),
+                                style = MaterialTheme.typography.headlineLarge.copy(
+                                    fontSize = 28.sp,
+                                    fontWeight = FontWeight.Black,
+                                    letterSpacing = (-0.8).sp
+                                ),
+                                color = TextPrimary
                             )
                         }
 
@@ -200,17 +202,19 @@ fun HomeScreen(
                         Box(
                             modifier = Modifier.wrapContentSize(Alignment.TopEnd)
                         ) {
+                            var isMenuBtnFocused by remember { mutableStateOf(false) }
                             IconButton(
                                 onClick = { showMenu = true },
                                 modifier = Modifier
+                                    .onFocusChanged { isMenuBtnFocused = it.isFocused }
                                     .clip(CircleShape)
-                                    .background(DarkSurfaceVariant)
+                                    .background(if (isMenuBtnFocused) NeonCyan else DarkSurfaceVariant)
                                     .testTag("btn_open_overflow_menu")
                             ) {
                                 Icon(
                                     imageVector = Icons.Filled.MoreVert,
                                     contentDescription = "More Options",
-                                    tint = NeonCyan
+                                    tint = if (isMenuBtnFocused) DarkBackground else NeonCyan
                                 )
                             }
 
@@ -255,6 +259,22 @@ fun HomeScreen(
                                 )
 
                                 DropdownMenuItem(
+                                    text = { Text("Appearance", color = TextPrimary) },
+                                    leadingIcon = {
+                                        Icon(
+                                            imageVector = Icons.Filled.Language,
+                                            contentDescription = "Appearance",
+                                            tint = NeonCyan
+                                        )
+                                    },
+                                    onClick = {
+                                        showMenu = false
+                                        showAppearanceScreen = true
+                                    },
+                                    modifier = Modifier.testTag("menu_item_appearance")
+                                )
+
+                                DropdownMenuItem(
                                     text = { Text("Info", color = TextPrimary) },
                                     leadingIcon = {
                                         Icon(
@@ -272,6 +292,13 @@ fun HomeScreen(
                             }
                         }
                     }
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = stringResource(R.string.app_description),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = TextSecondary,
+                        modifier = Modifier.padding(start = 46.dp)
+                    )
                 }
             }
 
@@ -285,10 +312,10 @@ fun HomeScreen(
                     singleLine = true,
                     shape = RoundedCornerShape(16.dp),
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedContainerColor = DarkSurfaceVariant,
-                        unfocusedContainerColor = DarkSurfaceVariant,
+                        focusedContainerColor = DarkSurface,
+                        unfocusedContainerColor = DarkSurface,
                         focusedBorderColor = NeonCyan,
-                        unfocusedBorderColor = CardBorder,
+                        unfocusedBorderColor = Color.Transparent,
                         focusedTextColor = TextPrimary,
                         unfocusedTextColor = TextPrimary
                     ),
@@ -310,29 +337,34 @@ fun HomeScreen(
                 ) {
                     items(availableGenres) { genre ->
                         val isSelected = genre == selectedGenre
-                        FilterChip(
-                            selected = isSelected,
-                            onClick = { onGenreSelect(genre) },
-                            label = {
-                                Text(
-                                    text = genre,
-                                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
+                        var isPillFocused by remember { mutableStateOf(false) }
+                        Box(
+                            modifier = Modifier
+                                .onFocusChanged { isPillFocused = it.isFocused }
+                                .clip(CircleShape)
+                                .background(
+                                    if (isSelected) NeonCyan 
+                                    else if (isPillFocused) DarkSurfaceVariant 
+                                    else Color.Transparent
                                 )
-                            },
-                            colors = FilterChipDefaults.filterChipColors(
-                                selectedContainerColor = NeonCyan,
-                                selectedLabelColor = DarkBackground,
-                                containerColor = DarkSurfaceVariant,
-                                labelColor = TextSecondary
-                            ),
-                            border = FilterChipDefaults.filterChipBorder(
-                                enabled = true,
-                                selected = isSelected,
-                                borderColor = CardBorder,
-                                selectedBorderColor = NeonCyan
-                            ),
-                            modifier = Modifier.testTag("genre_chip_$genre")
-                        )
+                                .border(
+                                    width = if (isPillFocused) 2.dp else if (isSelected) 0.dp else 1.dp,
+                                    color = if (isPillFocused) NeonCyan else if (isSelected) Color.Transparent else CardBorder,
+                                    shape = CircleShape
+                                )
+                                .clickable { onGenreSelect(genre) }
+                                .padding(horizontal = 18.dp, vertical = 8.dp)
+                                .testTag("genre_chip_$genre"),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = genre,
+                                style = MaterialTheme.typography.bodyMedium.copy(
+                                    fontWeight = if (isSelected || isPillFocused) FontWeight.Bold else FontWeight.Medium
+                                ),
+                                color = if (isSelected) DarkBackground else if (isPillFocused) NeonCyan else TextMuted
+                            )
+                        }
                     }
                 }
             }
@@ -341,12 +373,19 @@ fun HomeScreen(
             if (stations.isNotEmpty() && searchQuery.isEmpty() && selectedGenre == "All") {
                 val featured = stations.first()
                 item {
+                    var isHeroFocused by remember { mutableStateOf(false) }
                     Surface(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(horizontal = 20.dp, vertical = 8.dp)
+                            .onFocusChanged { isHeroFocused = it.isFocused }
                             .clip(RoundedCornerShape(20.dp))
                             .clickable { onStationSelect(featured) }
+                            .border(
+                                width = if (isHeroFocused) 2.5.dp else 0.dp,
+                                color = if (isHeroFocused) NeonCyan else Color.Transparent,
+                                shape = RoundedCornerShape(20.dp)
+                            )
                             .testTag("hero_featured_card"),
                         color = DarkSurface
                     ) {
@@ -379,7 +418,7 @@ fun HomeScreen(
                                     Text(
                                         text = "FEATURED STATION",
                                         style = MaterialTheme.typography.labelMedium,
-                                        color = NeonCyan,
+                                        color = TextMuted,
                                         fontWeight = FontWeight.Bold
                                     )
                                     Text(
@@ -396,26 +435,26 @@ fun HomeScreen(
                                     )
                                 }
 
-                                Surface(
-                                    modifier = Modifier.size(48.dp),
-                                    shape = CircleShape,
-                                    color = NeonCyan
+                                Box(
+                                    modifier = Modifier
+                                        .size(48.dp)
+                                        .clip(CircleShape)
+                                        .background(Color.White),
+                                    contentAlignment = Alignment.Center
                                 ) {
-                                    Box(contentAlignment = Alignment.Center) {
-                                        val isFeaturedSelected = currentStation?.id == featured.id
-                                        if (isFeaturedSelected && isLoading) {
-                                            CircularProgressIndicator(
-                                                modifier = Modifier.size(24.dp),
-                                                color = DarkBackground,
-                                                strokeWidth = 2.5.dp
-                                            )
-                                        } else {
-                                            Icon(
-                                                imageVector = if (isFeaturedSelected && isPlaying) Icons.Filled.Pause else Icons.Filled.PlayArrow,
-                                                contentDescription = "Play Featured",
-                                                tint = DarkBackground
-                                            )
-                                        }
+                                    val isFeaturedSelected = currentStation?.id == featured.id
+                                    if (isFeaturedSelected && isLoading) {
+                                        CircularProgressIndicator(
+                                            modifier = Modifier.size(24.dp),
+                                            color = DarkBackground,
+                                            strokeWidth = 2.5.dp
+                                        )
+                                    } else {
+                                        Icon(
+                                            imageVector = if (isFeaturedSelected && isPlaying) Icons.Filled.Pause else Icons.Filled.PlayArrow,
+                                            contentDescription = "Play Featured",
+                                            tint = DarkBackground
+                                        )
                                     }
                                 }
                             }
@@ -513,6 +552,18 @@ fun HomeScreen(
     if (showAttributionDialog) {
         AttributionDialog(onDismiss = { showAttributionDialog = false })
     }
+
+    if (showAppearanceScreen) {
+        val context = androidx.compose.ui.platform.LocalContext.current
+        AppearanceSelectionScreen(
+            currentTheme = AppThemeState.currentTheme,
+            themes = AppThemeState.ThemePresets,
+            onDismiss = { showAppearanceScreen = false },
+            onSelectTheme = { theme ->
+                AppThemeState.saveTheme(context, theme.id)
+            }
+        )
+    }
 }
 
 @Composable
@@ -525,19 +576,21 @@ fun StationCard(
     onSelect: () -> Unit,
     onToggleFavorite: () -> Unit
 ) {
+    var isFocused by remember { mutableStateOf(false) }
     Surface(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 20.dp, vertical = 6.dp)
+            .onFocusChanged { isFocused = it.isFocused }
             .clip(RoundedCornerShape(16.dp))
+            .clickable { onSelect() }
             .border(
-                width = if (isSelected) 1.5.dp else 1.dp,
-                color = if (isSelected) NeonCyan else CardBorder,
+                width = if (isFocused) 2.5.dp else if (isSelected) 1.dp else 0.dp,
+                color = if (isFocused) NeonCyan else if (isSelected) NeonCyan.copy(alpha = 0.5f) else Color.Transparent,
                 shape = RoundedCornerShape(16.dp)
             )
-            .clickable { onSelect() }
             .testTag("station_card_${station.id}"),
-        color = if (isSelected) DarkSurfaceVariant else DarkSurface
+        color = if (isFocused) DarkSurfaceVariant else if (isSelected) DarkSurfaceVariant.copy(alpha = 0.8f) else DarkSurface
     ) {
         Row(
             modifier = Modifier
@@ -647,3 +700,356 @@ fun StationCard(
         }
     }
 }
+
+@Composable
+fun AppearanceSelectionScreen(
+    currentTheme: ThemePreset,
+    themes: List<ThemePreset>,
+    onDismiss: () -> Unit,
+    onSelectTheme: (ThemePreset) -> Unit
+) {
+    val cafeThemeIds = listOf("espresso_bar", "bistro_warm", "fine_dining_obsidian", "garden_cafe", "wine_bar", "minimalist_cafe", "trattoria", "youth_cafe")
+    val cafeThemes = themes.filter { cafeThemeIds.contains(it.id) }
+    val standardThemes = themes.filter { !it.id.startsWith("youth_") && !cafeThemeIds.contains(it.id) }
+    val youthThemes = themes.filter { theme -> theme.id.startsWith("youth_") && !cafeThemeIds.contains(theme.id) }
+
+    Dialog(
+        onDismissRequest = onDismiss,
+        properties = DialogProperties(
+            usePlatformDefaultWidth = false,
+            decorFitsSystemWindows = false
+        )
+    ) {
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = DarkBackground
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .windowInsetsPadding(WindowInsets.statusBars)
+                    .windowInsetsPadding(WindowInsets.navigationBars)
+            ) {
+                // Top App Bar
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 8.dp, vertical = 12.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    var isBackFocused by remember { mutableStateOf(false) }
+                    IconButton(
+                        onClick = onDismiss,
+                        modifier = Modifier
+                            .onFocusChanged { isBackFocused = it.isFocused }
+                            .clip(CircleShape)
+                            .background(if (isBackFocused) NeonCyan else Color.Transparent)
+                            .testTag("btn_close_appearance")
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.ArrowBack,
+                            contentDescription = "Back",
+                            tint = if (isBackFocused) DarkBackground else NeonCyan
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(12.dp))
+                    Column {
+                        Text(
+                            text = "Appearance",
+                            style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
+                            color = TextPrimary
+                        )
+                        Text(
+                            text = "Giao diện & Tông màu ấm cúng cho không gian của bạn",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = TextSecondary
+                        )
+                    }
+                }
+
+                HorizontalDivider(color = CardBorder, thickness = 1.dp, modifier = Modifier.padding(horizontal = 20.dp))
+
+                LazyColumn(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxWidth()
+                        .padding(horizontal = 20.dp),
+                    contentPadding = PaddingValues(top = 16.dp, bottom = 40.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    // Cafe Themes Section
+                    item {
+                        Column {
+                            Text(
+                                text = "☕ CAFE & NHÀ HÀNG (TÔNG ẤM, SANG)",
+                                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold, letterSpacing = 0.5.sp),
+                                color = NeonPink,
+                                modifier = Modifier.padding(bottom = 4.dp)
+                            )
+                            Text(
+                                text = "Giao diện tông ấm dịu mắt, không gây chói cho thực khách, lý tưởng làm nhạc nền",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = TextMuted,
+                                modifier = Modifier.padding(bottom = 12.dp)
+                            )
+                        }
+                    }
+                    items(cafeThemes, key = { it.id }) { theme ->
+                        ThemeSelectionCard(theme, currentTheme, onSelectTheme)
+                    }
+
+                    // Standard Section
+                    item {
+                        Column {
+                            Text(
+                                text = "✨ TỐI GIẢN & TINH TẾ (STANDARD)",
+                                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold, letterSpacing = 0.5.sp),
+                                color = NeonCyan,
+                                modifier = Modifier.padding(top = 12.dp, bottom = 4.dp)
+                            )
+                            Text(
+                                text = "Thiết kế chuẩn mực, thanh lịch cho mọi nhu cầu thưởng thức âm nhạc hàng ngày",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = TextMuted,
+                                modifier = Modifier.padding(bottom = 12.dp)
+                            )
+                        }
+                    }
+                    items(standardThemes, key = { it.id }) { theme ->
+                        ThemeSelectionCard(theme, currentTheme, onSelectTheme)
+                    }
+
+                    // Youth Section
+                    item {
+                        Column {
+                            Text(
+                                text = "⚡ TRẺ TRUNG & CÁ TÍNH (YOUTH)",
+                                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold, letterSpacing = 0.5.sp),
+                                color = NeonPurple,
+                                modifier = Modifier.padding(top = 12.dp, bottom = 4.dp)
+                            )
+                            Text(
+                                text = "Năng động, đậm chất nghệ thuật, phá cách cho không gian trẻ trung",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = TextMuted,
+                                modifier = Modifier.padding(bottom = 12.dp)
+                            )
+                        }
+                    }
+                    items(youthThemes, key = { it.id }) { theme ->
+                        ThemeSelectionCard(theme, currentTheme, onSelectTheme)
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun ThemeSelectionCard(
+    theme: ThemePreset,
+    currentTheme: ThemePreset,
+    onSelectTheme: (ThemePreset) -> Unit
+) {
+    val isSelected = theme.id == currentTheme.id
+    var isFocused by remember { mutableStateOf(false) }
+
+    Surface(
+        modifier = Modifier
+            .fillMaxWidth()
+            .onFocusChanged { isFocused = it.isFocused }
+            .clip(RoundedCornerShape(16.dp))
+            .clickable { onSelectTheme(theme) }
+            .border(
+                width = if (isFocused) 3.dp else if (isSelected) 1.5.dp else 1.dp,
+                color = if (isFocused) theme.primary else if (isSelected) theme.primary.copy(alpha = 0.6f) else CardBorder,
+                shape = RoundedCornerShape(16.dp)
+            )
+            .testTag("theme_card_${theme.id}"),
+        color = if (isFocused) DarkSurfaceVariant else if (isSelected) DarkSurfaceVariant.copy(alpha = 0.5f) else DarkSurface
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            // Text Info (Left side)
+            Column(modifier = Modifier.weight(1.3f)) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = theme.name,
+                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                        color = if (isSelected) theme.primary else TextPrimary
+                    )
+                    if (isSelected) {
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Box(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(6.dp))
+                                .background(theme.primary.copy(alpha = 0.15f))
+                                .padding(horizontal = 6.dp, vertical = 2.dp)
+                        ) {
+                            Text(
+                                text = "Đang dùng",
+                                style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
+                                color = theme.primary
+                            )
+                        }
+                    }
+                }
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = theme.description,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = TextSecondary,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                // Color dots info
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    ColorPill(label = "Nền", color = theme.background)
+                    ColorPill(label = "Thẻ", color = theme.surface)
+                    ColorPill(label = "Nhấn", color = theme.primary)
+                }
+            }
+
+            Spacer(modifier = Modifier.width(16.dp))
+
+            // Mini Mockup (Right side - Illustration)
+            Box(
+                modifier = Modifier
+                    .width(100.dp)
+                    .height(68.dp)
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(theme.background)
+                    .border(1.dp, theme.cardBorder, RoundedCornerShape(8.dp))
+                    .padding(6.dp)
+            ) {
+                // Mini layout mimicking NeoTune App
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.SpaceBetween
+                ) {
+                    // Header line
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        // Tiny title "NeoTune"
+                        Box(
+                            modifier = Modifier
+                                .width(36.dp)
+                                .height(4.dp)
+                                .clip(RoundedCornerShape(2.dp))
+                                .background(theme.textPrimary.copy(alpha = 0.8f))
+                        )
+                        // Tiny dot for status/menu
+                        Box(
+                            modifier = Modifier
+                                .size(4.dp)
+                                .clip(CircleShape)
+                                .background(theme.primary)
+                        )
+                    }
+
+                    // Mini active card
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f)
+                            .padding(vertical = 4.dp)
+                            .clip(RoundedCornerShape(4.dp))
+                            .background(theme.surface)
+                            .padding(4.dp)
+                    ) {
+                        Row(
+                            modifier = Modifier.fillMaxSize(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            // Tiny image box
+                            Box(
+                                modifier = Modifier
+                                    .size(16.dp)
+                                    .clip(RoundedCornerShape(2.dp))
+                                    .background(theme.textMuted.copy(alpha = 0.4f))
+                            )
+                            Spacer(modifier = Modifier.width(4.dp))
+                            // Tiny text lines
+                            Column(modifier = Modifier.weight(1f)) {
+                                Box(
+                                    modifier = Modifier
+                                        .width(24.dp)
+                                        .height(3.dp)
+                                        .clip(RoundedCornerShape(1.5.dp))
+                                        .background(theme.primary)
+                                )
+                                Spacer(modifier = Modifier.height(2.dp))
+                                Box(
+                                    modifier = Modifier
+                                        .width(16.dp)
+                                        .height(2.dp)
+                                        .clip(RoundedCornerShape(1.dp))
+                                        .background(theme.textSecondary.copy(alpha = 0.6f))
+                                )
+                            }
+                            // Tiny play circle button
+                            Box(
+                                modifier = Modifier
+                                    .size(14.dp)
+                                    .clip(CircleShape)
+                                    .background(theme.primary),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Box(
+                                    modifier = Modifier
+                                        .size(4.dp)
+                                        .background(theme.background)
+                                )
+                            }
+                        }
+                    }
+
+                    // Mini Bottom bar dots
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceEvenly
+                    ) {
+                        Box(modifier = Modifier.size(3.dp).clip(CircleShape).background(theme.primary))
+                        Box(modifier = Modifier.size(3.dp).clip(CircleShape).background(theme.textMuted.copy(alpha = 0.5f)))
+                        Box(modifier = Modifier.size(3.dp).clip(CircleShape).background(theme.textMuted.copy(alpha = 0.5f)))
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun ColorPill(label: String, color: Color) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(4.dp)
+    ) {
+        Box(
+            modifier = Modifier
+                .size(10.dp)
+                .clip(CircleShape)
+                .background(color)
+                .border(0.5.dp, Color(0x33FFFFFF), CircleShape)
+        )
+        Text(
+            text = label,
+            style = MaterialTheme.typography.labelSmall,
+            color = TextMuted
+        )
+    }
+}
+

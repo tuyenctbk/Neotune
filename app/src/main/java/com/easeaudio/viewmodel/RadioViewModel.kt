@@ -15,7 +15,7 @@ import java.util.UUID
 class RadioViewModel(application: Application) : AndroidViewModel(application) {
 
     val repository: RadioRepository = RadioRepository(RadioDatabase.getDatabase(application).radioDao())
-    val playerManager: RadioPlayerManager = RadioPlayerManager(application)
+    val playerManager: RadioPlayerManager = RadioPlayerManager.getInstance(application)
 
     private val _searchQuery = MutableStateFlow("")
     val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()
@@ -292,6 +292,6 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
 
     override fun onCleared() {
         super.onCleared()
-        playerManager.release()
+        // Do not release playerManager here to keep background playback active when UI clears
     }
 }

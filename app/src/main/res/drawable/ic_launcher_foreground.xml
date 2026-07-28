@@ -5,51 +5,40 @@
     android:viewportWidth="108"
     android:viewportHeight="108">
 
-    <!-- Thin Circular Frequency Orbits (Representing Radio Tuner / Wireless Waves) -->
+    <!-- Outer Tuner Dial Ring -->
     <path
         android:strokeWidth="1.5"
-        android:strokeColor="#1F00E5FF"
+        android:strokeColor="#33FFFFFF"
         android:strokeLineCap="round"
         android:pathData="M 54,54 m -38,0 a 38,38 0 1,0 76,0 a 38,38 0 1,0 -76,0" />
 
+    <!-- Radio / Tuner Fine Graduation Ticks (Dashed Ring) -->
     <path
-        android:strokeWidth="0.8"
-        android:strokeColor="#157C4DFF"
+        android:strokeWidth="1.2"
+        android:strokeColor="#22FFFFFF"
         android:strokeLineCap="round"
-        android:pathData="M 54,54 m -44,0 a 44,44 0 1,0 88,0 a 44,44 0 1,0 -88,0" />
+        android:pathData="M 54,54 m -33,0 a 33,33 0 1,0 66,0 a 33,33 0 1,0 -66,0" />
 
-    <!-- Left Pillar of 'N' (Glowing Neon Cyan) -->
+    <!-- Top Accent Pointer (Orange Tuner Needle at 12 o'clock) -->
     <path
-        android:strokeWidth="7"
-        android:strokeColor="#00E5FF"
+        android:strokeWidth="2.5"
+        android:strokeColor="#FFA726"
         android:strokeLineCap="round"
-        android:pathData="M 36,36 L 36,72" />
+        android:pathData="M 54,12 L 54,19" />
 
-    <!-- Shared Stem of 'T' / Right Pillar of 'N' (Glowing Violet/Magenta) -->
+    <!-- Right Accent Pointer (Cyan Tuner Needle at 3 o'clock) -->
     <path
-        android:strokeWidth="7"
-        android:strokeColor="#7C4DFF"
+        android:strokeWidth="2.5"
+        android:strokeColor="#00F0FF"
         android:strokeLineCap="round"
-        android:pathData="M 68,36 L 68,72" />
+        android:pathData="M 89,54 L 96,54" />
 
-    <!-- Diagonal Line of 'N' (Glowing Pure White) -->
+    <!-- Central Sleek Bold Letter 'N' (Drawn as a single continuous line for perfect joints) -->
     <path
-        android:strokeWidth="5.5"
+        android:strokeWidth="8.5"
         android:strokeColor="#FFFFFF"
         android:strokeLineCap="round"
-        android:pathData="M 36,36 L 68,72" />
-
-    <!-- Crossbar of 'T' (Glowing Audio Equalizer Double-Peak Wavy Gull-wing) -->
-    <path
-        android:strokeWidth="5.5"
-        android:strokeColor="#FF4081"
-        android:strokeLineCap="round"
         android:strokeLineJoin="round"
-        android:pathData="M 50,36 Q 59,26 68,36 Q 77,26 86,36" />
-
-    <!-- Central Glowing Tuner Frequency Lock Node -->
-    <path
-        android:fillColor="#00E5FF"
-        android:pathData="M 52,54 m -3,0 a 3,3 0 1,0 6,0 a 3,3 0 1,0 -6,0" />
+        android:pathData="M 40,70 L 40,38 L 68,70 L 68,38" />
 
 </vector>

@@ -50,12 +50,12 @@ fun SleepTimerDialog(
                     )
                     Button(
                         onClick = onCancelTimer,
-                        colors = ButtonDefaults.buttonColors(containerColor = NeonPink),
+                        colors = ButtonDefaults.buttonColors(containerColor = NeonPink, contentColor = DarkBackground),
                         modifier = Modifier
                             .fillMaxWidth()
                             .testTag("cancel_sleep_timer")
                     ) {
-                        Text(stringResource(R.string.close), color = TextPrimary)
+                        Text(stringResource(R.string.close))
                     }
                     HorizontalDivider(color = CardBorder)
                 }

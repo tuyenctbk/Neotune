@@ -37,6 +37,15 @@ class RadioPlayerManager(private val context: Context) {
     companion object {
         @Volatile
         var sharedMediaSession: MediaSession? = null
+
+        @Volatile
+        private var instance: RadioPlayerManager? = null
+
+        fun getInstance(context: Context): RadioPlayerManager {
+            return instance ?: synchronized(this) {
+                instance ?: RadioPlayerManager(context.applicationContext).also { instance = it }
+            }
+        }
     }
 
     private val TAG = "RadioPlayerManager"
@@ -143,9 +152,9 @@ class RadioPlayerManager(private val context: Context) {
                         _isPlaying.value = isPlayingNow
                         _isLoading.value = false
                         if (isPlayingNow) {
+                            startForegroundService()
                             acquireLocks()
                             startWaveAnimation()
-                            startForegroundService()
                             _currentStation.value?.let { current ->
                                 if (_failedStationIds.value.contains(current.id)) {
                                     _failedStationIds.value = _failedStationIds.value - current.id
@@ -277,6 +286,7 @@ class RadioPlayerManager(private val context: Context) {
         _playbackError.value = null
         _isLoading.value = true
         _streamTitle.value = station.name
+        startForegroundService()
 
         exoPlayer?.let { player ->
             val mediaMetadata = MediaMetadata.Builder()
@@ -432,6 +442,9 @@ class RadioPlayerManager(private val context: Context) {
         sharedMediaSession = null
         exoPlayer?.release()
         exoPlayer = null
+        synchronized(RadioPlayerManager::class.java) {
+            instance = null
+        }
     }
 
     private fun startSilentChecking() {

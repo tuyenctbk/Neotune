@@ -9,28 +9,26 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 
-private val DarkColorScheme = darkColorScheme(
-    primary = NeonCyan,
-    onPrimary = DarkBackground,
-    primaryContainer = ActivePill,
-    onPrimaryContainer = NeonCyan,
-    secondary = NeonPurple,
-    onSecondary = TextPrimary,
-    tertiary = NeonPink,
-    background = DarkBackground,
-    onBackground = TextPrimary,
-    surface = DarkSurface,
-    onSurface = TextPrimary,
-    surfaceVariant = DarkSurfaceVariant,
-    onSurfaceVariant = TextSecondary,
-    outline = CardBorder
-)
-
 @Composable
 fun TuneveTheme(
     content: @Composable () -> Unit
 ) {
-    val colorScheme = DarkColorScheme
+    val colorScheme = darkColorScheme(
+        primary = NeonCyan,
+        onPrimary = DarkBackground,
+        primaryContainer = ActivePill,
+        onPrimaryContainer = NeonCyan,
+        secondary = NeonPurple,
+        onSecondary = TextPrimary,
+        tertiary = NeonPink,
+        background = DarkBackground,
+        onBackground = TextPrimary,
+        surface = DarkSurface,
+        onSurface = TextPrimary,
+        surfaceVariant = DarkSurfaceVariant,
+        onSurfaceVariant = TextSecondary,
+        outline = CardBorder
+    )
     val view = LocalView.current
     if (!view.isInEditMode) {
         SideEffect {

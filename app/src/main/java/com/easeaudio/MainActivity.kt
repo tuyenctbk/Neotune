@@ -1,6 +1,10 @@
 package com.easeaudio
 
 import android.os.Bundle
+import android.os.Build
+import android.util.Log
+import android.Manifest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -38,16 +42,25 @@ import com.easeaudio.ui.screens.HomeScreen
 import com.easeaudio.ui.screens.PlayerScreen
 import com.easeaudio.ui.screens.ScreensaverScreen
 import com.easeaudio.ui.theme.TuneveTheme
+import com.easeaudio.ui.theme.AppThemeState
 import com.easeaudio.viewmodel.RadioViewModel
 
 class MainActivity : ComponentActivity() {
 
     private val viewModel: RadioViewModel by viewModels()
 
+    @android.annotation.SuppressLint("InvalidFragmentVersionForActivityResult")
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
         super.onCreate(savedInstanceState)
+        AppThemeState.loadTheme(applicationContext)
         enableEdgeToEdge()
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
+                Log.d("MainActivity", "Notification permission granted: $isGranted")
+            }.launch(Manifest.permission.POST_NOTIFICATIONS)
+        }
 
         // Safe Firebase Initializer
         FirebaseManager.initialize(applicationContext)

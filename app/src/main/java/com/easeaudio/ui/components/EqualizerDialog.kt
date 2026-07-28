@@ -61,7 +61,7 @@ fun EqualizerDialog(
                         ) {
                             Text(
                                 text = preset,
-                                color = if (isSelected) NeonCyan else TextPrimary,
+                                color = if (isSelected) DarkBackground else TextPrimary,
                                 fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
                             )
                             if (isSelected) {
@@ -69,7 +69,7 @@ fun EqualizerDialog(
                                     modifier = Modifier
                                         .size(10.dp)
                                         .clip(CircleShape)
-                                        .background(NeonCyan)
+                                        .background(DarkBackground)
                                 )
                             }
                         }

@@ -281,10 +281,6 @@ fun ScreensaverScreen(
                     Surface(
                         color = DarkSurface.copy(alpha = if (isDimmed) 0.5f else 0.8f),
                         shape = RoundedCornerShape(20.dp),
-                        border = androidx.compose.foundation.BorderStroke(
-                            1.dp,
-                            Brush.linearGradient(listOf(NeonCyan.copy(alpha = 0.3f), NeonPurple.copy(alpha = 0.2f)))
-                        ),
                         modifier = Modifier
                             .fillMaxWidth()
                             .testTag("dock_now_playing_card")
@@ -357,7 +353,7 @@ fun ScreensaverScreen(
                                             .clip(CircleShape)
                                             .background(
                                                 Brush.verticalGradient(
-                                                    listOf(NeonCyan, NeonPurple)
+                                                    listOf(NeonCyan, NeonPurple, NeonPink)
                                                 )
                                             )
                                     )
@@ -448,7 +444,7 @@ fun ScreensaverScreen(
                                 },
                                 colors = FilterChipDefaults.filterChipColors(
                                     selectedContainerColor = ActivePill,
-                                    selectedLabelColor = NeonCyan,
+                                    selectedLabelColor = DarkBackground,
                                     containerColor = DarkSurfaceVariant.copy(alpha = 0.5f),
                                     labelColor = TextSecondary
                                 ),
@@ -479,7 +475,7 @@ fun ScreensaverScreen(
                             Icon(
                                 imageVector = Icons.Outlined.Bedtime,
                                 contentDescription = stringResource(R.string.sleep_timer),
-                                tint = if (sleepTimerRemaining != null) NeonPurple else TextSecondary,
+                                tint = if (sleepTimerRemaining != null) DarkBackground else TextSecondary,
                                 modifier = Modifier.size(18.dp)
                             )
                         }
