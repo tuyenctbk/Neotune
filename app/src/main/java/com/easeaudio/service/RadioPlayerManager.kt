@@ -203,10 +203,10 @@ class RadioPlayerManager(private val context: Context) {
             .setConnectTimeoutMs(10000)
             .setReadTimeoutMs(10000)
 
-        val mediaSourceFactory = DefaultMediaSourceFactory(context)
+        val mediaSourceFactory = DefaultMediaSourceFactory(context.applicationContext)
             .setDataSourceFactory(httpDataSourceFactory)
 
-        exoPlayer = ExoPlayer.Builder(context)
+        exoPlayer = ExoPlayer.Builder(context.applicationContext)
             .setMediaSourceFactory(mediaSourceFactory)
             .setAudioAttributes(audioAttributes, true)
             .setLoadControl(loadControl)
@@ -395,7 +395,7 @@ class RadioPlayerManager(private val context: Context) {
                     }
                 }
 
-                mediaSession = MediaSession.Builder(context, player)
+                mediaSession = MediaSession.Builder(context.applicationContext, player)
                     .setSessionActivity(pendingIntent)
                     .setCallback(mediaSessionCallback)
                     .build().also {
