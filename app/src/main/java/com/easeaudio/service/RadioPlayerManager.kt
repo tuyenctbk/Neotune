@@ -395,7 +395,28 @@ class RadioPlayerManager(private val context: Context) {
                     }
                 }
 
-                mediaSession = MediaSession.Builder(context.applicationContext, player)
+                val forwardingPlayer = object : androidx.media3.common.ForwardingPlayer(player) {
+                    override fun getAvailableCommands(): Player.Commands {
+                        return super.getAvailableCommands().buildUpon()
+                            .remove(Player.COMMAND_SEEK_BACK)
+                            .remove(Player.COMMAND_SEEK_FORWARD)
+                            .build()
+                    }
+
+                    override fun isCommandAvailable(command: Int): Boolean {
+                        return if (command == Player.COMMAND_SEEK_BACK ||
+                            command == Player.COMMAND_SEEK_FORWARD) {
+                            false
+                        } else {
+                            super.isCommandAvailable(command)
+                        }
+                    }
+
+                    override fun isCurrentMediaItemLive(): Boolean = true
+                    override fun isCurrentMediaItemSeekable(): Boolean = false
+                }
+
+                mediaSession = MediaSession.Builder(context.applicationContext, forwardingPlayer)
                     .setSessionActivity(pendingIntent)
                     .setCallback(mediaSessionCallback)
                     .build().also {

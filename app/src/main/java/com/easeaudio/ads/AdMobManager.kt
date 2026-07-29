@@ -103,6 +103,14 @@ fun AdMobBanner(
             update = { view ->
                 // No-op or dynamic updates if needed
             },
+            onRelease = { view ->
+                try {
+                    view.destroy()
+                    Log.d("AdMobBanner", "Banner ad view destroyed successfully")
+                } catch (e: Exception) {
+                    Log.e("AdMobBanner", "Failed to destroy banner ad view", e)
+                }
+            },
             modifier = Modifier
                 .fillMaxWidth()
                 .wrapContentHeight()
