@@ -35,7 +35,11 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -83,13 +87,22 @@ fun OnboardingScreen(
         )
     }
 
-    // Periodically sync permission state when screen is displayed
-    LaunchedEffect(Unit) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            hasNotificationPermission = ContextCompat.checkSelfPermission(
-                context,
-                Manifest.permission.POST_NOTIFICATIONS
-            ) == PackageManager.PERMISSION_GRANTED
+    // Sync permission state when screen is displayed or when app resumes from permission dialog
+    val lifecycleOwner = LocalLifecycleOwner.current
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    hasNotificationPermission = ContextCompat.checkSelfPermission(
+                        context,
+                        Manifest.permission.POST_NOTIFICATIONS
+                    ) == PackageManager.PERMISSION_GRANTED
+                }
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
         }
     }
 
@@ -109,20 +122,12 @@ fun OnboardingScreen(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Box(
-                    modifier = Modifier
-                        .size(36.dp)
-                        .clip(CircleShape)
-                        .background(Brush.linearGradient(listOf(NeonCyan, NeonBlue))),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.Radio,
-                        contentDescription = "Logo",
-                        tint = DarkBackground,
-                        modifier = Modifier.size(20.dp)
-                    )
-                }
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_favicon),
+                    contentDescription = "NeoTune Logo",
+                    tint = Color.Unspecified,
+                    modifier = Modifier.size(32.dp)
+                )
                 Spacer(modifier = Modifier.width(10.dp))
                 Text(
                     text = stringResource(R.string.app_name),
@@ -133,36 +138,14 @@ fun OnboardingScreen(
                     color = TextPrimary
                 )
             }
-
-            var isSkipFocused by remember { mutableStateOf(false) }
-            TextButton(
-                onClick = {
-                    onGenreSelected(selectedGenre)
-                    onCompleteOnboarding()
-                },
-                modifier = Modifier
-                    .onFocusChanged { isSkipFocused = it.isFocused }
-                    .border(
-                        width = if (isSkipFocused) 2.dp else 0.dp,
-                        color = if (isSkipFocused) NeonCyan else Color.Transparent,
-                        shape = RoundedCornerShape(20.dp)
-                    )
-                    .testTag("btn_onboarding_skip")
-            ) {
-                Text(
-                    text = stringResource(R.string.onboarding_skip),
-                    style = MaterialTheme.typography.labelLarge.copy(
-                        fontWeight = FontWeight.SemiBold,
-                        fontSize = 15.sp
-                    ),
-                    color = TextSecondary
-                )
-            }
         }
+
+        val canScrollForward = if (pagerState.currentPage == 1) hasNotificationPermission else true
 
         // Pager Content
         HorizontalPager(
             state = pagerState,
+            userScrollEnabled = canScrollForward,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(top = 70.dp, bottom = 100.dp)
@@ -255,6 +238,7 @@ fun OnboardingScreen(
 
                 var isNextFocused by remember { mutableStateOf(false) }
                 val isLastPage = pagerState.currentPage == 2
+                val isNextEnabled = if (pagerState.currentPage == 1) hasNotificationPermission else true
 
                 Button(
                     onClick = {
@@ -267,17 +251,20 @@ fun OnboardingScreen(
                             }
                         }
                     },
+                    enabled = isNextEnabled,
                     colors = ButtonDefaults.buttonColors(
                         containerColor = if (isNextFocused) Color.White else NeonCyan,
-                        contentColor = DarkBackground
+                        contentColor = DarkBackground,
+                        disabledContainerColor = DarkSurfaceVariant,
+                        disabledContentColor = TextMuted
                     ),
                     shape = RoundedCornerShape(16.dp),
                     elevation = ButtonDefaults.buttonElevation(defaultElevation = 6.dp),
                     modifier = Modifier
                         .onFocusChanged { isNextFocused = it.isFocused }
                         .border(
-                            width = if (isNextFocused) 3.dp else 0.dp,
-                            color = NeonCyan,
+                            width = if (isNextEnabled && isNextFocused) 3.dp else 0.dp,
+                            color = if (isNextEnabled) NeonCyan else Color.Transparent,
                             shape = RoundedCornerShape(16.dp)
                         )
                         .testTag("btn_onboarding_next")

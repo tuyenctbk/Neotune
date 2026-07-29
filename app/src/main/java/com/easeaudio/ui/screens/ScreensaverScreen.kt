@@ -338,6 +338,7 @@ fun ScreensaverScreen(
                             Spacer(modifier = Modifier.height(10.dp))
 
                             // Waveform Visualizer
+                            val barColors = WaveformAnimationColors
                             Row(
                                 modifier = Modifier
                                     .height(22.dp)
@@ -345,7 +346,8 @@ fun ScreensaverScreen(
                                 horizontalArrangement = Arrangement.spacedBy(4.dp),
                                 verticalAlignment = Alignment.Bottom
                             ) {
-                                waveAmplitudes.forEach { amp ->
+                                waveAmplitudes.forEachIndexed { index, amp ->
+                                    val barColor = barColors[index % barColors.size]
                                     Box(
                                         modifier = Modifier
                                             .weight(1f)
@@ -353,7 +355,7 @@ fun ScreensaverScreen(
                                             .clip(CircleShape)
                                             .background(
                                                 Brush.verticalGradient(
-                                                    listOf(NeonCyan, NeonPurple, NeonPink)
+                                                    listOf(barColor, barColor.copy(alpha = 0.55f))
                                                 )
                                             )
                                     )
@@ -506,7 +508,7 @@ fun ScreensaverScreen(
                                 Icon(
                                     imageVector = if (currentStation.isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
                                     contentDescription = "Favorite",
-                                    tint = if (currentStation.isFavorite) NeonPink else TextSecondary,
+                                    tint = if (currentStation.isFavorite) FavoriteHeartColor else TextSecondary,
                                     modifier = Modifier.size(18.dp)
                                 )
                             }

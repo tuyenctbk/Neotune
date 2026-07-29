@@ -1,4 +1,4 @@
-<?xml version='1.0' encoding='utf-8'?>
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">NeoTune</string>
     <string name="app_description">Radio Langsung Global &amp; Irama Dingin</string>
@@ -39,7 +39,12 @@
     <string name="favorites">Favorit</string>
     <string name="no_saved_favorites">Tidak ada stasiun favorit yang disimpan</string>
     <string name="custom">Adat</string>
+    <string name="genre_all">All</string>
     <string name="all">Semua</string>
+    <string name="pop">Pop</string>
+    <string name="hip_hop">Hip Hop</string>
+    <string name="house">House</string>
+    <string name="country_genre">Country</string>
     <string name="news_reports">Berita &amp; Laporan</string>
     <string name="lofi_chill">Lo-Fi &amp; Dinginkan</string>
     <string name="jazz">jaz</string>
@@ -77,10 +82,48 @@
     <string name="firebase_remote_config">Konfigurasi Jarak Jauh Firebase</string>
     <string name="source_label">Sumber: %1$s</string>
     <string name="admob_advertisements">Iklan AdMob</string>
-    <string name="always_silent_ad">Selalu 100% senyap (Video/audio tidak bersuara)</string>
+    <string name="always_silent_ad" formatted="false">Selalu 100% senyap (Video/audio tidak bersuara)</string>
     <string name="close">Tutup</string>
     <string name="data_provider_info">Info Penyedia Data</string>
     <string name="data_provider_desc">Aplikasi ini menggunakan Radio Browser, database sumber terbuka dan berbasis komunitas (radio-browser.info), untuk melakukan streaming stasiun radio dari seluruh dunia.</string>
     <string name="data_provider_gratitude">Kami berterima kasih kepada komunitas Radio Browser yang telah membuat direktori streaming global ini tersedia secara gratis bagi semua orang.</string>
     <string name="dismiss">Membubarkan</string>
+    <string name="banner_offline">Anda Sedang Offline</string>
+    <string name="banner_back_online">Kembali Online</string>
+    <string name="banner_weak_connection">Koneksi Lemah</string>
+    <string name="featured_station">STASIUN UNGGULAN</string>
+    <string name="appearance_subtitle">Antarmuka &amp; Palet Warna untuk Ruang Anda</string>
+    <string name="theme_section_cafe">☕ KAFE &amp; RESTORAN (HANGAT &amp; ELEGAN)</string>
+    <string name="theme_section_cafe_desc">Antarmuka bernuansa hangat, nyaman di mata, ideal untuk musik latar</string>
+    <string name="theme_section_standard">✨ MINIMALIS &amp; ELEGAN (STANDAR)</string>
+    <string name="theme_section_standard_desc">Desain bersih dan elegan untuk menikmati musik sehari-hari</string>
+    <string name="theme_section_youth">⚡ ENERGETIK &amp; BOLD (MUDA)</string>
+    <string name="theme_section_youth_desc">Dinamis, artistik, dan berani untuk ruang bernuansa muda</string>
+    <string name="in_use">Digunakan</string>
+    <string name="live_badge">LANGSUNG</string>
+    <string name="waiting_network_reconnect">Menunggu koneksi ulang jaringan…</string>
+    <string name="network_error_title">Kesalahan jaringan atau batas API tercapai.</string>
+    <string name="retry_discovery">Coba Lagi</string>
+    <string name="nav_onboarding">Panduan</string>
+    <string name="onboarding_skip">Lewati</string>
+    <string name="onboarding_next">Lanjut</string>
+    <string name="onboarding_get_started">Mulai</string>
+    <string name="onboarding_back">Kembali</string>
+    <string name="onboarding_app_tour">Tur &amp; Panduan Aplikasi</string>
+    <string name="onboarding_slide1_title">Radio Langsung Global</string>
+    <string name="onboarding_slide1_subtitle">Temukan ribuan stasiun radio langsung di seluruh dunia, musik santai, dan suara jernih.</string>
+    <string name="onboarding_slide1_badge1">50.000+ Stasiun</string>
+    <string name="onboarding_slide1_badge2">Streaming Langsung Global</string>
+    <string name="onboarding_slide1_badge3">Tanpa Iklan</string>
+    <string name="onboarding_slide2_title">Kontrol Putar Latar Belakang</string>
+    <string name="onboarding_slide2_subtitle">Tetap putar radio saat menggunakan aplikasi lain atau saat layar terkunci.</string>
+    <string name="onboarding_slide2_grant_btn">Aktifkan Izin Notifikasi</string>
+    <string name="onboarding_slide2_granted">Izin Notifikasi Diberikan ✓</string>
+    <string name="onboarding_slide2_feature1">Widget Media Layar Kunci</string>
+    <string name="onboarding_slide2_feature2">Kontrol Bilah Status Persisten</string>
+    <string name="onboarding_slide2_feature3">Sambung Ulang Otomatis &amp; Perlindungan Buffer</string>
+    <string name="onboarding_slide3_title">Genre &amp; Penjelajahan</string>
+    <string name="onboarding_slide3_subtitle">Pilih genre favorit Anda untuk menyesuaikan beranda.</string>
+    <string name="onboarding_slide3_select_genres">Pilih gaya favorit Anda:</string>
+    <string name="onboarding_slide3_start_listening">Mulai Mendengarkan</string>
 </resources>

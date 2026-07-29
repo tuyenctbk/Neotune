@@ -138,7 +138,7 @@ fun MiniPlayer(
 
                     // Mini Wave Visualizer
                     if (isPlaying) {
-                        val visualizerColors = listOf(NeonCyan, NeonPurple, NeonPink)
+                        val visualizerColors = WaveformAnimationColors
                         Row(
                             modifier = Modifier
                                 .height(20.dp)
@@ -165,13 +165,13 @@ fun MiniPlayer(
                         modifier = Modifier
                             .onFocusChanged { isFavFocused = it.isFocused }
                             .clip(CircleShape)
-                            .background(if (isFavFocused) NeonPink else Color.Transparent)
+                            .background(if (isFavFocused) FavoriteHeartColor else Color.Transparent)
                             .testTag("mini_player_favorite")
                     ) {
                         Icon(
                             imageVector = if (station.isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
                             contentDescription = "Favorite",
-                            tint = if (station.isFavorite) NeonPink else TextMuted
+                            tint = if (isFavFocused) DarkBackground else (if (station.isFavorite) FavoriteHeartColor else TextMuted)
                         )
                     }
 

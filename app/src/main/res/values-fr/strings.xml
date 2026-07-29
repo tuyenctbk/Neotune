@@ -1,4 +1,4 @@
-<?xml version='1.0' encoding='utf-8'?>
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">NeoTune</string>
     <string name="app_description">Radio mondiale en direct et musique relaxante</string>
@@ -39,7 +39,12 @@
     <string name="favorites">Favoris</string>
     <string name="no_saved_favorites">Aucune station favorite enregistrée</string>
     <string name="custom">Personnalisé</string>
+    <string name="genre_all">All</string>
     <string name="all">Tout</string>
+    <string name="pop">Pop</string>
+    <string name="hip_hop">Hip Hop</string>
+    <string name="house">House</string>
+    <string name="country_genre">Country</string>
     <string name="news_reports">Actualités et reportages</string>
     <string name="lofi_chill">Lo-Fi et relaxant</string>
     <string name="jazz">Jazz</string>
@@ -97,4 +102,28 @@
     <string name="in_use">En cours d\'utilisation</string>
     <string name="live_badge">EN DIRECT</string>
     <string name="waiting_network_reconnect">En attente de reconnexion au réseau…</string>
+    <string name="network_error_title">Erreur réseau ou limite d\'API atteinte.</string>
+    <string name="retry_discovery">Réessayer</string>
+    <string name="nav_onboarding">Guide</string>
+    <string name="onboarding_skip">Passer</string>
+    <string name="onboarding_next">Suivant</string>
+    <string name="onboarding_get_started">Commencer</string>
+    <string name="onboarding_back">Retour</string>
+    <string name="onboarding_app_tour">Visite et guide de l\'application</string>
+    <string name="onboarding_slide1_title">Radio en direct mondiale</string>
+    <string name="onboarding_slide1_subtitle">Découvrez des milliers de stations de radio en direct dans le monde entier, des flux chill et un son cristallin.</string>
+    <string name="onboarding_slide1_badge1">Plus de 50 000 stations</string>
+    <string name="onboarding_slide1_badge2">Flux directs mondiaux</string>
+    <string name="onboarding_slide1_badge3">Sans interruption publicitaire</string>
+    <string name="onboarding_slide2_title">Contrôles en arrière-plan</string>
+    <string name="onboarding_slide2_subtitle">Laissez la radio jouer en arrière-plan pendant que vous utilisez d\'autres applications ou lorsque l\'écran est verrouillé.</string>
+    <string name="onboarding_slide2_grant_btn">Activer la permission de notification</string>
+    <string name="onboarding_slide2_granted">Permission de notification accordée ✓</string>
+    <string name="onboarding_slide2_feature1">Widget média sur l\'écran de verrouillage</string>
+    <string name="onboarding_slide2_feature2">Contrôles permanents dans la barre d\'état</string>
+    <string name="onboarding_slide2_feature3">Reconnexion automatique et protection de mémoire tampon</string>
+    <string name="onboarding_slide3_title">Genres et découverte</string>
+    <string name="onboarding_slide3_subtitle">Sélectionnez vos genres préférés pour personnaliser votre écran d\'accueil.</string>
+    <string name="onboarding_slide3_select_genres">Choisissez vos styles préférés :</string>
+    <string name="onboarding_slide3_start_listening">Commencer l\'écoute</string>
 </resources>

@@ -14,7 +14,7 @@ interface RadioDao {
     @Query("SELECT * FROM radio_stations WHERE isCustom = 1 ORDER BY name ASC")
     fun getCustomStations(): Flow<List<RadioStation>>
 
-    @Query("SELECT * FROM radio_stations")
+    @Query("SELECT * FROM radio_stations ORDER BY isCustom DESC, name ASC")
     fun getAllStations(): Flow<List<RadioStation>>
 
     @Query("SELECT * FROM radio_stations WHERE id = :id LIMIT 1")

@@ -69,10 +69,6 @@ class MainActivity : ComponentActivity() {
         AppThemeState.loadTheme(applicationContext)
         enableEdgeToEdge()
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
-        }
-
         // Safe Firebase Initializer
         FirebaseManager.initialize(applicationContext)
 

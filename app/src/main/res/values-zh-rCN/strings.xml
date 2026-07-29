@@ -1,4 +1,4 @@
-<?xml version='1.0' encoding='utf-8'?>
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">NeoTune</string>
     <string name="app_description">全球直播电台与轻松节拍</string>
@@ -39,7 +39,12 @@
     <string name="favorites">收藏</string>
     <string name="no_saved_favorites">暂无保存的收藏电台</string>
     <string name="custom">自定义</string>
+    <string name="genre_all">All</string>
     <string name="all">全部</string>
+    <string name="pop">Pop</string>
+    <string name="hip_hop">Hip Hop</string>
+    <string name="house">House</string>
+    <string name="country_genre">Country</string>
     <string name="news_reports">新闻与报道</string>
     <string name="lofi_chill">Lo-Fi 与轻松</string>
     <string name="jazz">爵士</string>
@@ -97,4 +102,28 @@
     <string name="in_use">使用中</string>
     <string name="live_badge">直播</string>
     <string name="waiting_network_reconnect">正在等待网络重新连接…</string>
+    <string name="network_error_title">网络错误或已达到 API 调用上限。</string>
+    <string name="retry_discovery">重试</string>
+    <string name="nav_onboarding">指南</string>
+    <string name="onboarding_skip">跳过</string>
+    <string name="onboarding_next">下一步</string>
+    <string name="onboarding_get_started">开始使用</string>
+    <string name="onboarding_back">返回</string>
+    <string name="onboarding_app_tour">应用导览与指南</string>
+    <string name="onboarding_slide1_title">全球电台直播</string>
+    <string name="onboarding_slide1_subtitle">探索全球数万个电台直播、放松音乐、高品质音质体验。</string>
+    <string name="onboarding_slide1_badge1">50,000+ 电台</string>
+    <string name="onboarding_slide1_badge2">全球直连播放</string>
+    <string name="onboarding_slide1_badge3">零广告打扰</string>
+    <string name="onboarding_slide2_title">后台播放与锁屏控制</string>
+    <string name="onboarding_slide2_subtitle">在使用其他应用、驾驶或锁屏时，电台均可无缝持续播放。</string>
+    <string name="onboarding_slide2_grant_btn">开启通知权限</string>
+    <string name="onboarding_slide2_granted">已授予通知权限 ✓</string>
+    <string name="onboarding_slide2_feature1">锁屏媒体播放小组件</string>
+    <string name="onboarding_slide2_feature2">状态栏常驻快捷控制</string>
+    <string name="onboarding_slide2_feature3">自动重连与缓冲保护</string>
+    <string name="onboarding_slide3_title">流派与探索</string>
+    <string name="onboarding_slide3_subtitle">选择您喜爱的音乐流派，定制专属首页推荐。</string>
+    <string name="onboarding_slide3_select_genres">挑选您喜欢的风格：</string>
+    <string name="onboarding_slide3_start_listening">开始收听</string>
 </resources>

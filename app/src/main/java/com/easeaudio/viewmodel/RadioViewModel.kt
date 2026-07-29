@@ -65,28 +65,33 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
         _searchQuery,
         _selectedGenre
     ) { localStations, onlineList, query, genre ->
-        val favMap = localStations.filter { it.isFavorite }.associateBy { it.id }
+        val localMap = localStations.associateBy { it.id }
         
         val mergedList = mutableListOf<RadioStation>()
         val addedIds = mutableSetOf<String>()
 
-        // 1. Add priority local stations (custom, favorite, and default curated stations)
-        val priorityLocal = localStations.filter { it.isCustom || it.isFavorite || defaultStationIds.contains(it.id) }
-        priorityLocal.forEach { station ->
+        // 1. Add custom stations created by user first
+        val customStations = localStations.filter { it.isCustom }
+        customStations.forEach { station ->
             mergedList.add(station)
             addedIds.add(station.id)
         }
 
-        // 2. Add online discovered stations in their stable discovered order
+        // 2. Add online discovered stations in their stable discovered order, merging local state (isFavorite, etc.)
         onlineList.forEach { online ->
             if (!addedIds.contains(online.id)) {
-                val isFav = favMap.containsKey(online.id)
-                mergedList.add(online.copy(isFavorite = isFav))
+                val localCopy = localMap[online.id]
+                val mergedStation = online.copy(
+                    isFavorite = localCopy?.isFavorite ?: online.isFavorite,
+                    isCustom = localCopy?.isCustom ?: online.isCustom,
+                    lastListenedTimestamp = localCopy?.lastListenedTimestamp ?: online.lastListenedTimestamp
+                )
+                mergedList.add(mergedStation)
                 addedIds.add(online.id)
             }
         }
 
-        // 3. Add any other cached stations from local DB that were not in priorityLocal or onlineList
+        // 3. Add default curated stations and other cached local stations that were not in onlineList
         localStations.forEach { local ->
             if (!addedIds.contains(local.id)) {
                 mergedList.add(local)

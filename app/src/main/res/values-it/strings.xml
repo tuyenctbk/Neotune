@@ -1,4 +1,4 @@
-<?xml version='1.0' encoding='utf-8'?>
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">NeoTune</string>
     <string name="app_description">Radio dal vivo globale e ritmi rilassanti</string>
@@ -39,7 +39,12 @@
     <string name="favorites">Preferiti</string>
     <string name="no_saved_favorites">Nessuna stazione preferita salvata</string>
     <string name="custom">Personalizzato</string>
+    <string name="genre_all">All</string>
     <string name="all">Tutto</string>
+    <string name="pop">Pop</string>
+    <string name="hip_hop">Hip Hop</string>
+    <string name="house">House</string>
+    <string name="country_genre">Country</string>
     <string name="news_reports">Notizie e rapporti</string>
     <string name="lofi_chill">Lo-Fi e relax</string>
     <string name="jazz">Jazz</string>
@@ -77,10 +82,48 @@
     <string name="firebase_remote_config">Configurazione remota Firebase</string>
     <string name="source_label">Fonte: %1$s</string>
     <string name="admob_advertisements">Annunci AdMob</string>
-    <string name="always_silent_ad">Sempre silenzioso al 100% (video/audio disattivato)</string>
+    <string name="always_silent_ad" formatted="false">Sempre silenzioso al 100% (video/audio disattivato)</string>
     <string name="close">Chiudi</string>
     <string name="data_provider_info">Informazioni sul fornitore di dati</string>
     <string name="data_provider_desc">Questa applicazione utilizza Radio Browser, un database open source e gestito dalla comunità (radio-browser.info), per trasmettere in streaming stazioni radio da tutto il mondo.</string>
     <string name="data_provider_gratitude">Siamo grati alla comunità di Radio Browser per aver reso questa directory globale di streaming liberamente disponibile a tutti.</string>
     <string name="dismiss">Congedare</string>
+    <string name="banner_offline">Sei offline</string>
+    <string name="banner_back_online">Di nuovo online</string>
+    <string name="banner_weak_connection">Connessione debole</string>
+    <string name="featured_station">STAZIONE IN EVIDENZA</string>
+    <string name="appearance_subtitle">Interfaccia e tavolozza colori per il tuo spazio</string>
+    <string name="theme_section_cafe">☕ CAFÈ E RISTORANTE (CALDO ED ELEGANTE)</string>
+    <string name="theme_section_cafe_desc">Interfaccia dai toni caldi, rilassante per gli occhi, ideale per musica di sottofondo</string>
+    <string name="theme_section_standard">✨ MINIMALISTA E RAFFINATO (STANDARD)</string>
+    <string name="theme_section_standard_desc">Design pulito ed elegante per l\'ascolto quotidiano della musica</string>
+    <string name="theme_section_youth">⚡ VIBRANTE E AUDACE (GIOVANE)</string>
+    <string name="theme_section_youth_desc">Dinamico, artistico e audace per spazi giovanili</string>
+    <string name="in_use">In uso</string>
+    <string name="live_badge">IN DIRETTA</string>
+    <string name="waiting_network_reconnect">In attesa di riconnessione alla rete…</string>
+    <string name="network_error_title">Errore di rete o limite API raggiunto.</string>
+    <string name="retry_discovery">Riprova</string>
+    <string name="nav_onboarding">Guida</string>
+    <string name="onboarding_skip">Salta</string>
+    <string name="onboarding_next">Avanti</string>
+    <string name="onboarding_get_started">Inizia</string>
+    <string name="onboarding_back">Indietro</string>
+    <string name="onboarding_app_tour">Tour e guida dell\'app</string>
+    <string name="onboarding_slide1_title">Radio in diretta globale</string>
+    <string name="onboarding_slide1_subtitle">Scopri migliaia di stazioni radio in diretta in tutto il mondo, stream chill e audio cristallino.</string>
+    <string name="onboarding_slide1_badge1">Oltre 50.000 stazioni</string>
+    <string name="onboarding_slide1_badge2">Stream diretti globali</string>
+    <string name="onboarding_slide1_badge3">Senza pubblicità</string>
+    <string name="onboarding_slide2_title">Controlli in background</string>
+    <string name="onboarding_slide2_subtitle">Continua ad ascoltare la radio mentre usi altre app o con lo schermo bloccato.</string>
+    <string name="onboarding_slide2_grant_btn">Abilita permesso notifiche</string>
+    <string name="onboarding_slide2_granted">Permesso notifiche accordato ✓</string>
+    <string name="onboarding_slide2_feature1">Widget multimediale schermata di blocco</string>
+    <string name="onboarding_slide2_feature2">Controlli persistenti barra di stato</string>
+    <string name="onboarding_slide2_feature3">Riconnessione automatica e protezione buffer</string>
+    <string name="onboarding_slide3_title">Generi e scoperta</string>
+    <string name="onboarding_slide3_subtitle">Seleziona i tuoi generi preferiti per personalizzare la schermata iniziale.</string>
+    <string name="onboarding_slide3_select_genres">Scegli i tuoi stili preferiti:</string>
+    <string name="onboarding_slide3_start_listening">Inizia l\'ascolto</string>
 </resources>

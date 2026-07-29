@@ -1,4 +1,4 @@
-<?xml version='1.0' encoding='utf-8'?>
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">네오튠</string>
     <string name="app_description">글로벌 라이브 라디오 및 Chill Beats</string>
@@ -39,7 +39,12 @@
     <string name="favorites">즐겨찾기</string>
     <string name="no_saved_favorites">저장된 즐겨찾는 방송국이 없습니다.</string>
     <string name="custom">맞춤</string>
+    <string name="genre_all">All</string>
     <string name="all">모두</string>
+    <string name="pop">Pop</string>
+    <string name="hip_hop">Hip Hop</string>
+    <string name="house">House</string>
+    <string name="country_genre">Country</string>
     <string name="news_reports">뉴스 및 보고서</string>
     <string name="lofi_chill">로파이 앤 칠</string>
     <string name="jazz">재즈</string>
@@ -77,10 +82,48 @@
     <string name="firebase_remote_config">Firebase 원격 구성</string>
     <string name="source_label">출처: %1$s</string>
     <string name="admob_advertisements">AdMob 광고</string>
-    <string name="always_silent_ad">항상 100% 무음(음소거된 비디오/오디오)</string>
+    <string name="always_silent_ad" formatted="false">항상 100% 무음(음소거된 비디오/오디오)</string>
     <string name="close">닫기</string>
     <string name="data_provider_info">데이터 제공자 정보</string>
     <string name="data_provider_desc">이 애플리케이션은 오픈 소스 및 커뮤니티 기반 데이터베이스(radio-browser.info)인 Radio Browser를 사용하여 전 세계의 라디오 방송국을 스트리밍합니다.</string>
     <string name="data_provider_gratitude">우리는 이 글로벌 스트림 디렉토리를 모든 사람이 무료로 사용할 수 있도록 해준 라디오 브라우저 커뮤니티에 감사드립니다.</string>
     <string name="dismiss">해고하다</string>
+    <string name="banner_offline">오프라인 상태입니다</string>
+    <string name="banner_back_online">다시 온라인 상태입니다</string>
+    <string name="banner_weak_connection">연결이 원활하지 않습니다</string>
+    <string name="featured_station">추천 방송국</string>
+    <string name="appearance_subtitle">당신의 공간을 위한 인터페이스 및 컬러 팔레트</string>
+    <string name="theme_section_cafe">☕ 카페 &amp; 레스토랑 (따뜻하고 우아함)</string>
+    <string name="theme_section_cafe_desc">눈이 편안한 따뜻한 톤의 인터페이스로 배경 음악에 적합합니다.</string>
+    <string name="theme_section_standard">✨ 미니멀 &amp; 리파인드 (기본)</string>
+    <string name="theme_section_standard_desc">매일 음악을 즐기기 위한 깔끔하고 우아한 디자인</string>
+    <string name="theme_section_youth">⚡ 비브란트 &amp; 볼드 (유스)</string>
+    <string name="theme_section_youth_desc">젊고 역동적인 공간을 위한 예술적이고 대담한 디자인</string>
+    <string name="in_use">사용 중</string>
+    <string name="live_badge">라이브</string>
+    <string name="waiting_network_reconnect">네트워크 재연결 대기 중…</string>
+    <string name="network_error_title">네트워크 오류 또는 API 한도 초과.</string>
+    <string name="retry_discovery">다시 시도</string>
+    <string name="nav_onboarding">가이드</string>
+    <string name="onboarding_skip">건너뛰기</string>
+    <string name="onboarding_next">다음</string>
+    <string name="onboarding_get_started">시작하기</string>
+    <string name="onboarding_back">이전</string>
+    <string name="onboarding_app_tour">앱 투어 및 가이드</string>
+    <string name="onboarding_slide1_title">글로벌 라이브 라디오</string>
+    <string name="onboarding_slide1_subtitle">전 세계 수천 개의 라이브 라디오 방송국, 칠 스트림 및 선명한 오디오를 만나보세요.</string>
+    <string name="onboarding_slide1_badge1">50,000개 이상의 방송국</string>
+    <string name="onboarding_slide1_badge2">글로벌 다이렉트 스트림</string>
+    <string name="onboarding_slide1_badge3">광고 중단 없음</string>
+    <string name="onboarding_slide2_title">백그라운드 재생 제어</string>
+    <string name="onboarding_slide2_subtitle">다른 앱을 사용하거나 화면이 잠긴 상태에서도 라디오를 끊김 없이 감상하세요.</string>
+    <string name="onboarding_slide2_grant_btn">알림 권한 허용하기</string>
+    <string name="onboarding_slide2_granted">알림 권한 허용됨 ✓</string>
+    <string name="onboarding_slide2_feature1">시스템 잠금화면 미디어 위젯</string>
+    <string name="onboarding_slide2_feature2">상태 표시줄 지속 제어</string>
+    <string name="onboarding_slide2_feature3">자동 재연결 및 버퍼 보호</string>
+    <string name="onboarding_slide3_title">장르 및 탐색</string>
+    <string name="onboarding_slide3_subtitle">선호하는 장르를 선택하여 맞춤형 홈 화면을 만들어보세요.</string>
+    <string name="onboarding_slide3_select_genres">선호하는 스타일 선택:</string>
+    <string name="onboarding_slide3_start_listening">청취 시작</string>
 </resources>

@@ -1,4 +1,4 @@
-<?xml version='1.0' encoding='utf-8'?>
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">NeoTune</string>
     <string name="app_description">Rádio ao vivo global e batidas relaxantes</string>
@@ -39,7 +39,12 @@
     <string name="favorites">Favoritos</string>
     <string name="no_saved_favorites">Nenhuma estação favorita salva</string>
     <string name="custom">Personalizado</string>
+    <string name="genre_all">All</string>
     <string name="all">Tudo</string>
+    <string name="pop">Pop</string>
+    <string name="hip_hop">Hip Hop</string>
+    <string name="house">House</string>
+    <string name="country_genre">Country</string>
     <string name="news_reports">Notícias e reportagens</string>
     <string name="lofi_chill">Lo-Fi e relaxante</string>
     <string name="jazz">Jazz</string>
@@ -97,4 +102,28 @@
     <string name="in_use">Em uso</string>
     <string name="live_badge">AO VIVO</string>
     <string name="waiting_network_reconnect">Aguardando reconexão à rede…</string>
+    <string name="network_error_title">Erro de rede ou limite de API atingido.</string>
+    <string name="retry_discovery">Tentar novamente</string>
+    <string name="nav_onboarding">Guia</string>
+    <string name="onboarding_skip">Pular</string>
+    <string name="onboarding_next">Avançar</string>
+    <string name="onboarding_get_started">Começar</string>
+    <string name="onboarding_back">Voltar</string>
+    <string name="onboarding_app_tour">Guia e passeio pelo aplicativo</string>
+    <string name="onboarding_slide1_title">Rádio ao vivo global</string>
+    <string name="onboarding_slide1_subtitle">Descubra milhares de estações de rádio ao vivo no mundo todo, transmissões chill e áudio cristalino.</string>
+    <string name="onboarding_slide1_badge1">+50.000 estações</string>
+    <string name="onboarding_slide1_badge2">Transmissões diretas globais</string>
+    <string name="onboarding_slide1_badge3">Sem interrupção de anúncios</string>
+    <string name="onboarding_slide2_title">Controles em segundo plano</string>
+    <string name="onboarding_slide2_subtitle">Continue ouvindo a rádio enquanto usa outros aplicativos ou com a tela bloqueada.</string>
+    <string name="onboarding_slide2_grant_btn">Ativar permissão de notificação</string>
+    <string name="onboarding_slide2_granted">Permissão de notificação concedida ✓</string>
+    <string name="onboarding_slide2_feature1">Widget de mídia na tela de bloqueio</string>
+    <string name="onboarding_slide2_feature2">Controles na barra de status</string>
+    <string name="onboarding_slide2_feature3">Reconexão automática e proteção de buffer</string>
+    <string name="onboarding_slide3_title">Gênero e descoberta</string>
+    <string name="onboarding_slide3_subtitle">Escolha seus gêneros favoritos para personalizar sua tela inicial.</string>
+    <string name="onboarding_slide3_select_genres">Escolha seus estilos preferidos:</string>
+    <string name="onboarding_slide3_start_listening">Começar a ouvir</string>
 </resources>

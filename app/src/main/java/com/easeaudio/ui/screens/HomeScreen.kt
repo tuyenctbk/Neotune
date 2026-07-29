@@ -764,7 +764,7 @@ fun StationCard(
                 Icon(
                     imageVector = if (station.isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
                     contentDescription = "Favorite",
-                    tint = if (station.isFavorite) NeonPink else TextMuted
+                    tint = if (station.isFavorite) FavoriteHeartColor else TextMuted
                 )
             }
         }

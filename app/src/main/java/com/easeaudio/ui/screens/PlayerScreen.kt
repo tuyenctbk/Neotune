@@ -126,13 +126,13 @@ fun PlayerScreen(
                     modifier = Modifier
                         .onFocusChanged { isFavFocused = it.isFocused }
                         .clip(CircleShape)
-                        .background(if (showFavFocus) NeonPink else Color.Transparent)
+                        .background(if (showFavFocus) FavoriteHeartColor else Color.Transparent)
                         .testTag("btn_player_favorite")
                 ) {
                     Icon(
                         imageVector = if (station.isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
                         contentDescription = "Favorite",
-                        tint = if (showFavFocus) DarkBackground else (if (station.isFavorite) NeonPink else TextMuted)
+                        tint = if (showFavFocus) DarkBackground else (if (station.isFavorite) FavoriteHeartColor else TextMuted)
                     )
                 }
             }
@@ -269,6 +269,7 @@ fun PlayerScreen(
                 Spacer(modifier = Modifier.height(12.dp))
 
                 // Live Audio Waveform Animation
+                val barColors = WaveformAnimationColors
                 Row(
                     modifier = Modifier
                         .height(36.dp)
@@ -276,13 +277,21 @@ fun PlayerScreen(
                     horizontalArrangement = Arrangement.spacedBy(6.dp),
                     verticalAlignment = Alignment.Bottom
                 ) {
-                    waveAmplitudes.forEach { amp ->
+                    waveAmplitudes.forEachIndexed { index, amp ->
+                        val barColor = barColors[index % barColors.size]
                         Box(
                             modifier = Modifier
                                 .weight(1f)
                                 .fillMaxHeight(amp.coerceIn(0.12f, 1.0f))
                                 .clip(CircleShape)
-                                .background(Color.White)
+                                .background(
+                                    Brush.verticalGradient(
+                                        listOf(
+                                            barColor,
+                                            barColor.copy(alpha = 0.55f)
+                                        )
+                                    )
+                                )
                         )
                     }
                 }

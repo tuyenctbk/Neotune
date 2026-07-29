@@ -1,4 +1,4 @@
-<?xml version='1.0' encoding='utf-8'?>
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">NeoTune</string>
     <string name="app_description">راديو مباشر عالمي وإيقاعات هادئة</string>
@@ -39,7 +39,12 @@
     <string name="favorites">المفضلة</string>
     <string name="no_saved_favorites">لا توجد محطات مفضلة محفوظة</string>
     <string name="custom">مخصص</string>
+    <string name="genre_all">All</string>
     <string name="all">الكل</string>
+    <string name="pop">Pop</string>
+    <string name="hip_hop">Hip Hop</string>
+    <string name="house">House</string>
+    <string name="country_genre">Country</string>
     <string name="news_reports">الأخبار والتقارير</string>
     <string name="lofi_chill">Lo-Fi والاسترخاء</string>
     <string name="jazz">جاز</string>
@@ -97,4 +102,28 @@
     <string name="in_use">قيد الاستخدام</string>
     <string name="live_badge">مباشر</string>
     <string name="waiting_network_reconnect">في انتظار إعادة الاتصال بالشبكة…</string>
+    <string name="network_error_title">خطأ في الشبكة أو تم الوصول إلى حد واجهة البرمجة.</string>
+    <string name="retry_discovery">إعادة محاولة الاكتشاف</string>
+    <string name="nav_onboarding">دليل</string>
+    <string name="onboarding_skip">تخطي</string>
+    <string name="onboarding_next">التالي</string>
+    <string name="onboarding_get_started">البدء</string>
+    <string name="onboarding_back">رجوع</string>
+    <string name="onboarding_app_tour">جولة ودليل التطبيق</string>
+    <string name="onboarding_slide1_title">راديو مباشر عالمي</string>
+    <string name="onboarding_slide1_subtitle">اكتشف آلاف محطات الراديو المباشرة حول العالم، والبث الهادئ، والإيقاعات المحيطة، والصوت النقي.</string>
+    <string name="onboarding_slide1_badge1">أكثر من 50,000 محطة</string>
+    <string name="onboarding_slide1_badge2">بث مباشر عالمي</string>
+    <string name="onboarding_slide1_badge3">بدون إعلانات مزعجة</string>
+    <string name="onboarding_slide2_title">عناصر تحكم التشغيل في الخلفية</string>
+    <string name="onboarding_slide2_subtitle">استمر في تشغيل الراديو بسلاسة أثناء استخدام تطبيقات أخرى أو القيادة أو عند قفل الشاشة.</string>
+    <string name="onboarding_slide2_grant_btn">تفعيل إذن الإشعارات</string>
+    <string name="onboarding_slide2_granted">تم منح إذن الإشعارات ✓</string>
+    <string name="onboarding_slide2_feature1">أداة الوسائط لشاشة القفل</string>
+    <string name="onboarding_slide2_feature2">عناصر تحكم شريط الحالة الدائمة</string>
+    <string name="onboarding_slide2_feature3">إعادة الاتصال التلقائي وحماية التخزين المؤقت</string>
+    <string name="onboarding_slide3_title">الأنواع والاكتشاف</string>
+    <string name="onboarding_slide3_subtitle">حدد أنواعك المفضلة لتخصيص خلاصة الشاشة الرئيسية عند التشغيل.</string>
+    <string name="onboarding_slide3_select_genres">اختر الأنماط المفضلة لديك:</string>
+    <string name="onboarding_slide3_start_listening">ابدأ الاستماع</string>
 </resources>

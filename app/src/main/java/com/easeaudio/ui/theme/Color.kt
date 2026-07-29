@@ -469,3 +469,51 @@ val TextMuted: Color get() = AppThemeState.currentTheme.textMuted
 
 val ActivePill: Color get() = AppThemeState.currentTheme.activePill
 val CardBorder: Color get() = AppThemeState.currentTheme.cardBorder
+
+val FavoriteRed = Color(0xFFFF3B30)
+
+private fun isVibrantColor(color: Color): Boolean {
+    val r = color.red
+    val g = color.green
+    val b = color.blue
+    val max = maxOf(r, g, b)
+    val min = minOf(r, g, b)
+    if (max <= 0.05f) return false
+    val saturation = (max - min) / max
+    return saturation > 0.18f && max > 0.25f
+}
+
+val FavoriteHeartColor: Color
+    get() {
+        val theme = AppThemeState.currentTheme
+        val primary = theme.primary
+        val tertiary = theme.tertiary
+        val accent = theme.accent
+        return when {
+            isVibrantColor(tertiary) -> tertiary
+            isVibrantColor(primary) -> primary
+            isVibrantColor(accent) -> accent
+            else -> FavoriteRed
+        }
+    }
+
+val WaveformAnimationColors: List<Color>
+    get() {
+        val theme = AppThemeState.currentTheme
+        val primary = theme.primary
+        val secondary = theme.secondary
+        val tertiary = theme.tertiary
+        val accent = theme.accent
+
+        val candidates = listOf(primary, secondary, tertiary, accent).filter { isVibrantColor(it) }.distinct()
+        return if (candidates.isNotEmpty()) {
+            candidates
+        } else {
+            listOf(
+                primary,
+                primary.copy(alpha = 0.82f),
+                secondary.copy(alpha = 0.65f),
+                primary.copy(alpha = 0.9f)
+            )
+        }
+    }

@@ -57,7 +57,7 @@ fun FavoritesScreen(
                 Icon(
                     imageVector = Icons.Filled.Favorite,
                     contentDescription = null,
-                    tint = NeonPink,
+                    tint = FavoriteHeartColor,
                     modifier = Modifier.size(28.dp)
                 )
                 Spacer(modifier = Modifier.width(10.dp))

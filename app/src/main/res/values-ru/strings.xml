@@ -1,4 +1,4 @@
-<?xml version='1.0' encoding='utf-8'?>
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">NeoTune</string>
     <string name="app_description">Мировое живое радио и расслабляющие биты</string>
@@ -39,7 +39,12 @@
     <string name="favorites">Избранное</string>
     <string name="no_saved_favorites">Сохранённых избранных станций нет</string>
     <string name="custom">Пользовательское</string>
+    <string name="genre_all">All</string>
     <string name="all">Все</string>
+    <string name="pop">Pop</string>
+    <string name="hip_hop">Hip Hop</string>
+    <string name="house">House</string>
+    <string name="country_genre">Country</string>
     <string name="news_reports">Новости и репортажи</string>
     <string name="lofi_chill">Lo-Fi и расслабление</string>
     <string name="jazz">Джаз</string>
@@ -97,4 +102,28 @@
     <string name="in_use">Используется</string>
     <string name="live_badge">В ЭФИРЕ</string>
     <string name="waiting_network_reconnect">Ожидание восстановления соединения…</string>
+    <string name="network_error_title">Ошибка сети или превышен лимит API.</string>
+    <string name="retry_discovery">Повторить попытку</string>
+    <string name="nav_onboarding">Гиды</string>
+    <string name="onboarding_skip">Пропустить</string>
+    <string name="onboarding_next">Далее</string>
+    <string name="onboarding_get_started">Начать</string>
+    <string name="onboarding_back">Назад</string>
+    <string name="onboarding_app_tour">Обзор и гид по приложению</string>
+    <string name="onboarding_slide1_title">Мировое радио в прямом эфире</string>
+    <string name="onboarding_slide1_subtitle">Откройте для себя тысячи радиостанций по всему миру, чилл-потоки и кристально чистый звук.</string>
+    <string name="onboarding_slide1_badge1">50 000+ станций</string>
+    <string name="onboarding_slide1_badge2">Прямые мировые трансляции</string>
+    <string name="onboarding_slide1_badge3">Без рекламы</string>
+    <string name="onboarding_slide2_title">Управление в фоновом режиме</string>
+    <string name="onboarding_slide2_subtitle">Слушайте радио в фоновом режиме при использовании других приложений или при заблокированном экране.</string>
+    <string name="onboarding_slide2_grant_btn">Включить разрешение на уведомления</string>
+    <string name="onboarding_slide2_granted">Разрешение на уведомления получено ✓</string>
+    <string name="onboarding_slide2_feature1">Виджет медиа на экране блокировки</string>
+    <string name="onboarding_slide2_feature2">Элементы управления в строке состояния</string>
+    <string name="onboarding_slide2_feature3">Авто-переподключение и защита буфера</string>
+    <string name="onboarding_slide3_title">Жанры и рекомендации</string>
+    <string name="onboarding_slide3_subtitle">Выберите любимые жанры для персонализации главного экрана.</string>
+    <string name="onboarding_slide3_select_genres">Выберите предпочитаемые стили:</string>
+    <string name="onboarding_slide3_start_listening">Начать прослушивание</string>
 </resources>

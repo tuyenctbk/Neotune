@@ -1,4 +1,4 @@
-<?xml version='1.0' encoding='utf-8'?>
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">NeoTune</string>
     <string name="app_description">বৈশ্বিক লাইভ রেডিও ও শান্ত বিট</string>
@@ -39,7 +39,12 @@
     <string name="favorites">পছন্দের</string>
     <string name="no_saved_favorites">কোনো সংরক্ষিত পছন্দের স্টেশন নেই</string>
     <string name="custom">কাস্টম</string>
+    <string name="genre_all">All</string>
     <string name="all">সব</string>
+    <string name="pop">Pop</string>
+    <string name="hip_hop">Hip Hop</string>
+    <string name="house">House</string>
+    <string name="country_genre">Country</string>
     <string name="news_reports">খবর ও প্রতিবেদন</string>
     <string name="lofi_chill">Lo-Fi ও চিল</string>
     <string name="jazz">জ্যাজ</string>
@@ -97,4 +102,28 @@
     <string name="in_use">ব্যবহারে আছে</string>
     <string name="live_badge">লাইভ</string>
     <string name="waiting_network_reconnect">নেটওয়ার্ক পুনরায় সংযোগের অপেক্ষায়…</string>
+    <string name="network_error_title">নেটওয়ার্ক ত্রুটি বা API সীমা শেষ।</string>
+    <string name="retry_discovery">পুনরায় চেষ্টা করুন</string>
+    <string name="nav_onboarding">গাইড</string>
+    <string name="onboarding_skip">এড়িয়ে যান</string>
+    <string name="onboarding_next">পরবর্তী</string>
+    <string name="onboarding_get_started">শুরু করুন</string>
+    <string name="onboarding_back">ফিরে যান</string>
+    <string name="onboarding_app_tour">অ্যাপ ট্যুর ও গাইড</string>
+    <string name="onboarding_slide1_title">গ্লোবাল লাইভ রেডিও</string>
+    <string name="onboarding_slide1_subtitle">বিশ্বজুড়ে হাজার হাজার লাইভ রেডিও স্টেশন, চিল স্ট্রিম এবং ক্রিস্টাল-ক্লিয়ার অডিও আবিষ্কার করুন।</string>
+    <string name="onboarding_slide1_badge1">৫০,০০০+ স্টেশন</string>
+    <string name="onboarding_slide1_badge2">গ্লোবাল ডাইরেক্ট স্ট্রিম</string>
+    <string name="onboarding_slide1_badge3">বিজ্ঞাপন মুক্ত</string>
+    <string name="onboarding_slide2_title">ব্যাকগ্রাউন্ড প্লেব্যাক নিয়ন্ত্রণ</string>
+    <string name="onboarding_slide2_subtitle">অন্যান্য অ্যাপ ব্যবহার করার সময় বা স্ক্রিন লক থাকলেও রেডিও নির্বিঘ্নে চালান।</string>
+    <string name="onboarding_slide2_grant_btn">নোটিফিকেশন অনুমতি দিন</string>
+    <string name="onboarding_slide2_granted">নোটিফিকেশন অনুমতি দেওয়া হয়েছে ✓</string>
+    <string name="onboarding_slide2_feature1">সিস্টেম লকস্ক্রিন মিডিয়া উইজেট</string>
+    <string name="onboarding_slide2_feature2">স্ট্যাটাস বার কন্ট্রোল</string>
+    <string name="onboarding_slide2_feature3">অটো রিকানেক্ট এবং বাফার সুরক্ষা</string>
+    <string name="onboarding_slide3_title">জেনার ও ডিসকভারি</string>
+    <string name="onboarding_slide3_subtitle">অ্যাপ খোলার পর হোম স্ক্রিন ব্যক্তিগতকৃত করতে আপনার প্রিয় জেনার বেছে নিন।</string>
+    <string name="onboarding_slide3_select_genres">আপনার পছন্দের শৈলী বেছে নিন:</string>
+    <string name="onboarding_slide3_start_listening">শোনা শুরু করুন</string>
 </resources>

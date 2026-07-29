@@ -1,4 +1,4 @@
-<?xml version='1.0' encoding='utf-8'?>
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">NeoTune</string>
     <string name="app_description">Radio Toàn Cầu &amp; Nhạc Chill Phiêu</string>
@@ -39,7 +39,12 @@
     <string name="favorites">Đài Yêu Thích</string>
     <string name="no_saved_favorites">Chưa lưu đài yêu thích nào</string>
     <string name="custom">Tùy Chỉnh</string>
+    <string name="genre_all">All</string>
     <string name="all">Tất Cả</string>
+    <string name="pop">Pop</string>
+    <string name="hip_hop">Hip Hop</string>
+    <string name="house">House</string>
+    <string name="country_genre">Country</string>
     <string name="news_reports">Tin Tức &amp; Báo Cáo</string>
     <string name="lofi_chill">Lo-Fi &amp; Chill</string>
     <string name="jazz">Nhạc Jazz</string>
@@ -77,10 +82,48 @@
     <string name="firebase_remote_config">Firebase Remote Config</string>
     <string name="source_label">Source: %1$s</string>
     <string name="admob_advertisements">AdMob Advertisements</string>
-    <string name="always_silent_ad">Always 100% silent (Muted video/audio)</string>
+    <string name="always_silent_ad" formatted="false">Always 100% silent (Muted video/audio)</string>
     <string name="close">Close</string>
     <string name="data_provider_info">Thông tin nhà cung cấp dữ liệu</string>
     <string name="data_provider_desc">Ứng dụng này sử dụng Radio Browser, một cơ sở dữ liệu nguồn mở và dựa vào cộng đồng (radio-browser.info), để truyền phát các đài phát thanh từ khắp nơi trên thế giới.</string>
     <string name="data_provider_gratitude">Chúng tôi rất biết ơn cộng đồng Radio Browser vì đã cung cấp miễn phí danh mục các luồng toàn cầu này cho mọi người.</string>
     <string name="dismiss">Miễn nhiệm</string>
+    <string name="banner_offline">Bạn đang ngoại tuyến</string>
+    <string name="banner_back_online">Đã kết nối lại</string>
+    <string name="banner_weak_connection">Kết nối yếu</string>
+    <string name="featured_station">ĐÀI NỔI BẬT</string>
+    <string name="appearance_subtitle">Giao diện &amp; Bảng màu cho không gian của bạn</string>
+    <string name="theme_section_cafe">☕ QUÁN CAFE &amp; NHÀ HÀNG (ẤM CỦNG, SANG TRỌNG)</string>
+    <string name="theme_section_cafe_desc">Giao diện tông ấm, dịu mắt, lý tưởng cho nhạc nền không gian</string>
+    <string name="theme_section_standard">✨ TỐI GIẢN &amp; TINH TẾ (TIÊU CHUẨN)</string>
+    <string name="theme_section_standard_desc">Thiết kế sạch sẽ, tinh tế phục vụ thưởng thức âm nhạc hàng ngày</string>
+    <string name="theme_section_youth">⚡ RỰC RỠ &amp; BÁO TẠO (TRE TRUNG)</string>
+    <string name="theme_section_youth_desc">Năng động, nghệ thuật, táo bạo cho không gian trẻ trung</string>
+    <string name="in_use">Đang dùng</string>
+    <string name="live_badge">TRỰC TIẾP</string>
+    <string name="waiting_network_reconnect">Đang chờ kết nối lại mạng…</string>
+    <string name="network_error_title">Lỗi kết nối mạng hoặc quá giới hạn API.</string>
+    <string name="retry_discovery">Thử lại</string>
+    <string name="nav_onboarding">Hướng dẫn</string>
+    <string name="onboarding_skip">Bỏ qua</string>
+    <string name="onboarding_next">Tiếp theo</string>
+    <string name="onboarding_get_started">Bắt đầu</string>
+    <string name="onboarding_back">Quay lại</string>
+    <string name="onboarding_app_tour">Giới thiệu &amp; Hướng dẫn</string>
+    <string name="onboarding_slide1_title">Radio Trực tuyến Toàn cầu</string>
+    <string name="onboarding_slide1_subtitle">Khám phá hàng ngàn đài radio trực tiếp trên toàn thế giới, nhạc thư giãn, âm thanh sống động.</string>
+    <string name="onboarding_slide1_badge1">50.000+ Kênh đài</string>
+    <string name="onboarding_slide1_badge2">Luồng trực tiếp toàn cầu</string>
+    <string name="onboarding_slide1_badge3">Không quảng cáo chèn ngang</string>
+    <string name="onboarding_slide2_title">Phát nhạc Nền &amp; Màn hình khóa</string>
+    <string name="onboarding_slide2_subtitle">Giữ nhạc radio phát liên tục khi dùng ứng dụng khác, lái xe hoặc tắt màn hình.</string>
+    <string name="onboarding_slide2_grant_btn">Bật quyền thông báo</string>
+    <string name="onboarding_slide2_granted">Đã cấp quyền thông báo ✓</string>
+    <string name="onboarding_slide2_feature1">Widget trình phát màn hình khóa</string>
+    <string name="onboarding_slide2_feature2">Bảng điều khiển thanh trạng thái</string>
+    <string name="onboarding_slide2_feature3">Tự kết nối lại &amp; Chống giật lag</string>
+    <string name="onboarding_slide3_title">Thể loại &amp; Khám phá</string>
+    <string name="onboarding_slide3_subtitle">Chọn các thể loại yêu thích để cá nhân hóa trang chủ ngay khi mở ứng dụng.</string>
+    <string name="onboarding_slide3_select_genres">Chọn phong cách bạn thích:</string>
+    <string name="onboarding_slide3_start_listening">Bắt đầu nghe</string>
 </resources>

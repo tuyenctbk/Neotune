@@ -1,4 +1,4 @@
-<?xml version='1.0' encoding='utf-8'?>
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">NeoTune</string>
     <string name="app_description">ग्लोबल लाइव रेडियो और चिल बीट्स</string>
@@ -39,7 +39,12 @@
     <string name="favorites">पसंदीदा</string>
     <string name="no_saved_favorites">कोई सहेजा हुआ पसंदीदा स्टेशन नहीं</string>
     <string name="custom">कस्टम</string>
+    <string name="genre_all">All</string>
     <string name="all">सभी</string>
+    <string name="pop">Pop</string>
+    <string name="hip_hop">Hip Hop</string>
+    <string name="house">House</string>
+    <string name="country_genre">Country</string>
     <string name="news_reports">समाचार और रिपोर्ट</string>
     <string name="lofi_chill">Lo-Fi और चिल</string>
     <string name="jazz">जैज़</string>
@@ -97,4 +102,28 @@
     <string name="in_use">उपयोग में</string>
     <string name="live_badge">लाइव</string>
     <string name="waiting_network_reconnect">नेटवर्क पुनः कनेक्ट होने की प्रतीक्षा में…</string>
+    <string name="network_error_title">नेटवर्क त्रुटि या API सीमा समाप्त।</string>
+    <string name="retry_discovery">पुनः प्रयास करें</string>
+    <string name="nav_onboarding">गाइड</string>
+    <string name="onboarding_skip">छोड़ें</string>
+    <string name="onboarding_next">आगे</string>
+    <string name="onboarding_get_started">शुरू करें</string>
+    <string name="onboarding_back">पीछे</string>
+    <string name="onboarding_app_tour">ऐप टूर और गाइड</string>
+    <string name="onboarding_slide1_title">ग्लोबल लाइव रेडियो</string>
+    <string name="onboarding_slide1_subtitle">दुनिया भर में हज़ारों लाइव रेडियो स्टेशन, चिल्ड स्ट्रीम और क्रिस्टल-क्लियर ऑडियो खोजें।</string>
+    <string name="onboarding_slide1_badge1">50,000+ स्टेशन</string>
+    <string name="onboarding_slide1_badge2">ग्लोबल डायरेक्ट स्ट्रीम</string>
+    <string name="onboarding_slide1_badge3">विज्ञापन-मुक्त</string>
+    <string name="onboarding_slide2_title">बैकग्राउंड प्लेबैक नियंत्रण</string>
+    <string name="onboarding_slide2_subtitle">अन्य ऐप्स का उपयोग करते समय या स्क्रीन लॉक होने पर भी रेडियो निर्बाध रूप से चलाएं।</string>
+    <string name="onboarding_slide2_grant_btn">सूचना अनुमति सक्षम करें</string>
+    <string name="onboarding_slide2_granted">सूचना अनुमति प्रदान की गई ✓</string>
+    <string name="onboarding_slide2_feature1">सिस्टम लॉकस्क्रीन मीडिया विजेट</string>
+    <string name="onboarding_slide2_feature2">स्टेटस बार नियंत्रण</string>
+    <string name="onboarding_slide2_feature3">ऑटो रीकनेक्ट और बफर सुरक्षा</string>
+    <string name="onboarding_slide3_title">शैली और खोज</string>
+    <string name="onboarding_slide3_subtitle">ऐप खोलते ही होम स्क्रीन को व्यक्तिगत बनाने के लिए अपनी पसंदीदा शैलियां चुनें।</string>
+    <string name="onboarding_slide3_select_genres">अपनी पसंदीदा शैलियां चुनें:</string>
+    <string name="onboarding_slide3_start_listening">सुनना शुरू करें</string>
 </resources>

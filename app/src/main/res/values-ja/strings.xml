@@ -1,4 +1,4 @@
-<?xml version='1.0' encoding='utf-8'?>
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">ネオチューン</string>
     <string name="app_description">グローバル ライブ ラジオ &amp; チル ビーツ</string>
@@ -39,7 +39,12 @@
     <string name="favorites">お気に入り</string>
     <string name="no_saved_favorites">お気に入りの放送局が保存されていません</string>
     <string name="custom">カスタム</string>
+    <string name="genre_all">All</string>
     <string name="all">すべて</string>
+    <string name="pop">Pop</string>
+    <string name="hip_hop">Hip Hop</string>
+    <string name="house">House</string>
+    <string name="country_genre">Country</string>
     <string name="news_reports">ニュースとレポート</string>
     <string name="lofi_chill">ローファイ＆チル</string>
     <string name="jazz">ジャズ</string>
@@ -77,10 +82,48 @@
     <string name="firebase_remote_config">Firebaseリモート設定</string>
     <string name="source_label">ソース: %1$s</string>
     <string name="admob_advertisements">AdMob 広告</string>
-    <string name="always_silent_ad">常に 100% サイレント (ビデオ/オーディオをミュート)</string>
+    <string name="always_silent_ad" formatted="false">常に 100% サイレント (ビデオ/オーディオをミュート)</string>
     <string name="close">閉じる</string>
     <string name="data_provider_info">データプロバイダー情報</string>
     <string name="data_provider_desc">このアプリケーションは、オープンソースのコミュニティ主導型データベース (radio-browser.info) である Radio Browser を使用して、世界中のラジオ局をストリーミングします。</string>
     <string name="data_provider_gratitude">このストリームのグローバル ディレクトリを誰でも無料で利用できるようにしてくれた Radio Browser コミュニティに感謝します。</string>
     <string name="dismiss">却下する</string>
+    <string name="banner_offline">オフラインです</string>
+    <string name="banner_back_online">オンラインに戻りました</string>
+    <string name="banner_weak_connection">接続が不安定です</string>
+    <string name="featured_station">おすすめの局</string>
+    <string name="appearance_subtitle">あなたの空間に合わせたテーマとカラーパレット</string>
+    <string name="theme_section_cafe">☕ カフェ＆レストラン（温かみのあるエレガント）</string>
+    <string name="theme_section_cafe_desc">目に優しい温かみのあるカラーで、BGMに最適</string>
+    <string name="theme_section_standard">✨ ミニマル＆洗練（標準）</string>
+    <string name="theme_section_standard_desc">日常の音楽観賞に最適なクリーンでエレガントなデザイン</string>
+    <string name="theme_section_youth">⚡ 鮮やか＆ボールド（ユース）</string>
+    <string name="theme_section_youth_desc">ダイナミックでアーティスティックなアクティブデザイン</string>
+    <string name="in_use">使用中</string>
+    <string name="live_badge">LIVE</string>
+    <string name="waiting_network_reconnect">ネットワークの再接続を待っています…</string>
+    <string name="network_error_title">ネットワークエラーまたはAPI制限に達しました。</string>
+    <string name="retry_discovery">再試行</string>
+    <string name="nav_onboarding">ガイド</string>
+    <string name="onboarding_skip">スキップ</string>
+    <string name="onboarding_next">次へ</string>
+    <string name="onboarding_get_started">始める</string>
+    <string name="onboarding_back">戻る</string>
+    <string name="onboarding_app_tour">アプリツアー＆ガイド</string>
+    <string name="onboarding_slide1_title">世界のライブラジオ</string>
+    <string name="onboarding_slide1_subtitle">世界中の数千のライブラジオ局、チルストリーム、クリアな高音質オーディオを発見しましょう。</string>
+    <string name="onboarding_slide1_badge1">50,000以上の局</string>
+    <string name="onboarding_slide1_badge2">グローバルダイレクト配信</string>
+    <string name="onboarding_slide1_badge3">広告の割り込みなし</string>
+    <string name="onboarding_slide2_title">バックグラウンド再生コントロール</string>
+    <string name="onboarding_slide2_subtitle">他のアプリの使用中や画面ロック時でもシームレスにラジオを再生し続けます。</string>
+    <string name="onboarding_slide2_grant_btn">通知権限を有効にする</string>
+    <string name="onboarding_slide2_granted">通知権限が許可されました ✓</string>
+    <string name="onboarding_slide2_feature1">ロック画面メディアウィジェット</string>
+    <string name="onboarding_slide2_feature2">ステータスバー常駐コントロール</string>
+    <string name="onboarding_slide2_feature3">自動再接続＆バッファ保護</string>
+    <string name="onboarding_slide3_title">ジャンル＆ディスカバリー</string>
+    <string name="onboarding_slide3_subtitle">お気に入りのジャンルを選択して、ホーム画面をカスタマイズしましょう。</string>
+    <string name="onboarding_slide3_select_genres">好きなスタイルを選択:</string>
+    <string name="onboarding_slide3_start_listening">再生を開始</string>
 </resources>

@@ -1,4 +1,4 @@
-<?xml version='1.0' encoding='utf-8'?>
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">NeoTune</string>
     <string name="app_description">Globales Live-Radio und Chill-Beats</string>
@@ -39,7 +39,12 @@
     <string name="favorites">Favoriten</string>
     <string name="no_saved_favorites">Keine gespeicherten Lieblingssender</string>
     <string name="custom">Benutzerdefiniert</string>
+    <string name="genre_all">All</string>
     <string name="all">Alle</string>
+    <string name="pop">Pop</string>
+    <string name="hip_hop">Hip Hop</string>
+    <string name="house">House</string>
+    <string name="country_genre">Country</string>
     <string name="news_reports">Nachrichten &amp; Berichte</string>
     <string name="lofi_chill">Lo-Fi &amp; Chill</string>
     <string name="jazz">Jazz</string>
@@ -77,10 +82,48 @@
     <string name="firebase_remote_config">Firebase-Remote-Konfiguration</string>
     <string name="source_label">Quelle: %1$s</string>
     <string name="admob_advertisements">AdMob-Werbung</string>
-    <string name="always_silent_ad">Immer 100 % lautlos (stummgeschaltetes Video/Audio)</string>
+    <string name="always_silent_ad" formatted="false">Immer 100 % lautlos (stummgeschaltetes Video/Audio)</string>
     <string name="close">Schließen</string>
     <string name="data_provider_info">Informationen zum Datenanbieter</string>
     <string name="data_provider_desc">Diese Anwendung verwendet Radio Browser, eine Open-Source- und Community-Datenbank (radio-browser.info), um Radiosender aus aller Welt zu streamen.</string>
     <string name="data_provider_gratitude">Wir sind der Radio Browser-Community dankbar, dass sie dieses globale Stream-Verzeichnis für jedermann frei verfügbar gemacht hat.</string>
     <string name="dismiss">Zurückweisen</string>
+    <string name="banner_offline">Sie sind offline</string>
+    <string name="banner_back_online">Wieder online</string>
+    <string name="banner_weak_connection">Schwache Verbindung</string>
+    <string name="featured_station">EMPFOHLENER SENDER</string>
+    <string name="appearance_subtitle">Benutzeroberfläche &amp; Farbpalette für Ihren Bereich</string>
+    <string name="theme_section_cafe">☕ CAFÉ &amp; RESTAURANT (WARM &amp; ELEGANT)</string>
+    <string name="theme_section_cafe_desc">Warmtonige Benutzeroberfläche, augenschonend, ideal für Hintergrundmusik</string>
+    <string name="theme_section_standard">✨ MINIMALISTISCH &amp; EDEL (STANDARD)</string>
+    <string name="theme_section_standard_desc">Klares, elegantes Design für täglichen Musikgenuss</string>
+    <string name="theme_section_youth">⚡ LEBENDIG &amp; MUTIG (JUGEND)</string>
+    <string name="theme_section_youth_desc">Dynamisch, künstlerisch und ausdrucksstark für moderne Räume</string>
+    <string name="in_use">Aktiv</string>
+    <string name="live_badge">LIVE</string>
+    <string name="waiting_network_reconnect">Warte auf Netzwerkverbindung…</string>
+    <string name="network_error_title">Netzwerkfehler oder API-Limit erreicht.</string>
+    <string name="retry_discovery">Erneut versuchen</string>
+    <string name="nav_onboarding">Anleitung</string>
+    <string name="onboarding_skip">Überspringen</string>
+    <string name="onboarding_next">Weiter</string>
+    <string name="onboarding_get_started">Loslegen</string>
+    <string name="onboarding_back">Zurück</string>
+    <string name="onboarding_app_tour">App-Tour &amp; Anleitung</string>
+    <string name="onboarding_slide1_title">Weltweites Live-Radio</string>
+    <string name="onboarding_slide1_subtitle">Entdecken Sie Tausende von Live-Radiosendern weltweit, Chill-Streams und kristallklaren Sound.</string>
+    <string name="onboarding_slide1_badge1">50.000+ Sender</string>
+    <string name="onboarding_slide1_badge2">Globale Direkt-Streams</string>
+    <string name="onboarding_slide1_badge3">Werbefrei</string>
+    <string name="onboarding_slide2_title">Hintergrund-Wiedergabe</string>
+    <string name="onboarding_slide2_subtitle">Lassen Sie das Radio nahtlos weiterlaufen, während Sie andere Apps nutzen oder der Bildschirm gesperrt ist.</string>
+    <string name="onboarding_slide2_grant_btn">Benachrichtigungsberechtigung aktivieren</string>
+    <string name="onboarding_slide2_granted">Benachrichtigungsberechtigung erteilt ✓</string>
+    <string name="onboarding_slide2_feature1">Sperrbildschirm-Medien-Widget</string>
+    <string name="onboarding_slide2_feature2">Dauerhafte Statusleisten-Steuerung</string>
+    <string name="onboarding_slide2_feature3">Automatische Wiederverbindung &amp; Pufferschutz</string>
+    <string name="onboarding_slide3_title">Genres &amp; Entdecken</string>
+    <string name="onboarding_slide3_subtitle">Wählen Sie Ihre Lieblingsgenres, um Ihre Startseite zu personalisieren.</string>
+    <string name="onboarding_slide3_select_genres">Wählen Sie Ihre bevorzugten Stile:</string>
+    <string name="onboarding_slide3_start_listening">Jetzt hören</string>
 </resources>
