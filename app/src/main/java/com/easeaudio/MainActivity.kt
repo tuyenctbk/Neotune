@@ -18,6 +18,7 @@ import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material.icons.filled.Wifi
 import androidx.compose.material.icons.filled.WifiOff
@@ -42,11 +43,14 @@ import com.easeaudio.service.FirebaseManager
 import com.easeaudio.ui.components.*
 import com.easeaudio.ui.screens.FavoritesScreen
 import com.easeaudio.ui.screens.HomeScreen
+import com.easeaudio.ui.screens.OnboardingScreen
 import com.easeaudio.ui.screens.PlayerScreen
 import com.easeaudio.ui.screens.ScreensaverScreen
 import com.easeaudio.ui.theme.TuneveTheme
 import com.easeaudio.ui.theme.AppThemeState
 import com.easeaudio.viewmodel.RadioViewModel
+import android.content.Context
+import androidx.compose.ui.platform.LocalContext
 import kotlin.time.Duration.Companion.seconds
 
 class MainActivity : ComponentActivity() {
@@ -74,17 +78,40 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             TuneveTheme {
-                MainAppContent(viewModel)
+                MainAppContent(
+                    viewModel = viewModel,
+                    onRequestNotificationPermission = {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                            requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                        }
+                    }
+                )
             }
         }
     }
 }
 
 @Composable
-fun MainAppContent(viewModel: RadioViewModel) {
+fun MainAppContent(
+    viewModel: RadioViewModel,
+    onRequestNotificationPermission: () -> Unit = {}
+) {
+    val context = LocalContext.current
+    val prefs = remember { context.getSharedPreferences("neotune_prefs", Context.MODE_PRIVATE) }
+    val isOnboardingCompleted = remember { mutableStateOf(prefs.getBoolean("is_onboarding_completed", false)) }
+    val startDestination = if (isOnboardingCompleted.value) NavRoute.Home.route else NavRoute.Onboarding.route
+
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentRoute = navBackStackEntry?.destination?.route ?: NavRoute.Home.route
+    val currentRoute = navBackStackEntry?.destination?.route ?: startDestination
+
+    val completeOnboarding = {
+        prefs.edit().putBoolean("is_onboarding_completed", true).apply()
+        isOnboardingCompleted.value = true
+        navController.navigate(NavRoute.Home.route) {
+            popUpTo(NavRoute.Onboarding.route) { inclusive = true }
+        }
+    }
 
     val stations by viewModel.stations.collectAsState()
     val favoriteStations by viewModel.favoriteStations.collectAsState()
@@ -171,7 +198,7 @@ fun MainAppContent(viewModel: RadioViewModel) {
             snackbarHost = { SnackbarHost(snackbarHostState) },
             contentWindowInsets = WindowInsets(0, 0, 0, 0),
             bottomBar = {
-                if (!isFullPlayerVisible) {
+                if (!isFullPlayerVisible && currentRoute != NavRoute.Onboarding.route) {
                     BottomNavBar(
                         currentRoute = currentRoute,
                         onNavigate = { route ->
@@ -194,8 +221,17 @@ fun MainAppContent(viewModel: RadioViewModel) {
             ) {
                 NavHost(
                     navController = navController,
-                    startDestination = NavRoute.Home.route
+                    startDestination = startDestination
                 ) {
+                    composable(NavRoute.Onboarding.route) {
+                        OnboardingScreen(
+                            availableGenres = viewModel.availableGenres.map { it.key },
+                            onGenreSelected = { genre -> viewModel.setSelectedGenre(genre) },
+                            onRequestNotificationPermission = onRequestNotificationPermission,
+                            onCompleteOnboarding = completeOnboarding
+                        )
+                    }
+
                     composable(NavRoute.Home.route) {
                         HomeScreen(
                             stations = stations,
@@ -221,6 +257,7 @@ fun MainAppContent(viewModel: RadioViewModel) {
                             onOpenAddStation = { viewModel.setShowAddStationDialog(true) },
                             onOpenSleepTimer = { viewModel.setShowSleepTimerDialog(true) },
                             onOpenEqualizer = { viewModel.setShowEqualizerDialog(true) },
+                            onOpenOnboarding = { navController.navigate(NavRoute.Onboarding.route) },
                             onLoadMore = { viewModel.loadMoreStations() },
                             onRefresh = { viewModel.refreshStations() },
                             onRetryDiscovery = { viewModel.retryDiscovery() }
@@ -254,7 +291,7 @@ fun MainAppContent(viewModel: RadioViewModel) {
                 }
 
                 // Mini Player floating bar (shown if station is selected and full player is collapsed)
-                if (!isFullPlayerVisible && currentRoute != NavRoute.Screensaver.route) {
+                if (!isFullPlayerVisible && currentRoute != NavRoute.Screensaver.route && currentRoute != NavRoute.Onboarding.route) {
                     MiniPlayer(
                         station = currentStation,
                         isPlaying = isPlaying,
@@ -326,7 +363,7 @@ fun MainAppContent(viewModel: RadioViewModel) {
             )
         }
 
-        // Floating Network Status Overlay Banner (Graceful overlay)
+        // Floating Network Status Overlay Banner (Graceful non-blocking overlay)
         AnimatedVisibility(
             visible = activeBanner != NetworkBannerType.NONE,
             enter = fadeIn() + slideInVertically { -it },
@@ -334,7 +371,7 @@ fun MainAppContent(viewModel: RadioViewModel) {
             modifier = Modifier
                 .align(Alignment.TopCenter)
                 .statusBarsPadding()
-                .padding(top = 16.dp)
+                .padding(top = 72.dp)
                 .zIndex(99f),
         ) {
             val config = when (activeBanner) {
@@ -369,7 +406,7 @@ fun MainAppContent(viewModel: RadioViewModel) {
                         .testTag("network_status_overlay_pill")
                 ) {
                     Row(
-                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                        modifier = Modifier.padding(start = 14.dp, end = 6.dp, top = 4.dp, bottom = 4.dp),
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
@@ -381,10 +418,21 @@ fun MainAppContent(viewModel: RadioViewModel) {
                         )
                         Text(
                             text = config.text,
-                            style = MaterialTheme.typography.bodyMedium,
+                            style = MaterialTheme.typography.labelLarge,
                             color = Color.White,
-                            fontWeight = FontWeight.Medium
+                            fontWeight = FontWeight.SemiBold
                         )
+                        IconButton(
+                            onClick = { activeBanner = NetworkBannerType.NONE },
+                            modifier = Modifier.size(28.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.Close,
+                                contentDescription = "Dismiss",
+                                tint = Color.White.copy(alpha = 0.85f),
+                                modifier = Modifier.size(14.dp)
+                            )
+                        }
                     }
                 }
             }

@@ -59,6 +59,7 @@ object RadioBrowserService {
         val mappedTag = mapGenreToTag(genreTag)
         val activeUrls = getActiveServers()
         
+        var lastNetworkException: Exception? = null
         for (baseUrl in activeUrls) {
             val stations = mutableListOf<RadioStation>()
             try {
@@ -134,6 +135,7 @@ object RadioBrowserService {
                     connection.disconnect()
                 }
             } catch (e: Exception) {
+                lastNetworkException = e
                 Log.w(TAG, "Failed fetching online stations from $baseUrl: ${e.message}")
                 try {
                     val crashlytics = com.google.firebase.crashlytics.FirebaseCrashlytics.getInstance()
@@ -145,6 +147,9 @@ object RadioBrowserService {
                     // Firebase Crashlytics not configured or initialized yet
                 }
             }
+        }
+        if (lastNetworkException != null) {
+            throw lastNetworkException
         }
         return@withContext emptyList()
     }

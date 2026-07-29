@@ -21,6 +21,7 @@ import androidx.compose.material.icons.filled.Bedtime
 import androidx.compose.material.icons.filled.CellTower
 import androidx.compose.material.icons.filled.CloudDone
 import androidx.compose.material.icons.filled.Equalizer
+import androidx.compose.material.icons.filled.Explore
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.MoreVert
@@ -88,6 +89,7 @@ fun HomeScreen(
     onOpenSleepTimer: () -> Unit,
     onOpenEqualizer: () -> Unit,
     onOpenNetworkConfig: () -> Unit = {},
+    onOpenOnboarding: () -> Unit = {},
     onLoadMore: () -> Unit = {},
     onRefresh: () -> Unit = {},
     onRetryDiscovery: () -> Unit = {},
@@ -110,6 +112,8 @@ fun HomeScreen(
         }
     }
 
+    val isTv = rememberIsTv()
+
     LaunchedEffect(shouldLoadMore, canLoadMore, isLoadingMore) {
         if (shouldLoadMore && canLoadMore && !isLoadingMore) {
             onLoadMore()
@@ -127,17 +131,18 @@ fun HomeScreen(
                 modifier = Modifier.imePadding()
             ) {
                 var isFabFocused by remember { mutableStateOf(false) }
+                val showFabFocus = isFabFocused
                 FloatingActionButton(
                     onClick = onOpenAddStation,
-                    containerColor = if (isFabFocused) Color.White else NeonCyan,
+                    containerColor = if (showFabFocus) Color.White else NeonCyan,
                     contentColor = DarkBackground,
                     shape = CircleShape,
                     modifier = Modifier
                         .navigationBarsPadding()
                         .onFocusChanged { isFabFocused = it.isFocused }
                         .border(
-                            width = if (isFabFocused) 3.dp else 0.dp,
-                            color = if (isFabFocused) NeonCyan else Color.Transparent,
+                            width = if (showFabFocus) 3.dp else 0.dp,
+                            color = if (showFabFocus) NeonCyan else Color.Transparent,
                             shape = CircleShape
                         )
                         .testTag("fab_add_station")
@@ -189,40 +194,59 @@ fun HomeScreen(
                             Icon(
                                 painter = androidx.compose.ui.res.painterResource(id = R.drawable.ic_favicon),
                                 contentDescription = "NeoTune Logo",
-                                tint = NeonCyan,
-                                modifier = Modifier.size(36.dp)
+                                tint = Color.Unspecified,
+                                modifier = Modifier.size(44.dp)
                             )
-                            Spacer(modifier = Modifier.width(10.dp))
-                            Text(
-                                text = stringResource(R.string.app_name),
-                                style = MaterialTheme.typography.headlineLarge.copy(
-                                    fontSize = 28.sp,
-                                    fontWeight = FontWeight.Black,
-                                    letterSpacing = (-0.8).sp
-                                ),
-                                color = TextPrimary
-                            )
+                            Spacer(modifier = Modifier.width(12.dp))
+                            Column(
+                                verticalArrangement = Arrangement.Center
+                            ) {
+                                Text(
+                                    text = stringResource(R.string.app_name),
+                                    style = MaterialTheme.typography.headlineLarge.copy(
+                                        fontSize = 26.sp,
+                                        fontWeight = FontWeight.Black,
+                                        letterSpacing = (-0.6).sp,
+                                        lineHeight = 28.sp
+                                    ),
+                                    color = TextPrimary
+                                )
+                                Text(
+                                    text = stringResource(R.string.app_description),
+                                    style = MaterialTheme.typography.bodySmall.copy(
+                                        fontSize = 12.sp,
+                                        fontWeight = FontWeight.Medium,
+                                        letterSpacing = 0.2.sp
+                                    ),
+                                    color = TextSecondary
+                                )
+                            }
                         }
 
-                        // Dropdown overflow menu button for multiple secondary actions (Solution 1)
+                        // Dropdown overflow menu button for multiple secondary actions
                         var showMenu by remember { mutableStateOf(false) }
 
                         Box(
                             modifier = Modifier.wrapContentSize(Alignment.TopEnd)
                         ) {
                             var isMenuBtnFocused by remember { mutableStateOf(false) }
+                            val showMenuBtnFocus = isMenuBtnFocused
                             IconButton(
                                 onClick = { showMenu = true },
                                 modifier = Modifier
                                     .onFocusChanged { isMenuBtnFocused = it.isFocused }
                                     .clip(CircleShape)
-                                    .background(if (isMenuBtnFocused) NeonCyan else DarkSurfaceVariant)
+                                    .background(
+                                        if (showMenuBtnFocus) NeonCyan
+                                        else if (showMenu) DarkSurfaceVariant
+                                        else Color.Transparent
+                                    )
                                     .testTag("btn_open_overflow_menu")
                             ) {
                                 Icon(
                                     imageVector = Icons.Filled.MoreVert,
                                     contentDescription = "More Options",
-                                    tint = if (isMenuBtnFocused) DarkBackground else NeonCyan
+                                    tint = if (showMenuBtnFocus) DarkBackground else TextPrimary
                                 )
                             }
 
@@ -283,6 +307,22 @@ fun HomeScreen(
                                 )
 
                                 DropdownMenuItem(
+                                    text = { Text(stringResource(R.string.onboarding_app_tour), color = TextPrimary) },
+                                    leadingIcon = {
+                                        Icon(
+                                            imageVector = Icons.Filled.Explore,
+                                            contentDescription = stringResource(R.string.onboarding_app_tour),
+                                            tint = NeonCyan
+                                        )
+                                    },
+                                    onClick = {
+                                        showMenu = false
+                                        onOpenOnboarding()
+                                    },
+                                    modifier = Modifier.testTag("menu_item_onboarding")
+                                )
+
+                                DropdownMenuItem(
                                     text = { Text(stringResource(R.string.info), color = TextPrimary) },
                                     leadingIcon = {
                                         Icon(
@@ -300,13 +340,6 @@ fun HomeScreen(
                             }
                         }
                     }
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        text = stringResource(R.string.app_description),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = TextSecondary,
-                        modifier = Modifier.padding(start = 46.dp)
-                    )
                 }
             }
 
@@ -346,18 +379,19 @@ fun HomeScreen(
                     items(availableGenres) { genre ->
                         val isSelected = genre.key == selectedGenre
                         var isPillFocused by remember { mutableStateOf(false) }
+                        val showPillFocus = isPillFocused
                         Box(
                             modifier = Modifier
                                 .onFocusChanged { isPillFocused = it.isFocused }
                                 .clip(CircleShape)
                                 .background(
                                     if (isSelected) NeonCyan 
-                                    else if (isPillFocused) DarkSurfaceVariant 
+                                    else if (showPillFocus) DarkSurfaceVariant 
                                     else Color.Transparent
                                 )
                                 .border(
-                                    width = if (isPillFocused) 2.dp else if (isSelected) 0.dp else 1.dp,
-                                    color = if (isPillFocused) NeonCyan else if (isSelected) Color.Transparent else CardBorder,
+                                    width = if (showPillFocus) 2.dp else if (isSelected) 0.dp else 1.dp,
+                                    color = if (showPillFocus) NeonCyan else if (isSelected) Color.Transparent else CardBorder,
                                     shape = CircleShape
                                 )
                                 .clickable { onGenreSelect(genre.key) }
@@ -368,9 +402,9 @@ fun HomeScreen(
                             Text(
                                 text = stringResource(genre.labelResId),
                                 style = MaterialTheme.typography.bodyMedium.copy(
-                                    fontWeight = if (isSelected || isPillFocused) FontWeight.Bold else FontWeight.Medium
+                                    fontWeight = if (isSelected || showPillFocus) FontWeight.Bold else FontWeight.Medium
                                 ),
-                                color = if (isSelected) DarkBackground else if (isPillFocused) NeonCyan else TextMuted
+                                color = if (isSelected) DarkBackground else if (showPillFocus) NeonCyan else TextMuted
                             )
                         }
                     }
@@ -382,6 +416,7 @@ fun HomeScreen(
                 val featured = stations.first()
                 item {
                     var isHeroFocused by remember { mutableStateOf(false) }
+                    val showHeroFocus = isHeroFocused
                     Surface(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -390,8 +425,8 @@ fun HomeScreen(
                             .clip(RoundedCornerShape(20.dp))
                             .clickable { onStationSelect(featured) }
                             .border(
-                                width = if (isHeroFocused) 2.5.dp else 0.dp,
-                                color = if (isHeroFocused) NeonCyan else Color.Transparent,
+                                width = if (showHeroFocus) 2.5.dp else 0.dp,
+                                color = if (showHeroFocus) NeonCyan else Color.Transparent,
                                 shape = RoundedCornerShape(20.dp)
                             )
                             .testTag("hero_featured_card"),
@@ -607,7 +642,9 @@ fun StationCard(
     onSelect: () -> Unit,
     onToggleFavorite: () -> Unit
 ) {
+    val isTv = rememberIsTv()
     var isFocused by remember { mutableStateOf(false) }
+    val showFocus = isFocused
     Surface(
         modifier = Modifier
             .fillMaxWidth()
@@ -616,12 +653,12 @@ fun StationCard(
             .clip(RoundedCornerShape(16.dp))
             .clickable { onSelect() }
             .border(
-                width = if (isFocused) 2.5.dp else if (isSelected) 1.dp else 0.dp,
-                color = if (isFocused) NeonCyan else if (isSelected) NeonCyan.copy(alpha = 0.5f) else Color.Transparent,
+                width = if (showFocus) 2.5.dp else if (isSelected) 1.dp else 0.dp,
+                color = if (showFocus) NeonCyan else if (isSelected) NeonCyan.copy(alpha = 0.5f) else Color.Transparent,
                 shape = RoundedCornerShape(16.dp)
             )
             .testTag("station_card_${station.id}"),
-        color = if (isFocused) DarkSurfaceVariant else if (isSelected) DarkSurfaceVariant.copy(alpha = 0.8f) else DarkSurface
+        color = if (showFocus) DarkSurfaceVariant else if (isSelected) DarkSurfaceVariant.copy(alpha = 0.8f) else DarkSurface
     ) {
         Row(
             modifier = Modifier
@@ -884,8 +921,10 @@ fun ThemeSelectionCard(
     currentTheme: ThemePreset,
     onSelectTheme: (ThemePreset) -> Unit
 ) {
+    val isTv = rememberIsTv()
     val isSelected = theme.id == currentTheme.id
     var isFocused by remember { mutableStateOf(false) }
+    val showFocus = isFocused
 
     Surface(
         modifier = Modifier
@@ -894,12 +933,12 @@ fun ThemeSelectionCard(
             .clip(RoundedCornerShape(16.dp))
             .clickable { onSelectTheme(theme) }
             .border(
-                width = if (isFocused) 3.dp else if (isSelected) 1.5.dp else 1.dp,
-                color = if (isFocused) theme.primary else if (isSelected) theme.primary.copy(alpha = 0.6f) else CardBorder,
+                width = if (showFocus) 3.dp else if (isSelected) 1.5.dp else 1.dp,
+                color = if (showFocus) theme.primary else if (isSelected) theme.primary.copy(alpha = 0.6f) else CardBorder,
                 shape = RoundedCornerShape(16.dp)
             )
             .testTag("theme_card_${theme.id}"),
-        color = if (isFocused) DarkSurfaceVariant else if (isSelected) DarkSurfaceVariant.copy(alpha = 0.5f) else DarkSurface
+        color = if (showFocus) DarkSurfaceVariant else if (isSelected) DarkSurfaceVariant.copy(alpha = 0.5f) else DarkSurface
     ) {
         Row(
             modifier = Modifier

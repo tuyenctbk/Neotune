@@ -115,4 +115,34 @@
     <!-- Discovery error messages -->
     <string name="network_error_title">Network error or API limit reached.</string>
     <string name="retry_discovery">Retry Discovery</string>
+
+    <!-- Onboarding Flow Strings -->
+    <string name="nav_onboarding">Guide</string>
+    <string name="onboarding_skip">Skip</string>
+    <string name="onboarding_next">Next</string>
+    <string name="onboarding_get_started">Get Started</string>
+    <string name="onboarding_back">Back</string>
+    <string name="onboarding_app_tour">App Tour &amp; Guide</string>
+    
+    <!-- Slide 1: Global Live Radio -->
+    <string name="onboarding_slide1_title">Global Live Radio</string>
+    <string name="onboarding_slide1_subtitle">Discover thousands of live radio stations worldwide, curated chill streams, ambient beats, and crystal-clear audio.</string>
+    <string name="onboarding_slide1_badge1">50,000+ Stations</string>
+    <string name="onboarding_slide1_badge2">Global Direct Streams</string>
+    <string name="onboarding_slide1_badge3">Zero Ad Interruption</string>
+    
+    <!-- Slide 2: Background Playback Controls -->
+    <string name="onboarding_slide2_title">Background Playback Controls</string>
+    <string name="onboarding_slide2_subtitle">Keep the radio playing seamlessly while using other apps, taking a drive, or when your device screen is locked.</string>
+    <string name="onboarding_slide2_grant_btn">Enable Notification Permission</string>
+    <string name="onboarding_slide2_granted">Notification Permission Granted ✓</string>
+    <string name="onboarding_slide2_feature1">System Lockscreen Media Widget</string>
+    <string name="onboarding_slide2_feature2">Persistent Status Bar Controls</string>
+    <string name="onboarding_slide2_feature3">Auto Reconnect &amp; Buffer Protection</string>
+
+    <!-- Slide 3: Genre & Discovery -->
+    <string name="onboarding_slide3_title">Genre &amp; Discovery</string>
+    <string name="onboarding_slide3_subtitle">Select your favorite genres to personalize your home screen feed upon launch.</string>
+    <string name="onboarding_slide3_select_genres">Pick your preferred styles:</string>
+    <string name="onboarding_slide3_start_listening">Start Listening</string>
 </resources>

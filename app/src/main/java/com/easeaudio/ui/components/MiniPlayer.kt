@@ -60,6 +60,7 @@ fun MiniPlayer(
     ) {
         if (station != null) {
             var isFocused by remember { mutableStateOf(false) }
+            val showFocus = isFocused
             Surface(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -68,8 +69,8 @@ fun MiniPlayer(
                     .clip(RoundedCornerShape(16.dp))
                     .clickable { onOpenFullPlayer() }
                     .border(
-                        width = if (isFocused) 2.5.dp else 0.dp,
-                        color = if (isFocused) NeonCyan else Color.Transparent,
+                        width = if (showFocus) 2.5.dp else 0.dp,
+                        color = if (showFocus) NeonCyan else Color.Transparent,
                         shape = RoundedCornerShape(16.dp)
                     )
                     .testTag("mini_player_bar"),

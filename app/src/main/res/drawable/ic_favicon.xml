@@ -5,26 +5,19 @@
     android:viewportWidth="36"
     android:viewportHeight="36">
 
-    <!-- Left Pillar of 'N' -->
+    <!-- Left Cyan Pillar of 'N' -->
     <path
-        android:strokeWidth="3.6"
-        android:strokeColor="#FFFFFF"
-        android:strokeLineCap="round"
-        android:pathData="M 10,11 L 10,29" />
+        android:fillColor="#38C7FF"
+        android:pathData="M 7,7 L 12.5,7 L 12.5,29 L 7,29 Z" />
 
-    <!-- Right Pillar of 'N' -->
+    <!-- Right Orange Pillar of 'N' -->
     <path
-        android:strokeWidth="3.6"
-        android:strokeColor="#FFFFFF"
-        android:strokeLineCap="round"
-        android:pathData="M 26,11 L 26,29" />
+        android:fillColor="#FF8C38"
+        android:pathData="M 23.5,7 L 29,7 L 29,29 L 23.5,29 Z" />
 
-    <!-- Diagonal Line of 'N' -->
+    <!-- Pink Diagonal Bar of 'N' -->
     <path
-        android:strokeWidth="3.6"
-        android:strokeColor="#FFFFFF"
-        android:strokeLineCap="round"
-        android:strokeLineJoin="round"
-        android:pathData="M 10,11 L 26,29" />
+        android:fillColor="#FF538A"
+        android:pathData="M 7,7 L 12.5,7 L 29,29 L 23.5,29 Z" />
 
 </vector>

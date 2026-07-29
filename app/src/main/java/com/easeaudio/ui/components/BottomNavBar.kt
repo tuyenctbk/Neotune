@@ -6,9 +6,11 @@ import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Bedtime
+import androidx.compose.material.icons.filled.Explore
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Radio
 import androidx.compose.material.icons.outlined.Bedtime
+import androidx.compose.material.icons.outlined.Explore
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.Radio
 import androidx.compose.material3.*
@@ -36,6 +38,7 @@ sealed class NavRoute(
     object Home : NavRoute("home", R.string.nav_tuner, Icons.Filled.Radio, Icons.Outlined.Radio, "nav_tuner")
     object Favorites : NavRoute("favorites", R.string.nav_favorites, Icons.Filled.Favorite, Icons.Outlined.FavoriteBorder, "nav_favorites")
     object Screensaver : NavRoute("screensaver", R.string.nav_dock, Icons.Filled.Bedtime, Icons.Outlined.Bedtime, "nav_screensaver")
+    object Onboarding : NavRoute("onboarding", R.string.nav_onboarding, Icons.Filled.Explore, Icons.Outlined.Explore, "nav_onboarding")
 }
 
 @Composable

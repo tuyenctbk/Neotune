@@ -56,6 +56,8 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
 
     private val pageSize = 40
 
+    private val defaultStationIds = setOf("bbc_world_service", "jazz_groove", "lofi_girl_radio")
+
     @OptIn(FlowPreview::class)
     val stations: StateFlow<List<RadioStation>> = combine(
         repository.getAllStations(),
@@ -63,24 +65,32 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
         _searchQuery,
         _selectedGenre
     ) { localStations, onlineList, query, genre ->
-        // Merge local curated & custom with online discovered stations
         val favMap = localStations.filter { it.isFavorite }.associateBy { it.id }
         
         val mergedList = mutableListOf<RadioStation>()
         val addedIds = mutableSetOf<String>()
 
-        // Add local/curated first
-        localStations.forEach {
-            mergedList.add(it)
-            addedIds.add(it.id)
+        // 1. Add priority local stations (custom, favorite, and default curated stations)
+        val priorityLocal = localStations.filter { it.isCustom || it.isFavorite || defaultStationIds.contains(it.id) }
+        priorityLocal.forEach { station ->
+            mergedList.add(station)
+            addedIds.add(station.id)
         }
 
-        // Add online discovered if not duplicate
+        // 2. Add online discovered stations in their stable discovered order
         onlineList.forEach { online ->
             if (!addedIds.contains(online.id)) {
                 val isFav = favMap.containsKey(online.id)
                 mergedList.add(online.copy(isFavorite = isFav))
                 addedIds.add(online.id)
+            }
+        }
+
+        // 3. Add any other cached stations from local DB that were not in priorityLocal or onlineList
+        localStations.forEach { local ->
+            if (!addedIds.contains(local.id)) {
+                mergedList.add(local)
+                addedIds.add(local.id)
             }
         }
 
@@ -90,6 +100,8 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
                     station.name.contains(query, ignoreCase = true) ||
                     station.genre.contains(query, ignoreCase = true) ||
                     station.country.contains(query, ignoreCase = true)
+
+            val isOnlineMatch = onlineList.any { it.id == station.id }
 
             val matchesGenre = when (genre) {
                 "All" -> true
@@ -107,13 +119,17 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
                         station.genre.contains("Ambient", ignoreCase = true)
                 "Jazz" -> station.genre.contains("Jazz", ignoreCase = true)
                 "Rock" -> station.genre.contains("Rock", ignoreCase = true)
-                "Classical" -> station.genre.contains("Classic", ignoreCase = true) || station.genre.contains("Piano", ignoreCase = true)
+                "Classical" -> station.genre.contains("Classic", ignoreCase = true) || station.genre.contains("Piano", ignoreCase = true) || station.genre.contains("Orchestra", ignoreCase = true) || station.genre.contains("Symphony", ignoreCase = true)
                 "Ambient" -> station.genre.contains("Ambient", ignoreCase = true) || station.genre.contains("Drone", ignoreCase = true)
-                "EDM" -> station.genre.contains("EDM", ignoreCase = true) || station.genre.contains("Dance", ignoreCase = true) || station.genre.contains("House", ignoreCase = true) || station.genre.contains("Techno", ignoreCase = true)
+                "EDM" -> station.genre.contains("EDM", ignoreCase = true) || station.genre.contains("Dance", ignoreCase = true) || station.genre.contains("House", ignoreCase = true) || station.genre.contains("Techno", ignoreCase = true) || station.genre.contains("Club", ignoreCase = true)
+                "House" -> station.genre.contains("House", ignoreCase = true) || station.genre.contains("Deep", ignoreCase = true)
+                "Pop" -> station.genre.contains("Pop", ignoreCase = true) || station.genre.contains("Hit", ignoreCase = true) || station.genre.contains("Top 40", ignoreCase = true) || station.genre.contains("Top40", ignoreCase = true)
+                "Hip Hop" -> station.genre.contains("Hip", ignoreCase = true) || station.genre.contains("Rap", ignoreCase = true) || station.genre.contains("Urban", ignoreCase = true)
+                "Country" -> station.genre.contains("Country", ignoreCase = true) || station.genre.contains("Folk", ignoreCase = true)
                 else -> station.genre.contains(genre, ignoreCase = true)
             }
 
-            matchesQuery && matchesGenre
+            matchesQuery && (matchesGenre || isOnlineMatch)
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
@@ -190,6 +206,7 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
                 _canLoadMore.value = results.size >= pageSize
                 _isDiscoveryError.value = results.isEmpty() && query.isBlank() && genre == "All"
             } catch (e: Exception) {
+                // Keep existing discovered stations when offline instead of wiping the list
                 _isDiscoveryError.value = _onlineDiscoveredStations.value.isEmpty()
                 try {
                     val crashlytics = com.google.firebase.crashlytics.FirebaseCrashlytics.getInstance()

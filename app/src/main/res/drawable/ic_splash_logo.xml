@@ -5,40 +5,19 @@
     android:viewportWidth="192"
     android:viewportHeight="192">
 
-    <!-- Outer Tuner Dial Ring -->
+    <!-- Left Cyan Pillar of 'N' -->
     <path
-        android:strokeWidth="2.0"
-        android:strokeColor="#33FFFFFF"
-        android:strokeLineCap="round"
-        android:pathData="M 96,96 m -54,0 a 54,54 0 1,0 108,0 a 54,54 0 1,0 -108,0" />
+        android:fillColor="#38C7FF"
+        android:pathData="M 58,56 L 78,56 L 78,136 L 58,136 Z" />
 
-    <!-- Radio / Tuner Fine Graduation Ticks (Dashed Ring) -->
+    <!-- Right Orange Pillar of 'N' -->
     <path
-        android:strokeWidth="1.6"
-        android:strokeColor="#22FFFFFF"
-        android:strokeLineCap="round"
-        android:pathData="M 96,96 m -47,0 a 47,47 0 1,0 94,0 a 47,47 0 1,0 -94,0" />
+        android:fillColor="#FF8C38"
+        android:pathData="M 114,56 L 134,56 L 134,136 L 114,136 Z" />
 
-    <!-- Top Accent Pointer (Orange Tuner Needle at 12 o'clock) -->
+    <!-- Pink Diagonal Bar of 'N' -->
     <path
-        android:strokeWidth="3.6"
-        android:strokeColor="#FFA726"
-        android:strokeLineCap="round"
-        android:pathData="M 96,36 L 96,45" />
-
-    <!-- Right Accent Pointer (Cyan Tuner Needle at 3 o'clock) -->
-    <path
-        android:strokeWidth="3.6"
-        android:strokeColor="#00F0FF"
-        android:strokeLineCap="round"
-        android:pathData="M 147,96 L 156,96" />
-
-    <!-- Central Sleek Bold Letter 'N' (Drawn as a single continuous line for perfect joints) -->
-    <path
-        android:strokeWidth="12.0"
-        android:strokeColor="#FFFFFF"
-        android:strokeLineCap="round"
-        android:strokeLineJoin="round"
-        android:pathData="M 76,119.2 L 76,72.8 L 116,119.2 L 116,72.8" />
+        android:fillColor="#FF538A"
+        android:pathData="M 58,56 L 78,56 L 134,136 L 114,136 Z" />
 
 </vector>

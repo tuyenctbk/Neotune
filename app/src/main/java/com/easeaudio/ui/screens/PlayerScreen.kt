@@ -81,6 +81,8 @@ fun PlayerScreen(
         label = "artPulse"
     )
 
+    val isTv = com.easeaudio.ui.theme.rememberIsTv()
+
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         containerColor = DarkBackground,
@@ -94,18 +96,19 @@ fun PlayerScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 var isBackFocused by remember { mutableStateOf(false) }
+                val showBackFocus = isBackFocused
                 IconButton(
                     onClick = onBack,
                     modifier = Modifier
                         .onFocusChanged { isBackFocused = it.isFocused }
                         .clip(CircleShape)
-                        .background(if (isBackFocused) NeonCyan else Color.Transparent)
+                        .background(if (showBackFocus) NeonCyan else Color.Transparent)
                         .testTag("btn_player_back")
                 ) {
                     Icon(
                         imageVector = Icons.Filled.ArrowBack, 
                         contentDescription = stringResource(R.string.close), 
-                        tint = if (isBackFocused) DarkBackground else TextPrimary
+                        tint = if (showBackFocus) DarkBackground else TextPrimary
                     )
                 }
 
@@ -117,18 +120,19 @@ fun PlayerScreen(
                 )
 
                 var isFavFocused by remember { mutableStateOf(false) }
+                val showFavFocus = isFavFocused
                 IconButton(
                     onClick = onToggleFavorite,
                     modifier = Modifier
                         .onFocusChanged { isFavFocused = it.isFocused }
                         .clip(CircleShape)
-                        .background(if (isFavFocused) NeonPink else Color.Transparent)
+                        .background(if (showFavFocus) NeonPink else Color.Transparent)
                         .testTag("btn_player_favorite")
                 ) {
                     Icon(
                         imageVector = if (station.isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
                         contentDescription = "Favorite",
-                        tint = if (isFavFocused) DarkBackground else (if (station.isFavorite) NeonPink else TextMuted)
+                        tint = if (showFavFocus) DarkBackground else (if (station.isFavorite) NeonPink else TextMuted)
                     )
                 }
             }
@@ -383,34 +387,36 @@ fun PlayerScreen(
                     horizontalArrangement = Arrangement.spacedBy(24.dp)
                 ) {
                     var isPrevFocused by remember { mutableStateOf(false) }
+                    val showPrevFocus = isPrevFocused
                     IconButton(
                         onClick = onPlayPreviousStation,
                         modifier = Modifier
                             .size(48.dp)
                             .onFocusChanged { isPrevFocused = it.isFocused }
                             .clip(CircleShape)
-                            .background(if (isPrevFocused) NeonCyan else Color.Transparent)
+                            .background(if (showPrevFocus) NeonCyan else Color.Transparent)
                     ) {
                         Icon(
                             imageVector = Icons.Filled.SkipPrevious,
                             contentDescription = "Previous Station",
-                            tint = if (isPrevFocused) DarkBackground else TextPrimary,
+                            tint = if (showPrevFocus) DarkBackground else TextPrimary,
                             modifier = Modifier.size(32.dp)
                         )
                     }
 
                     // Play / Pause Transport Button
                     var isPlayFocused by remember { mutableStateOf(false) }
+                    val showPlayFocus = isPlayFocused
                     Box(
                         modifier = Modifier
                             .size(68.dp)
                             .onFocusChanged { isPlayFocused = it.isFocused }
                             .clip(CircleShape)
-                            .background(if (isPlayFocused) NeonCyan else Color.White)
+                            .background(if (showPlayFocus) NeonCyan else Color.White)
                             .clickable(onClick = onTogglePlay)
                             .border(
-                                width = if (isPlayFocused) 3.dp else 0.dp,
-                                color = if (isPlayFocused) Color.White else Color.Transparent,
+                                width = if (showPlayFocus) 3.dp else 0.dp,
+                                color = if (showPlayFocus) Color.White else Color.Transparent,
                                 shape = CircleShape
                             )
                             .testTag("btn_player_toggle_play"),
@@ -419,7 +425,7 @@ fun PlayerScreen(
                         if (isLoading) {
                             CircularProgressIndicator(
                                 modifier = Modifier.size(30.dp),
-                                color = if (isPlayFocused) NeonCyan else DarkBackground,
+                                color = if (showPlayFocus) NeonCyan else DarkBackground,
                                 strokeWidth = 3.dp
                             )
                         } else {
@@ -433,18 +439,19 @@ fun PlayerScreen(
                     }
 
                     var isNextFocused by remember { mutableStateOf(false) }
+                    val showNextFocus = isNextFocused
                     IconButton(
                         onClick = onPlayNextStation,
                         modifier = Modifier
                             .size(48.dp)
                             .onFocusChanged { isNextFocused = it.isFocused }
                             .clip(CircleShape)
-                            .background(if (isNextFocused) NeonCyan else Color.Transparent)
+                            .background(if (showNextFocus) NeonCyan else Color.Transparent)
                     ) {
                         Icon(
                             imageVector = Icons.Filled.SkipNext,
                             contentDescription = "Next Station",
-                            tint = if (isNextFocused) DarkBackground else TextPrimary,
+                            tint = if (showNextFocus) DarkBackground else TextPrimary,
                             modifier = Modifier.size(32.dp)
                         )
                     }
@@ -458,6 +465,7 @@ fun PlayerScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     var isEqFocused by remember { mutableStateOf(false) }
+                    val showEqFocus = isEqFocused
                     val activePresetLabel = eqPresets.find { it.key == activeEqPreset }?.labelResId?.let { stringResource(it) } ?: activeEqPreset
                     AssistChip(
                         onClick = onOpenEqualizer,
@@ -465,45 +473,46 @@ fun PlayerScreen(
                             Icon(
                                 imageVector = Icons.Filled.Equalizer,
                                 contentDescription = null,
-                                tint = if (isEqFocused) DarkBackground else NeonCyan,
+                                tint = if (showEqFocus) DarkBackground else NeonCyan,
                                 modifier = Modifier.size(16.dp)
                             )
                         },
-                        label = { Text(stringResource(R.string.eq_label, activePresetLabel), color = if (isEqFocused) DarkBackground else TextPrimary, fontSize = 12.sp) },
+                        label = { Text(stringResource(R.string.eq_label, activePresetLabel), color = if (showEqFocus) DarkBackground else TextPrimary, fontSize = 12.sp) },
                         colors = AssistChipDefaults.assistChipColors(
-                            containerColor = if (isEqFocused) NeonCyan else DarkSurfaceVariant
+                            containerColor = if (showEqFocus) NeonCyan else DarkSurfaceVariant
                         ),
                         border = AssistChipDefaults.assistChipBorder(
                             enabled = true,
-                            borderColor = if (isEqFocused) Color.White else CardBorder
+                            borderColor = if (showEqFocus) Color.White else CardBorder
                         ),
                         modifier = Modifier.onFocusChanged { isEqFocused = it.isFocused }
                     )
 
                     var isSleepFocused by remember { mutableStateOf(false) }
+                    val showSleepFocus = isSleepFocused
                     AssistChip(
                         onClick = onOpenSleepTimer,
                         leadingIcon = {
                             Icon(
                                 imageVector = Icons.Filled.Bedtime,
                                 contentDescription = null,
-                                tint = if (isSleepFocused) DarkBackground else (if (sleepTimerRemaining != null) DarkBackground else TextMuted),
+                                tint = if (showSleepFocus) DarkBackground else (if (sleepTimerRemaining != null) DarkBackground else TextMuted),
                                 modifier = Modifier.size(16.dp)
                             )
                         },
                         label = {
                             Text(
                                 text = if (sleepTimerRemaining != null) stringResource(R.string.sleeping_in, sleepTimerRemaining) else stringResource(R.string.sleep_timer),
-                                color = if (isSleepFocused) DarkBackground else (if (sleepTimerRemaining != null) DarkBackground else TextPrimary),
+                                color = if (showSleepFocus) DarkBackground else (if (sleepTimerRemaining != null) DarkBackground else TextPrimary),
                                 fontSize = 12.sp
                             )
                         },
                         colors = AssistChipDefaults.assistChipColors(
-                            containerColor = if (isSleepFocused) NeonCyan else (if (sleepTimerRemaining != null) ActivePill else DarkSurfaceVariant)
+                            containerColor = if (showSleepFocus) NeonCyan else (if (sleepTimerRemaining != null) ActivePill else DarkSurfaceVariant)
                         ),
                         border = AssistChipDefaults.assistChipBorder(
                             enabled = true,
-                            borderColor = if (isSleepFocused) Color.White else (if (sleepTimerRemaining != null) Color.White else CardBorder)
+                            borderColor = if (showSleepFocus) Color.White else (if (sleepTimerRemaining != null) Color.White else CardBorder)
                         ),
                         modifier = Modifier.onFocusChanged { isSleepFocused = it.isFocused }
                     )

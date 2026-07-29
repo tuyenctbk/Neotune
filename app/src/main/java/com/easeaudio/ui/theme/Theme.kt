@@ -49,3 +49,15 @@ fun TuneveTheme(
 
 @Composable
 fun EaseAudioTheme(content: @Composable () -> Unit) = TuneveTheme(content = content)
+
+@Composable
+fun rememberIsTv(): Boolean {
+    val context = androidx.compose.ui.platform.LocalContext.current
+    return androidx.compose.runtime.remember(context) {
+        val uiModeManager = context.getSystemService(android.content.Context.UI_MODE_SERVICE) as? android.app.UiModeManager
+        val isTvMode = uiModeManager?.currentModeType == android.content.res.Configuration.UI_MODE_TYPE_TELEVISION
+        val hasLeanback = context.packageManager.hasSystemFeature(android.content.pm.PackageManager.FEATURE_LEANBACK)
+        val hasTvHardware = context.packageManager.hasSystemFeature(android.content.pm.PackageManager.FEATURE_TELEVISION)
+        isTvMode || hasLeanback || hasTvHardware
+    }
+}
