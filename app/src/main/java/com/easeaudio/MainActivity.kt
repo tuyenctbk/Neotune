@@ -101,6 +101,10 @@ fun MainAppContent(
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route ?: startDestination
 
+    LaunchedEffect(currentRoute) {
+        FirebaseManager.logScreenView(currentRoute)
+    }
+
     val completeOnboarding = {
         prefs.edit().putBoolean("is_onboarding_completed", true).apply()
         isOnboardingCompleted.value = true
@@ -114,6 +118,8 @@ fun MainAppContent(
     val recentStations by viewModel.recentStations.collectAsState()
 
     val currentStation by viewModel.playerManager.currentStation.collectAsState()
+    val isCurrentStationFavorite = favoriteStations.any { it.id == currentStation?.id }
+    val syncedCurrentStation = currentStation?.copy(isFavorite = isCurrentStationFavorite)
     val isPlaying by viewModel.playerManager.isPlaying.collectAsState()
     val isLoading by viewModel.playerManager.isLoading.collectAsState()
     val playbackError by viewModel.playerManager.playbackError.collectAsState()
@@ -183,6 +189,7 @@ fun MainAppContent(
     LaunchedEffect(playbackError, playbackErrorDetails) {
         playbackErrorDetails?.let { details ->
             Log.e("MainActivity", "Stream Error Captured: ${details.toUserSummary()} (Code: ${details.errorCodeName}, HTTP: ${details.httpStatusCode ?: "N/A"})")
+            FirebaseManager.recordException(Exception("Stream Error: ${details.errorCodeName}"))
         }
         playbackError?.let { err ->
             snackbarHostState.showSnackbar(err)
@@ -232,7 +239,7 @@ fun MainAppContent(
                         HomeScreen(
                             stations = stations,
                             recentStations = recentStations,
-                            currentStation = currentStation,
+                            currentStation = syncedCurrentStation,
                             isPlaying = isPlaying,
                             isLoading = isLoading,
                             isDiscoveringOnline = isDiscoveringOnline,
@@ -248,8 +255,14 @@ fun MainAppContent(
                             isDiscoveryError = isDiscoveryError,
                             onSearchQueryChange = { viewModel.setSearchQuery(it) },
                             onGenreSelect = { viewModel.setSelectedGenre(it) },
-                            onStationSelect = { station -> viewModel.playStation(station) },
-                            onToggleFavorite = { station -> viewModel.toggleFavorite(station) },
+                            onStationSelect = { station -> 
+                                FirebaseManager.logEvent("play_station", Bundle().apply { putString("station_name", station.name) })
+                                viewModel.playStation(station) 
+                            },
+                            onToggleFavorite = { station -> 
+                                FirebaseManager.logEvent("toggle_favorite", Bundle().apply { putString("station_name", station.name) })
+                                viewModel.toggleFavorite(station) 
+                            },
                             onOpenAddStation = { viewModel.setShowAddStationDialog(true) },
                             onOpenSleepTimer = { viewModel.setShowSleepTimerDialog(true) },
                             onOpenEqualizer = { viewModel.setShowEqualizerDialog(true) },
@@ -263,25 +276,31 @@ fun MainAppContent(
                     composable(NavRoute.Favorites.route) {
                         FavoritesScreen(
                             favoriteStations = favoriteStations,
-                            currentStation = currentStation,
+                            currentStation = syncedCurrentStation,
                             isPlaying = isPlaying,
                             isLoading = isLoading,
                             failedStationIds = failedStationIds,
-                            onStationSelect = { station -> viewModel.playStation(station) },
-                            onToggleFavorite = { station -> viewModel.toggleFavorite(station) }
+                            onStationSelect = { station -> 
+                                FirebaseManager.logEvent("play_station", Bundle().apply { putString("station_name", station.name) })
+                                viewModel.playStation(station) 
+                            },
+                            onToggleFavorite = { station -> 
+                                FirebaseManager.logEvent("toggle_favorite", Bundle().apply { putString("station_name", station.name) })
+                                viewModel.toggleFavorite(station) 
+                            }
                         )
                     }
 
                     composable(NavRoute.Screensaver.route) {
                         ScreensaverScreen(
-                            currentStation = currentStation,
+                            currentStation = syncedCurrentStation,
                             isPlaying = isPlaying,
                             streamTitle = streamTitle,
                             waveAmplitudes = waveAmplitudes,
                             sleepTimerRemaining = sleepTimerRemaining,
                             onTogglePlay = { viewModel.togglePlayPause() },
                             onOpenSleepTimer = { viewModel.setShowSleepTimerDialog(true) },
-                            onToggleFavorite = { currentStation?.let { viewModel.toggleFavorite(it) } }
+                            onToggleFavorite = { syncedCurrentStation?.let { viewModel.toggleFavorite(it) } }
                         )
                     }
                 }
@@ -289,13 +308,13 @@ fun MainAppContent(
                 // Mini Player floating bar (shown if station is selected and full player is collapsed)
                 if (!isFullPlayerVisible && currentRoute != NavRoute.Screensaver.route && currentRoute != NavRoute.Onboarding.route) {
                     MiniPlayer(
-                        station = currentStation,
+                        station = syncedCurrentStation,
                         isPlaying = isPlaying,
                         isLoading = isLoading,
                         streamTitle = streamTitle,
                         waveAmplitudes = waveAmplitudes,
                         onTogglePlay = { viewModel.togglePlayPause() },
-                        onToggleFavorite = { currentStation?.let { viewModel.toggleFavorite(it) } },
+                        onToggleFavorite = { syncedCurrentStation?.let { viewModel.toggleFavorite(it) } },
                         onOpenFullPlayer = { isFullPlayerVisible = true },
                         modifier = Modifier.align(Alignment.BottomCenter)
                     )
@@ -311,7 +330,7 @@ fun MainAppContent(
             modifier = Modifier.fillMaxSize()
         ) {
             PlayerScreen(
-                station = currentStation,
+                station = syncedCurrentStation,
                 isPlaying = isPlaying,
                 isLoading = isLoading,
                 streamTitle = streamTitle,
@@ -322,7 +341,7 @@ fun MainAppContent(
                 eqPresets = viewModel.eqPresets,
                 playbackError = playbackError,
                 onTogglePlay = { viewModel.togglePlayPause() },
-                onToggleFavorite = { currentStation?.let { viewModel.toggleFavorite(it) } },
+                onToggleFavorite = { syncedCurrentStation?.let { viewModel.toggleFavorite(it) } },
                 onVolumeChange = { viewModel.playerManager.setVolume(it) },
                 onOpenSleepTimer = { viewModel.setShowSleepTimerDialog(true) },
                 onOpenEqualizer = { viewModel.setShowEqualizerDialog(true) },

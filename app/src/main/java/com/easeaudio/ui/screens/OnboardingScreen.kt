@@ -260,13 +260,9 @@ fun OnboardingScreen(
                     ),
                     shape = RoundedCornerShape(16.dp),
                     elevation = ButtonDefaults.buttonElevation(defaultElevation = 6.dp),
+                    border = if (isNextEnabled && isNextFocused) androidx.compose.foundation.BorderStroke(3.dp, NeonCyan) else null,
                     modifier = Modifier
                         .onFocusChanged { isNextFocused = it.isFocused }
-                        .border(
-                            width = if (isNextEnabled && isNextFocused) 3.dp else 0.dp,
-                            color = if (isNextEnabled) NeonCyan else Color.Transparent,
-                            shape = RoundedCornerShape(16.dp)
-                        )
                         .testTag("btn_onboarding_next")
                 ) {
                     Text(
@@ -486,14 +482,10 @@ private fun SlideBackgroundControls(
                         contentColor = if (hasPermission) StatusGreen else DarkBackground
                     ),
                     shape = RoundedCornerShape(14.dp),
+                    border = if (isBtnFocused) androidx.compose.foundation.BorderStroke(3.dp, if (hasPermission) StatusGreen else NeonCyan) else null,
                     modifier = Modifier
                         .fillMaxWidth()
                         .onFocusChanged { isBtnFocused = it.isFocused }
-                        .border(
-                            width = if (isBtnFocused) 3.dp else 0.dp,
-                            color = if (hasPermission) StatusGreen else NeonCyan,
-                            shape = RoundedCornerShape(14.dp)
-                        )
                         .testTag("btn_grant_notification")
                 ) {
                     Icon(
