@@ -36,7 +36,6 @@ import androidx.compose.material.icons.filled.Radio
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material.icons.filled.Wifi
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -81,6 +80,7 @@ fun HomeScreen(
     availableGenres: List<GenreDisplay>,
     selectedCountry: String = "Global",
     availableCountries: List<com.easeaudio.viewmodel.CountryDisplay> = emptyList(),
+    isLoadingCountries: Boolean = false,
     sleepTimerRemaining: Int?,
     networkStatus: NetworkStatus = NetworkStatus(),
     remoteConfig: AppRemoteConfig = AppRemoteConfig(),
@@ -278,6 +278,7 @@ fun HomeScreen(
                                 com.easeaudio.ui.components.CountrySelectionDialog(
                                     selectedCountry = selectedCountry,
                                     countries = availableCountries,
+                                    isLoading = isLoadingCountries,
                                     onSelectCountry = { onCountrySelect(it) },
                                     onDismiss = { showCountryDialog = false }
                                 )
@@ -335,13 +336,16 @@ fun HomeScreen(
 
                                 DropdownMenuItem(
                                     text = {
-                                        val label = if (sleepTimerRemaining != null) "Sleep Timer (Active)" else "Sleep Timer"
+                                        val label = if (sleepTimerRemaining != null)
+                                            stringResource(R.string.sleep_timer_active)
+                                        else
+                                            stringResource(R.string.sleep_timer)
                                         Text(label, color = TextPrimary)
                                     },
                                     leadingIcon = {
                                         Icon(
                                             imageVector = Icons.Filled.Bedtime,
-                                            contentDescription = "Sleep Timer",
+                                            contentDescription = stringResource(R.string.sleep_timer),
                                             tint = if (sleepTimerRemaining != null) NeonPurple else TextMuted
                                         )
                                     },
@@ -1122,9 +1126,9 @@ fun ThemeSelectionCard(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    ColorPill(label = "Nền", color = theme.background)
-                    ColorPill(label = "Thẻ", color = theme.surface)
-                    ColorPill(label = "Nhấn", color = theme.primary)
+                    ColorPill(label = stringResource(R.string.color_pill_bg), color = theme.background)
+                    ColorPill(label = stringResource(R.string.color_pill_card), color = theme.surface)
+                    ColorPill(label = stringResource(R.string.color_pill_accent), color = theme.primary)
                 }
             }
 

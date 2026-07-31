@@ -177,4 +177,17 @@
     <string name="dsp_lofi">Warm Lo-Fi</string>
     <string name="dsp_acoustic">Acoustic</string>
     <string name="dsp_bass">Bass Boost</string>
+
+    <!-- Sleep Timer active state -->
+    <string name="sleep_timer_active">Sleep Timer (Active)</string>
+
+    <!-- Theme card color dot labels -->
+    <string name="color_pill_bg">BG</string>
+    <string name="color_pill_card">Card</string>
+    <string name="color_pill_accent">Accent</string>
+
+    <!-- Country Selection Dialog -->
+    <string name="select_country">Select Country / Region</string>
+    <string name="discovering_countries">Discovering countries…</string>
+    <string name="country_count">%d countries available</string>
 </resources>

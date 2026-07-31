@@ -16,5 +16,6 @@ data class CountryDisplay(
     val name: String,
     val flag: String,
     val code: String = "",
+    val stationCount: Int = 0,
     val stationCountText: String = ""
 )

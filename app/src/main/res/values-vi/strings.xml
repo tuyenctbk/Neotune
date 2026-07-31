@@ -93,11 +93,11 @@
     <string name="banner_weak_connection">Kết nối yếu</string>
     <string name="featured_station">ĐÀI NỔI BẬT</string>
     <string name="appearance_subtitle">Giao diện &amp; Bảng màu cho không gian của bạn</string>
-    <string name="theme_section_cafe">☕ QUÁN CAFE &amp; NHÀ HÀNG (ẤM CỦNG, SANG TRỌNG)</string>
+    <string name="theme_section_cafe">☕ QUÁN CAFE &amp; NHÀ HÀNG (ẤM CÚNG, SANG TRỌNG)</string>
     <string name="theme_section_cafe_desc">Giao diện tông ấm, dịu mắt, lý tưởng cho nhạc nền không gian</string>
     <string name="theme_section_standard">✨ TỐI GIẢN &amp; TINH TẾ (TIÊU CHUẨN)</string>
     <string name="theme_section_standard_desc">Thiết kế sạch sẽ, tinh tế phục vụ thưởng thức âm nhạc hàng ngày</string>
-    <string name="theme_section_youth">⚡ RỰC RỠ &amp; BÁO TẠO (TRE TRUNG)</string>
+    <string name="theme_section_youth">⚡ RỰC RỠ &amp; TÁO BẠO (TRẺ TRUNG)</string>
     <string name="theme_section_youth_desc">Năng động, nghệ thuật, táo bạo cho không gian trẻ trung</string>
     <string name="in_use">Đang dùng</string>
     <string name="live_badge">TRỰC TIẾP</string>
@@ -158,4 +158,17 @@
     <string name="dsp_lofi">Lo-Fi Ấm Áp</string>
     <string name="dsp_acoustic">Nhạc Mộc Acoustic</string>
     <string name="dsp_bass">Tăng Bass Uy Lực</string>
+
+    <!-- Sleep Timer active state -->
+    <string name="sleep_timer_active">Hẹn Giờ Tắt (Đang Bật)</string>
+
+    <!-- Theme card color dot labels -->
+    <string name="color_pill_bg">Nền</string>
+    <string name="color_pill_card">Thẻ</string>
+    <string name="color_pill_accent">Nhấn</string>
+
+    <!-- Country Selection Dialog -->
+    <string name="select_country">Chọn Quốc Gia / Khu Vực</string>
+    <string name="discovering_countries">Đang khám phá quốc gia…</string>
+    <string name="country_count">%d quốc gia có sẵn</string>
 </resources>

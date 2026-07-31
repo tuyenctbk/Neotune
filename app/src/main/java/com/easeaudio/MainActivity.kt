@@ -33,7 +33,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
-import androidx.compose.ui.res.stringResource
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -142,6 +141,8 @@ fun MainAppContent(
     val isDiscoveryError by viewModel.isDiscoveryError.collectAsState()
     val canLoadMore by viewModel.canLoadMore.collectAsState()
     val failedStationIds by viewModel.failedStationIds.collectAsState()
+    val availableCountries by viewModel.availableCountries.collectAsState()
+    val isLoadingCountries by viewModel.isLoadingCountries.collectAsState()
 
     val showSleepTimerDialog by viewModel.showSleepTimerDialog.collectAsState()
     val showEqualizerDialog by viewModel.showEqualizerDialog.collectAsState()
@@ -216,7 +217,8 @@ fun MainAppContent(
                             selectedGenre = selectedGenre,
                             availableGenres = viewModel.availableGenres,
                             selectedCountry = selectedCountry,
-                            availableCountries = viewModel.availableCountries,
+                            availableCountries = availableCountries,
+                            isLoadingCountries = isLoadingCountries,
                             sleepTimerRemaining = sleepTimerRemaining,
                             networkStatus = networkStatus,
                             remoteConfig = remoteConfig,

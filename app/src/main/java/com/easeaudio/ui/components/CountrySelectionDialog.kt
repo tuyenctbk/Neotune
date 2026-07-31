@@ -35,6 +35,7 @@ import com.easeaudio.viewmodel.CountryDisplay
 fun CountrySelectionDialog(
     selectedCountry: String,
     countries: List<CountryDisplay>,
+    isLoading: Boolean = false,
     onSelectCountry: (String) -> Unit,
     onDismiss: () -> Unit
 ) {
@@ -74,14 +75,28 @@ fun CountrySelectionDialog(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(
-                        text = "Select Country / Region",
-                        style = MaterialTheme.typography.titleLarge.copy(
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 20.sp
-                        ),
-                        color = TextPrimary
-                    )
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = stringResource(R.string.select_country),
+                            style = MaterialTheme.typography.titleLarge.copy(
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 20.sp
+                            ),
+                            color = TextPrimary
+                        )
+                        val subtitleText = when {
+                            isLoading -> stringResource(R.string.discovering_countries)
+                            countries.size > 1 -> stringResource(R.string.country_count, countries.size - 1)
+                            else -> ""
+                        }
+                        if (subtitleText.isNotBlank()) {
+                            Text(
+                                text = subtitleText,
+                                style = MaterialTheme.typography.bodySmall,
+                                color = if (isLoading) NeonCyan else TextMuted
+                            )
+                        }
+                    }
                     IconButton(
                         onClick = onDismiss,
                         modifier = Modifier
@@ -97,6 +112,19 @@ fun CountrySelectionDialog(
                             modifier = Modifier.size(18.dp)
                         )
                     }
+                }
+
+                // Subtle loading progress bar
+                if (isLoading) {
+                    Spacer(modifier = Modifier.height(6.dp))
+                    LinearProgressIndicator(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(2.dp)
+                            .clip(RoundedCornerShape(1.dp)),
+                        color = NeonCyan,
+                        trackColor = NeonCyan.copy(alpha = 0.1f)
+                    )
                 }
 
                 Spacer(modifier = Modifier.height(14.dp))
@@ -180,7 +208,10 @@ fun CountrySelectionDialog(
                                     verticalAlignment = Alignment.CenterVertically,
                                     horizontalArrangement = Arrangement.SpaceBetween
                                 ) {
-                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        modifier = Modifier.weight(1f)
+                                    ) {
                                         Text(text = country.flag, fontSize = 20.sp)
                                         Spacer(modifier = Modifier.width(12.dp))
                                         Text(
@@ -188,9 +219,13 @@ fun CountrySelectionDialog(
                                             style = MaterialTheme.typography.bodyLarge.copy(
                                                 fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium
                                             ),
-                                            color = if (isSelected) NeonCyan else TextPrimary
+                                            color = if (isSelected) NeonCyan else TextPrimary,
+                                            maxLines = 1,
+                                            overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
                                         )
                                     }
+
+                                    Spacer(modifier = Modifier.width(8.dp))
 
                                     Row(verticalAlignment = Alignment.CenterVertically) {
                                         if (country.stationCountText.isNotBlank()) {
@@ -203,6 +238,8 @@ fun CountrySelectionDialog(
                                                     text = country.stationCountText,
                                                     style = MaterialTheme.typography.labelSmall.copy(fontSize = 11.sp, fontWeight = FontWeight.SemiBold),
                                                     color = if (isSelected) NeonCyan else TextMuted,
+                                                    maxLines = 1,
+                                                    softWrap = false,
                                                     modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
                                                 )
                                             }

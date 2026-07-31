@@ -254,4 +254,56 @@ object RadioBrowserService {
                 "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=600&q=80"
         }
     }
+
+    /**
+     * Fetches all countries from the RadioBrowser API, sorted by station count descending.
+     * Returns a list of (name, isoCode, stationCount) triples.
+     */
+    suspend fun fetchCountries(): List<Triple<String, String, Int>> = withContext(Dispatchers.IO) {
+        val activeUrls = getActiveServers()
+        for (baseUrl in activeUrls) {
+            try {
+                // Strip the /stations suffix to get the API base
+                val apiBase = baseUrl.removeSuffix("/stations")
+                val url = "$apiBase/countries?order=stationcount&reverse=true&hidebroken=true"
+                val responseText = executeHttpRequest(url) ?: continue
+                if (responseText.isBlank() || responseText.trim() == "[]") continue
+
+                val jsonArray = JSONArray(responseText)
+                val result = mutableListOf<Triple<String, String, Int>>()
+                for (i in 0 until jsonArray.length()) {
+                    val obj = jsonArray.getJSONObject(i)
+                    val name = obj.optString("name", "").trim()
+                    val isoCode = obj.optString("iso_3166_1", "").trim().uppercase()
+                    val count = obj.optInt("stationcount", 0)
+                    if (name.isNotBlank() && count > 0) {
+                        result.add(Triple(name, isoCode, count))
+                    }
+                }
+                if (result.isNotEmpty()) {
+                    Log.i(TAG, "Fetched ${result.size} countries from RadioBrowser API.")
+                    return@withContext result
+                }
+            } catch (e: Exception) {
+                Log.w(TAG, "fetchCountries failed on $baseUrl: ${e.message}")
+            }
+        }
+        Log.w(TAG, "fetchCountries: all servers failed, returning empty list.")
+        return@withContext emptyList()
+    }
+
+    /**
+     * Converts a 2-letter ISO 3166-1 alpha-2 country code to its flag emoji.
+     * Works by offsetting each letter from 'A' into the Unicode Regional Indicator block (U+1F1E6..U+1F1FF).
+     * e.g. "US" -> 🇺🇸, "VN" -> 🇻🇳
+     */
+    fun isoToFlagEmoji(isoCode: String): String {
+        if (isoCode.length != 2) return "🌐"
+        val base = 0x1F1E6 - 'A'.code
+        val chars = isoCode.uppercase()
+        return chars.map { ch ->
+            val codePoint = base + ch.code
+            String(Character.toChars(codePoint))
+        }.joinToString("")
+    }
 }

@@ -27,48 +27,104 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
     private val _selectedCountry = MutableStateFlow("Global")
     val selectedCountry: StateFlow<String> = _selectedCountry.asStateFlow()
 
-    val availableCountries = listOf(
-        CountryDisplay("Global", "🌐", "", "> 50k"),
-        CountryDisplay("United States", "🇺🇸", "US", "> 5000"),
-        CountryDisplay("Germany", "🇩🇪", "DE", "> 3000"),
-        CountryDisplay("United Kingdom", "🇬🇧", "GB", "> 2000"),
-        CountryDisplay("France", "🇫🇷", "FR", "> 2000"),
-        CountryDisplay("Spain", "🇪🇸", "ES", "> 1000"),
-        CountryDisplay("Italy", "🇮🇹", "IT", "> 1000"),
-        CountryDisplay("Canada", "🇨🇦", "CA", "> 800"),
-        CountryDisplay("Brazil", "🇧🇷", "BR", "> 800"),
-        CountryDisplay("Australia", "🇦🇺", "AU", "> 500"),
-        CountryDisplay("Mexico", "🇲🇽", "MX", "> 500"),
-        CountryDisplay("Argentina", "🇦🇷", "AR", "> 400"),
-        CountryDisplay("Netherlands", "🇳🇱", "NL", "> 400"),
-        CountryDisplay("Poland", "🇵🇱", "PL", "> 400"),
-        CountryDisplay("Switzerland", "🇨🇭", "CH", "> 300"),
-        CountryDisplay("Austria", "🇦🇹", "AT", "> 300"),
-        CountryDisplay("Belgium", "🇧🇪", "BE", "> 300"),
-        CountryDisplay("Japan", "🇯🇵", "JP", "> 200"),
-        CountryDisplay("India", "🇮🇳", "IN", "> 200"),
-        CountryDisplay("Turkey", "🇹🇷", "TR", "> 200"),
-        CountryDisplay("Sweden", "🇸🇪", "SE", "> 200"),
-        CountryDisplay("Norway", "🇳🇴", "NO", "> 150"),
-        CountryDisplay("Czech Republic", "🇨🇿", "CZ", "> 150"),
-        CountryDisplay("Portugal", "🇵🇹", "PT", "> 150"),
-        CountryDisplay("Greece", "🇬🇷", "GR", "> 150"),
-        CountryDisplay("Ireland", "🇮🇪", "IE", "> 100"),
-        CountryDisplay("Chile", "🇨🇱", "CL", "> 100"),
-        CountryDisplay("Colombia", "🇨🇴", "CO", "> 100"),
-        CountryDisplay("South Africa", "🇿🇦", "ZA", "> 100"),
-        CountryDisplay("New Zealand", "🇳🇿", "NZ", "> 80"),
-        CountryDisplay("Vietnam", "🇻🇳", "VN", "> 50"),
-        CountryDisplay("Indonesia", "🇮🇩", "ID", "> 50"),
-        CountryDisplay("Thailand", "🇹🇭", "TH", "> 40"),
-        CountryDisplay("Philippines", "🇵🇭", "PH", "> 30"),
-        CountryDisplay("Malaysia", "🇲🇾", "MY", "> 30"),
-        CountryDisplay("Singapore", "🇸🇬", "SG", "< 30"),
-        CountryDisplay("South Korea", "🇰🇷", "KR", "< 30"),
-        CountryDisplay("Nigeria", "🇳🇬", "NG", "< 30"),
-        CountryDisplay("Egypt", "🇪🇬", "EG", "< 20"),
-        CountryDisplay("Ukraine", "🇺🇦", "UA", "> 200")
+    // ---- Country Discovery ----
+
+    /** Fallback countries shown instantly while the API call loads (sorted by station count desc) */
+    private val fallbackCountries = listOf(
+        CountryDisplay("Global",         "🌐", "",   50000, "> 50k stns"),
+        CountryDisplay("United States",  "🇺🇸", "US", 5000,  "> 5,000 stns"),
+        CountryDisplay("Germany",        "🇩🇪", "DE", 3000,  "> 3,000 stns"),
+        CountryDisplay("United Kingdom", "🇬🇧", "GB", 2000,  "> 2,000 stns"),
+        CountryDisplay("France",         "🇫🇷", "FR", 2000,  "> 2,000 stns"),
+        CountryDisplay("Spain",          "🇪🇸", "ES", 1000,  "> 1,000 stns"),
+        CountryDisplay("Italy",          "🇮🇹", "IT", 1000,  "> 1,000 stns"),
+        CountryDisplay("Canada",         "🇨🇦", "CA", 800,   "> 800 stns"),
+        CountryDisplay("Brazil",         "🇧🇷", "BR", 800,   "> 800 stns"),
+        CountryDisplay("Australia",      "🇦🇺", "AU", 500,   "> 500 stns"),
+        CountryDisplay("Mexico",         "🇲🇽", "MX", 500,   "> 500 stns"),
+        CountryDisplay("Argentina",      "🇦🇷", "AR", 400,   "> 400 stns"),
+        CountryDisplay("Netherlands",    "🇳🇱", "NL", 400,   "> 400 stns"),
+        CountryDisplay("Poland",         "🇵🇱", "PL", 400,   "> 400 stns"),
+        CountryDisplay("Ukraine",        "🇺🇦", "UA", 300,   "> 300 stns"),
+        CountryDisplay("Switzerland",    "🇨🇭", "CH", 300,   "> 300 stns"),
+        CountryDisplay("Austria",        "🇦🇹", "AT", 300,   "> 300 stns"),
+        CountryDisplay("Belgium",        "🇧🇪", "BE", 300,   "> 300 stns"),
+        CountryDisplay("Turkey",         "🇹🇷", "TR", 200,   "> 200 stns"),
+        CountryDisplay("Sweden",         "🇸🇪", "SE", 200,   "> 200 stns"),
+        CountryDisplay("Japan",          "🇯🇵", "JP", 200,   "> 200 stns"),
+        CountryDisplay("India",          "🇮🇳", "IN", 200,   "> 200 stns"),
+        CountryDisplay("Norway",         "🇳🇴", "NO", 150,   "> 150 stns"),
+        CountryDisplay("Czech Republic", "🇨🇿", "CZ", 150,   "> 150 stns"),
+        CountryDisplay("Portugal",       "🇵🇹", "PT", 150,   "> 150 stns"),
+        CountryDisplay("Greece",         "🇬🇷", "GR", 150,   "> 150 stns"),
+        CountryDisplay("Ireland",        "🇮🇪", "IE", 100,   "> 100 stns"),
+        CountryDisplay("Chile",          "🇨🇱", "CL", 100,   "> 100 stns"),
+        CountryDisplay("Colombia",       "🇨🇴", "CO", 100,   "> 100 stns"),
+        CountryDisplay("South Africa",   "🇿🇦", "ZA", 100,   "> 100 stns"),
+        CountryDisplay("New Zealand",    "🇳🇿", "NZ", 80,    "> 80 stns"),
+        CountryDisplay("Vietnam",        "🇻🇳", "VN", 50,    "> 50 stns"),
+        CountryDisplay("Indonesia",      "🇮🇩", "ID", 50,    "> 50 stns"),
+        CountryDisplay("Thailand",       "🇹🇭", "TH", 40,    "> 40 stns"),
+        CountryDisplay("Philippines",    "🇵🇭", "PH", 30,    "> 30 stns"),
+        CountryDisplay("Malaysia",       "🇲🇾", "MY", 30,    "> 30 stns"),
+        CountryDisplay("Singapore",      "🇸🇬", "SG", 20,    "~20 stns"),
+        CountryDisplay("South Korea",    "🇰🇷", "KR", 20,    "~20 stns"),
+        CountryDisplay("Nigeria",        "🇳🇬", "NG", 20,    "~20 stns"),
+        CountryDisplay("Egypt",          "🇪🇬", "EG", 15,    "~15 stns")
     )
+
+    private val _availableCountries = MutableStateFlow(fallbackCountries)
+    val availableCountries: StateFlow<List<CountryDisplay>> = _availableCountries.asStateFlow()
+
+    val isLoadingCountries: StateFlow<Boolean>
+        get() = _isLoadingCountries
+    private val _isLoadingCountries = MutableStateFlow(false)
+
+    private fun discoverCountries() {
+        viewModelScope.launch(kotlinx.coroutines.Dispatchers.IO) {
+            _isLoadingCountries.value = true
+            try {
+                val apiData = com.easeaudio.data.RadioBrowserService.fetchCountries()
+                if (apiData.isEmpty()) return@launch
+
+                // Build the Global entry first (always at top)
+                val globalEntry = CountryDisplay(
+                    name = "Global",
+                    flag = "🌐",
+                    code = "",
+                    stationCount = apiData.sumOf { it.third },
+                    stationCountText = "> 50k stns"
+                )
+
+                // Convert API triples -> CountryDisplay, sorted by stationCount descending
+                val discovered = apiData
+                    .map { (name, isoCode, count) ->
+                        val flag = com.easeaudio.data.RadioBrowserService.isoToFlagEmoji(isoCode)
+                        val countText = when {
+                            count >= 1000 -> "${"%,d".format(count)} stns"
+                            count >= 100  -> "$count stns"
+                            else          -> "~$count stns"
+                        }
+                        CountryDisplay(
+                            name = name,
+                            flag = flag,
+                            code = isoCode,
+                            stationCount = count,
+                            stationCountText = countText
+                        )
+                    }
+                    .sortedByDescending { it.stationCount }
+
+                _availableCountries.value = listOf(globalEntry) + discovered
+                android.util.Log.i("RadioViewModel", "Country list updated: ${discovered.size} countries discovered.")
+            } catch (e: Exception) {
+                android.util.Log.w("RadioViewModel", "discoverCountries failed, keeping fallback: ${e.message}")
+                // Keep fallback list — no UI disruption
+            } finally {
+                _isLoadingCountries.value = false
+            }
+        }
+    }
 
     val availableGenres = listOf(
         GenreDisplay("All", R.string.genre_all),
@@ -253,6 +309,8 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
     val showAddStationDialog: StateFlow<Boolean> = _showAddStationDialog.asStateFlow()
 
     init {
+        // Discover countries from RadioBrowser API (fallback shown immediately)
+        discoverCountries()
         // Trigger initial online discovery for top global working stations
         discoverStationsOnline("", "All", "Global")
 
@@ -298,7 +356,7 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
             _isDiscoveryError.value = false
             _canLoadMore.value = true
             try {
-                val code = availableCountries.find { it.name.equals(country, ignoreCase = true) }?.code ?: ""
+                val code = _availableCountries.value.find { it.name.equals(country, ignoreCase = true) }?.code ?: ""
                 val results = repository.discoverOnlineStations(
                     query = query,
                     genre = genre,
@@ -335,7 +393,7 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
             _isLoadingMore.value = true
             try {
                 val currentOffset = _onlineDiscoveredStations.value.size
-                val code = availableCountries.find { it.name.equals(_selectedCountry.value, ignoreCase = true) }?.code ?: ""
+                val code = _availableCountries.value.find { it.name.equals(_selectedCountry.value, ignoreCase = true) }?.code ?: ""
                 val newResults = repository.discoverOnlineStations(
                     query = _searchQuery.value,
                     genre = _selectedGenre.value,
