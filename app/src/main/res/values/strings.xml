@@ -140,9 +140,10 @@
     <string name="onboarding_slide2_feature2">Persistent Status Bar Controls</string>
     <string name="onboarding_slide2_feature3">Auto Reconnect &amp; Buffer Protection</string>
 
-    <!-- Slide 3: Genre & Discovery -->
-    <string name="onboarding_slide3_title">Genre &amp; Discovery</string>
-    <string name="onboarding_slide3_subtitle">Select your favorite genres to personalize your home screen feed upon launch.</string>
+    <!-- Slide 3: Country & Region Discovery -->
+    <string name="onboarding_slide3_title">Country &amp; Region Discovery</string>
+    <string name="onboarding_slide3_subtitle">Select your preferred country or region to discover top local and global radio stations.</string>
+    <string name="onboarding_slide3_select_country">Select Preferred Country / Region</string>
     <string name="onboarding_slide3_select_genres">Pick your preferred styles:</string>
     <string name="onboarding_slide3_start_listening">Start Listening</string>
 </resources>

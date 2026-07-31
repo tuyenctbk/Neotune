@@ -32,6 +32,9 @@ gradle/wrapper/
 
 # Keystores & sensitive credentials
 *.jks
+*.keystore
+common_release_key.jks
+release.keystore
 
 # Memory dumps, profiling & logs
 *.hprof

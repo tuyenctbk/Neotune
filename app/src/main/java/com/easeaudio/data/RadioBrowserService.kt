@@ -23,38 +23,92 @@ object RadioBrowserService {
                 return@withContext cachedServers
             }
             
+            val defaultMirrors = listOf(
+                "http://all.api.radio-browser.info/json/stations",
+                "https://de1.api.radio-browser.info/json/stations",
+                "https://nl1.api.radio-browser.info/json/stations",
+                "https://at1.api.radio-browser.info/json/stations",
+                "https://fr1.api.radio-browser.info/json/stations"
+            )
+            
             val servers = mutableListOf<String>()
             try {
                 val addresses = java.net.InetAddress.getAllByName("all.api.radio-browser.info")
                 for (addr in addresses) {
                     val host = addr.canonicalHostName
-                    if (host.isNotBlank() && host != addr.hostAddress && host.contains("radio-browser.info")) {
-                        servers.add("https://$host/json/stations")
+                    val ip = addr.hostAddress
+                    if (host.isNotBlank() && host != ip && host.endsWith("radio-browser.info")) {
+                        val url = "https://$host/json/stations"
+                        if (!servers.contains(url)) {
+                            servers.add(url)
+                        }
+                    } else if (!ip.isNullOrBlank()) {
+                        // HTTP over direct IP address avoids SSL hostname mismatch completely
+                        val url = "http://$ip/json/stations"
+                        if (!servers.contains(url)) {
+                            servers.add(url)
+                        }
                     }
                 }
             } catch (e: Exception) {
-                Log.e(TAG, "DNS resolution of all.api.radio-browser.info failed, using fallback mirrors: ${e.message}")
+                Log.e(TAG, "DNS resolution of all.api.radio-browser.info failed, using default mirrors: ${e.message}")
             }
             
-            // If DNS lookup failed or returned empty, use fallback mirrors
-            if (servers.isEmpty()) {
-                servers.addAll(listOf(
-                    "https://de1.api.radio-browser.info/json/stations",
-                    "https://nl1.api.radio-browser.info/json/stations",
-                    "https://at1.api.radio-browser.info/json/stations",
-                    "https://fr1.api.radio-browser.info/json/stations"
-                ))
+            // Always ensure valid fallback mirrors are in the server list
+            for (mirror in defaultMirrors) {
+                if (!servers.contains(mirror)) {
+                    servers.add(mirror)
+                }
             }
+
             cachedServers = servers
             return@withContext servers
         }
+    }
+
+    private fun executeHttpRequest(urlString: String, redirectCount: Int = 0): String? {
+        if (redirectCount > 5) return null
+        try {
+            val url = URL(urlString)
+            val connection = (url.openConnection() as HttpURLConnection).apply {
+                requestMethod = "GET"
+                connectTimeout = 5000
+                readTimeout = 5000
+                instanceFollowRedirects = true
+                setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) EaseAudioApp/1.0")
+                setRequestProperty("Accept", "application/json")
+            }
+            
+            val status = connection.responseCode
+            if (status in 200..299) {
+                val text = connection.inputStream.bufferedReader().use { it.readText() }
+                connection.disconnect()
+                return text
+            } else if (status in listOf(301, 302, 303, 307, 308)) {
+                val location = connection.getHeaderField("Location")
+                connection.disconnect()
+                if (!location.isNullOrBlank()) {
+                    val redirectUrl = if (location.startsWith("http")) location else {
+                        val base = URL(urlString)
+                        URL(base, location).toString()
+                    }
+                    return executeHttpRequest(redirectUrl, redirectCount + 1)
+                }
+            }
+            connection.disconnect()
+        } catch (e: Exception) {
+            Log.e(TAG, "HTTP Request error for $urlString: ${e.message}")
+        }
+        return null
     }
 
     suspend fun fetchTopStations(
         limit: Int = 40,
         offset: Int = 0,
         searchQuery: String = "",
-        genreTag: String = ""
+        genreTag: String = "",
+        country: String = "",
+        countryCode: String = ""
     ): List<RadioStation> = withContext(Dispatchers.IO) {
         val mappedTag = mapGenreToTag(genreTag)
         val activeUrls = getActiveServers()
@@ -73,19 +127,33 @@ object RadioBrowserService {
                     val encodedTag = URLEncoder.encode(mappedTag, "UTF-8")
                     urlBuilder.append("&tag=").append(encodedTag)
                 }
-
-                val urlString = urlBuilder.toString()
-                val url = URL(urlString)
-                val connection = (url.openConnection() as HttpURLConnection).apply {
-                    requestMethod = "GET"
-                    connectTimeout = 6000
-                    readTimeout = 6000
-                    setRequestProperty("User-Agent", "EaseAudioApp/1.0")
+                if (countryCode.isNotBlank()) {
+                    val encodedCode = URLEncoder.encode(countryCode.trim(), "UTF-8")
+                    urlBuilder.append("&countrycode=").append(encodedCode)
+                } else if (country.isNotBlank() && !country.equals("Global", ignoreCase = true) && !country.equals("All", ignoreCase = true)) {
+                    val encodedCountry = URLEncoder.encode(country.trim(), "UTF-8")
+                    urlBuilder.append("&country=").append(encodedCountry)
                 }
 
-                if (connection.responseCode == HttpURLConnection.HTTP_OK) {
-                    val responseText = connection.inputStream.bufferedReader().use { it.readText() }
-                    connection.disconnect()
+                var responseText: String? = executeHttpRequest(urlBuilder.toString())
+
+                // Fallback 1: If countrycode query yielded empty response and country name is available
+                if ((responseText.isNullOrBlank() || responseText.trim() == "[]") && countryCode.isNotBlank() && country.isNotBlank() && !country.equals("Global", ignoreCase = true)) {
+                    val fallbackUrlBuilder = StringBuilder("$baseUrl/search?offset=$offset&limit=$limit&order=clickcount&reverse=true&hidebroken=true")
+                    if (searchQuery.isNotBlank()) fallbackUrlBuilder.append("&name=").append(URLEncoder.encode(searchQuery.trim(), "UTF-8"))
+                    if (mappedTag.isNotBlank()) fallbackUrlBuilder.append("&tag=").append(URLEncoder.encode(mappedTag, "UTF-8"))
+                    fallbackUrlBuilder.append("&country=").append(URLEncoder.encode(country.trim(), "UTF-8"))
+
+                    responseText = executeHttpRequest(fallbackUrlBuilder.toString())
+                }
+
+                // Fallback 2: If country query yielded empty array, query general top stations
+                if ((responseText.isNullOrBlank() || responseText.trim() == "[]") && (countryCode.isNotBlank() || country.isNotBlank()) && searchQuery.isBlank() && mappedTag.isBlank()) {
+                    val fallbackUrlBuilder = StringBuilder("$baseUrl/search?offset=$offset&limit=$limit&order=clickcount&reverse=true&hidebroken=true")
+                    responseText = executeHttpRequest(fallbackUrlBuilder.toString())
+                }
+
+                if (!responseText.isNullOrBlank()) {
                     val jsonArray = JSONArray(responseText)
 
                     for (i in 0 until jsonArray.length()) {
@@ -131,8 +199,6 @@ object RadioBrowserService {
                     if (stations.isNotEmpty() || (searchQuery.isNotBlank() || mappedTag.isNotBlank())) {
                         return@withContext stations
                     }
-                } else {
-                    connection.disconnect()
                 }
             } catch (e: Exception) {
                 lastNetworkException = e

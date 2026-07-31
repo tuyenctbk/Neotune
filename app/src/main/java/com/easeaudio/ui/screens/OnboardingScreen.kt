@@ -58,6 +58,8 @@ private val NeonBlue = Color(0xFF3B82F6)
 fun OnboardingScreen(
     availableGenres: List<String>,
     onGenreSelected: (String) -> Unit,
+    onGenresSelected: (Set<String>) -> Unit = {},
+    onCountrySelected: (String) -> Unit = {},
     onRequestNotificationPermission: () -> Unit,
     onCompleteOnboarding: () -> Unit,
     modifier: Modifier = Modifier
@@ -70,8 +72,9 @@ fun OnboardingScreen(
                 context.packageManager.hasSystemFeature(PackageManager.FEATURE_TELEVISION)
     }
 
-    // Selected genre state for slide 3
-    var selectedGenre by remember { mutableStateOf("Chillout") }
+    // Selected genres state for slide 3 (multi-select, keeping at least 1 selected)
+    var selectedGenres by remember { mutableStateOf(setOf("Chillout")) }
+    var selectedCountry by remember { mutableStateOf("Global") }
 
     // Permission state check for slide 2
     var hasNotificationPermission by remember {
@@ -167,8 +170,16 @@ fun OnboardingScreen(
                 )
                 2 -> SlideGenreDiscovery(
                     availableGenres = availableGenres,
-                    selectedGenre = selectedGenre,
-                    onGenreSelected = { selectedGenre = it },
+                    selectedGenres = selectedGenres,
+                    onGenreToggled = { genre ->
+                        selectedGenres = if (selectedGenres.contains(genre)) {
+                            if (selectedGenres.size > 1) selectedGenres - genre else selectedGenres
+                        } else {
+                            selectedGenres + genre
+                        }
+                    },
+                    selectedCountry = selectedCountry,
+                    onCountrySelected = { selectedCountry = it },
                     isTv = isTv
                 )
             }
@@ -243,7 +254,8 @@ fun OnboardingScreen(
                 Button(
                     onClick = {
                         if (isLastPage) {
-                            onGenreSelected(selectedGenre)
+                            onGenresSelected(selectedGenres)
+                            onCountrySelected(selectedCountry)
                             onCompleteOnboarding()
                         } else {
                             scope.launch {
@@ -548,8 +560,10 @@ private fun SlideBackgroundControls(
 @Composable
 private fun SlideGenreDiscovery(
     availableGenres: List<String>,
-    selectedGenre: String,
-    onGenreSelected: (String) -> Unit,
+    selectedGenres: Set<String>,
+    onGenreToggled: (String) -> Unit,
+    selectedCountry: String,
+    onCountrySelected: (String) -> Unit,
     isTv: Boolean
 ) {
     Column(
@@ -601,69 +615,161 @@ private fun SlideGenreDiscovery(
             modifier = Modifier.padding(horizontal = 12.dp)
         )
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(20.dp))
 
         Text(
-            text = stringResource(R.string.onboarding_slide3_select_genres),
+            text = stringResource(R.string.onboarding_slide3_select_country),
             style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
             color = TextPrimary,
             modifier = Modifier.align(Alignment.Start)
         )
 
-        Spacer(modifier = Modifier.height(14.dp))
+        Spacer(modifier = Modifier.height(10.dp))
 
-        // Multi-genre chips flow layout
+        val countries = remember {
+            listOf(
+                "Global" to "🌐",
+                "United States" to "🇺🇸",
+                "Germany" to "🇩🇪",
+                "United Kingdom" to "🇬🇧",
+                "France" to "🇫🇷",
+                "Spain" to "🇪🇸",
+                "Italy" to "🇮🇹",
+                "Canada" to "🇨🇦"
+            )
+        }
+
+        val allCountriesList = remember {
+            listOf(
+                com.easeaudio.viewmodel.CountryDisplay("Global", "🌐"),
+                com.easeaudio.viewmodel.CountryDisplay("Vietnam", "🇻🇳"),
+                com.easeaudio.viewmodel.CountryDisplay("United States", "🇺🇸"),
+                com.easeaudio.viewmodel.CountryDisplay("United Kingdom", "🇬🇧"),
+                com.easeaudio.viewmodel.CountryDisplay("Canada", "🇨🇦"),
+                com.easeaudio.viewmodel.CountryDisplay("Australia", "🇦🇺"),
+                com.easeaudio.viewmodel.CountryDisplay("France", "🇫🇷"),
+                com.easeaudio.viewmodel.CountryDisplay("Germany", "🇩🇪"),
+                com.easeaudio.viewmodel.CountryDisplay("Japan", "🇯🇵"),
+                com.easeaudio.viewmodel.CountryDisplay("South Korea", "🇰🇷"),
+                com.easeaudio.viewmodel.CountryDisplay("Brazil", "🇧🇷"),
+                com.easeaudio.viewmodel.CountryDisplay("India", "🇮🇳"),
+                com.easeaudio.viewmodel.CountryDisplay("Spain", "🇪🇸"),
+                com.easeaudio.viewmodel.CountryDisplay("Italy", "🇮🇹"),
+                com.easeaudio.viewmodel.CountryDisplay("Mexico", "🇲🇽"),
+                com.easeaudio.viewmodel.CountryDisplay("Argentina", "🇦🇷"),
+                com.easeaudio.viewmodel.CountryDisplay("Netherlands", "🇳🇱"),
+                com.easeaudio.viewmodel.CountryDisplay("Switzerland", "🇨🇭"),
+                com.easeaudio.viewmodel.CountryDisplay("Sweden", "🇸🇪"),
+                com.easeaudio.viewmodel.CountryDisplay("Norway", "🇳🇴"),
+                com.easeaudio.viewmodel.CountryDisplay("Poland", "🇵🇱"),
+                com.easeaudio.viewmodel.CountryDisplay("Turkey", "🇹🇷"),
+                com.easeaudio.viewmodel.CountryDisplay("Thailand", "🇹🇭"),
+                com.easeaudio.viewmodel.CountryDisplay("Indonesia", "🇮🇩"),
+                com.easeaudio.viewmodel.CountryDisplay("Philippines", "🇵🇭"),
+                com.easeaudio.viewmodel.CountryDisplay("Malaysia", "🇲🇾"),
+                com.easeaudio.viewmodel.CountryDisplay("Singapore", "🇸🇬"),
+                com.easeaudio.viewmodel.CountryDisplay("South Africa", "🇿🇦"),
+                com.easeaudio.viewmodel.CountryDisplay("Nigeria", "🇳🇬"),
+                com.easeaudio.viewmodel.CountryDisplay("Egypt", "🇪🇬"),
+                com.easeaudio.viewmodel.CountryDisplay("Chile", "🇨🇱"),
+                com.easeaudio.viewmodel.CountryDisplay("Colombia", "🇨🇴"),
+                com.easeaudio.viewmodel.CountryDisplay("New Zealand", "🇳🇿"),
+                com.easeaudio.viewmodel.CountryDisplay("Belgium", "🇧🇪"),
+                com.easeaudio.viewmodel.CountryDisplay("Austria", "🇦🇹"),
+                com.easeaudio.viewmodel.CountryDisplay("Portugal", "🇵🇹"),
+                com.easeaudio.viewmodel.CountryDisplay("Greece", "🇬🇷"),
+                com.easeaudio.viewmodel.CountryDisplay("Ireland", "🇮🇪"),
+                com.easeaudio.viewmodel.CountryDisplay("Czech Republic", "🇨🇿"),
+                com.easeaudio.viewmodel.CountryDisplay("Ukraine", "🇺🇦")
+            )
+        }
+
+        var showCountryDialog by remember { mutableStateOf(false) }
+
         FlowRow(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(10.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp)
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            val genres = remember(availableGenres) {
-                val list = availableGenres.filter { it != "Custom" }.toMutableList()
-                if (!list.contains("Chillout")) list.add(1, "Chillout")
-                list
+            val displayList = remember(selectedCountry, countries) {
+                if (countries.any { it.first.equals(selectedCountry, ignoreCase = true) }) {
+                    countries
+                } else {
+                    val flag = allCountriesList.find { it.name.equals(selectedCountry, ignoreCase = true) }?.flag ?: "🌐"
+                    listOf(selectedCountry to flag) + countries
+                }
             }
 
-            genres.forEach { genre ->
-                val isSelected = selectedGenre.equals(genre, ignoreCase = true)
-                var isChipFocused by remember { mutableStateOf(false) }
+            displayList.forEach { (country, flag) ->
+                val isSelected = selectedCountry.equals(country, ignoreCase = true)
+                var isCountryFocused by remember { mutableStateOf(false) }
 
                 Box(
                     modifier = Modifier
-                        .clip(RoundedCornerShape(20.dp))
-                        .background(
-                            if (isSelected) NeonCyan else DarkSurfaceVariant
-                        )
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(if (isSelected) NeonCyan.copy(alpha = 0.2f) else DarkSurfaceVariant)
                         .border(
-                            width = if (isSelected || isChipFocused) 2.dp else 1.dp,
-                            color = if (isSelected) NeonCyan else if (isChipFocused) Color.White else TextMuted.copy(alpha = 0.3f),
-                            shape = RoundedCornerShape(20.dp)
+                            width = if (isSelected) 1.5.dp else 1.dp,
+                            color = if (isSelected) NeonCyan else TextMuted.copy(alpha = 0.3f),
+                            shape = RoundedCornerShape(16.dp)
                         )
-                        .clickable { onGenreSelected(genre) }
-                        .onFocusChanged { isChipFocused = it.isFocused }
-                        .padding(horizontal = 16.dp, vertical = 10.dp)
-                        .testTag("chip_genre_$genre")
+                        .clickable { onCountrySelected(country) }
+                        .onFocusChanged { isCountryFocused = it.isFocused }
+                        .padding(horizontal = 14.dp, vertical = 8.dp)
+                        .testTag("chip_country_$country")
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        if (isSelected) {
-                            Icon(
-                                imageVector = Icons.Filled.Check,
-                                contentDescription = null,
-                                tint = DarkBackground,
-                                modifier = Modifier.size(16.dp)
-                            )
-                            Spacer(modifier = Modifier.width(6.dp))
-                        }
+                        Text(text = flag, fontSize = 14.sp)
+                        Spacer(modifier = Modifier.width(6.dp))
                         Text(
-                            text = genre,
+                            text = country,
                             style = MaterialTheme.typography.bodyMedium.copy(
                                 fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium
                             ),
-                            color = if (isSelected) DarkBackground else TextPrimary
+                            color = if (isSelected) NeonCyan else TextPrimary
                         )
                     }
                 }
             }
+
+            // "More Countries..." button
+            Box(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(DarkSurfaceVariant)
+                    .border(
+                        width = 1.dp,
+                        color = NeonCyan.copy(alpha = 0.5f),
+                        shape = RoundedCornerShape(16.dp)
+                    )
+                    .clickable { showCountryDialog = true }
+                    .padding(horizontal = 14.dp, vertical = 8.dp)
+                    .testTag("chip_more_countries")
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        imageVector = Icons.Filled.Search,
+                        contentDescription = "Search",
+                        tint = NeonCyan,
+                        modifier = Modifier.size(16.dp)
+                    )
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text(
+                        text = "More Countries...",
+                        style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold),
+                        color = NeonCyan
+                    )
+                }
+            }
+        }
+
+        if (showCountryDialog) {
+            com.easeaudio.ui.components.CountrySelectionDialog(
+                selectedCountry = selectedCountry,
+                countries = allCountriesList,
+                onSelectCountry = { onCountrySelected(it) },
+                onDismiss = { showCountryDialog = false }
+            )
         }
     }
 }

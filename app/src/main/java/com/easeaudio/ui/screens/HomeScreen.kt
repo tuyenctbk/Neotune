@@ -16,7 +16,9 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Bedtime
 import androidx.compose.material.icons.filled.CellTower
 import androidx.compose.material.icons.filled.CloudDone
@@ -75,6 +77,8 @@ fun HomeScreen(
     searchQuery: String,
     selectedGenre: String,
     availableGenres: List<GenreDisplay>,
+    selectedCountry: String = "Global",
+    availableCountries: List<com.easeaudio.viewmodel.CountryDisplay> = emptyList(),
     sleepTimerRemaining: Int?,
     networkStatus: NetworkStatus = NetworkStatus(),
     remoteConfig: AppRemoteConfig = AppRemoteConfig(),
@@ -83,6 +87,7 @@ fun HomeScreen(
     isDiscoveryError: Boolean = false,
     onSearchQueryChange: (String) -> Unit,
     onGenreSelect: (String) -> Unit,
+    onCountrySelect: (String) -> Unit = {},
     onStationSelect: (RadioStation) -> Unit,
     onToggleFavorite: (RadioStation) -> Unit,
     onOpenAddStation: () -> Unit,
@@ -222,33 +227,81 @@ fun HomeScreen(
                                 )
                             }
                         }
-
-                        // Dropdown overflow menu button for multiple secondary actions
-                        var showMenu by remember { mutableStateOf(false) }
-
-                        Box(
-                            modifier = Modifier.wrapContentSize(Alignment.TopEnd)
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(0.dp)
                         ) {
-                            var isMenuBtnFocused by remember { mutableStateOf(false) }
-                            val showMenuBtnFocus = isMenuBtnFocused
-                            IconButton(
-                                onClick = { showMenu = true },
+                            // Country / Region Selector Button in Header
+                            var showCountryDialog by remember { mutableStateOf(false) }
+                            var isCountryFocused by remember { mutableStateOf(false) }
+                            val selectedCountryObj = availableCountries.find { it.name.equals(selectedCountry, ignoreCase = true) }
+                            val isGlobal = selectedCountry == "Global" || selectedCountry == "All"
+
+                            Box(
                                 modifier = Modifier
-                                    .onFocusChanged { isMenuBtnFocused = it.isFocused }
+                                    .size(32.dp)
+                                    .onFocusChanged { isCountryFocused = it.isFocused }
                                     .clip(CircleShape)
                                     .background(
-                                        if (showMenuBtnFocus) NeonCyan
-                                        else if (showMenu) DarkSurfaceVariant
+                                        if (isCountryFocused) NeonCyan
                                         else Color.Transparent
                                     )
-                                    .testTag("btn_open_overflow_menu")
+                                    .clickable { showCountryDialog = true }
+                                    .testTag("btn_country_selector"),
+                                contentAlignment = Alignment.Center
                             ) {
-                                Icon(
-                                    imageVector = Icons.Filled.MoreVert,
-                                    contentDescription = "More Options",
-                                    tint = if (showMenuBtnFocus) DarkBackground else TextPrimary
+                                if (isGlobal) {
+                                    Icon(
+                                        imageVector = Icons.Filled.Language,
+                                        contentDescription = "Select Region",
+                                        tint = if (isCountryFocused) DarkBackground else NeonCyan,
+                                        modifier = Modifier.size(20.dp)
+                                    )
+                                } else {
+                                    Text(
+                                        text = selectedCountryObj?.flag ?: "🌐",
+                                        fontSize = 20.sp
+                                    )
+                                }
+                            }
+
+                            if (showCountryDialog) {
+                                com.easeaudio.ui.components.CountrySelectionDialog(
+                                    selectedCountry = selectedCountry,
+                                    countries = availableCountries,
+                                    onSelectCountry = { onCountrySelect(it) },
+                                    onDismiss = { showCountryDialog = false }
                                 )
                             }
+
+                            // Dropdown overflow menu button for multiple secondary actions
+                            var showMenu by remember { mutableStateOf(false) }
+
+                            Box(
+                                modifier = Modifier.wrapContentSize(Alignment.TopEnd)
+                            ) {
+                                var isMenuBtnFocused by remember { mutableStateOf(false) }
+                                val showMenuBtnFocus = isMenuBtnFocused
+                                Box(
+                                    modifier = Modifier
+                                        .size(32.dp)
+                                        .onFocusChanged { isMenuBtnFocused = it.isFocused }
+                                        .clip(CircleShape)
+                                        .background(
+                                            if (showMenuBtnFocus) NeonCyan
+                                            else if (showMenu) DarkSurfaceVariant
+                                            else Color.Transparent
+                                        )
+                                        .clickable { showMenu = true }
+                                        .testTag("btn_open_overflow_menu"),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Filled.MoreVert,
+                                        contentDescription = "More Options",
+                                        tint = if (showMenuBtnFocus) DarkBackground else TextPrimary
+                                    )
+                                }
 
                             DropdownMenu(
                                 expanded = showMenu,
@@ -342,6 +395,7 @@ fun HomeScreen(
                     }
                 }
             }
+        }
 
             // Search Bar
             item {
@@ -367,7 +421,7 @@ fun HomeScreen(
                 )
             }
 
-            // Genre Filter Pills
+            // Genre & Country Filter Pills
             item {
                 LazyRow(
                     modifier = Modifier
@@ -694,7 +748,7 @@ fun StationCard(
                         } else {
                             Icon(
                                 imageVector = if (isPlaying) Icons.Filled.Pause else Icons.Filled.PlayArrow,
-                                contentDescription = null,
+                                contentDescription = if (isPlaying) "Pause" else "Play",
                                 tint = NeonCyan
                             )
                         }
@@ -817,7 +871,7 @@ fun AppearanceSelectionScreen(
                             .testTag("btn_close_appearance")
                     ) {
                         Icon(
-                            imageVector = Icons.Filled.ArrowBack,
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Back",
                             tint = if (isBackFocused) DarkBackground else NeonCyan
                         )

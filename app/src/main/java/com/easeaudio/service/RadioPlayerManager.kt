@@ -344,6 +344,10 @@ class RadioPlayerManager(private val context: Context) {
                             }
                         }
 
+                        if (current != null && !isHealingAttempt) {
+                            tryAutoHealStream(current, currentUrl)
+                        }
+
                         _playbackErrorDetails.value = details
                         _isLoading.value = false
                         _isPlaying.value = false
@@ -424,6 +428,44 @@ class RadioPlayerManager(private val context: Context) {
                     }
             } catch (e: Exception) {
                 Log.e(TAG, "Failed to create MediaSession: ${e.message}", e)
+            }
+        }
+    }
+
+    private var isHealingAttempt = false
+
+    private fun tryAutoHealStream(station: RadioStation, failedUrl: String?) {
+        if (isHealingAttempt) return
+        isHealingAttempt = true
+        scope.launch(Dispatchers.IO) {
+            try {
+                Log.i(TAG, "Attempting automated online stream healing for station '${station.name}'...")
+                val queryName = station.name.split("-").firstOrNull()?.trim() ?: station.name
+                val results = com.easeaudio.data.RadioBrowserService.fetchTopStations(
+                    limit = 10,
+                    searchQuery = queryName,
+                    country = if (station.country != "Global") station.country else ""
+                )
+
+                val freshStream = results.firstOrNull { candidate ->
+                    candidate.streamUrl.isNotBlank() &&
+                            candidate.streamUrl != station.streamUrl &&
+                            candidate.streamUrl != failedUrl
+                }
+
+                if (freshStream != null) {
+                    Log.i(TAG, "Stream Auto-Healed! Switched '${station.name}' to fresh mirror: ${freshStream.streamUrl}")
+                    withContext(Dispatchers.Main) {
+                        val updatedStation = station.copy(streamUrl = freshStream.streamUrl)
+                        _currentStation.value = updatedStation
+                        playStationWithUrl(updatedStation, freshStream.streamUrl, isFallback = true)
+                    }
+                    return@launch
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Auto-healing failed for ${station.name}: ${e.message}")
+            } finally {
+                isHealingAttempt = false
             }
         }
     }

@@ -24,6 +24,52 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
     private val _selectedGenre = MutableStateFlow("All")
     val selectedGenre: StateFlow<String> = _selectedGenre.asStateFlow()
 
+    private val _selectedCountry = MutableStateFlow("Global")
+    val selectedCountry: StateFlow<String> = _selectedCountry.asStateFlow()
+
+    val availableCountries = listOf(
+        CountryDisplay("Global", "🌐", "", "> 50k"),
+        CountryDisplay("United States", "🇺🇸", "US", "> 5000"),
+        CountryDisplay("Germany", "🇩🇪", "DE", "> 3000"),
+        CountryDisplay("United Kingdom", "🇬🇧", "GB", "> 2000"),
+        CountryDisplay("France", "🇫🇷", "FR", "> 2000"),
+        CountryDisplay("Spain", "🇪🇸", "ES", "> 1000"),
+        CountryDisplay("Italy", "🇮🇹", "IT", "> 1000"),
+        CountryDisplay("Canada", "🇨🇦", "CA", "> 800"),
+        CountryDisplay("Brazil", "🇧🇷", "BR", "> 800"),
+        CountryDisplay("Australia", "🇦🇺", "AU", "> 500"),
+        CountryDisplay("Mexico", "🇲🇽", "MX", "> 500"),
+        CountryDisplay("Argentina", "🇦🇷", "AR", "> 400"),
+        CountryDisplay("Netherlands", "🇳🇱", "NL", "> 400"),
+        CountryDisplay("Poland", "🇵🇱", "PL", "> 400"),
+        CountryDisplay("Switzerland", "🇨🇭", "CH", "> 300"),
+        CountryDisplay("Austria", "🇦🇹", "AT", "> 300"),
+        CountryDisplay("Belgium", "🇧🇪", "BE", "> 300"),
+        CountryDisplay("Japan", "🇯🇵", "JP", "> 200"),
+        CountryDisplay("India", "🇮🇳", "IN", "> 200"),
+        CountryDisplay("Turkey", "🇹🇷", "TR", "> 200"),
+        CountryDisplay("Sweden", "🇸🇪", "SE", "> 200"),
+        CountryDisplay("Norway", "🇳🇴", "NO", "> 150"),
+        CountryDisplay("Czech Republic", "🇨🇿", "CZ", "> 150"),
+        CountryDisplay("Portugal", "🇵🇹", "PT", "> 150"),
+        CountryDisplay("Greece", "🇬🇷", "GR", "> 150"),
+        CountryDisplay("Ireland", "🇮🇪", "IE", "> 100"),
+        CountryDisplay("Chile", "🇨🇱", "CL", "> 100"),
+        CountryDisplay("Colombia", "🇨🇴", "CO", "> 100"),
+        CountryDisplay("South Africa", "🇿🇦", "ZA", "> 100"),
+        CountryDisplay("New Zealand", "🇳🇿", "NZ", "> 80"),
+        CountryDisplay("Vietnam", "🇻🇳", "VN", "> 50"),
+        CountryDisplay("Indonesia", "🇮🇩", "ID", "> 50"),
+        CountryDisplay("Thailand", "🇹🇭", "TH", "> 40"),
+        CountryDisplay("Philippines", "🇵🇭", "PH", "> 30"),
+        CountryDisplay("Malaysia", "🇲🇾", "MY", "> 30"),
+        CountryDisplay("Singapore", "🇸🇬", "SG", "< 30"),
+        CountryDisplay("South Korea", "🇰🇷", "KR", "< 30"),
+        CountryDisplay("Nigeria", "🇳🇬", "NG", "< 30"),
+        CountryDisplay("Egypt", "🇪🇬", "EG", "< 20"),
+        CountryDisplay("Ukraine", "🇺🇦", "UA", "> 200")
+    )
+
     val availableGenres = listOf(
         GenreDisplay("All", R.string.genre_all),
         GenreDisplay("News & Reports", R.string.news_reports),
@@ -56,15 +102,35 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
 
     private val pageSize = 40
 
+    private val _preferredGenres = MutableStateFlow<Set<String>>(emptySet())
+    val preferredGenres: StateFlow<Set<String>> = _preferredGenres.asStateFlow()
+
+    fun setPreferredGenres(genres: Set<String>) {
+        _preferredGenres.value = genres
+    }
+
+    private data class FilterState(
+        val query: String,
+        val genre: String,
+        val country: String,
+        val preferredGenres: Set<String>
+    )
+
     private val defaultStationIds = setOf("bbc_world_service", "jazz_groove", "lofi_girl_radio")
 
     @OptIn(FlowPreview::class)
     val stations: StateFlow<List<RadioStation>> = combine(
         repository.getAllStations(),
         _onlineDiscoveredStations,
-        _searchQuery,
-        _selectedGenre
-    ) { localStations, onlineList, query, genre ->
+        combine(_searchQuery, _selectedGenre, _selectedCountry, _preferredGenres) { query, genre, country, preferred ->
+            FilterState(query, genre, country, preferred)
+        }
+    ) { localStations, onlineList, filter ->
+        val query = filter.query
+        val genre = filter.genre
+        val country = filter.country
+        val preferredGenres = filter.preferredGenres
+
         val localMap = localStations.associateBy { it.id }
         
         val mergedList = mutableListOf<RadioStation>()
@@ -100,13 +166,18 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
         }
 
         // Filter merged results
-        mergedList.filter { station ->
+        val filteredList = mergedList.filter { station ->
             val matchesQuery = query.isBlank() ||
                     station.name.contains(query, ignoreCase = true) ||
                     station.genre.contains(query, ignoreCase = true) ||
                     station.country.contains(query, ignoreCase = true)
 
             val isOnlineMatch = onlineList.any { it.id == station.id }
+
+            val matchesCountry = when (country) {
+                "Global", "All" -> true
+                else -> station.country.contains(country, ignoreCase = true) || isOnlineMatch
+            }
 
             val matchesGenre = when (genre) {
                 "All" -> true
@@ -134,7 +205,20 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
                 else -> station.genre.contains(genre, ignoreCase = true)
             }
 
-            matchesQuery && (matchesGenre || isOnlineMatch)
+            matchesQuery && matchesCountry && (matchesGenre || isOnlineMatch)
+        }
+
+        if (genre == "All" && preferredGenres.isNotEmpty()) {
+            filteredList.sortedByDescending { station ->
+                val matchesPref = preferredGenres.any { pref ->
+                    station.genre.contains(pref, ignoreCase = true) ||
+                            (pref.contains("Lo-Fi", ignoreCase = true) && (station.genre.contains("Lo-Fi", ignoreCase = true) || station.genre.contains("Chill", ignoreCase = true) || station.genre.contains("Lofi", ignoreCase = true))) ||
+                            (pref.contains("News", ignoreCase = true) && (station.genre.contains("News", ignoreCase = true) || station.genre.contains("Talk", ignoreCase = true)))
+                }
+                if (matchesPref) 1 else 0
+            }
+        } else {
+            filteredList
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
@@ -162,7 +246,7 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
 
     init {
         // Trigger initial online discovery for top global working stations
-        discoverStationsOnline("", "All")
+        discoverStationsOnline("", "All", "Global")
 
         viewModelScope.launch {
             stations.collect { list ->
@@ -179,37 +263,45 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
 
     fun setSearchQuery(query: String) {
         _searchQuery.value = query
-        discoverStationsOnline(query, _selectedGenre.value)
+        discoverStationsOnline(query, _selectedGenre.value, _selectedCountry.value)
     }
 
     fun setSelectedGenre(genre: String) {
         _selectedGenre.value = genre
-        discoverStationsOnline(_searchQuery.value, genre)
+        discoverStationsOnline(_searchQuery.value, genre, _selectedCountry.value)
+    }
+
+    fun setSelectedCountry(country: String) {
+        _selectedCountry.value = country
+        discoverStationsOnline(_searchQuery.value, _selectedGenre.value, country)
     }
 
     fun refreshStations() {
-        discoverStationsOnline(_searchQuery.value, _selectedGenre.value)
+        discoverStationsOnline(_searchQuery.value, _selectedGenre.value, _selectedCountry.value)
     }
 
     fun retryDiscovery() {
-        discoverStationsOnline(_searchQuery.value, _selectedGenre.value)
+        discoverStationsOnline(_searchQuery.value, _selectedGenre.value, _selectedCountry.value)
     }
 
-    private fun discoverStationsOnline(query: String, genre: String) {
+    private fun discoverStationsOnline(query: String, genre: String, country: String = _selectedCountry.value) {
         viewModelScope.launch {
             _isDiscoveringOnline.value = true
             _isDiscoveryError.value = false
             _canLoadMore.value = true
             try {
+                val code = availableCountries.find { it.name.equals(country, ignoreCase = true) }?.code ?: ""
                 val results = repository.discoverOnlineStations(
                     query = query,
                     genre = genre,
+                    country = country,
+                    countryCode = code,
                     offset = 0,
                     limit = pageSize
                 )
                 _onlineDiscoveredStations.value = results
                 _canLoadMore.value = results.size >= pageSize
-                _isDiscoveryError.value = results.isEmpty() && query.isBlank() && genre == "All"
+                _isDiscoveryError.value = results.isEmpty() && query.isBlank() && genre == "All" && (country == "Global" || country == "All")
             } catch (e: Exception) {
                 // Keep existing discovered stations when offline instead of wiping the list
                 _isDiscoveryError.value = _onlineDiscoveredStations.value.isEmpty()
@@ -217,6 +309,7 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
                     val crashlytics = com.google.firebase.crashlytics.FirebaseCrashlytics.getInstance()
                     crashlytics.setCustomKey("viewmodel_query", query)
                     crashlytics.setCustomKey("viewmodel_genre", genre)
+                    crashlytics.setCustomKey("viewmodel_country", country)
                     crashlytics.recordException(e)
                 } catch (ce: Exception) {
                     // Ignore if Crashlytics is not active
@@ -234,9 +327,12 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
             _isLoadingMore.value = true
             try {
                 val currentOffset = _onlineDiscoveredStations.value.size
+                val code = availableCountries.find { it.name.equals(_selectedCountry.value, ignoreCase = true) }?.code ?: ""
                 val newResults = repository.discoverOnlineStations(
                     query = _searchQuery.value,
                     genre = _selectedGenre.value,
+                    country = _selectedCountry.value,
+                    countryCode = code,
                     offset = currentOffset,
                     limit = pageSize
                 )
@@ -257,9 +353,13 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun playStation(station: RadioStation) {
-        playerManager.playStation(station)
-        viewModelScope.launch {
-            repository.recordStationListened(station)
+        if (playerManager.currentStation.value?.id == station.id) {
+            playerManager.togglePlayPause()
+        } else {
+            playerManager.playStation(station)
+            viewModelScope.launch {
+                repository.recordStationListened(station)
+            }
         }
     }
 

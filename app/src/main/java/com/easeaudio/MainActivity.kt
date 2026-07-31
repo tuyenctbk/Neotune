@@ -134,6 +134,7 @@ fun MainAppContent(
 
     val searchQuery by viewModel.searchQuery.collectAsState()
     val selectedGenre by viewModel.selectedGenre.collectAsState()
+    val selectedCountry by viewModel.selectedCountry.collectAsState()
     val activeEqPreset by viewModel.activeEqPreset.collectAsState()
 
     val isLoadingMore by viewModel.isLoadingMore.collectAsState()
@@ -148,42 +149,6 @@ fun MainAppContent(
 
     var isFullPlayerVisible by remember { mutableStateOf(value = false) }
     val snackbarHostState = remember { SnackbarHostState() }
-
-    // Network notification banner state
-    var previousConnected by remember { mutableStateOf<Boolean?>(null) }
-    var activeBanner by remember { mutableStateOf(NetworkBannerType.NONE) }
-
-    LaunchedEffect(networkStatus) {
-        val connected = networkStatus.isConnected
-        val quality = networkStatus.qualityLevel
-        
-        if (previousConnected != null) {
-            if (!connected) {
-                activeBanner = NetworkBannerType.OFFLINE
-            } else if (previousConnected == false) {
-                activeBanner = NetworkBannerType.BACK_ONLINE
-                kotlinx.coroutines.delay(3.seconds)
-                if (activeBanner == NetworkBannerType.BACK_ONLINE) {
-                    activeBanner = NetworkBannerType.NONE
-                }
-            } else if (quality == QualityLevel.SAVER_SMOOTH) {
-                activeBanner = NetworkBannerType.WEAK_CONNECTION
-                kotlinx.coroutines.delay(3.seconds)
-                if (activeBanner == NetworkBannerType.WEAK_CONNECTION) {
-                    activeBanner = NetworkBannerType.NONE
-                }
-            } else {
-                if (activeBanner == NetworkBannerType.WEAK_CONNECTION) {
-                    activeBanner = NetworkBannerType.NONE
-                }
-            }
-        } else {
-            if (!connected) {
-                activeBanner = NetworkBannerType.OFFLINE
-            }
-        }
-        previousConnected = connected
-    }
 
     // Show error toast/snackbar if stream error occurs
     LaunchedEffect(playbackError, playbackErrorDetails) {
@@ -230,6 +195,8 @@ fun MainAppContent(
                         OnboardingScreen(
                             availableGenres = viewModel.availableGenres.map { it.key },
                             onGenreSelected = { genre -> viewModel.setSelectedGenre(genre) },
+                            onGenresSelected = { genres -> viewModel.setPreferredGenres(genres) },
+                            onCountrySelected = { country -> viewModel.setSelectedCountry(country) },
                             onRequestNotificationPermission = onRequestNotificationPermission,
                             onCompleteOnboarding = completeOnboarding
                         )
@@ -247,6 +214,8 @@ fun MainAppContent(
                             searchQuery = searchQuery,
                             selectedGenre = selectedGenre,
                             availableGenres = viewModel.availableGenres,
+                            selectedCountry = selectedCountry,
+                            availableCountries = viewModel.availableCountries,
                             sleepTimerRemaining = sleepTimerRemaining,
                             networkStatus = networkStatus,
                             remoteConfig = remoteConfig,
@@ -255,6 +224,7 @@ fun MainAppContent(
                             isDiscoveryError = isDiscoveryError,
                             onSearchQueryChange = { viewModel.setSearchQuery(it) },
                             onGenreSelect = { viewModel.setSelectedGenre(it) },
+                            onCountrySelect = { viewModel.setSelectedCountry(it) },
                             onStationSelect = { station -> 
                                 FirebaseManager.logEvent("play_station", Bundle().apply { putString("station_name", station.name) })
                                 viewModel.playStation(station) 
@@ -377,91 +347,5 @@ fun MainAppContent(
                 onDismiss = { viewModel.setShowAddStationDialog(false) }
             )
         }
-
-        // Floating Network Status Overlay Banner (Graceful non-blocking overlay)
-        AnimatedVisibility(
-            visible = activeBanner != NetworkBannerType.NONE,
-            enter = fadeIn() + slideInVertically { -it },
-            exit = fadeOut() + slideOutVertically { -it },
-            modifier = Modifier
-                .align(Alignment.TopCenter)
-                .statusBarsPadding()
-                .padding(top = 72.dp)
-                .zIndex(99f),
-        ) {
-            val config = when (activeBanner) {
-                NetworkBannerType.OFFLINE -> BannerUIConfig(
-                    text = stringResource(R.string.banner_offline),
-                    bgColor = Color(0xFFD32F2F),
-                    icon = Icons.Filled.WifiOff,
-                    iconColor = Color.White
-                )
-                NetworkBannerType.BACK_ONLINE -> BannerUIConfig(
-                    text = stringResource(R.string.banner_back_online),
-                    bgColor = Color(0xFF388E3C),
-                    icon = Icons.Filled.Wifi,
-                    iconColor = Color.White
-                )
-                NetworkBannerType.WEAK_CONNECTION -> BannerUIConfig(
-                    text = stringResource(R.string.banner_weak_connection),
-                    bgColor = Color(0xFFF57C00),
-                    icon = Icons.Filled.Warning,
-                    iconColor = Color.White
-                )
-                else -> BannerUIConfig("", Color.Transparent, Icons.Filled.Wifi, Color.White)
-            }
-
-            if (config.text.isNotEmpty()) {
-                Card(
-                    colors = CardDefaults.cardColors(containerColor = config.bgColor),
-                    shape = RoundedCornerShape(24.dp),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
-                    modifier = Modifier
-                        .padding(horizontal = 24.dp)
-                        .testTag("network_status_overlay_pill")
-                ) {
-                    Row(
-                        modifier = Modifier.padding(start = 14.dp, end = 6.dp, top = 4.dp, bottom = 4.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        Icon(
-                            imageVector = config.icon,
-                            contentDescription = null,
-                            tint = config.iconColor,
-                            modifier = Modifier.size(16.dp)
-                        )
-                        Text(
-                            text = config.text,
-                            style = MaterialTheme.typography.labelLarge,
-                            color = Color.White,
-                            fontWeight = FontWeight.SemiBold
-                        )
-                        IconButton(
-                            onClick = { activeBanner = NetworkBannerType.NONE },
-                            modifier = Modifier.size(28.dp)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Filled.Close,
-                                contentDescription = "Dismiss",
-                                tint = Color.White.copy(alpha = 0.85f),
-                                modifier = Modifier.size(14.dp)
-                            )
-                        }
-                    }
-                }
-            }
-        }
     }
 }
-
-enum class NetworkBannerType {
-    OFFLINE, BACK_ONLINE, WEAK_CONNECTION, NONE
-}
-
-private data class BannerUIConfig(
-    val text: String,
-    val bgColor: Color,
-    val icon: androidx.compose.ui.graphics.vector.ImageVector,
-    val iconColor: Color
-)

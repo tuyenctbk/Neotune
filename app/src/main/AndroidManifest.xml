@@ -36,6 +36,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.EaseAudio"
         android:usesCleartextTraffic="true"
+        android:enableOnBackInvokedCallback="true"
         tools:targetApi="31">
 
         <!-- Bug #10: Provider authority must use the full package name, not a relative path.

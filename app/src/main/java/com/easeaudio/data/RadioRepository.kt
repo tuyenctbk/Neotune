@@ -6,68 +6,17 @@ import kotlinx.coroutines.flow.map
 
 class RadioRepository(private val dao: RadioDao) {
 
-    val defaultStations = listOf(
-        RadioStation(
-            id = "bbc_world_service",
-            name = "BBC World Service",
-            genre = "News & Reports",
-            country = "United Kingdom",
-            streamUrl = "https://stream.live.vc.bbcmedia.co.uk/bbc_world_service",
-            imageUrl = "https://images.unsplash.com/photo-1585829365295-ab7cd400c167?auto=format&fit=crop&w=600&q=80",
-            bitrate = "128 kbps",
-            codec = "MP3"
-        ),
-        RadioStation(
-            id = "jazz_groove",
-            name = "Smooth Jazz & Lounge",
-            genre = "Jazz",
-            country = "United States",
-            streamUrl = "https://smoothjazz.cdnstream1.com/2585_128.mp3",
-            imageUrl = "https://images.unsplash.com/photo-1511192336575-5a79af67a629?auto=format&fit=crop&w=600&q=80",
-            bitrate = "128 kbps",
-            codec = "MP3"
-        ),
-        RadioStation(
-            id = "lofi_girl_radio",
-            name = "Lofi Chill Beats",
-            genre = "Lo-Fi & Chill",
-            country = "Global",
-            streamUrl = "https://stream.zeno.fm/f3wvbbqmdg8uv",
-            imageUrl = "https://images.unsplash.com/photo-1518609878373-06d740f60d8b?auto=format&fit=crop&w=600&q=80",
-            bitrate = "128 kbps",
-            codec = "MP3"
-        )
-    )
+    val defaultStations = emptyList<RadioStation>()
 
     fun getAllStations(): Flow<List<RadioStation>> {
-        return dao.getAllStations().map { dbList ->
-            val dbMap = dbList.associateBy { it.id }
-            val mergedList = mutableListOf<RadioStation>()
-            
-            // Add default stations first, updating their properties from DB if present (such as isFavorite)
-            defaultStations.forEach { default ->
-                val dbStation = dbMap[default.id]
-                if (dbStation != null) {
-                    mergedList.add(dbStation)
-                } else {
-                    mergedList.add(default)
-                }
-            }
-            
-            // Add all other stations from database (which includes custom and cached online stations)
-            dbList.forEach { dbStation ->
-                if (defaultStations.none { it.id == dbStation.id }) {
-                    mergedList.add(dbStation)
-                }
-            }
-            
-            mergedList
-        }
+        return dao.getAllStations()
     }
 
     suspend fun discoverOnlineStations(
         query: String = "",
         genre: String = "",
+        country: String = "",
+        countryCode: String = "",
         offset: Int = 0,
         limit: Int = 40
     ): List<RadioStation> {
@@ -75,7 +24,9 @@ class RadioRepository(private val dao: RadioDao) {
             limit = limit,
             offset = offset,
             searchQuery = query,
-            genreTag = genre
+            genreTag = genre,
+            country = country,
+            countryCode = countryCode
         )
         if (onlineList.isNotEmpty()) {
             dao.saveStationsToCache(onlineList)
