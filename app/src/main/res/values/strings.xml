@@ -146,4 +146,35 @@
     <string name="onboarding_slide3_select_country">Select Preferred Country / Region</string>
     <string name="onboarding_slide3_select_genres">Pick your preferred styles:</string>
     <string name="onboarding_slide3_start_listening">Start Listening</string>
+
+    <!-- Feature 1: Live Track Action Sheet -->
+    <string name="track_options">Track Options</string>
+    <string name="search_on_youtube">Search on YouTube</string>
+    <string name="search_on_spotify">Search on Spotify</string>
+    <string name="copy_track_info">Copy Track Title</string>
+    <string name="share_track">Share Track</string>
+    <string name="track_copied">Track title copied to clipboard</string>
+
+    <!-- Feature 2: Radio Alarm Clock -->
+    <string name="radio_alarm">Radio Alarm</string>
+    <string name="alarm_set_for">Alarm set for %1$s</string>
+    <string name="alarm_off">Alarm Turned Off</string>
+    <string name="alarm_time">Alarm Time</string>
+    <string name="wake_station">Wake-up Station</string>
+    <string name="enable_alarm">Enable Alarm</string>
+    <string name="alarm_active">Alarm Active (%1$s)</string>
+    <string name="tap_to_change">Tap to Change</string>
+
+    <!-- Feature 3: Car Mode -->
+    <string name="car_mode">Car Mode</string>
+    <string name="exit_car_mode">Exit Car Mode</string>
+    <string name="car_mode_title">CAR MODE</string>
+    <string name="car_mode_subtitle">Large Touch Targets • Hands-Free Driving</string>
+    <string name="quick_select">Quick Select</string>
+
+    <!-- Feature 4: DSP Audio Profiles -->
+    <string name="dsp_speech">Speech Boost</string>
+    <string name="dsp_lofi">Warm Lo-Fi</string>
+    <string name="dsp_acoustic">Acoustic</string>
+    <string name="dsp_bass">Bass Boost</string>
 </resources>

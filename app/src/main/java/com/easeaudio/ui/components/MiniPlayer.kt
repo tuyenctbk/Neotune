@@ -50,6 +50,7 @@ fun MiniPlayer(
     onTogglePlay: () -> Unit,
     onToggleFavorite: () -> Unit,
     onOpenFullPlayer: () -> Unit,
+    onOpenTrackOptions: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     AnimatedVisibility(
@@ -102,7 +103,9 @@ fun MiniPlayer(
 
                     // Title & Stream Info
                     Column(
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier
+                            .weight(1f)
+                            .clickable(enabled = !streamTitle.isNullOrBlank()) { onOpenTrackOptions() }
                     ) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Text(

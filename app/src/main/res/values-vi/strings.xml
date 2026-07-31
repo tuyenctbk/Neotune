@@ -127,4 +127,35 @@
     <string name="onboarding_slide3_select_country">Chọn Quốc gia / Khu vực ưu tiên</string>
     <string name="onboarding_slide3_select_genres">Chọn phong cách bạn thích:</string>
     <string name="onboarding_slide3_start_listening">Bắt đầu nghe</string>
+
+    <!-- Feature 1: Live Track Action Sheet -->
+    <string name="track_options">Tùy Chọn Bài Hát</string>
+    <string name="search_on_youtube">Tìm trên YouTube</string>
+    <string name="search_on_spotify">Tìm trên Spotify</string>
+    <string name="copy_track_info">Sao Chép Tên Bài Hát</string>
+    <string name="share_track">Chia Sẻ Bài Hát</string>
+    <string name="track_copied">Đã sao chép tên bài hát vào bộ nhớ tạm</string>
+
+    <!-- Feature 2: Radio Alarm Clock -->
+    <string name="radio_alarm">Báo Thức Radio</string>
+    <string name="alarm_set_for">Đã đặt báo thức lúc %1$s</string>
+    <string name="alarm_off">Đã tắt báo thức</string>
+    <string name="alarm_time">Giờ Báo Thức</string>
+    <string name="wake_station">Đài Phát Báo Thức</string>
+    <string name="enable_alarm">Bật Báo Thức</string>
+    <string name="alarm_active">Báo Thức Đang Bật (%1$s)</string>
+    <string name="tap_to_change">Nhấn Để Thay Đổi</string>
+
+    <!-- Feature 3: Car Mode -->
+    <string name="car_mode">Chế Độ Lái Xe</string>
+    <string name="exit_car_mode">Thoát Chế Độ Lái Xe</string>
+    <string name="car_mode_title">CHẾ ĐỘ LÁI XE</string>
+    <string name="car_mode_subtitle">Nút Bấm Lớn • An Toàn Khi Lái Xe</string>
+    <string name="quick_select">Chọn Nhanh</string>
+
+    <!-- Feature 4: DSP Audio Profiles -->
+    <string name="dsp_speech">Tăng Cường Giọng Nói</string>
+    <string name="dsp_lofi">Lo-Fi Ấm Áp</string>
+    <string name="dsp_acoustic">Nhạc Mộc Acoustic</string>
+    <string name="dsp_bass">Tăng Bass Uy Lực</string>
 </resources>

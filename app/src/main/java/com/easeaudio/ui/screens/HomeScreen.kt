@@ -18,10 +18,12 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Alarm
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Bedtime
 import androidx.compose.material.icons.filled.CellTower
 import androidx.compose.material.icons.filled.CloudDone
+import androidx.compose.material.icons.filled.DirectionsCar
 import androidx.compose.material.icons.filled.Equalizer
 import androidx.compose.material.icons.filled.Explore
 import androidx.compose.material.icons.filled.Favorite
@@ -85,6 +87,10 @@ fun HomeScreen(
     isLoadingMore: Boolean = false,
     canLoadMore: Boolean = true,
     isDiscoveryError: Boolean = false,
+    streamTitle: String? = null,
+    onPlayPause: () -> Unit = {},
+    onNextStation: () -> Unit = {},
+    onPreviousStation: () -> Unit = {},
     onSearchQueryChange: (String) -> Unit,
     onGenreSelect: (String) -> Unit,
     onCountrySelect: (String) -> Unit = {},
@@ -103,6 +109,9 @@ fun HomeScreen(
     val listState = rememberLazyListState()
     var showAttributionDialog by remember { mutableStateOf(false) }
     var showAppearanceScreen by remember { mutableStateOf(false) }
+    var showCarMode by remember { mutableStateOf(false) }
+    var showAlarmDialog by remember { mutableStateOf(false) }
+    var showTrackActionSheet by remember { mutableStateOf(false) }
     val isFabVisible by remember(searchQuery, stations) {
         derivedStateOf {
             searchQuery.isNotBlank() && stations.isEmpty() && !isDiscoveringOnline
@@ -341,6 +350,38 @@ fun HomeScreen(
                                         onOpenSleepTimer()
                                     },
                                     modifier = Modifier.testTag("menu_item_sleep_timer")
+                                )
+
+                                DropdownMenuItem(
+                                    text = { Text(stringResource(R.string.radio_alarm), color = TextPrimary) },
+                                    leadingIcon = {
+                                        Icon(
+                                            imageVector = Icons.Filled.Alarm,
+                                            contentDescription = stringResource(R.string.radio_alarm),
+                                            tint = NeonCyan
+                                        )
+                                    },
+                                    onClick = {
+                                        showMenu = false
+                                        showAlarmDialog = true
+                                    },
+                                    modifier = Modifier.testTag("menu_item_radio_alarm")
+                                )
+
+                                DropdownMenuItem(
+                                    text = { Text(stringResource(R.string.car_mode), color = TextPrimary) },
+                                    leadingIcon = {
+                                        Icon(
+                                            imageVector = Icons.Filled.DirectionsCar,
+                                            contentDescription = stringResource(R.string.car_mode),
+                                            tint = NeonCyan
+                                        )
+                                    },
+                                    onClick = {
+                                        showMenu = false
+                                        showCarMode = true
+                                    },
+                                    modifier = Modifier.testTag("menu_item_car_mode")
                                 )
 
                                 DropdownMenuItem(
@@ -684,6 +725,34 @@ fun HomeScreen(
             }
         )
     }
+
+    if (showCarMode) {
+        CarModeScreen(
+            currentStation = currentStation,
+            isPlaying = isPlaying,
+            stations = stations,
+            onPlayPause = onPlayPause,
+            onNextStation = { onNextStation() },
+            onPreviousStation = { onPreviousStation() },
+            onSelectStation = { onStationSelect(it) },
+            onExitCarMode = { showCarMode = false }
+        )
+    }
+
+    if (showAlarmDialog) {
+        com.easeaudio.ui.components.AlarmDialog(
+            currentStation = currentStation,
+            onDismiss = { showAlarmDialog = false }
+        )
+    }
+
+    if (showTrackActionSheet && !streamTitle.isNullOrBlank()) {
+        com.easeaudio.ui.components.TrackActionSheet(
+            trackTitle = streamTitle!!,
+            stationName = currentStation?.name ?: "Radio",
+            onDismiss = { showTrackActionSheet = false }
+        )
+    }
 }
 
 @Composable
@@ -804,6 +873,20 @@ fun StationCard(
                             style = MaterialTheme.typography.bodyMedium,
                             color = TextMuted
                         )
+                        if (station.bitrate.isNotBlank()) {
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Surface(
+                                shape = RoundedCornerShape(6.dp),
+                                color = DarkBackground.copy(alpha = 0.6f)
+                            ) {
+                                Text(
+                                    text = station.bitrate.replace("kbps", "k").trim(),
+                                    style = MaterialTheme.typography.labelSmall.copy(fontSize = 10.sp, fontWeight = FontWeight.Bold),
+                                    color = NeonCyan,
+                                    modifier = Modifier.padding(horizontal = 5.dp, vertical = 2.dp)
+                                )
+                            }
+                        }
                     }
                 }
             }

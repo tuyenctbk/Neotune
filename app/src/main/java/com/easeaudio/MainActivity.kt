@@ -148,6 +148,7 @@ fun MainAppContent(
     val showAddStationDialog by viewModel.showAddStationDialog.collectAsState()
 
     var isFullPlayerVisible by remember { mutableStateOf(value = false) }
+    var showTrackActionSheet by remember { mutableStateOf(false) }
     val snackbarHostState = remember { SnackbarHostState() }
 
     // Show error toast/snackbar if stream error occurs
@@ -222,6 +223,10 @@ fun MainAppContent(
                             isLoadingMore = isLoadingMore,
                             canLoadMore = canLoadMore,
                             isDiscoveryError = isDiscoveryError,
+                            streamTitle = streamTitle,
+                            onPlayPause = { viewModel.togglePlayPause() },
+                            onNextStation = { viewModel.playNextStation() },
+                            onPreviousStation = { viewModel.playPreviousStation() },
                             onSearchQueryChange = { viewModel.setSearchQuery(it) },
                             onGenreSelect = { viewModel.setSelectedGenre(it) },
                             onCountrySelect = { viewModel.setSelectedCountry(it) },
@@ -286,7 +291,16 @@ fun MainAppContent(
                         onTogglePlay = { viewModel.togglePlayPause() },
                         onToggleFavorite = { syncedCurrentStation?.let { viewModel.toggleFavorite(it) } },
                         onOpenFullPlayer = { isFullPlayerVisible = true },
+                        onOpenTrackOptions = { showTrackActionSheet = true },
                         modifier = Modifier.align(Alignment.BottomCenter)
+                    )
+                }
+
+                if (showTrackActionSheet && !streamTitle.isNullOrBlank()) {
+                    com.easeaudio.ui.components.TrackActionSheet(
+                        trackTitle = streamTitle!!,
+                        stationName = syncedCurrentStation?.name ?: "Radio",
+                        onDismiss = { showTrackActionSheet = false }
                     )
                 }
             }

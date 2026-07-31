@@ -86,6 +86,14 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
         GenreDisplay("Custom", R.string.custom),
     )
 
+    val availableEqPresets = listOf(
+        EqPresetDisplay("Balanced", R.string.balanced),
+        EqPresetDisplay("Speech", R.string.dsp_speech),
+        EqPresetDisplay("LoFi", R.string.dsp_lofi),
+        EqPresetDisplay("Acoustic", R.string.dsp_acoustic),
+        EqPresetDisplay("Bass", R.string.dsp_bass)
+    )
+
     // Online discovered radio streams state
     private val _onlineDiscoveredStations = MutableStateFlow<List<RadioStation>>(emptyList())
     private val _isDiscoveringOnline = MutableStateFlow(false)
