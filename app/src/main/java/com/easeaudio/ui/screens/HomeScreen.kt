@@ -5,6 +5,9 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.material.icons.filled.Mic
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -66,6 +69,8 @@ import com.easeaudio.network.NetworkStatus
 import com.easeaudio.ui.theme.*
 import com.easeaudio.viewmodel.GenreDisplay
 
+enum class HomeTab { Radio, Podcast }
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
@@ -115,9 +120,16 @@ fun HomeScreen(
     var showCarMode by remember { mutableStateOf(false) }
     var showAlarmDialog by remember { mutableStateOf(false) }
     var showTrackActionSheet by remember { mutableStateOf(false) }
-    val isFabVisible by remember(searchQuery, stations) {
+    var activeTab by remember { mutableStateOf(HomeTab.Radio) }
+    val displayedStations = remember(stations, activeTab) {
+        when (activeTab) {
+            HomeTab.Podcast -> stations.filter { it.isPodcast }
+            HomeTab.Radio  -> stations.filter { !it.isPodcast }
+        }
+    }
+    val isFabVisible by remember(searchQuery, displayedStations) {
         derivedStateOf {
-            searchQuery.isNotBlank() && stations.isEmpty() && !isDiscoveringOnline
+            searchQuery.isNotBlank() && displayedStations.isEmpty() && !isDiscoveringOnline
         }
     }
 
@@ -243,48 +255,50 @@ fun HomeScreen(
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(0.dp)
                         ) {
-                            // Country / Region Selector Button in Header
-                            var showCountryDialog by remember { mutableStateOf(false) }
-                            var isCountryFocused by remember { mutableStateOf(false) }
-                            val selectedCountryObj = availableCountries.find { it.name.equals(selectedCountry, ignoreCase = true) }
-                            val isGlobal = selectedCountry == "Global" || selectedCountry == "All"
+                            // Country / Region Selector — only relevant for Radio mode
+                            if (activeTab == HomeTab.Radio) {
+                                var showCountryDialog by remember { mutableStateOf(false) }
+                                var isCountryFocused by remember { mutableStateOf(false) }
+                                val selectedCountryObj = availableCountries.find { it.name.equals(selectedCountry, ignoreCase = true) }
+                                val isGlobal = selectedCountry == "Global" || selectedCountry == "All"
 
-                            Box(
-                                modifier = Modifier
-                                    .size(32.dp)
-                                    .onFocusChanged { isCountryFocused = it.isFocused }
-                                    .clip(CircleShape)
-                                    .background(
-                                        if (isCountryFocused) NeonCyan
-                                        else Color.Transparent
-                                    )
-                                    .clickable { showCountryDialog = true }
-                                    .testTag("btn_country_selector"),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                if (isGlobal) {
-                                    Icon(
-                                        imageVector = Icons.Filled.Language,
-                                        contentDescription = "Select Region",
-                                        tint = if (isCountryFocused) DarkBackground else NeonCyan,
-                                        modifier = Modifier.size(20.dp)
-                                    )
-                                } else {
-                                    Text(
-                                        text = selectedCountryObj?.flag ?: "🌐",
-                                        fontSize = 20.sp
+                                Box(
+                                    modifier = Modifier
+                                        .size(32.dp)
+                                        .onFocusChanged { isCountryFocused = it.isFocused }
+                                        .clip(CircleShape)
+                                        .background(
+                                            if (isCountryFocused) NeonCyan
+                                            else Color.Transparent
+                                        )
+                                        .clickable { showCountryDialog = true }
+                                        .testTag("btn_country_selector"),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    if (isGlobal) {
+                                        Icon(
+                                            imageVector = Icons.Filled.Language,
+                                            contentDescription = "Select Region",
+                                            tint = if (isCountryFocused) DarkBackground else NeonCyan,
+                                            modifier = Modifier.size(20.dp)
+                                        )
+                                    } else {
+                                        Text(
+                                            text = selectedCountryObj?.flag ?: "🌐",
+                                            fontSize = 20.sp
+                                        )
+                                    }
+                                }
+
+                                if (showCountryDialog) {
+                                    com.easeaudio.ui.components.CountrySelectionDialog(
+                                        selectedCountry = selectedCountry,
+                                        countries = availableCountries,
+                                        isLoading = isLoadingCountries,
+                                        onSelectCountry = { onCountrySelect(it) },
+                                        onDismiss = { showCountryDialog = false }
                                     )
                                 }
-                            }
-
-                            if (showCountryDialog) {
-                                com.easeaudio.ui.components.CountrySelectionDialog(
-                                    selectedCountry = selectedCountry,
-                                    countries = availableCountries,
-                                    isLoading = isLoadingCountries,
-                                    onSelectCountry = { onCountrySelect(it) },
-                                    onDismiss = { showCountryDialog = false }
-                                )
                             }
 
                             // Dropdown overflow menu button for multiple secondary actions
@@ -466,14 +480,19 @@ fun HomeScreen(
                 OutlinedTextField(
                     value = searchQuery,
                     onValueChange = onSearchQueryChange,
-                    placeholder = { Text(stringResource(R.string.search_placeholder), color = TextMuted) },
+                    placeholder = {
+                        Text(
+                            text = if (activeTab == HomeTab.Podcast) "Search podcasts…" else stringResource(R.string.search_placeholder),
+                            color = TextMuted
+                        )
+                    },
                     leadingIcon = { Icon(imageVector = Icons.Filled.Search, contentDescription = null, tint = TextMuted) },
                     singleLine = true,
                     shape = RoundedCornerShape(16.dp),
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedContainerColor = DarkSurface,
                         unfocusedContainerColor = DarkSurface,
-                        focusedBorderColor = NeonCyan,
+                        focusedBorderColor = if (activeTab == HomeTab.Podcast) NeonPurple else NeonCyan,
                         unfocusedBorderColor = Color.Transparent,
                         focusedTextColor = TextPrimary,
                         unfocusedTextColor = TextPrimary
@@ -485,53 +504,151 @@ fun HomeScreen(
                 )
             }
 
-            // Genre & Country Filter Pills
+            // Radio | Podcast segmented control
             item {
-                LazyRow(
+                val radioTabBg by animateColorAsState(
+                    targetValue = if (activeTab == HomeTab.Radio) NeonCyan else Color.Transparent,
+                    animationSpec = tween(200), label = "radio_bg"
+                )
+                val podcastTabBg by animateColorAsState(
+                    targetValue = if (activeTab == HomeTab.Podcast) NeonPurple else Color.Transparent,
+                    animationSpec = tween(200), label = "podcast_bg"
+                )
+                val radioTextColor by animateColorAsState(
+                    targetValue = if (activeTab == HomeTab.Radio) DarkBackground else TextMuted,
+                    animationSpec = tween(200), label = "radio_text"
+                )
+                val podcastTextColor by animateColorAsState(
+                    targetValue = if (activeTab == HomeTab.Podcast) DarkBackground else TextMuted,
+                    animationSpec = tween(200), label = "podcast_text"
+                )
+                Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 16.dp),
-                    contentPadding = PaddingValues(horizontal = 20.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        .padding(horizontal = 20.dp, vertical = 10.dp)
+                        .clip(RoundedCornerShape(50))
+                        .background(DarkSurface)
                 ) {
-                    items(availableGenres) { genre ->
-                        val isSelected = genre.key == selectedGenre
-                        var isPillFocused by remember { mutableStateOf(false) }
-                        val showPillFocus = isPillFocused
-                        Box(
-                            modifier = Modifier
-                                .onFocusChanged { isPillFocused = it.isFocused }
-                                .clip(CircleShape)
-                                .background(
-                                    if (isSelected) NeonCyan 
-                                    else if (showPillFocus) DarkSurfaceVariant 
-                                    else Color.Transparent
-                                )
-                                .border(
-                                    width = if (showPillFocus) 2.dp else if (isSelected) 0.dp else 1.dp,
-                                    color = if (showPillFocus) NeonCyan else if (isSelected) Color.Transparent else CardBorder,
-                                    shape = CircleShape
-                                )
-                                .clickable { onGenreSelect(genre.key) }
-                                .padding(horizontal = 18.dp, vertical = 8.dp)
-                                .testTag("genre_chip_${genre.key}"),
-                            contentAlignment = Alignment.Center
+                    // Radio tab
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .clip(RoundedCornerShape(50))
+                            .background(radioTabBg)
+                            .clickable {
+                                if (activeTab != HomeTab.Radio) {
+                                    activeTab = HomeTab.Radio
+                                    onGenreSelect("All")
+                                }
+                            }
+                            .padding(vertical = 11.dp)
+                            .testTag("tab_radio"),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Center
                         ) {
+                            Icon(
+                                imageVector = Icons.Filled.Radio,
+                                contentDescription = null,
+                                tint = radioTextColor,
+                                modifier = Modifier.size(15.dp)
+                            )
+                            Spacer(modifier = Modifier.width(6.dp))
                             Text(
-                                text = stringResource(genre.labelResId),
-                                style = MaterialTheme.typography.bodyMedium.copy(
-                                    fontWeight = if (isSelected || showPillFocus) FontWeight.Bold else FontWeight.Medium
-                                ),
-                                color = if (isSelected) DarkBackground else if (showPillFocus) NeonCyan else TextMuted
+                                text = "Radio",
+                                color = radioTextColor,
+                                style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold)
+                            )
+                        }
+                    }
+                    // Podcast tab
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .clip(RoundedCornerShape(50))
+                            .background(podcastTabBg)
+                            .clickable {
+                                if (activeTab != HomeTab.Podcast) {
+                                    activeTab = HomeTab.Podcast
+                                    onGenreSelect("Podcasts")
+                                }
+                            }
+                            .padding(vertical = 11.dp)
+                            .testTag("tab_podcast"),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Center
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.Mic,
+                                contentDescription = null,
+                                tint = podcastTextColor,
+                                modifier = Modifier.size(15.dp)
+                            )
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Text(
+                                text = "Podcast",
+                                color = podcastTextColor,
+                                style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold)
                             )
                         }
                     }
                 }
             }
 
-            // Featured Station Hero Banner
-            if (stations.isNotEmpty() && searchQuery.isEmpty() && selectedGenre == "All") {
-                val featured = stations.first()
+            // Genre pills — only shown on Radio tab
+            if (activeTab == HomeTab.Radio) {
+                item {
+                    LazyRow(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 16.dp),
+                        contentPadding = PaddingValues(horizontal = 20.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        items(availableGenres) { genre ->
+                            val isSelected = genre.key == selectedGenre
+                            var isPillFocused by remember { mutableStateOf(false) }
+                            val showPillFocus = isPillFocused
+                            Box(
+                                modifier = Modifier
+                                    .onFocusChanged { isPillFocused = it.isFocused }
+                                    .clip(CircleShape)
+                                    .background(
+                                        if (isSelected) NeonCyan
+                                        else if (showPillFocus) DarkSurfaceVariant
+                                        else Color.Transparent
+                                    )
+                                    .border(
+                                        width = if (showPillFocus) 2.dp else if (isSelected) 0.dp else 1.dp,
+                                        color = if (showPillFocus) NeonCyan else if (isSelected) Color.Transparent else CardBorder,
+                                        shape = CircleShape
+                                    )
+                                    .clickable { onGenreSelect(genre.key) }
+                                    .padding(horizontal = 18.dp, vertical = 8.dp)
+                                    .testTag("genre_chip_${genre.key}"),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = stringResource(genre.labelResId),
+                                    style = MaterialTheme.typography.bodyMedium.copy(
+                                        fontWeight = if (isSelected || showPillFocus) FontWeight.Bold else FontWeight.Medium
+                                    ),
+                                    color = if (isSelected) DarkBackground else if (showPillFocus) NeonCyan else TextMuted
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Featured Station Hero Banner — Radio mode only
+            if (displayedStations.isNotEmpty() && searchQuery.isEmpty() && selectedGenre == "All" && activeTab == HomeTab.Radio) {
+                val featured = displayedStations.first()
                 item {
                     var isHeroFocused by remember { mutableStateOf(false) }
                     val showHeroFocus = isHeroFocused
@@ -627,17 +744,9 @@ fun HomeScreen(
             // Section Title
             item {
                 val sectionTitle = when {
-                    searchQuery.isNotBlank() -> {
-                        when {
-                            stations.isNotEmpty() && stations.all { it.isPodcast } -> stringResource(R.string.search_results_podcasts)
-                            stations.isNotEmpty() && stations.none { it.isPodcast } -> stringResource(R.string.search_results_radio)
-                            else -> stringResource(R.string.search_results)
-                        }
-                    }
+                    searchQuery.isNotBlank() -> stringResource(R.string.search_results)
                     selectedGenre == "Favorites" -> stringResource(R.string.your_favorite_stations)
-                    selectedGenre == "Podcasts" || selectedGenre == "Podcast" -> stringResource(R.string.podcasts_and_shows)
-                    stations.isNotEmpty() && stations.all { it.isPodcast } -> stringResource(R.string.podcasts_and_shows)
-                    stations.isNotEmpty() && stations.any { it.isPodcast } -> stringResource(R.string.radio_and_podcasts)
+                    activeTab == HomeTab.Podcast -> stringResource(R.string.podcasts_and_shows)
                     else -> stringResource(R.string.live_radio_stations)
                 }
                 Text(
@@ -649,7 +758,7 @@ fun HomeScreen(
             }
 
             // Empty or Initial Loading State
-            if (stations.isEmpty()) {
+            if (displayedStations.isEmpty()) {
                 item {
                     Box(
                         modifier = Modifier
@@ -660,7 +769,7 @@ fun HomeScreen(
                         if (isDiscoveringOnline) {
                             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                 CircularProgressIndicator(
-                                    color = NeonCyan,
+                                    color = if (activeTab == HomeTab.Podcast) NeonPurple else NeonCyan,
                                     modifier = Modifier.size(32.dp),
                                     strokeWidth = 3.dp
                                 )
@@ -706,7 +815,7 @@ fun HomeScreen(
             }
 
             // Station Cards List
-            items(stations, key = { it.id }) { station ->
+            items(displayedStations, key = { it.id }) { station ->
                 val isSelected = currentStation?.id == station.id
                 val isUnreachable = failedStationIds.contains(station.id)
                 StationCard(
@@ -886,24 +995,11 @@ fun StationCard(
                     Text(
                         text = station.name,
                         style = MaterialTheme.typography.titleMedium,
-                        color = if (isSelected) NeonCyan else TextPrimary,
+                        color = if (isSelected) (if (isPodcast) NeonPurple else NeonCyan) else TextPrimary,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                         modifier = Modifier.weight(1f, fill = false)
                     )
-                    if (isPodcast) {
-                        Spacer(modifier = Modifier.width(6.dp))
-                        Text(
-                            text = stringResource(R.string.badge_podcast),
-                            style = MaterialTheme.typography.labelSmall.copy(fontSize = 9.sp),
-                            color = DarkBackground,
-                            fontWeight = FontWeight.Bold,
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(4.dp))
-                                .background(NeonPurple)
-                                .padding(horizontal = 4.dp, vertical = 1.dp)
-                        )
-                    }
                 }
                 Spacer(modifier = Modifier.height(2.dp))
                 if (isSelected && isLoading) {
@@ -931,7 +1027,9 @@ fun StationCard(
                     }
                 } else {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        val subtitleText = if (station.country.isNotBlank()) {
+                        val subtitleText = if (isPodcast) {
+                            station.genre
+                        } else if (station.country.isNotBlank()) {
                             "${station.genre} • ${station.country}"
                         } else {
                             station.genre
@@ -944,7 +1042,7 @@ fun StationCard(
                             overflow = TextOverflow.Ellipsis,
                             modifier = Modifier.weight(1f, fill = false)
                         )
-                        if (station.bitrate.isNotBlank()) {
+                        if (!isPodcast && station.bitrate.isNotBlank()) {
                             Spacer(modifier = Modifier.width(6.dp))
                             Surface(
                                 shape = RoundedCornerShape(6.dp),

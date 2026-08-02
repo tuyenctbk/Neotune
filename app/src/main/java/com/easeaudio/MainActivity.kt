@@ -167,6 +167,8 @@ fun MainAppContent(
     val waveAmplitudes by viewModel.playerManager.waveAmplitudes.collectAsState()
     val volume by viewModel.playerManager.volume.collectAsState()
     val sleepTimerRemaining by viewModel.playerManager.sleepTimerMinutesRemaining.collectAsState()
+    val currentPlaybackPosition by viewModel.playerManager.currentPosition.collectAsState()
+    val totalPlaybackDuration by viewModel.playerManager.totalDuration.collectAsState()
 
     val networkStatus by viewModel.networkStatus.collectAsState()
     val remoteConfig by viewModel.remoteConfig.collectAsState()
@@ -388,6 +390,8 @@ fun MainAppContent(
                 eqPresets = viewModel.eqPresets,
                 playbackError = playbackError,
                 hasNotificationPermission = hasNotificationPermission,
+                currentPosition = currentPlaybackPosition,
+                totalDuration = totalPlaybackDuration,
                 onRequestNotificationPermission = onRequestNotificationPermission,
                 onTogglePlay = { viewModel.togglePlayPause() },
                 onToggleFavorite = { syncedCurrentStation?.let { viewModel.toggleFavorite(it) } },
@@ -398,6 +402,7 @@ fun MainAppContent(
                 onPlayNextStation = { viewModel.playNextStation() },
                 onPlayPreviousStation = { viewModel.playPreviousStation() },
                 onSeekRelative = { offsetMs -> viewModel.playerManager.seekRelative(offsetMs) },
+                onSeek = { posMs -> viewModel.playerManager.seekTo(posMs) },
                 onBack = { isFullPlayerVisible = false }
             )
         }

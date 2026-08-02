@@ -66,6 +66,9 @@ fun PlayerScreen(
     onPlayNextStation: () -> Unit = {},
     onPlayPreviousStation: () -> Unit = {},
     onSeekRelative: ((Long) -> Unit)? = null,
+    onSeek: ((Long) -> Unit)? = null,
+    currentPosition: Long = 0L,
+    totalDuration: Long = 0L,
     onBack: () -> Unit
 ) {
     if (station == null) {
@@ -248,6 +251,8 @@ fun PlayerScreen(
 
                     Spacer(modifier = Modifier.height(2.dp))
 
+                // Metadata row — radio only (bitrate/codec/country irrelevant for podcasts)
+                if (!isPodcast) {
                     Row(
                         horizontalArrangement = Arrangement.Center,
                         verticalAlignment = Alignment.CenterVertically
@@ -287,34 +292,70 @@ fun PlayerScreen(
                         }
                     }
                 }
+                }
 
                 Spacer(modifier = Modifier.height(12.dp))
 
-                // Live Audio Waveform Animation
-                val barColors = WaveformAnimationColors
-                Row(
-                    modifier = Modifier
-                        .height(36.dp)
-                        .fillMaxWidth(0.7f),
-                    horizontalArrangement = Arrangement.spacedBy(6.dp),
-                    verticalAlignment = Alignment.Bottom
-                ) {
-                    waveAmplitudes.forEachIndexed { index, amp ->
-                        val barColor = barColors[index % barColors.size]
-                        Box(
-                            modifier = Modifier
-                                .weight(1f)
-                                .fillMaxHeight(amp.coerceIn(0.12f, 1.0f))
-                                .clip(CircleShape)
-                                .background(
-                                    Brush.verticalGradient(
-                                        listOf(
-                                            barColor,
-                                            barColor.copy(alpha = 0.55f)
+                // Podcast: seek slider with position labels — Radio: live waveform
+                if (isPodcast && totalDuration > 0L) {
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Slider(
+                            value = currentPosition.toFloat(),
+                            onValueChange = { onSeek?.invoke(it.toLong()) },
+                            valueRange = 0f..totalDuration.toFloat(),
+                            colors = SliderDefaults.colors(
+                                thumbColor = NeonPurple,
+                                activeTrackColor = NeonPurple,
+                                inactiveTrackColor = DarkSurfaceVariant
+                            ),
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Text(
+                                text = formatDuration(currentPosition),
+                                style = MaterialTheme.typography.labelSmall,
+                                color = TextMuted
+                            )
+                            Text(
+                                text = formatDuration(totalDuration),
+                                style = MaterialTheme.typography.labelSmall,
+                                color = TextMuted
+                            )
+                        }
+                    }
+                } else if (!isPodcast) {
+                    // Live waveform bars (radio only)
+                    val barColors = WaveformAnimationColors
+                    Row(
+                        modifier = Modifier
+                            .height(36.dp)
+                            .fillMaxWidth(0.7f),
+                        horizontalArrangement = Arrangement.spacedBy(6.dp),
+                        verticalAlignment = Alignment.Bottom
+                    ) {
+                        waveAmplitudes.forEachIndexed { index, amp ->
+                            val barColor = barColors[index % barColors.size]
+                            Box(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .fillMaxHeight(amp.coerceIn(0.12f, 1.0f))
+                                    .clip(CircleShape)
+                                    .background(
+                                        Brush.verticalGradient(
+                                            listOf(
+                                                barColor,
+                                                barColor.copy(alpha = 0.55f)
+                                            )
                                         )
                                     )
-                                )
-                        )
+                            )
+                        }
                     }
                 }
 
@@ -440,12 +481,15 @@ fun PlayerScreen(
                             onClick = { onSeekRelative(-15000L) },
                             modifier = Modifier.size(44.dp)
                         ) {
-                            Icon(
-                                imageVector = Icons.Filled.PlayArrow,
-                                contentDescription = "Rewind 15s",
-                                tint = NeonPurple,
-                                modifier = Modifier.size(24.dp)
-                            )
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                Icon(
+                                    imageVector = Icons.Filled.Replay,
+                                    contentDescription = "Rewind 15s",
+                                    tint = NeonPurple,
+                                    modifier = Modifier.size(26.dp)
+                                )
+                                Text("15s", fontSize = 9.sp, color = NeonPurple)
+                            }
                         }
                     }
 
@@ -488,12 +532,15 @@ fun PlayerScreen(
                             onClick = { onSeekRelative(15000L) },
                             modifier = Modifier.size(44.dp)
                         ) {
-                            Icon(
-                                imageVector = Icons.Filled.PlayArrow,
-                                contentDescription = "Forward 15s",
-                                tint = NeonPurple,
-                                modifier = Modifier.size(24.dp)
-                            )
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                Icon(
+                                    imageVector = Icons.Filled.Forward10,
+                                    contentDescription = "Forward 15s",
+                                    tint = NeonPurple,
+                                    modifier = Modifier.size(26.dp)
+                                )
+                                Text("+15s", fontSize = 9.sp, color = NeonPurple)
+                            }
                         }
                     }
 
@@ -509,7 +556,7 @@ fun PlayerScreen(
                     ) {
                         Icon(
                             imageVector = Icons.Filled.SkipNext,
-                            contentDescription = "Next Station",
+                            contentDescription = if (isPodcast) "Next Episode" else "Next Station",
                             tint = if (showNextFocus) DarkBackground else TextPrimary,
                             modifier = Modifier.size(28.dp)
                         )
@@ -580,5 +627,19 @@ fun PlayerScreen(
                 Spacer(modifier = Modifier.height(16.dp))
             }
         }
+    }
+}
+
+private fun formatDuration(ms: Long): String {
+    if (ms <= 0L) return "00:00"
+    val totalSeconds = ms / 1000
+    val minutes = totalSeconds / 60
+    val seconds = totalSeconds % 60
+    val hours = minutes / 60
+    return if (hours > 0) {
+        val remMinutes = minutes % 60
+        String.format(java.util.Locale.US, "%d:%02d:%02d", hours, remMinutes, seconds)
+    } else {
+        String.format(java.util.Locale.US, "%02d:%02d", minutes, seconds)
     }
 }

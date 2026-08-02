@@ -147,8 +147,16 @@ class RadioPlayerManager(private val context: Context) {
     private val _sleepTimerMinutesRemaining = MutableStateFlow<Int?>(null)
     val sleepTimerMinutesRemaining: StateFlow<Int?> = _sleepTimerMinutesRemaining.asStateFlow()
 
+    // Podcast playback position (ms) and duration (ms)
+    private val _currentPosition = MutableStateFlow(0L)
+    val currentPosition: StateFlow<Long> = _currentPosition.asStateFlow()
+
+    private val _totalDuration = MutableStateFlow(0L)
+    val totalDuration: StateFlow<Long> = _totalDuration.asStateFlow()
+
     private var sleepTimerJob: Job? = null
     private var waveAnimationJob: Job? = null
+    private var positionPollingJob: Job? = null
 
     init {
         setupPlayer()
@@ -225,6 +233,7 @@ class RadioPlayerManager(private val context: Context) {
                             // creating a foreground-service-without-notification window (ANR risk).
                             acquireLocks()
                             startWaveAnimation()
+                            startPositionPolling()
                             _currentStation.value?.let { current ->
                                 if (_failedStationIds.value.contains(current.id)) {
                                     _failedStationIds.value = _failedStationIds.value - current.id
@@ -233,6 +242,7 @@ class RadioPlayerManager(private val context: Context) {
                         } else {
                             releaseLocks()
                             stopWaveAnimation()
+                            stopPositionPolling()
                         }
                     }
 
@@ -408,10 +418,7 @@ class RadioPlayerManager(private val context: Context) {
                     override fun isCommandAvailable(command: Int): Boolean {
                         val currentStation = _currentStation.value
                         val isPodcast = currentStation?.isPodcast == true
-                        return if (!isPodcast && (command == Player.COMMAND_SEEK_TO_NEXT ||
-                                    command == Player.COMMAND_SEEK_TO_PREVIOUS ||
-                                    command == Player.COMMAND_SEEK_BACK ||
-                                    command == Player.COMMAND_SEEK_FORWARD)) {
+                        return if (!isPodcast && (command == Player.COMMAND_SEEK_BACK || command == Player.COMMAND_SEEK_FORWARD)) {
                             false
                         } else {
                             super.isCommandAvailable(command)
@@ -703,6 +710,30 @@ class RadioPlayerManager(private val context: Context) {
     private fun stopWaveAnimation() {
         waveAnimationJob?.cancel()
         _waveAmplitudes.value = List(8) { 0.15f }
+    }
+
+    private fun startPositionPolling() {
+        positionPollingJob?.cancel()
+        positionPollingJob = scope.launch {
+            while (isActive) {
+                delay(1000L)
+                exoPlayer?.let { p ->
+                    _currentPosition.value = p.currentPosition.coerceAtLeast(0L)
+                    val dur = p.duration
+                    _totalDuration.value = if (dur > 0L) dur else 0L
+                }
+            }
+        }
+    }
+
+    private fun stopPositionPolling() {
+        positionPollingJob?.cancel()
+        positionPollingJob = null
+    }
+
+    fun seekTo(positionMs: Long) {
+        exoPlayer?.seekTo(positionMs.coerceAtLeast(0L))
+        _currentPosition.value = positionMs.coerceAtLeast(0L)
     }
 
     // startForegroundService() removed (bug #3/#5).

@@ -132,7 +132,6 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
 
     val availableGenres = listOf(
         GenreDisplay("All", R.string.genre_all),
-        GenreDisplay("Podcasts", R.string.genre_podcasts),
         GenreDisplay("News & Reports", R.string.news_reports),
         GenreDisplay("Lo-Fi & Chill", R.string.lofi_chill),
         GenreDisplay("Pop", R.string.pop),
