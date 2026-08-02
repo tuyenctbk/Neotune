@@ -121,10 +121,13 @@ fun PlayerScreen(
                     )
                 }
 
+                val isPodcast = station.genre.contains("Podcast", ignoreCase = true) ||
+                        station.genre.contains("Talk", ignoreCase = true) ||
+                        station.genre.contains("Audiobook", ignoreCase = true)
                 Text(
-                    text = stringResource(R.string.now_playing),
-                    style = MaterialTheme.typography.titleMedium,
-                    color = TextPrimary,
+                    text = stringResource(if (isPodcast) R.string.on_demand_podcast else R.string.live_radio_broadcast),
+                    style = MaterialTheme.typography.labelLarge,
+                    color = if (isPodcast) NeonPurple else NeonPink,
                     fontWeight = FontWeight.Bold
                 )
 
