@@ -54,7 +54,7 @@ fun ShareAppDialog(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "SHARE THE MUSIC",
+                        text = stringResource(R.string.share_app_header),
                         style = MaterialTheme.typography.labelMedium.copy(
                             fontWeight = FontWeight.Bold,
                             letterSpacing = 1.2.sp
@@ -95,7 +95,7 @@ fun ShareAppDialog(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Text(
-                    text = "Share NeoTune with Friends",
+                    text = stringResource(R.string.share_app_title),
                     style = MaterialTheme.typography.titleLarge.copy(
                         fontWeight = FontWeight.Bold,
                         fontSize = 22.sp
@@ -107,7 +107,7 @@ fun ShareAppDialog(
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
-                    text = "Know someone who loves radio stations, lo-fi beats, or ambient sounds? Share NeoTune with them!",
+                    text = stringResource(R.string.share_app_desc),
                     style = MaterialTheme.typography.bodyMedium.copy(lineHeight = 20.sp),
                     color = TextSecondary,
                     textAlign = TextAlign.Center,
@@ -136,7 +136,7 @@ fun ShareAppDialog(
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = "Share App Link",
+                        text = stringResource(R.string.share_app_btn),
                         style = MaterialTheme.typography.titleMedium.copy(
                             fontWeight = FontWeight.Bold,
                             fontSize = 15.sp
@@ -148,7 +148,7 @@ fun ShareAppDialog(
 
                 TextButton(onClick = onDismiss) {
                     Text(
-                        text = "Not Now",
+                        text = stringResource(R.string.not_now_btn),
                         style = MaterialTheme.typography.labelLarge,
                         color = TextMuted
                     )

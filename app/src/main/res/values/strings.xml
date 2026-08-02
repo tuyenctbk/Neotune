@@ -225,4 +225,30 @@
     <string name="unblock">Unblock</string>
     <string name="unblock_all">Clear All</string>
     <string name="block_this_station">Block This Station</string>
+
+    <!-- App Engagement & Update Strings -->
+    <string name="critical_update_header">CRITICAL UPDATE REQUIRED</string>
+    <string name="new_version_header">NEW VERSION AVAILABLE</string>
+    <string name="update_required_title">Update Required to Continue</string>
+    <string name="update_available_title">NeoTune %1$s is Ready!</string>
+    <string name="update_critical_desc">A critical update is required to maintain live radio streaming stability and secure connectivity.</string>
+    <string name="update_optional_desc">New stations, audio enhancements, and performance improvements are available. Update now for the best radio experience!</string>
+    <string name="update_now_btn">Update Now on Google Play</string>
+    <string name="remind_later_btn">Remind Me Later</string>
+
+    <string name="enjoying_app_header">ENJOYING NEOTUNE?</string>
+    <string name="rate_us_title">Tap a Star to Rate Us!</string>
+    <string name="rate_us_desc">Your 5-star rating helps us keep global radio streaming free and uninterrupted for everyone.</string>
+    <string name="rate_on_google_play_btn">Rate %1$d Stars on Google Play</string>
+    <string name="submit_rating_btn">Submit Rating</string>
+    <string name="maybe_later_btn">Maybe Later</string>
+
+    <string name="share_app_header">SHARE THE MUSIC</string>
+    <string name="share_app_title">Share NeoTune with Friends</string>
+    <string name="share_app_desc">Know someone who loves radio stations, lo-fi beats, or ambient sounds? Share NeoTune with them!</string>
+    <string name="share_app_btn">Share App Link</string>
+    <string name="not_now_btn">Not Now</string>
+
+    <string name="share_track_message">🎶 Listening to \"%1$s\" on %2$s via NeoTune Radio!\n\nDownload NeoTune: %3$s</string>
+    <string name="share_track_chooser">Share Track</string>
 </resources>

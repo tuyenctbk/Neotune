@@ -163,20 +163,20 @@ fun TrackActionSheet(
             }
 
             // Action Item 4: Share Track (with App Download Link)
+            val shareTrackMessage = stringResource(R.string.share_track_message, trackTitle, stationName, "https://play.google.com/store/apps/details?id=${context.packageName}")
+            val shareTrackChooserText = stringResource(R.string.share_track_chooser)
             TrackActionItem(
                 icon = Icons.Filled.Share,
                 label = stringResource(R.string.share_track),
                 tint = TextPrimary
             ) {
                 onDismiss()
-                val appLink = "https://play.google.com/store/apps/details?id=${context.packageName}"
-                val shareText = "🎶 Listening to \"$trackTitle\" on $stationName via NeoTune Radio!\n\nDownload NeoTune: $appLink"
                 val sendIntent = Intent().apply {
                     action = Intent.ACTION_SEND
-                    putExtra(Intent.EXTRA_TEXT, shareText)
+                    putExtra(Intent.EXTRA_TEXT, shareTrackMessage)
                     type = "text/plain"
                 }
-                context.startActivity(Intent.createChooser(sendIntent, "Share Track"))
+                context.startActivity(Intent.createChooser(sendIntent, shareTrackChooserText))
             }
 
             // Action Item 5: Block This Station

@@ -63,7 +63,7 @@ fun UpdateAppDialog(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = if (updateInfo.isForceUpdate) "CRITICAL UPDATE REQUIRED" else "NEW VERSION AVAILABLE",
+                        text = if (updateInfo.isForceUpdate) stringResource(R.string.critical_update_header) else stringResource(R.string.new_version_header),
                         style = MaterialTheme.typography.labelMedium.copy(
                             fontWeight = FontWeight.Bold,
                             letterSpacing = 1.2.sp
@@ -106,7 +106,7 @@ fun UpdateAppDialog(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Text(
-                    text = if (updateInfo.isForceUpdate) "Update Required to Continue" else "NeoTune ${updateInfo.latestVersionName} is Ready!",
+                    text = if (updateInfo.isForceUpdate) stringResource(R.string.update_required_title) else stringResource(R.string.update_available_title, updateInfo.latestVersionName),
                     style = MaterialTheme.typography.titleLarge.copy(
                         fontWeight = FontWeight.Bold,
                         fontSize = 20.sp
@@ -119,8 +119,8 @@ fun UpdateAppDialog(
 
                 val descriptionText = when {
                     updateInfo.updateNotes.isNotBlank() -> updateInfo.updateNotes
-                    updateInfo.isForceUpdate -> "A critical update is required to maintain live radio streaming stability and secure connectivity."
-                    else -> "New stations, audio enhancements, and performance improvements are available. Update now for the best radio experience!"
+                    updateInfo.isForceUpdate -> stringResource(R.string.update_critical_desc)
+                    else -> stringResource(R.string.update_optional_desc)
                 }
 
                 Text(
@@ -153,7 +153,7 @@ fun UpdateAppDialog(
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = "Update Now on Google Play",
+                        text = stringResource(R.string.update_now_btn),
                         style = MaterialTheme.typography.titleMedium.copy(
                             fontWeight = FontWeight.Bold,
                             fontSize = 15.sp
@@ -165,7 +165,7 @@ fun UpdateAppDialog(
                     Spacer(modifier = Modifier.height(10.dp))
                     TextButton(onClick = onDismiss) {
                         Text(
-                            text = "Remind Me Later",
+                            text = stringResource(R.string.remind_later_btn),
                             style = MaterialTheme.typography.labelLarge,
                             color = TextMuted
                         )

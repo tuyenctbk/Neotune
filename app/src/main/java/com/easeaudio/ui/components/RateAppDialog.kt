@@ -62,7 +62,7 @@ fun RateAppDialog(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "ENJOYING NEOTUNE?",
+                        text = stringResource(R.string.enjoying_app_header),
                         style = MaterialTheme.typography.labelMedium.copy(
                             fontWeight = FontWeight.Bold,
                             letterSpacing = 1.2.sp
@@ -103,7 +103,7 @@ fun RateAppDialog(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Text(
-                    text = "Tap a Star to Rate Us!",
+                    text = stringResource(R.string.rate_us_title),
                     style = MaterialTheme.typography.titleLarge.copy(
                         fontWeight = FontWeight.Bold,
                         fontSize = 22.sp
@@ -115,7 +115,7 @@ fun RateAppDialog(
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
-                    text = "Your 5-star rating helps us keep global radio streaming free and uninterrupted for everyone.",
+                    text = stringResource(R.string.rate_us_desc),
                     style = MaterialTheme.typography.bodyMedium.copy(lineHeight = 20.sp),
                     color = TextSecondary,
                     textAlign = TextAlign.Center,
@@ -167,7 +167,7 @@ fun RateAppDialog(
                         .testTag("btn_submit_rating")
                 ) {
                     Text(
-                        text = if (selectedStars >= 4) "Rate 5 Stars on Google Play" else "Submit Rating",
+                        text = if (selectedStars >= 4) stringResource(R.string.rate_on_google_play_btn, selectedStars) else stringResource(R.string.submit_rating_btn),
                         style = MaterialTheme.typography.titleMedium.copy(
                             fontWeight = FontWeight.Bold,
                             fontSize = 15.sp
@@ -179,7 +179,7 @@ fun RateAppDialog(
 
                 TextButton(onClick = onDismiss) {
                     Text(
-                        text = "Maybe Later",
+                        text = stringResource(R.string.maybe_later_btn),
                         style = MaterialTheme.typography.labelLarge,
                         color = TextMuted
                     )
