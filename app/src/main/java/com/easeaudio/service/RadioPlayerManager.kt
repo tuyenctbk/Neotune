@@ -412,7 +412,7 @@ class RadioPlayerManager(private val context: Context) {
                                 currentStation?.genre?.contains("Audiobook", ignoreCase = true) == true
                         return if (!isPodcast && (command == Player.COMMAND_SEEK_TO_NEXT ||
                                     command == Player.COMMAND_SEEK_TO_PREVIOUS ||
-                                    command == Player.COMMAND_SEEK_BACKWARD ||
+                                    command == Player.COMMAND_SEEK_BACK ||
                                     command == Player.COMMAND_SEEK_FORWARD)) {
                             false
                         } else {
