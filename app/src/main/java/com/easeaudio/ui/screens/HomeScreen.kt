@@ -626,8 +626,13 @@ fun HomeScreen(
 
             // Section Title
             item {
+                val sectionTitleRes = when (selectedGenre) {
+                    "Favorites" -> R.string.your_favorite_stations
+                    "Podcasts", "Podcast" -> R.string.podcasts_and_shows
+                    else -> R.string.live_radio_stations
+                }
                 Text(
-                    text = stringResource(R.string.live_radio_stations),
+                    text = stringResource(sectionTitleRes),
                     style = MaterialTheme.typography.titleLarge,
                     color = TextPrimary,
                     modifier = Modifier.padding(horizontal = 20.dp, vertical = 12.dp)

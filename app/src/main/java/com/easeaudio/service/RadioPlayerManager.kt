@@ -406,16 +406,35 @@ class RadioPlayerManager(private val context: Context) {
                     }
 
                     override fun isCommandAvailable(command: Int): Boolean {
-                        return if (command == Player.COMMAND_SEEK_BACK ||
-                            command == Player.COMMAND_SEEK_FORWARD) {
+                        val currentStation = _currentStation.value
+                        val isPodcast = currentStation?.genre?.contains("Podcast", ignoreCase = true) == true ||
+                                currentStation?.genre?.contains("Talk", ignoreCase = true) == true ||
+                                currentStation?.genre?.contains("Audiobook", ignoreCase = true) == true
+                        return if (!isPodcast && (command == Player.COMMAND_SEEK_TO_NEXT ||
+                                    command == Player.COMMAND_SEEK_TO_PREVIOUS ||
+                                    command == Player.COMMAND_SEEK_BACKWARD ||
+                                    command == Player.COMMAND_SEEK_FORWARD)) {
                             false
                         } else {
                             super.isCommandAvailable(command)
                         }
                     }
 
-                    override fun isCurrentMediaItemLive(): Boolean = true
-                    override fun isCurrentMediaItemSeekable(): Boolean = false
+                    override fun isCurrentMediaItemLive(): Boolean {
+                        val currentStation = _currentStation.value
+                        val isPodcast = currentStation?.genre?.contains("Podcast", ignoreCase = true) == true ||
+                                currentStation?.genre?.contains("Talk", ignoreCase = true) == true ||
+                                currentStation?.genre?.contains("Audiobook", ignoreCase = true) == true
+                        return !isPodcast
+                    }
+
+                    override fun isCurrentMediaItemSeekable(): Boolean {
+                        val currentStation = _currentStation.value
+                        val isPodcast = currentStation?.genre?.contains("Podcast", ignoreCase = true) == true ||
+                                currentStation?.genre?.contains("Talk", ignoreCase = true) == true ||
+                                currentStation?.genre?.contains("Audiobook", ignoreCase = true) == true
+                        return isPodcast
+                    }
                 }
 
                 mediaSession = MediaSession.Builder(context.applicationContext, forwardingPlayer)
@@ -587,6 +606,17 @@ class RadioPlayerManager(private val context: Context) {
 
                 player.setMediaItem(mediaItem)
                 player.prepare()
+
+                val isPodcast = station.genre.contains("Podcast", ignoreCase = true) ||
+                        station.genre.contains("Talk", ignoreCase = true) ||
+                        station.genre.contains("Audiobook", ignoreCase = true)
+                if (isPodcast) {
+                    val savedPos = com.easeaudio.data.PodcastProgressManager.getProgress(context, station.id)
+                    if (savedPos > 5000L) {
+                        player.seekTo(savedPos)
+                    }
+                }
+
                 player.play()
             }
         }
@@ -595,6 +625,14 @@ class RadioPlayerManager(private val context: Context) {
     fun togglePlayPause() {
         exoPlayer?.let { player ->
             if (player.isPlaying) {
+                _currentStation.value?.let { current ->
+                    val isPodcast = current.genre.contains("Podcast", ignoreCase = true) ||
+                            current.genre.contains("Talk", ignoreCase = true) ||
+                            current.genre.contains("Audiobook", ignoreCase = true)
+                    if (isPodcast && player.currentPosition > 0L) {
+                        com.easeaudio.data.PodcastProgressManager.saveProgress(context, current.id, player.currentPosition)
+                    }
+                }
                 player.pause()
             } else {
                 // Bug #6: mediaItemCount is always >= 1 after the first playStation() call

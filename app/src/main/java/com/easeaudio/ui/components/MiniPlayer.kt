@@ -138,14 +138,17 @@ fun MiniPlayer(
                             )
                             Spacer(modifier = Modifier.width(6.dp))
                             // Badge
+                            val isPodcast = station.genre.contains("Podcast", ignoreCase = true) ||
+                                    station.genre.contains("Talk", ignoreCase = true) ||
+                                    station.genre.contains("Audiobook", ignoreCase = true)
                             Text(
-                                text = stringResource(R.string.live_badge),
+                                text = stringResource(if (isPodcast) R.string.badge_podcast else R.string.live_badge),
                                 style = MaterialTheme.typography.labelMedium,
                                 color = DarkBackground,
                                 fontWeight = FontWeight.Bold,
                                 modifier = Modifier
                                     .clip(RoundedCornerShape(4.dp))
-                                    .background(NeonPink)
+                                    .background(if (isPodcast) NeonPurple else NeonPink)
                                     .padding(horizontal = 4.dp, vertical = 1.dp)
                             )
                         }
