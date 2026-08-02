@@ -47,7 +47,12 @@ fun TrackActionSheet(
     val context = LocalContext.current
     val isPodcast = stationGenre.contains("Podcast", ignoreCase = true) ||
             stationGenre.contains("Talk", ignoreCase = true) ||
-            stationGenre.contains("Audiobook", ignoreCase = true)
+            stationGenre.contains("Audiobook", ignoreCase = true) ||
+            stationGenre.contains("Story", ignoreCase = true) ||
+            stationGenre.contains("Drama", ignoreCase = true) ||
+            stationGenre.contains("Interview", ignoreCase = true) ||
+            stationGenre.contains("Speech", ignoreCase = true) ||
+            stationGenre.contains("Spoken", ignoreCase = true)
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,

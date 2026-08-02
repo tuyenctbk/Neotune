@@ -872,10 +872,7 @@ fun StationCard(
 
             // Text Info
             Column(modifier = Modifier.weight(1f)) {
-                val isPodcast = station.genre.contains("Podcast", ignoreCase = true) ||
-                        station.genre.contains("Talk", ignoreCase = true) ||
-                        station.genre.contains("Audiobook", ignoreCase = true) ||
-                        station.genre.contains("Story", ignoreCase = true)
+                val isPodcast = station.isPodcast
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
                         text = station.name,

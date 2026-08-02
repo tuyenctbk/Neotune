@@ -16,4 +16,14 @@ data class RadioStation(
     val isFavorite: Boolean = false,
     val isCustom: Boolean = false,
     val lastListenedTimestamp: Long = 0L
-)
+) {
+    val isPodcast: Boolean
+        get() = genre.contains("Podcast", ignoreCase = true) ||
+                genre.contains("Talk", ignoreCase = true) ||
+                genre.contains("Audiobook", ignoreCase = true) ||
+                genre.contains("Story", ignoreCase = true) ||
+                genre.contains("Drama", ignoreCase = true) ||
+                genre.contains("Interview", ignoreCase = true) ||
+                genre.contains("Speech", ignoreCase = true) ||
+                genre.contains("Spoken", ignoreCase = true)
+}
