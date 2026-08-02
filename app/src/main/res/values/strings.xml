@@ -260,4 +260,10 @@
     <string name="on_demand_podcast">ON-DEMAND PODCAST</string>
     <string name="podcast_options">Podcast Options</string>
     <string name="station_options">Radio Station Options</string>
+
+    <!-- Context Titles -->
+    <string name="search_results">Search Results</string>
+    <string name="search_results_podcasts">Podcast Search Results</string>
+    <string name="search_results_radio">Radio Search Results</string>
+    <string name="radio_and_podcasts">Radio &amp; Podcasts</string>
 </resources>

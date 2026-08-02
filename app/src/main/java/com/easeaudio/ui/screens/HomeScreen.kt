@@ -626,13 +626,22 @@ fun HomeScreen(
 
             // Section Title
             item {
-                val sectionTitleRes = when (selectedGenre) {
-                    "Favorites" -> R.string.your_favorite_stations
-                    "Podcasts", "Podcast" -> R.string.podcasts_and_shows
-                    else -> R.string.live_radio_stations
+                val sectionTitle = when {
+                    searchQuery.isNotBlank() -> {
+                        when {
+                            stations.isNotEmpty() && stations.all { it.isPodcast } -> stringResource(R.string.search_results_podcasts)
+                            stations.isNotEmpty() && stations.none { it.isPodcast } -> stringResource(R.string.search_results_radio)
+                            else -> stringResource(R.string.search_results)
+                        }
+                    }
+                    selectedGenre == "Favorites" -> stringResource(R.string.your_favorite_stations)
+                    selectedGenre == "Podcasts" || selectedGenre == "Podcast" -> stringResource(R.string.podcasts_and_shows)
+                    stations.isNotEmpty() && stations.all { it.isPodcast } -> stringResource(R.string.podcasts_and_shows)
+                    stations.isNotEmpty() && stations.any { it.isPodcast } -> stringResource(R.string.radio_and_podcasts)
+                    else -> stringResource(R.string.live_radio_stations)
                 }
                 Text(
-                    text = stringResource(sectionTitleRes),
+                    text = sectionTitle,
                     style = MaterialTheme.typography.titleLarge,
                     color = TextPrimary,
                     modifier = Modifier.padding(horizontal = 20.dp, vertical = 12.dp)
