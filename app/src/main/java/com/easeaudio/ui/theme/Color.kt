@@ -462,6 +462,8 @@ val NeonCyan: Color get() = AppThemeState.currentTheme.primary
 val NeonPurple: Color get() = AppThemeState.currentTheme.secondary
 val NeonPink: Color get() = AppThemeState.currentTheme.tertiary
 val AccentOrange: Color get() = AppThemeState.currentTheme.accent
+val NeonYellow: Color = Color(0xFFFFD600)
+val NeonOrange: Color = Color(0xFFFF9100)
 
 val TextPrimary: Color get() = AppThemeState.currentTheme.textPrimary
 val TextSecondary: Color get() = AppThemeState.currentTheme.textSecondary

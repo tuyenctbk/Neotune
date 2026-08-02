@@ -1,22 +1,22 @@
 package com.easeaudio.ui.components
 
-import android.content.ClipData
-import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Alarm
+import androidx.compose.material.icons.filled.Block
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.ContentCopy
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.MusicNote
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -37,6 +37,10 @@ import java.net.URLEncoder
 fun TrackActionSheet(
     trackTitle: String,
     stationName: String,
+    isFavorite: Boolean = false,
+    onToggleFavorite: (() -> Unit)? = null,
+    onSetAsAlarmStation: (() -> Unit)? = null,
+    onBlockStation: (() -> Unit)? = null,
     onDismiss: () -> Unit
 ) {
     val context = LocalContext.current
@@ -122,7 +126,31 @@ fun TrackActionSheet(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Action Items
+            // Action Item 1: Add/Remove Favorites
+            if (onToggleFavorite != null) {
+                TrackActionItem(
+                    icon = if (isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
+                    label = stringResource(if (isFavorite) R.string.remove_from_favorites else R.string.add_to_favorites),
+                    tint = if (isFavorite) FavoriteHeartColor else TextPrimary
+                ) {
+                    onDismiss()
+                    onToggleFavorite()
+                }
+            }
+
+            // Action Item 2: Set as Radio Alarm Station
+            if (onSetAsAlarmStation != null) {
+                TrackActionItem(
+                    icon = Icons.Filled.Alarm,
+                    label = stringResource(R.string.set_as_alarm_station),
+                    tint = NeonCyan
+                ) {
+                    onDismiss()
+                    onSetAsAlarmStation()
+                }
+            }
+
+            // Action Item 3: Search on YouTube
             TrackActionItem(
                 icon = Icons.Filled.PlayArrow,
                 label = stringResource(R.string.search_on_youtube),
@@ -134,41 +162,33 @@ fun TrackActionSheet(
                 context.startActivity(intent)
             }
 
-            TrackActionItem(
-                icon = Icons.Filled.MusicNote,
-                label = stringResource(R.string.search_on_spotify),
-                tint = NeonPurple
-            ) {
-                onDismiss()
-                val query = URLEncoder.encode(trackTitle, "UTF-8")
-                val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://open.spotify.com/search/$query"))
-                context.startActivity(intent)
-            }
-
-            TrackActionItem(
-                icon = Icons.Filled.ContentCopy,
-                label = stringResource(R.string.copy_track_info),
-                tint = TextPrimary
-            ) {
-                onDismiss()
-                val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                val clip = ClipData.newPlainText("Track Title", trackTitle)
-                clipboard.setPrimaryClip(clip)
-                Toast.makeText(context, context.getString(R.string.track_copied), Toast.LENGTH_SHORT).show()
-            }
-
+            // Action Item 4: Share Track (with App Download Link)
             TrackActionItem(
                 icon = Icons.Filled.Share,
                 label = stringResource(R.string.share_track),
                 tint = TextPrimary
             ) {
                 onDismiss()
+                val appLink = "https://play.google.com/store/apps/details?id=${context.packageName}"
+                val shareText = "🎶 Listening to \"$trackTitle\" on $stationName via NeoTune Radio!\n\nDownload NeoTune: $appLink"
                 val sendIntent = Intent().apply {
                     action = Intent.ACTION_SEND
-                    putExtra(Intent.EXTRA_TEXT, "🎶 Listening to \"$trackTitle\" on $stationName via NeoTune Radio!")
+                    putExtra(Intent.EXTRA_TEXT, shareText)
                     type = "text/plain"
                 }
                 context.startActivity(Intent.createChooser(sendIntent, "Share Track"))
+            }
+
+            // Action Item 5: Block This Station
+            if (onBlockStation != null) {
+                TrackActionItem(
+                    icon = Icons.Filled.Block,
+                    label = stringResource(R.string.block_this_station),
+                    tint = androidx.compose.ui.graphics.Color(0xFFFF5252)
+                ) {
+                    onDismiss()
+                    onBlockStation()
+                }
             }
 
             Spacer(modifier = Modifier.height(20.dp))
@@ -188,16 +208,19 @@ private fun TrackActionItem(
             .fillMaxWidth()
             .padding(vertical = 4.dp)
             .clip(RoundedCornerShape(12.dp))
-            .clickable(onClick = onClick),
+            .clickable { onClick() },
         color = DarkSurfaceVariant.copy(alpha = 0.5f)
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 14.dp, vertical = 12.dp),
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Icon(imageVector = icon, contentDescription = null, tint = tint, modifier = Modifier.size(20.dp))
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = tint,
+                modifier = Modifier.size(22.dp)
+            )
             Spacer(modifier = Modifier.width(14.dp))
             Text(
                 text = label,

@@ -37,6 +37,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import android.content.Context
+import androidx.compose.ui.platform.LocalContext
+import com.easeaudio.viewmodel.RadioViewModel
 import com.easeaudio.network.QualityLevel
 import com.easeaudio.service.FirebaseManager
 import com.easeaudio.ui.components.*
@@ -47,19 +50,23 @@ import com.easeaudio.ui.screens.PlayerScreen
 import com.easeaudio.ui.screens.ScreensaverScreen
 import com.easeaudio.ui.theme.TuneveTheme
 import com.easeaudio.ui.theme.AppThemeState
-import com.easeaudio.viewmodel.RadioViewModel
-import android.content.Context
-import androidx.compose.ui.platform.LocalContext
-import kotlin.time.Duration.Companion.seconds
+import android.content.pm.PackageManager
+import androidx.core.content.ContextCompat
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 
 class MainActivity : ComponentActivity() {
 
     private val viewModel: RadioViewModel by viewModels()
 
+    private val isPermissionGrantedState = mutableStateOf(false)
+
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission(),
     ) { isGranted ->
         Log.d("MainActivity", "Notification permission granted: $isGranted")
+        isPermissionGrantedState.value = isGranted
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -95,6 +102,39 @@ fun MainAppContent(
     val prefs = remember { context.getSharedPreferences("neotune_prefs", Context.MODE_PRIVATE) }
     val isOnboardingCompleted = remember { mutableStateOf(prefs.getBoolean("is_onboarding_completed", false)) }
     val startDestination = if (isOnboardingCompleted.value) NavRoute.Home.route else NavRoute.Onboarding.route
+
+    var hasNotificationPermission by remember {
+        mutableStateOf(
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                ContextCompat.checkSelfPermission(
+                    context,
+                    Manifest.permission.POST_NOTIFICATIONS
+                ) == PackageManager.PERMISSION_GRANTED
+            } else {
+                true
+            }
+        )
+    }
+
+    val lifecycleOwner = LocalLifecycleOwner.current
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    hasNotificationPermission = ContextCompat.checkSelfPermission(
+                        context,
+                        Manifest.permission.POST_NOTIFICATIONS
+                    ) == PackageManager.PERMISSION_GRANTED
+                }
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
+
+    var isPlaytimePermissionDismissed by remember { mutableStateOf(false) }
 
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -244,6 +284,7 @@ fun MainAppContent(
                             onOpenSleepTimer = { viewModel.setShowSleepTimerDialog(true) },
                             onOpenEqualizer = { viewModel.setShowEqualizerDialog(true) },
                             onOpenOnboarding = { navController.navigate(NavRoute.Onboarding.route) },
+                            onOpenBlockedDialog = { viewModel.setShowBlockedDialog(true) },
                             onLoadMore = { viewModel.loadMoreStations() },
                             onRefresh = { viewModel.refreshStations() },
                             onRetryDiscovery = { viewModel.retryDiscovery() }
@@ -284,24 +325,43 @@ fun MainAppContent(
 
                 // Mini Player floating bar (shown if station is selected and full player is collapsed)
                 if (!isFullPlayerVisible && currentRoute != NavRoute.Screensaver.route && currentRoute != NavRoute.Onboarding.route) {
-                    MiniPlayer(
-                        station = syncedCurrentStation,
-                        isPlaying = isPlaying,
-                        isLoading = isLoading,
-                        streamTitle = streamTitle,
-                        waveAmplitudes = waveAmplitudes,
-                        onTogglePlay = { viewModel.togglePlayPause() },
-                        onToggleFavorite = { syncedCurrentStation?.let { viewModel.toggleFavorite(it) } },
-                        onOpenFullPlayer = { isFullPlayerVisible = true },
-                        onOpenTrackOptions = { showTrackActionSheet = true },
+                    Column(
                         modifier = Modifier.align(Alignment.BottomCenter)
-                    )
+                    ) {
+                        com.easeaudio.ui.components.NotificationPermissionReminder(
+                            visible = (currentStation != null && (isPlaying || isLoading) && !hasNotificationPermission && !isPlaytimePermissionDismissed && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU),
+                            onRequestPermission = onRequestNotificationPermission,
+                            onDismiss = { isPlaytimePermissionDismissed = true }
+                        )
+
+                        MiniPlayer(
+                            station = syncedCurrentStation,
+                            isPlaying = isPlaying,
+                            isLoading = isLoading,
+                            streamTitle = streamTitle,
+                            waveAmplitudes = waveAmplitudes,
+                            onTogglePlay = { viewModel.togglePlayPause() },
+                            onToggleFavorite = { syncedCurrentStation?.let { viewModel.toggleFavorite(it) } },
+                            onOpenFullPlayer = { isFullPlayerVisible = true },
+                            onOpenTrackOptions = { showTrackActionSheet = true }
+                        )
+                    }
                 }
 
                 if (showTrackActionSheet && !streamTitle.isNullOrBlank()) {
+                    val context = androidx.compose.ui.platform.LocalContext.current
                     com.easeaudio.ui.components.TrackActionSheet(
                         trackTitle = streamTitle!!,
                         stationName = syncedCurrentStation?.name ?: "Radio",
+                        isFavorite = syncedCurrentStation?.isFavorite ?: false,
+                        onToggleFavorite = syncedCurrentStation?.let { { viewModel.toggleFavorite(it) } },
+                        onSetAsAlarmStation = syncedCurrentStation?.let { st ->
+                            {
+                                com.easeaudio.alarm.RadioAlarmManager.setWakeUpStation(context, st.id, st.name, st.streamUrl)
+                                android.widget.Toast.makeText(context, context.getString(R.string.alarm_station_saved), android.widget.Toast.LENGTH_SHORT).show()
+                            }
+                        },
+                        onBlockStation = { syncedCurrentStation?.let { viewModel.blockStation(it.id) } },
                         onDismiss = { showTrackActionSheet = false }
                     )
                 }
@@ -326,6 +386,8 @@ fun MainAppContent(
                 activeEqPreset = activeEqPreset,
                 eqPresets = viewModel.eqPresets,
                 playbackError = playbackError,
+                hasNotificationPermission = hasNotificationPermission,
+                onRequestNotificationPermission = onRequestNotificationPermission,
                 onTogglePlay = { viewModel.togglePlayPause() },
                 onToggleFavorite = { syncedCurrentStation?.let { viewModel.toggleFavorite(it) } },
                 onVolumeChange = { viewModel.playerManager.setVolume(it) },
@@ -337,6 +399,12 @@ fun MainAppContent(
                 onBack = { isFullPlayerVisible = false }
             )
         }
+
+        val activePrompt by viewModel.smartEngagementManager.activePrompt.collectAsState()
+        val updateInfo by viewModel.smartEngagementManager.updateInfo.collectAsState()
+        val showBlockedDialog by viewModel.showBlockedDialog.collectAsState()
+        val filterConfig by viewModel.filterConfig.collectAsState()
+        val blockedStations by viewModel.blockedStations.collectAsState()
 
         // Dialogs
         if (showSleepTimerDialog) {
@@ -362,6 +430,46 @@ fun MainAppContent(
                 onAddStation = { name, url, genre -> viewModel.addCustomStation(name, url, genre) },
                 onDismiss = { viewModel.setShowAddStationDialog(false) }
             )
+        }
+
+        if (showBlockedDialog) {
+            com.easeaudio.ui.components.BlockedStationsDialog(
+                filterConfig = filterConfig,
+                blockedStations = blockedStations,
+                onToggleAdultFilter = { enabled -> viewModel.setFilterAdultContent(enabled) },
+                onTogglePoliticsFilter = { enabled -> viewModel.setFilterPoliticsContent(enabled) },
+                onToggleReligiousFilter = { enabled -> viewModel.setFilterReligiousContent(enabled) },
+                onAddCustomKeyword = { keyword -> viewModel.addCustomFilterKeyword(keyword) },
+                onRemoveCustomKeyword = { keyword -> viewModel.removeCustomFilterKeyword(keyword) },
+                onClearCustomKeywords = { viewModel.clearCustomFilterKeywords() },
+                onUnblockStation = { stationId -> viewModel.unblockStation(stationId) },
+                onClearAllBlocked = { viewModel.clearAllBlockedStations() },
+                onDismiss = { viewModel.setShowBlockedDialog(false) }
+            )
+        }
+
+        // Smart Engagement Dialog Prompts
+        when (activePrompt) {
+            com.easeaudio.engagement.EngagementPromptType.RATE_5_STARS -> {
+                RateAppDialog(
+                    onRateSubmitted = { stars -> viewModel.smartEngagementManager.onRatingCompleted(stars) },
+                    onDismiss = { viewModel.smartEngagementManager.onRatingDismissed() }
+                )
+            }
+            com.easeaudio.engagement.EngagementPromptType.SHARE_APP -> {
+                ShareAppDialog(
+                    onShareConfirmed = { viewModel.smartEngagementManager.onShareCompleted() },
+                    onDismiss = { viewModel.smartEngagementManager.onShareDismissed() }
+                )
+            }
+            com.easeaudio.engagement.EngagementPromptType.UPDATE_APP -> {
+                UpdateAppDialog(
+                    updateInfo = updateInfo,
+                    onUpdateConfirmed = { viewModel.smartEngagementManager.onUpdateConfirmed() },
+                    onDismiss = { viewModel.smartEngagementManager.onUpdateDismissed() }
+                )
+            }
+            com.easeaudio.engagement.EngagementPromptType.NONE -> {}
         }
     }
 }

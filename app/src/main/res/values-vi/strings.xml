@@ -119,24 +119,27 @@
     <string name="onboarding_slide2_subtitle">Giữ nhạc radio phát liên tục khi dùng ứng dụng khác, lái xe hoặc tắt màn hình.</string>
     <string name="onboarding_slide2_grant_btn">Bật quyền thông báo</string>
     <string name="onboarding_slide2_granted">Đã cấp quyền thông báo ✓</string>
+    <string name="onboarding_slide2_explanation">NeoTune cần quyền thông báo để hiển thị bảng điều khiển phát nhạc trên màn hình khóa và thanh trạng thái, giúp nhạc phát liên tục không bị dừng. Quyền này là hoàn toàn tùy chọn.</string>
+    <string name="onboarding_slide2_optional_note">Bạn có thể bật quyền ngay hoặc bỏ qua và bật bất kỳ lúc nào.</string>
+    <string name="onboarding_slide2_why_needed">Tại sao cần quyền này?</string>
     <string name="onboarding_slide2_feature1">Widget trình phát màn hình khóa</string>
     <string name="onboarding_slide2_feature2">Bảng điều khiển thanh trạng thái</string>
     <string name="onboarding_slide2_feature3">Tự kết nối lại &amp; Chống giật lag</string>
+    <string name="playtime_permission_reminder_title">Bật điều khiển màn hình khóa &amp; phát nền</string>
+    <string name="playtime_permission_reminder_desc">Quyền thông báo hiển thị trình điều khiển trên thanh trạng thái &amp; màn hình khóa để radio phát mượt mà.</string>
+    <string name="playtime_permission_grant_btn">Bật quyền</string>
+    <string name="playtime_permission_dismiss">Để sau</string>
     <string name="onboarding_slide3_title">Quốc gia &amp; Khám phá</string>
     <string name="onboarding_slide3_subtitle">Chọn quốc gia hoặc khu vực yêu thích để khám phá các đài radio hàng đầu.</string>
     <string name="onboarding_slide3_select_country">Chọn Quốc gia / Khu vực ưu tiên</string>
     <string name="onboarding_slide3_select_genres">Chọn phong cách bạn thích:</string>
     <string name="onboarding_slide3_start_listening">Bắt đầu nghe</string>
-
-    <!-- Feature 1: Live Track Action Sheet -->
     <string name="track_options">Tùy Chọn Bài Hát</string>
     <string name="search_on_youtube">Tìm trên YouTube</string>
     <string name="search_on_spotify">Tìm trên Spotify</string>
     <string name="copy_track_info">Sao Chép Tên Bài Hát</string>
     <string name="share_track">Chia Sẻ Bài Hát</string>
     <string name="track_copied">Đã sao chép tên bài hát vào bộ nhớ tạm</string>
-
-    <!-- Feature 2: Radio Alarm Clock -->
     <string name="radio_alarm">Báo Thức Radio</string>
     <string name="alarm_set_for">Đã đặt báo thức lúc %1$s</string>
     <string name="alarm_off">Đã tắt báo thức</string>
@@ -145,30 +148,29 @@
     <string name="enable_alarm">Bật Báo Thức</string>
     <string name="alarm_active">Báo Thức Đang Bật (%1$s)</string>
     <string name="tap_to_change">Nhấn Để Thay Đổi</string>
-
-    <!-- Feature 3: Car Mode -->
     <string name="car_mode">Chế Độ Lái Xe</string>
     <string name="exit_car_mode">Thoát Chế Độ Lái Xe</string>
     <string name="car_mode_title">CHẾ ĐỘ LÁI XE</string>
     <string name="car_mode_subtitle">Nút Bấm Lớn • An Toàn Khi Lái Xe</string>
     <string name="quick_select">Chọn Nhanh</string>
-
-    <!-- Feature 4: DSP Audio Profiles -->
     <string name="dsp_speech">Tăng Cường Giọng Nói</string>
     <string name="dsp_lofi">Lo-Fi Ấm Áp</string>
     <string name="dsp_acoustic">Nhạc Mộc Acoustic</string>
     <string name="dsp_bass">Tăng Bass Uy Lực</string>
-
-    <!-- Sleep Timer active state -->
     <string name="sleep_timer_active">Hẹn Giờ Tắt (Đang Bật)</string>
-
-    <!-- Theme card color dot labels -->
     <string name="color_pill_bg">Nền</string>
     <string name="color_pill_card">Thẻ</string>
     <string name="color_pill_accent">Nhấn</string>
-
-    <!-- Country Selection Dialog -->
     <string name="select_country">Chọn Quốc Gia / Khu Vực</string>
     <string name="discovering_countries">Đang khám phá quốc gia…</string>
     <string name="country_count">%d quốc gia có sẵn</string>
+    <string name="content_filters_blocklist">Content Filters &amp; Blocklist</string>
+    <string name="default_content_filters">DEFAULT CONTENT FILTERS</string>
+    <string name="block_adult_content">Block Adult &amp; Explicit Content</string>
+    <string name="block_adult_desc">Filters out stations containing adult, explicit, or NSFW content by default</string>
+    <string name="your_blocked_stations">YOUR BLOCKED STATIONS (%d)</string>
+    <string name="no_blocked_stations">You haven\'t blocked any stations yet</string>
+    <string name="unblock">Unblock</string>
+    <string name="unblock_all">Clear All</string>
+    <string name="block_this_station">Block This Station</string>
 </resources>

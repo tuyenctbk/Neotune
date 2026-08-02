@@ -33,6 +33,7 @@ import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Radio
+import androidx.compose.material.icons.filled.Shield
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material.icons.filled.Wifi
@@ -101,6 +102,8 @@ fun HomeScreen(
     onOpenEqualizer: () -> Unit,
     onOpenNetworkConfig: () -> Unit = {},
     onOpenOnboarding: () -> Unit = {},
+    onOpenBlockedDialog: () -> Unit = {},
+    onBlockStation: (String) -> Unit = {},
     onLoadMore: () -> Unit = {},
     onRefresh: () -> Unit = {},
     onRetryDiscovery: () -> Unit = {},
@@ -386,6 +389,22 @@ fun HomeScreen(
                                         showCarMode = true
                                     },
                                     modifier = Modifier.testTag("menu_item_car_mode")
+                                )
+
+                                DropdownMenuItem(
+                                    text = { Text(stringResource(R.string.content_filters_blocklist), color = TextPrimary) },
+                                    leadingIcon = {
+                                        Icon(
+                                            imageVector = Icons.Filled.Shield,
+                                            contentDescription = stringResource(R.string.content_filters_blocklist),
+                                            tint = NeonCyan
+                                        )
+                                    },
+                                    onClick = {
+                                        showMenu = false
+                                        onOpenBlockedDialog()
+                                    },
+                                    modifier = Modifier.testTag("menu_item_blocked_stations")
                                 )
 
                                 DropdownMenuItem(
@@ -683,7 +702,8 @@ fun HomeScreen(
                     isLoading = isSelected && isLoading,
                     isUnreachable = isUnreachable,
                     onSelect = { onStationSelect(station) },
-                    onToggleFavorite = { onToggleFavorite(station) }
+                    onToggleFavorite = { onToggleFavorite(station) },
+                    onBlockStation = { onBlockStation(station.id) }
                 )
             }
 
@@ -767,18 +787,27 @@ fun StationCard(
     isLoading: Boolean = false,
     isUnreachable: Boolean = false,
     onSelect: () -> Unit,
-    onToggleFavorite: () -> Unit
+    onToggleFavorite: () -> Unit,
+    onBlockStation: (() -> Unit)? = null
 ) {
     val isTv = rememberIsTv()
     var isFocused by remember { mutableStateOf(false) }
     val showFocus = isFocused
+    var lastCardClickTime by remember { androidx.compose.runtime.mutableLongStateOf(0L) }
+    val debouncedSelect = {
+        val now = System.currentTimeMillis()
+        if (now - lastCardClickTime > 400L) {
+            lastCardClickTime = now
+            onSelect()
+        }
+    }
     Surface(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 20.dp, vertical = 6.dp)
             .onFocusChanged { isFocused = it.isFocused }
             .clip(RoundedCornerShape(16.dp))
-            .clickable { onSelect() }
+            .clickable { debouncedSelect() }
             .border(
                 width = if (showFocus) 2.5.dp else if (isSelected) 1.dp else 0.dp,
                 color = if (showFocus) NeonCyan else if (isSelected) NeonCyan.copy(alpha = 0.5f) else Color.Transparent,
@@ -895,18 +924,20 @@ fun StationCard(
                 }
             }
 
-            // Favorite Button
-            IconButton(
-                onClick = onToggleFavorite,
-                modifier = Modifier
-                    .focusProperties { canFocus = false }
-                    .testTag("favorite_button_${station.id}")
-            ) {
-                Icon(
-                    imageVector = if (station.isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
-                    contentDescription = "Favorite",
-                    tint = if (station.isFavorite) FavoriteHeartColor else TextMuted
-                )
+            // Action Buttons
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                IconButton(
+                    onClick = onToggleFavorite,
+                    modifier = Modifier
+                        .focusProperties { canFocus = false }
+                        .testTag("favorite_button_${station.id}")
+                ) {
+                    Icon(
+                        imageVector = if (station.isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
+                        contentDescription = "Favorite",
+                        tint = if (station.isFavorite) FavoriteHeartColor else TextMuted
+                    )
+                }
             }
         }
     }

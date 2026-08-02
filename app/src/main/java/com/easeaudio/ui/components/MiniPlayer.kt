@@ -5,41 +5,45 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.OpenInFull
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.focusProperties
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.focus.focusProperties
-import androidx.compose.foundation.border
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
-import com.easeaudio.R
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import com.easeaudio.R
 import com.easeaudio.data.RadioStation
 import com.easeaudio.ui.theme.*
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun MiniPlayer(
     station: RadioStation?,
@@ -68,7 +72,10 @@ fun MiniPlayer(
                     .padding(horizontal = 12.dp, vertical = 6.dp)
                     .onFocusChanged { isFocused = it.isFocused }
                     .clip(RoundedCornerShape(16.dp))
-                    .clickable { onOpenFullPlayer() }
+                    .combinedClickable(
+                        onClick = { onOpenFullPlayer() },
+                        onDoubleClick = { onOpenFullPlayer() }
+                    )
                     .border(
                         width = if (showFocus) 2.5.dp else 0.dp,
                         color = if (showFocus) NeonCyan else Color.Transparent,
@@ -85,11 +92,15 @@ fun MiniPlayer(
                         .padding(8.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    // Station Artwork
+                    // Station Artwork (Clicking or double-clicking artwork opens Fullscreen)
                     Box(
                         modifier = Modifier
                             .size(48.dp)
                             .clip(RoundedCornerShape(10.dp))
+                            .combinedClickable(
+                                onClick = { onOpenFullPlayer() },
+                                onDoubleClick = { onOpenFullPlayer() }
+                            )
                     ) {
                         AsyncImage(
                             model = station.imageUrl,
@@ -105,7 +116,16 @@ fun MiniPlayer(
                     Column(
                         modifier = Modifier
                             .weight(1f)
-                            .clickable(enabled = !streamTitle.isNullOrBlank()) { onOpenTrackOptions() }
+                            .combinedClickable(
+                                onClick = {
+                                    if (!streamTitle.isNullOrBlank()) {
+                                        onOpenTrackOptions()
+                                    } else {
+                                        onOpenFullPlayer()
+                                    }
+                                },
+                                onDoubleClick = { onOpenFullPlayer() }
+                            )
                     ) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Text(
@@ -145,11 +165,11 @@ fun MiniPlayer(
                         Row(
                             modifier = Modifier
                                 .height(20.dp)
-                                .padding(horizontal = 6.dp),
+                                .padding(horizontal = 4.dp),
                             horizontalArrangement = Arrangement.spacedBy(2.dp),
                             verticalAlignment = Alignment.Bottom
                         ) {
-                            waveAmplitudes.take(5).forEachIndexed { index, amp ->
+                            waveAmplitudes.take(4).forEachIndexed { index, amp ->
                                 Box(
                                     modifier = Modifier
                                         .width(3.dp)
@@ -166,6 +186,7 @@ fun MiniPlayer(
                     IconButton(
                         onClick = onToggleFavorite,
                         modifier = Modifier
+                            .size(36.dp)
                             .onFocusChanged { isFavFocused = it.isFocused }
                             .clip(CircleShape)
                             .background(if (isFavFocused) FavoriteHeartColor else Color.Transparent)
@@ -174,9 +195,30 @@ fun MiniPlayer(
                         Icon(
                             imageVector = if (station.isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
                             contentDescription = "Favorite",
-                            tint = if (isFavFocused) DarkBackground else (if (station.isFavorite) FavoriteHeartColor else TextMuted)
+                            tint = if (isFavFocused) DarkBackground else (if (station.isFavorite) FavoriteHeartColor else TextMuted),
+                            modifier = Modifier.size(20.dp)
                         )
                     }
+
+                    // Expand to Fullscreen Button
+                    var isExpandFocused by remember { mutableStateOf(false) }
+                    IconButton(
+                        onClick = onOpenFullPlayer,
+                        modifier = Modifier
+                            .size(36.dp)
+                            .onFocusChanged { isExpandFocused = it.isFocused }
+                            .clip(CircleShape)
+                            .testTag("mini_player_expand_fullscreen")
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.OpenInFull,
+                            contentDescription = "Fullscreen Player",
+                            tint = if (isExpandFocused) NeonCyan else TextMuted,
+                            modifier = Modifier.size(18.dp)
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.width(2.dp))
 
                     // Play/Pause Button
                     var isPlayFocused by remember { mutableStateOf(false) }

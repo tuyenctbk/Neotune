@@ -45,8 +45,10 @@ fun CountrySelectionDialog(
         if (searchQuery.isBlank()) {
             countries
         } else {
+            val query = searchQuery.trim()
             countries.filter {
-                it.name.contains(searchQuery.trim(), ignoreCase = true)
+                it.name.contains(query, ignoreCase = true) ||
+                        it.code.contains(query, ignoreCase = true)
             }
         }
     }

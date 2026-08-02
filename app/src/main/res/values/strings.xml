@@ -136,9 +136,18 @@
     <string name="onboarding_slide2_subtitle">Keep the radio playing seamlessly while using other apps, taking a drive, or when your device screen is locked.</string>
     <string name="onboarding_slide2_grant_btn">Enable Notification Permission</string>
     <string name="onboarding_slide2_granted">Notification Permission Granted ✓</string>
+    <string name="onboarding_slide2_explanation">NeoTune requests notification permission to display live playback controls on your lockscreen and status bar, ensuring continuous radio streaming without OS interruption. This permission is completely optional.</string>
+    <string name="onboarding_slide2_optional_note">You can enable permission now or skip and enable it anytime later.</string>
+    <string name="onboarding_slide2_why_needed">Why is this permission needed?</string>
     <string name="onboarding_slide2_feature1">System Lockscreen Media Widget</string>
     <string name="onboarding_slide2_feature2">Persistent Status Bar Controls</string>
     <string name="onboarding_slide2_feature3">Auto Reconnect &amp; Buffer Protection</string>
+
+    <!-- Playtime Permission Reminder -->
+    <string name="playtime_permission_reminder_title">Enable Lockscreen &amp; Background Controls</string>
+    <string name="playtime_permission_reminder_desc">Notification permission displays status bar and lockscreen playback controls so radio stays playing smoothly.</string>
+    <string name="playtime_permission_grant_btn">Enable</string>
+    <string name="playtime_permission_dismiss">Not Now</string>
 
     <!-- Slide 3: Country & Region Discovery -->
     <string name="onboarding_slide3_title">Country &amp; Region Discovery</string>
@@ -149,6 +158,11 @@
 
     <!-- Feature 1: Live Track Action Sheet -->
     <string name="track_options">Track Options</string>
+    <string name="add_to_favorites">Add to Favorites</string>
+    <string name="remove_from_favorites">Remove from Favorites</string>
+    <string name="set_as_alarm_station">Set as Radio Alarm Station</string>
+    <string name="alarm_station_saved">Set as wake-up alarm station</string>
+    <string name="find_similar_stations">More %1$s Stations</string>
     <string name="search_on_youtube">Search on YouTube</string>
     <string name="search_on_spotify">Search on Spotify</string>
     <string name="copy_track_info">Copy Track Title</string>
@@ -190,4 +204,25 @@
     <string name="select_country">Select Country / Region</string>
     <string name="discovering_countries">Discovering countries…</string>
     <string name="country_count">%d countries available</string>
+
+    <!-- Content Filters & Blocklist -->
+    <string name="content_filters_blocklist">Content Filters &amp; Blocklist</string>
+    <string name="default_content_filters">PRESET CONTENT FILTERS</string>
+    <string name="block_adult_content">Block Adult &amp; Explicit Content</string>
+    <string name="block_adult_desc">Filters out stations containing adult, explicit, or NSFW content by default</string>
+    <string name="block_politics_content">Filter Political Talk &amp; News</string>
+    <string name="block_politics_desc">Hide stations tagged with politics, elections, and political debates</string>
+    <string name="block_religious_content">Filter Religious &amp; Faith Content</string>
+    <string name="block_religious_desc">Hide stations with sermons, gospel, or religious broadcasting</string>
+    <string name="custom_filter_keywords">CUSTOM BANNED KEYWORDS</string>
+    <string name="custom_filter_keywords_desc">Hide any station whose name, genre, or region matches these keywords</string>
+    <string name="add_keyword_hint">Type word to filter (e.g. sports)…</string>
+    <string name="add_keyword_btn">Add</string>
+    <string name="no_custom_keywords">No custom keywords added yet</string>
+    <string name="clear_keywords">Clear Keywords</string>
+    <string name="your_blocked_stations">YOUR BLOCKED STATIONS (%d)</string>
+    <string name="no_blocked_stations">You haven\'t blocked any stations yet</string>
+    <string name="unblock">Unblock</string>
+    <string name="unblock_all">Clear All</string>
+    <string name="block_this_station">Block This Station</string>
 </resources>

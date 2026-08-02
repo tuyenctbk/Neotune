@@ -9,6 +9,7 @@ import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -35,7 +36,7 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.compose.ui.platform.testTag
@@ -143,12 +144,10 @@ fun OnboardingScreen(
             }
         }
 
-        val canScrollForward = if (pagerState.currentPage == 1) hasNotificationPermission else true
-
-        // Pager Content
+        // Pager Content - user can scroll freely without forced permission
         HorizontalPager(
             state = pagerState,
-            userScrollEnabled = canScrollForward,
+            userScrollEnabled = true,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(top = 70.dp, bottom = 100.dp)
@@ -227,8 +226,9 @@ fun OnboardingScreen(
                         colors = ButtonDefaults.outlinedButtonColors(
                             contentColor = TextPrimary
                         ),
-                        border = ButtonDefaults.outlinedButtonBorder.copy(
-                            brush = Brush.linearGradient(
+                        border = BorderStroke(
+                            1.dp,
+                            Brush.linearGradient(
                                 listOf(
                                     if (isBackFocused) NeonCyan else TextMuted,
                                     TextMuted
@@ -249,7 +249,7 @@ fun OnboardingScreen(
 
                 var isNextFocused by remember { mutableStateOf(false) }
                 val isLastPage = pagerState.currentPage == 2
-                val isNextEnabled = if (pagerState.currentPage == 1) hasNotificationPermission else true
+                val isNextEnabled = true
 
                 Button(
                     onClick = {
@@ -517,7 +517,7 @@ private fun SlideBackgroundControls(
             }
         }
 
-        Spacer(modifier = Modifier.height(28.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
         Text(
             text = stringResource(R.string.onboarding_slide2_title),
@@ -530,7 +530,7 @@ private fun SlideBackgroundControls(
             textAlign = TextAlign.Center
         )
 
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(10.dp))
 
         Text(
             text = stringResource(R.string.onboarding_slide2_subtitle),
@@ -543,7 +543,50 @@ private fun SlideBackgroundControls(
             modifier = Modifier.padding(horizontal = 12.dp)
         )
 
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Explanation / Rationale Card
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 8.dp)
+                .border(1.dp, NeonCyan.copy(alpha = 0.25f), RoundedCornerShape(16.dp)),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = DarkSurface)
+        ) {
+            Column(
+                modifier = Modifier.padding(14.dp)
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        imageVector = Icons.Filled.Info,
+                        contentDescription = null,
+                        tint = NeonCyan,
+                        modifier = Modifier.size(18.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = stringResource(R.string.onboarding_slide2_why_needed),
+                        style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold),
+                        color = TextPrimary
+                    )
+                }
+                Spacer(modifier = Modifier.height(6.dp))
+                Text(
+                    text = stringResource(R.string.onboarding_slide2_explanation),
+                    style = MaterialTheme.typography.bodySmall.copy(lineHeight = 18.sp),
+                    color = TextSecondary
+                )
+                Spacer(modifier = Modifier.height(6.dp))
+                Text(
+                    text = stringResource(R.string.onboarding_slide2_optional_note),
+                    style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.SemiBold),
+                    color = NeonCyan
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
 
         Column(
             modifier = Modifier.fillMaxWidth(),
@@ -673,7 +716,9 @@ private fun SlideGenreDiscovery(
                 com.easeaudio.viewmodel.CountryDisplay("Egypt", "🇪🇬"),
                 com.easeaudio.viewmodel.CountryDisplay("Chile", "🇨🇱"),
                 com.easeaudio.viewmodel.CountryDisplay("Colombia", "🇨🇴"),
-                com.easeaudio.viewmodel.CountryDisplay("New Zealand", "🇳🇿"),
+                com.easeaudio.viewmodel.CountryDisplay("Qatar", "🇶🇦", "QA"),
+                com.easeaudio.viewmodel.CountryDisplay("Saudi Arabia", "🇸🇦", "SA"),
+                com.easeaudio.viewmodel.CountryDisplay("United Arab Emirates", "🇦🇪", "AE"),
                 com.easeaudio.viewmodel.CountryDisplay("Belgium", "🇧🇪"),
                 com.easeaudio.viewmodel.CountryDisplay("Austria", "🇦🇹"),
                 com.easeaudio.viewmodel.CountryDisplay("Portugal", "🇵🇹"),

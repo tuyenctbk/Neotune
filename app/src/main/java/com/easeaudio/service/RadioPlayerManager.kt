@@ -387,13 +387,11 @@ class RadioPlayerManager(private val context: Context) {
                             scope.launch(Dispatchers.Main) {
                                 playNextStation(currentStationList)
                             }
-                            return SessionError.ERROR_NOT_SUPPORTED
                         }
                         if (playerCommand == Player.COMMAND_SEEK_TO_PREVIOUS) {
                             scope.launch(Dispatchers.Main) {
                                 playPreviousStation(currentStationList)
                             }
-                            return SessionError.ERROR_NOT_SUPPORTED
                         }
                         return super.onPlayerCommandRequest(session, controller, playerCommand)
                     }

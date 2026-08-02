@@ -12,6 +12,10 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.VolumeDown
+import androidx.compose.material.icons.automirrored.filled.VolumeOff
+import androidx.compose.material.icons.automirrored.filled.VolumeUp
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.*
@@ -24,6 +28,10 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
+import com.easeaudio.R
+import com.easeaudio.data.RadioStation
+import com.easeaudio.ui.theme.*
+import com.easeaudio.viewmodel.EqPresetDisplay
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -31,10 +39,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import androidx.compose.ui.res.stringResource
-import com.easeaudio.R
-import com.easeaudio.data.RadioStation
-import com.easeaudio.ui.theme.*
-import com.easeaudio.viewmodel.EqPresetDisplay
+import com.easeaudio.ui.components.NotificationPermissionReminder
+import android.os.Build
+import android.Manifest
 
 @Composable
 fun PlayerScreen(
@@ -48,6 +55,8 @@ fun PlayerScreen(
     activeEqPreset: String,
     eqPresets: List<EqPresetDisplay> = emptyList(),
     playbackError: String? = null,
+    hasNotificationPermission: Boolean = true,
+    onRequestNotificationPermission: () -> Unit = {},
     onTogglePlay: () -> Unit,
     onToggleFavorite: () -> Unit,
     onVolumeChange: (Float) -> Unit,
@@ -106,7 +115,7 @@ fun PlayerScreen(
                         .testTag("btn_player_back")
                 ) {
                     Icon(
-                        imageVector = Icons.Filled.ArrowBack, 
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack, 
                         contentDescription = stringResource(R.string.close), 
                         tint = if (showBackFocus) DarkBackground else TextPrimary
                     )
@@ -158,6 +167,16 @@ fun PlayerScreen(
                 verticalArrangement = Arrangement.SpaceEvenly
             ) {
                 Spacer(modifier = Modifier.height(8.dp))
+
+                if (!hasNotificationPermission && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    var isPlayerReminderDismissed by remember { mutableStateOf(false) }
+                    NotificationPermissionReminder(
+                        visible = !isPlayerReminderDismissed,
+                        onRequestPermission = onRequestNotificationPermission,
+                        onDismiss = { isPlayerReminderDismissed = true },
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
+                }
 
                 // Station Artwork Frame
                 Box(
@@ -304,7 +323,7 @@ fun PlayerScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Icon(
-                        imageVector = if (volume == 0f) Icons.Filled.VolumeOff else Icons.Filled.VolumeDown,
+                        imageVector = if (volume == 0f) Icons.AutoMirrored.Filled.VolumeOff else Icons.AutoMirrored.Filled.VolumeDown,
                         contentDescription = null,
                         tint = TextMuted,
                         modifier = Modifier.size(20.dp)
@@ -323,7 +342,7 @@ fun PlayerScreen(
                             .testTag("slider_player_volume")
                     )
                     Icon(
-                        imageVector = Icons.Filled.VolumeUp,
+                        imageVector = Icons.AutoMirrored.Filled.VolumeUp,
                         contentDescription = null,
                         tint = TextMuted,
                         modifier = Modifier.size(20.dp)

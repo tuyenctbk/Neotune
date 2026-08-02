@@ -106,4 +106,9 @@ object RadioAlarmManager {
             Log.i(TAG, "Radio Alarm canceled.")
         }
     }
+
+    fun setWakeUpStation(context: Context, stationId: String, stationName: String, stationUrl: String) {
+        val current = getAlarmConfig(context)
+        setAlarm(context, current.isEnabled, current.hour, current.minute, stationId, stationName, stationUrl)
+    }
 }

@@ -62,11 +62,15 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
         CountryDisplay("Colombia",       "🇨🇴", "CO", 100,   "> 100 stns"),
         CountryDisplay("South Africa",   "🇿🇦", "ZA", 100,   "> 100 stns"),
         CountryDisplay("New Zealand",    "🇳🇿", "NZ", 80,    "> 80 stns"),
+        CountryDisplay("Saudi Arabia",   "🇸🇦", "SA", 50,    "~50 stns"),
         CountryDisplay("Vietnam",        "🇻🇳", "VN", 50,    "> 50 stns"),
         CountryDisplay("Indonesia",      "🇮🇩", "ID", 50,    "> 50 stns"),
+        CountryDisplay("United Arab Emirates", "🇦🇪", "AE", 40, "~40 stns"),
         CountryDisplay("Thailand",       "🇹🇭", "TH", 40,    "> 40 stns"),
+        CountryDisplay("Qatar",          "🇶🇦", "QA", 30,    "~30 stns"),
         CountryDisplay("Philippines",    "🇵🇭", "PH", 30,    "> 30 stns"),
         CountryDisplay("Malaysia",       "🇲🇾", "MY", 30,    "> 30 stns"),
+        CountryDisplay("Israel",         "🇮🇱", "IL", 30,    "~30 stns"),
         CountryDisplay("Singapore",      "🇸🇬", "SG", 20,    "~20 stns"),
         CountryDisplay("South Korea",    "🇰🇷", "KR", 20,    "~20 stns"),
         CountryDisplay("Nigeria",        "🇳🇬", "NG", 20,    "~20 stns"),
@@ -173,43 +177,54 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
         _preferredGenres.value = genres
     }
 
+    val filterAndBlockManager = com.easeaudio.data.FilterAndBlockManager.getInstance(application)
+    val filterConfig = filterAndBlockManager.filterConfig
+    val blockedStationIds = filterAndBlockManager.blockedStationIds
+
     private data class FilterState(
         val query: String,
         val genre: String,
         val country: String,
-        val preferredGenres: Set<String>
+        val preferredGenres: Set<String>,
+        val blockedIds: Set<String>,
+        val filterConfig: com.easeaudio.data.StationFilterConfig
     )
 
     private val defaultStationIds = setOf("bbc_world_service", "jazz_groove", "lofi_girl_radio")
+
+    private val filterStateFlow = combine(
+        combine(_searchQuery, _selectedGenre, _selectedCountry) { q, g, c -> Triple(q, g, c) },
+        combine(_preferredGenres, filterAndBlockManager.blockedStationIds, filterAndBlockManager.filterConfig) { p, b, c -> Triple(p, b, c) }
+    ) { (query, genre, country), (preferred, blocked, config) ->
+        FilterState(query, genre, country, preferred, blocked, config)
+    }
 
     @OptIn(FlowPreview::class)
     val stations: StateFlow<List<RadioStation>> = combine(
         repository.getAllStations(),
         _onlineDiscoveredStations,
-        combine(_searchQuery, _selectedGenre, _selectedCountry, _preferredGenres) { query, genre, country, preferred ->
-            FilterState(query, genre, country, preferred)
-        }
+        filterStateFlow
     ) { localStations, onlineList, filter ->
         val query = filter.query
         val genre = filter.genre
         val country = filter.country
         val preferredGenres = filter.preferredGenres
-
-        val localMap = localStations.associateBy { it.id }
-        
         val mergedList = mutableListOf<RadioStation>()
         val addedIds = mutableSetOf<String>()
+        val localMap = localStations.associateBy { it.id }
 
-        // 1. Add custom stations created by user first
-        val customStations = localStations.filter { it.isCustom }
-        customStations.forEach { station ->
+        // 1. Prioritize active user search match if station is custom or local
+        val localMatches = localStations.filter { local ->
+            local.isCustom && filterAndBlockManager.shouldIncludeStation(local)
+        }
+        localMatches.forEach { station ->
             mergedList.add(station)
             addedIds.add(station.id)
         }
 
-        // 2. Add online discovered stations in their stable discovered order, merging local state (isFavorite, etc.)
+        // 2. Add online discovered stations in their stable discovered order, filtering blocked & adult content
         onlineList.forEach { online ->
-            if (!addedIds.contains(online.id)) {
+            if (!addedIds.contains(online.id) && filterAndBlockManager.shouldIncludeStation(online)) {
                 val localCopy = localMap[online.id]
                 val mergedStation = online.copy(
                     isFavorite = localCopy?.isFavorite ?: online.isFavorite,
@@ -223,7 +238,7 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
 
         // 3. Add default curated stations and other cached local stations that were not in onlineList
         localStations.forEach { local ->
-            if (!addedIds.contains(local.id)) {
+            if (!addedIds.contains(local.id) && filterAndBlockManager.shouldIncludeStation(local)) {
                 mergedList.add(local)
                 addedIds.add(local.id)
             }
@@ -308,6 +323,11 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
     private val _showAddStationDialog = MutableStateFlow(false)
     val showAddStationDialog: StateFlow<Boolean> = _showAddStationDialog.asStateFlow()
 
+    private val _showBlockedDialog = MutableStateFlow(false)
+    val showBlockedDialog: StateFlow<Boolean> = _showBlockedDialog.asStateFlow()
+
+    val smartEngagementManager = com.easeaudio.engagement.SmartEngagementManager.getInstance(application)
+
     init {
         // Discover countries from RadioBrowser API (fallback shown immediately)
         discoverCountries()
@@ -319,13 +339,42 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
                 playerManager.updateStationList(list)
             }
         }
+
+        // Periodically record listening time and check smart engagement triggers while playing
+        viewModelScope.launch {
+            playerManager.isPlaying.collect { playing ->
+                while (playing && playerManager.isPlaying.value) {
+                    kotlinx.coroutines.delay(60_000L) // Record every 60 seconds
+                    if (!playerManager.isPlaying.value) break
+                    smartEngagementManager.recordListeningTime(60L)
+                    smartEngagementManager.checkSmartTriggers(eventSource = "playback_timer")
+                }
+            }
+        }
     }
 
-    val favoriteStations: StateFlow<List<RadioStation>> = repository.getFavoriteStations()
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+    val favoriteStations: StateFlow<List<RadioStation>> = combine(
+        repository.getFavoriteStations(),
+        filterAndBlockManager.blockedStationIds,
+        filterAndBlockManager.filterConfig
+    ) { favs, _, _ ->
+        favs.filter { filterAndBlockManager.shouldIncludeStation(it) }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
-    val recentStations: StateFlow<List<RadioStation>> = repository.getRecentStations()
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+    val recentStations: StateFlow<List<RadioStation>> = combine(
+        repository.getRecentStations(),
+        filterAndBlockManager.blockedStationIds,
+        filterAndBlockManager.filterConfig
+    ) { recents, _, _ ->
+        recents.filter { filterAndBlockManager.shouldIncludeStation(it) }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    val blockedStations: StateFlow<List<RadioStation>> = combine(
+        repository.getAllStations(),
+        filterAndBlockManager.blockedStationIds
+    ) { all, blockedIds ->
+        all.filter { blockedIds.contains(it.id) }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     fun setSearchQuery(query: String) {
         _searchQuery.value = query
@@ -418,9 +467,19 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    private var lastPlaybackClickTimestamp = 0L
+
     fun playStation(station: RadioStation) {
+        val now = System.currentTimeMillis()
+        if (now - lastPlaybackClickTimestamp < 400L) {
+            return
+        }
+        lastPlaybackClickTimestamp = now
+
         if (playerManager.currentStation.value?.id == station.id) {
-            playerManager.togglePlayPause()
+            if (!playerManager.isLoading.value) {
+                playerManager.togglePlayPause()
+            }
         } else {
             playerManager.playStation(station)
             viewModelScope.launch {
@@ -430,13 +489,62 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun togglePlayPause() {
+        val now = System.currentTimeMillis()
+        if (now - lastPlaybackClickTimestamp < 400L) {
+            return
+        }
+        lastPlaybackClickTimestamp = now
         playerManager.togglePlayPause()
     }
 
     fun toggleFavorite(station: RadioStation) {
         viewModelScope.launch {
+            val wasFav = station.isFavorite
             repository.toggleFavorite(station)
+            if (!wasFav) {
+                smartEngagementManager.recordFavoriteAdded()
+            }
         }
+    }
+
+    fun setShowBlockedDialog(show: Boolean) {
+        _showBlockedDialog.value = show
+    }
+
+    fun blockStation(stationId: String) {
+        filterAndBlockManager.blockStation(stationId)
+    }
+
+    fun unblockStation(stationId: String) {
+        filterAndBlockManager.unblockStation(stationId)
+    }
+
+    fun clearAllBlockedStations() {
+        filterAndBlockManager.clearBlockList()
+    }
+
+    fun setFilterAdultContent(enabled: Boolean) {
+        filterAndBlockManager.setFilterAdultContent(enabled)
+    }
+
+    fun setFilterPoliticsContent(enabled: Boolean) {
+        filterAndBlockManager.setFilterPoliticsContent(enabled)
+    }
+
+    fun setFilterReligiousContent(enabled: Boolean) {
+        filterAndBlockManager.setFilterReligiousContent(enabled)
+    }
+
+    fun addCustomFilterKeyword(keyword: String) {
+        filterAndBlockManager.addCustomKeyword(keyword)
+    }
+
+    fun removeCustomFilterKeyword(keyword: String) {
+        filterAndBlockManager.removeCustomKeyword(keyword)
+    }
+
+    fun clearCustomFilterKeywords() {
+        filterAndBlockManager.clearCustomKeywords()
     }
 
     fun addCustomStation(name: String, streamUrl: String, genre: String) {

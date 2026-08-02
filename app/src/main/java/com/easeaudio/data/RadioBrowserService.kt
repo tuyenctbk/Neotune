@@ -137,7 +137,19 @@ object RadioBrowserService {
 
                 var responseText: String? = executeHttpRequest(urlBuilder.toString())
 
-                // Fallback 1: If countrycode query yielded empty response and country name is available
+                // Fallback 1: If name + genre tag query yielded empty response, try searching by name alone (broadening tag filter)
+                if ((responseText.isNullOrBlank() || responseText.trim() == "[]") && searchQuery.isNotBlank() && mappedTag.isNotBlank()) {
+                    val fallbackUrlBuilder = StringBuilder("$baseUrl/search?offset=$offset&limit=$limit&order=clickcount&reverse=true&hidebroken=true")
+                    fallbackUrlBuilder.append("&name=").append(URLEncoder.encode(searchQuery.trim(), "UTF-8"))
+                    if (countryCode.isNotBlank()) {
+                        fallbackUrlBuilder.append("&countrycode=").append(URLEncoder.encode(countryCode.trim(), "UTF-8"))
+                    } else if (country.isNotBlank() && !country.equals("Global", ignoreCase = true) && !country.equals("All", ignoreCase = true)) {
+                        fallbackUrlBuilder.append("&country=").append(URLEncoder.encode(country.trim(), "UTF-8"))
+                    }
+                    responseText = executeHttpRequest(fallbackUrlBuilder.toString())
+                }
+
+                // Fallback 2: If countrycode query yielded empty response and country name is available
                 if ((responseText.isNullOrBlank() || responseText.trim() == "[]") && countryCode.isNotBlank() && country.isNotBlank() && !country.equals("Global", ignoreCase = true)) {
                     val fallbackUrlBuilder = StringBuilder("$baseUrl/search?offset=$offset&limit=$limit&order=clickcount&reverse=true&hidebroken=true")
                     if (searchQuery.isNotBlank()) fallbackUrlBuilder.append("&name=").append(URLEncoder.encode(searchQuery.trim(), "UTF-8"))
@@ -147,7 +159,14 @@ object RadioBrowserService {
                     responseText = executeHttpRequest(fallbackUrlBuilder.toString())
                 }
 
-                // Fallback 2: If country query yielded empty array, query general top stations
+                // Fallback 3: If searching by name with country filter yielded empty response, fallback to global name search
+                if ((responseText.isNullOrBlank() || responseText.trim() == "[]") && searchQuery.isNotBlank() && (countryCode.isNotBlank() || country.isNotBlank())) {
+                    val fallbackUrlBuilder = StringBuilder("$baseUrl/search?offset=$offset&limit=$limit&order=clickcount&reverse=true&hidebroken=true")
+                    fallbackUrlBuilder.append("&name=").append(URLEncoder.encode(searchQuery.trim(), "UTF-8"))
+                    responseText = executeHttpRequest(fallbackUrlBuilder.toString())
+                }
+
+                // Fallback 4: If country query yielded empty array, query general top stations
                 if ((responseText.isNullOrBlank() || responseText.trim() == "[]") && (countryCode.isNotBlank() || country.isNotBlank()) && searchQuery.isBlank() && mappedTag.isBlank()) {
                     val fallbackUrlBuilder = StringBuilder("$baseUrl/search?offset=$offset&limit=$limit&order=clickcount&reverse=true&hidebroken=true")
                     responseText = executeHttpRequest(fallbackUrlBuilder.toString())
