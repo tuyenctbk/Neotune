@@ -154,6 +154,7 @@ fun PlayerScreen(
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
+            val isPodcast = station?.isPodcast == true
             val maxScreenHeight = maxHeight
             val isCompact = maxScreenHeight < 650.dp
             val artSize = if (isCompact) 180.dp else 240.dp
