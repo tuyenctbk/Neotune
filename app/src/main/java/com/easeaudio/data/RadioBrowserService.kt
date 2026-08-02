@@ -241,6 +241,7 @@ object RadioBrowserService {
 
     private fun mapGenreToTag(genreTag: String): String {
         return when (genreTag) {
+            "Podcasts", "Podcast" -> "podcast"
             "News & Reports" -> "news"
             "Lo-Fi & Chill" -> "chill"
             "Jazz" -> "jazz"

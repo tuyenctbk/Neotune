@@ -132,6 +132,7 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
 
     val availableGenres = listOf(
         GenreDisplay("All", R.string.genre_all),
+        GenreDisplay("Podcasts", R.string.genre_podcasts),
         GenreDisplay("News & Reports", R.string.news_reports),
         GenreDisplay("Lo-Fi & Chill", R.string.lofi_chill),
         GenreDisplay("Pop", R.string.pop),
@@ -261,6 +262,12 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
             val matchesGenre = when (genre) {
                 "All" -> true
                 "Custom" -> station.isCustom
+                "Podcasts", "Podcast" -> station.genre.contains("Podcast", ignoreCase = true) ||
+                        station.genre.contains("Talk", ignoreCase = true) ||
+                        station.genre.contains("Audiobook", ignoreCase = true) ||
+                        station.genre.contains("Story", ignoreCase = true) ||
+                        station.genre.contains("Drama", ignoreCase = true) ||
+                        station.genre.contains("Interview", ignoreCase = true)
                 "News & Reports" -> station.genre.contains("News", ignoreCase = true) ||
                         station.genre.contains("Report", ignoreCase = true) ||
                         station.genre.contains("Talk", ignoreCase = true) ||

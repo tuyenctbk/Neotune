@@ -251,4 +251,8 @@
 
     <string name="share_track_message">🎶 Listening to \"%1$s\" on %2$s via NeoTune Radio!\n\nDownload NeoTune: %3$s</string>
     <string name="share_track_chooser">Share Track</string>
+
+    <!-- Podcasts -->
+    <string name="genre_podcasts">Podcasts</string>
+    <string name="badge_podcast">PODCAST</string>
 </resources>

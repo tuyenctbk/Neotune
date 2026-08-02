@@ -862,13 +862,33 @@ fun StationCard(
 
             // Text Info
             Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = station.name,
-                    style = MaterialTheme.typography.titleMedium,
-                    color = if (isSelected) NeonCyan else TextPrimary,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
+                val isPodcast = station.genre.contains("Podcast", ignoreCase = true) ||
+                        station.genre.contains("Talk", ignoreCase = true) ||
+                        station.genre.contains("Audiobook", ignoreCase = true) ||
+                        station.genre.contains("Story", ignoreCase = true)
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = station.name,
+                        style = MaterialTheme.typography.titleMedium,
+                        color = if (isSelected) NeonCyan else TextPrimary,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.weight(1f, fill = false)
+                    )
+                    if (isPodcast) {
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text(
+                            text = stringResource(R.string.badge_podcast),
+                            style = MaterialTheme.typography.labelSmall.copy(fontSize = 9.sp),
+                            color = DarkBackground,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(4.dp))
+                                .background(NeonPurple)
+                                .padding(horizontal = 4.dp, vertical = 1.dp)
+                        )
+                    }
+                }
                 Spacer(modifier = Modifier.height(2.dp))
                 if (isSelected && isLoading) {
                     Text(
