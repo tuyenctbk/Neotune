@@ -659,6 +659,18 @@ class RadioPlayerManager(private val context: Context) {
         playStation(stationList[prevIndex])
     }
 
+    fun seekRelative(offsetMs: Long) {
+        exoPlayer?.let { player ->
+            val targetPos = (player.currentPosition + offsetMs).coerceAtLeast(0L)
+            player.seekTo(targetPos)
+            _currentStation.value?.let { current ->
+                if (current.isPodcast) {
+                    com.easeaudio.data.PodcastProgressManager.saveProgress(context, current.id, targetPos)
+                }
+            }
+        }
+    }
+
     fun setVolume(newVolume: Float) {
         _volume.value = newVolume.coerceIn(0.0f, 1.0f)
         exoPlayer?.volume = _volume.value

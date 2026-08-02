@@ -397,6 +397,7 @@ fun MainAppContent(
                 onRetryStream = { viewModel.retryCurrentStation() },
                 onPlayNextStation = { viewModel.playNextStation() },
                 onPlayPreviousStation = { viewModel.playPreviousStation() },
+                onSeekRelative = { offsetMs -> viewModel.playerManager.seekRelative(offsetMs) },
                 onBack = { isFullPlayerVisible = false }
             )
         }

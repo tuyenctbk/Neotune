@@ -65,6 +65,7 @@ fun PlayerScreen(
     onRetryStream: () -> Unit = {},
     onPlayNextStation: () -> Unit = {},
     onPlayPreviousStation: () -> Unit = {},
+    onSeekRelative: ((Long) -> Unit)? = null,
     onBack: () -> Unit
 ) {
     if (station == null) {
@@ -410,17 +411,17 @@ fun PlayerScreen(
 
                 Spacer(modifier = Modifier.height(12.dp))
 
-                // Transport Row (Previous, Play/Pause, Next)
+                // Transport Row (Previous, 15s Rewind, Play/Pause, 15s Forward, Next)
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(24.dp)
+                    horizontalArrangement = Arrangement.spacedBy(if (isPodcast) 12.dp else 24.dp)
                 ) {
                     var isPrevFocused by remember { mutableStateOf(false) }
                     val showPrevFocus = isPrevFocused
                     IconButton(
                         onClick = onPlayPreviousStation,
                         modifier = Modifier
-                            .size(48.dp)
+                            .size(44.dp)
                             .onFocusChanged { isPrevFocused = it.isFocused }
                             .clip(CircleShape)
                             .background(if (showPrevFocus) NeonCyan else Color.Transparent)
@@ -429,8 +430,22 @@ fun PlayerScreen(
                             imageVector = Icons.Filled.SkipPrevious,
                             contentDescription = "Previous Station",
                             tint = if (showPrevFocus) DarkBackground else TextPrimary,
-                            modifier = Modifier.size(32.dp)
+                            modifier = Modifier.size(28.dp)
                         )
+                    }
+
+                    if (isPodcast && onSeekRelative != null) {
+                        IconButton(
+                            onClick = { onSeekRelative(-15000L) },
+                            modifier = Modifier.size(44.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.PlayArrow,
+                                contentDescription = "Rewind 15s",
+                                tint = NeonPurple,
+                                modifier = Modifier.size(24.dp)
+                            )
+                        }
                     }
 
                     // Play / Pause Transport Button
@@ -467,12 +482,26 @@ fun PlayerScreen(
                         }
                     }
 
+                    if (isPodcast && onSeekRelative != null) {
+                        IconButton(
+                            onClick = { onSeekRelative(15000L) },
+                            modifier = Modifier.size(44.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.PlayArrow,
+                                contentDescription = "Forward 15s",
+                                tint = NeonPurple,
+                                modifier = Modifier.size(24.dp)
+                            )
+                        }
+                    }
+
                     var isNextFocused by remember { mutableStateOf(false) }
                     val showNextFocus = isNextFocused
                     IconButton(
                         onClick = onPlayNextStation,
                         modifier = Modifier
-                            .size(48.dp)
+                            .size(44.dp)
                             .onFocusChanged { isNextFocused = it.isFocused }
                             .clip(CircleShape)
                             .background(if (showNextFocus) NeonCyan else Color.Transparent)
@@ -481,7 +510,7 @@ fun PlayerScreen(
                             imageVector = Icons.Filled.SkipNext,
                             contentDescription = "Next Station",
                             tint = if (showNextFocus) DarkBackground else TextPrimary,
-                            modifier = Modifier.size(32.dp)
+                            modifier = Modifier.size(28.dp)
                         )
                     }
                 }
