@@ -18,7 +18,9 @@ data class RadioStation(
     val lastListenedTimestamp: Long = 0L
 ) {
     val isPodcast: Boolean
-        get() = genre.contains("Podcast", ignoreCase = true) ||
+        get() = id.startsWith("itunes_", ignoreCase = true) ||
+                bitrate.equals("Podcast", ignoreCase = true) ||
+                genre.contains("Podcast", ignoreCase = true) ||
                 genre.contains("Audiobook", ignoreCase = true) ||
                 genre.contains("Story", ignoreCase = true) ||
                 genre.contains("Interview", ignoreCase = true) ||

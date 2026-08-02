@@ -84,7 +84,13 @@ object RadioAlarmManager {
             }
 
             try {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !alarmManager.canScheduleExactAlarms()) {
+                    alarmManager.setAndAllowWhileIdle(
+                        AlarmManager.RTC_WAKEUP,
+                        calendar.timeInMillis,
+                        pendingIntent
+                    )
+                } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                     alarmManager.setExactAndAllowWhileIdle(
                         AlarmManager.RTC_WAKEUP,
                         calendar.timeInMillis,
@@ -99,7 +105,16 @@ object RadioAlarmManager {
                 }
                 Log.i(TAG, "Radio Alarm scheduled for ${calendar.time}")
             } catch (e: Exception) {
-                Log.e(TAG, "Failed to schedule alarm: ${e.message}")
+                Log.e(TAG, "Failed exact alarm, trying fallback: ${e.message}")
+                try {
+                    alarmManager.setAndAllowWhileIdle(
+                        AlarmManager.RTC_WAKEUP,
+                        calendar.timeInMillis,
+                        pendingIntent
+                    )
+                } catch (e2: Exception) {
+                    Log.e(TAG, "Fallback alarm failed: ${e2.message}")
+                }
             }
         } else {
             alarmManager.cancel(pendingIntent)

@@ -84,6 +84,7 @@ fun HomeScreen(
     searchQuery: String,
     selectedGenre: String,
     availableGenres: List<GenreDisplay>,
+    availablePodcastTopics: List<GenreDisplay> = emptyList(),
     selectedCountry: String = "Global",
     availableCountries: List<com.easeaudio.viewmodel.CountryDisplay> = emptyList(),
     isLoadingCountries: Boolean = false,
@@ -94,6 +95,7 @@ fun HomeScreen(
     canLoadMore: Boolean = true,
     isDiscoveryError: Boolean = false,
     streamTitle: String? = null,
+    initialTab: HomeTab = HomeTab.Radio,
     onPlayPause: () -> Unit = {},
     onNextStation: () -> Unit = {},
     onPreviousStation: () -> Unit = {},
@@ -120,13 +122,11 @@ fun HomeScreen(
     var showCarMode by remember { mutableStateOf(false) }
     var showAlarmDialog by remember { mutableStateOf(false) }
     var showTrackActionSheet by remember { mutableStateOf(false) }
-    var activeTab by remember { mutableStateOf(HomeTab.Radio) }
-    val displayedStations = remember(stations, activeTab) {
-        when (activeTab) {
-            HomeTab.Podcast -> stations.filter { it.isPodcast }
-            HomeTab.Radio  -> stations.filter { !it.isPodcast }
-        }
+    var activeTab by remember(initialTab) { mutableStateOf(initialTab) }
+    LaunchedEffect(initialTab) {
+        activeTab = initialTab
     }
+    val displayedStations = stations
     val isFabVisible by remember(searchQuery, displayedStations) {
         derivedStateOf {
             searchQuery.isNotBlank() && displayedStations.isEmpty() && !isDiscoveringOnline
@@ -251,229 +251,9 @@ fun HomeScreen(
                                 )
                             }
                         }
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(0.dp)
-                        ) {
-                            // Country / Region Selector — only relevant for Radio mode
-                            if (activeTab == HomeTab.Radio) {
-                                var showCountryDialog by remember { mutableStateOf(false) }
-                                var isCountryFocused by remember { mutableStateOf(false) }
-                                val selectedCountryObj = availableCountries.find { it.name.equals(selectedCountry, ignoreCase = true) }
-                                val isGlobal = selectedCountry == "Global" || selectedCountry == "All"
-
-                                Box(
-                                    modifier = Modifier
-                                        .size(32.dp)
-                                        .onFocusChanged { isCountryFocused = it.isFocused }
-                                        .clip(CircleShape)
-                                        .background(
-                                            if (isCountryFocused) NeonCyan
-                                            else Color.Transparent
-                                        )
-                                        .clickable { showCountryDialog = true }
-                                        .testTag("btn_country_selector"),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    if (isGlobal) {
-                                        Icon(
-                                            imageVector = Icons.Filled.Language,
-                                            contentDescription = "Select Region",
-                                            tint = if (isCountryFocused) DarkBackground else NeonCyan,
-                                            modifier = Modifier.size(20.dp)
-                                        )
-                                    } else {
-                                        Text(
-                                            text = selectedCountryObj?.flag ?: "🌐",
-                                            fontSize = 20.sp
-                                        )
-                                    }
-                                }
-
-                                if (showCountryDialog) {
-                                    com.easeaudio.ui.components.CountrySelectionDialog(
-                                        selectedCountry = selectedCountry,
-                                        countries = availableCountries,
-                                        isLoading = isLoadingCountries,
-                                        onSelectCountry = { onCountrySelect(it) },
-                                        onDismiss = { showCountryDialog = false }
-                                    )
-                                }
-                            }
-
-                            // Dropdown overflow menu button for multiple secondary actions
-                            var showMenu by remember { mutableStateOf(false) }
-
-                            Box(
-                                modifier = Modifier.wrapContentSize(Alignment.TopEnd)
-                            ) {
-                                var isMenuBtnFocused by remember { mutableStateOf(false) }
-                                val showMenuBtnFocus = isMenuBtnFocused
-                                Box(
-                                    modifier = Modifier
-                                        .size(32.dp)
-                                        .onFocusChanged { isMenuBtnFocused = it.isFocused }
-                                        .clip(CircleShape)
-                                        .background(
-                                            if (showMenuBtnFocus) NeonCyan
-                                            else if (showMenu) DarkSurfaceVariant
-                                            else Color.Transparent
-                                        )
-                                        .clickable { showMenu = true }
-                                        .testTag("btn_open_overflow_menu"),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Filled.MoreVert,
-                                        contentDescription = "More Options",
-                                        tint = if (showMenuBtnFocus) DarkBackground else TextPrimary
-                                    )
-                                }
-
-                            DropdownMenu(
-                                expanded = showMenu,
-                                onDismissRequest = { showMenu = false },
-                                modifier = Modifier.background(DarkSurfaceVariant)
-                            ) {
-                                DropdownMenuItem(
-                                    text = { Text(stringResource(R.string.equalizer), color = TextPrimary) },
-                                    leadingIcon = {
-                                        Icon(
-                                            imageVector = Icons.Filled.Equalizer,
-                                            contentDescription = stringResource(R.string.equalizer),
-                                            tint = NeonCyan
-                                        )
-                                    },
-                                    onClick = {
-                                        showMenu = false
-                                        onOpenEqualizer()
-                                    },
-                                    modifier = Modifier.testTag("menu_item_equalizer")
-                                )
-
-                                DropdownMenuItem(
-                                    text = {
-                                        val label = if (sleepTimerRemaining != null)
-                                            stringResource(R.string.sleep_timer_active)
-                                        else
-                                            stringResource(R.string.sleep_timer)
-                                        Text(label, color = TextPrimary)
-                                    },
-                                    leadingIcon = {
-                                        Icon(
-                                            imageVector = Icons.Filled.Bedtime,
-                                            contentDescription = stringResource(R.string.sleep_timer),
-                                            tint = if (sleepTimerRemaining != null) NeonPurple else TextMuted
-                                        )
-                                    },
-                                    onClick = {
-                                        showMenu = false
-                                        onOpenSleepTimer()
-                                    },
-                                    modifier = Modifier.testTag("menu_item_sleep_timer")
-                                )
-
-                                DropdownMenuItem(
-                                    text = { Text(stringResource(R.string.radio_alarm), color = TextPrimary) },
-                                    leadingIcon = {
-                                        Icon(
-                                            imageVector = Icons.Filled.Alarm,
-                                            contentDescription = stringResource(R.string.radio_alarm),
-                                            tint = NeonCyan
-                                        )
-                                    },
-                                    onClick = {
-                                        showMenu = false
-                                        showAlarmDialog = true
-                                    },
-                                    modifier = Modifier.testTag("menu_item_radio_alarm")
-                                )
-
-                                DropdownMenuItem(
-                                    text = { Text(stringResource(R.string.car_mode), color = TextPrimary) },
-                                    leadingIcon = {
-                                        Icon(
-                                            imageVector = Icons.Filled.DirectionsCar,
-                                            contentDescription = stringResource(R.string.car_mode),
-                                            tint = NeonCyan
-                                        )
-                                    },
-                                    onClick = {
-                                        showMenu = false
-                                        showCarMode = true
-                                    },
-                                    modifier = Modifier.testTag("menu_item_car_mode")
-                                )
-
-                                DropdownMenuItem(
-                                    text = { Text(stringResource(R.string.content_filters_blocklist), color = TextPrimary) },
-                                    leadingIcon = {
-                                        Icon(
-                                            imageVector = Icons.Filled.Shield,
-                                            contentDescription = stringResource(R.string.content_filters_blocklist),
-                                            tint = NeonCyan
-                                        )
-                                    },
-                                    onClick = {
-                                        showMenu = false
-                                        onOpenBlockedDialog()
-                                    },
-                                    modifier = Modifier.testTag("menu_item_blocked_stations")
-                                )
-
-                                DropdownMenuItem(
-                                    text = { Text(stringResource(R.string.appearance), color = TextPrimary) },
-                                    leadingIcon = {
-                                        Icon(
-                                            imageVector = Icons.Filled.Language,
-                                            contentDescription = stringResource(R.string.appearance),
-                                            tint = NeonCyan
-                                        )
-                                    },
-                                    onClick = {
-                                        showMenu = false
-                                        showAppearanceScreen = true
-                                    },
-                                    modifier = Modifier.testTag("menu_item_appearance")
-                                )
-
-                                DropdownMenuItem(
-                                    text = { Text(stringResource(R.string.onboarding_app_tour), color = TextPrimary) },
-                                    leadingIcon = {
-                                        Icon(
-                                            imageVector = Icons.Filled.Explore,
-                                            contentDescription = stringResource(R.string.onboarding_app_tour),
-                                            tint = NeonCyan
-                                        )
-                                    },
-                                    onClick = {
-                                        showMenu = false
-                                        onOpenOnboarding()
-                                    },
-                                    modifier = Modifier.testTag("menu_item_onboarding")
-                                )
-
-                                DropdownMenuItem(
-                                    text = { Text(stringResource(R.string.info), color = TextPrimary) },
-                                    leadingIcon = {
-                                        Icon(
-                                            imageVector = Icons.Filled.Info,
-                                            contentDescription = stringResource(R.string.info),
-                                            tint = NeonCyan
-                                        )
-                                    },
-                                    onClick = {
-                                        showMenu = false
-                                        showAttributionDialog = true
-                                    },
-                                    modifier = Modifier.testTag("menu_item_attribution")
-                                )
-                            }
-                        }
                     }
                 }
             }
-        }
 
             // Search Bar
             item {
@@ -504,104 +284,13 @@ fun HomeScreen(
                 )
             }
 
-            // Radio | Podcast segmented control
-            item {
-                val radioTabBg by animateColorAsState(
-                    targetValue = if (activeTab == HomeTab.Radio) NeonCyan else Color.Transparent,
-                    animationSpec = tween(200), label = "radio_bg"
-                )
-                val podcastTabBg by animateColorAsState(
-                    targetValue = if (activeTab == HomeTab.Podcast) NeonPurple else Color.Transparent,
-                    animationSpec = tween(200), label = "podcast_bg"
-                )
-                val radioTextColor by animateColorAsState(
-                    targetValue = if (activeTab == HomeTab.Radio) DarkBackground else TextMuted,
-                    animationSpec = tween(200), label = "radio_text"
-                )
-                val podcastTextColor by animateColorAsState(
-                    targetValue = if (activeTab == HomeTab.Podcast) DarkBackground else TextMuted,
-                    animationSpec = tween(200), label = "podcast_text"
-                )
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 20.dp, vertical = 10.dp)
-                        .clip(RoundedCornerShape(50))
-                        .background(DarkSurface)
-                ) {
-                    // Radio tab
-                    Box(
-                        modifier = Modifier
-                            .weight(1f)
-                            .clip(RoundedCornerShape(50))
-                            .background(radioTabBg)
-                            .clickable {
-                                if (activeTab != HomeTab.Radio) {
-                                    activeTab = HomeTab.Radio
-                                    onGenreSelect("All")
-                                }
-                            }
-                            .padding(vertical = 11.dp)
-                            .testTag("tab_radio"),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.Center
-                        ) {
-                            Icon(
-                                imageVector = Icons.Filled.Radio,
-                                contentDescription = null,
-                                tint = radioTextColor,
-                                modifier = Modifier.size(15.dp)
-                            )
-                            Spacer(modifier = Modifier.width(6.dp))
-                            Text(
-                                text = "Radio",
-                                color = radioTextColor,
-                                style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold)
-                            )
-                        }
-                    }
-                    // Podcast tab
-                    Box(
-                        modifier = Modifier
-                            .weight(1f)
-                            .clip(RoundedCornerShape(50))
-                            .background(podcastTabBg)
-                            .clickable {
-                                if (activeTab != HomeTab.Podcast) {
-                                    activeTab = HomeTab.Podcast
-                                    onGenreSelect("Podcasts")
-                                }
-                            }
-                            .padding(vertical = 11.dp)
-                            .testTag("tab_podcast"),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.Center
-                        ) {
-                            Icon(
-                                imageVector = Icons.Filled.Mic,
-                                contentDescription = null,
-                                tint = podcastTextColor,
-                                modifier = Modifier.size(15.dp)
-                            )
-                            Spacer(modifier = Modifier.width(6.dp))
-                            Text(
-                                text = "Podcast",
-                                color = podcastTextColor,
-                                style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold)
-                            )
-                        }
-                    }
-                }
-            }
 
-            // Genre pills — only shown on Radio tab
-            if (activeTab == HomeTab.Radio) {
+
+            // Category / Topic Pills — shown on both Radio & Podcast tabs
+            val currentPills = if (activeTab == HomeTab.Podcast) availablePodcastTopics else availableGenres
+            val pillAccent = if (activeTab == HomeTab.Podcast) NeonPurple else NeonCyan
+
+            if (currentPills.isNotEmpty()) {
                 item {
                     LazyRow(
                         modifier = Modifier
@@ -610,7 +299,7 @@ fun HomeScreen(
                         contentPadding = PaddingValues(horizontal = 20.dp),
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        items(availableGenres) { genre ->
+                        items(currentPills) { genre ->
                             val isSelected = genre.key == selectedGenre
                             var isPillFocused by remember { mutableStateOf(false) }
                             val showPillFocus = isPillFocused
@@ -619,13 +308,13 @@ fun HomeScreen(
                                     .onFocusChanged { isPillFocused = it.isFocused }
                                     .clip(CircleShape)
                                     .background(
-                                        if (isSelected) NeonCyan
+                                        if (isSelected) pillAccent
                                         else if (showPillFocus) DarkSurfaceVariant
                                         else Color.Transparent
                                     )
                                     .border(
                                         width = if (showPillFocus) 2.dp else if (isSelected) 0.dp else 1.dp,
-                                        color = if (showPillFocus) NeonCyan else if (isSelected) Color.Transparent else CardBorder,
+                                        color = if (showPillFocus) pillAccent else if (isSelected) Color.Transparent else CardBorder,
                                         shape = CircleShape
                                     )
                                     .clickable { onGenreSelect(genre.key) }
@@ -638,7 +327,7 @@ fun HomeScreen(
                                     style = MaterialTheme.typography.bodyMedium.copy(
                                         fontWeight = if (isSelected || showPillFocus) FontWeight.Bold else FontWeight.Medium
                                     ),
-                                    color = if (isSelected) DarkBackground else if (showPillFocus) NeonCyan else TextMuted
+                                    color = if (isSelected) DarkBackground else if (showPillFocus) pillAccent else TextMuted
                                 )
                             }
                         }
@@ -775,7 +464,7 @@ fun HomeScreen(
                                 )
                                 Spacer(modifier = Modifier.height(12.dp))
                                 Text(
-                                    text = stringResource(R.string.loading_more_stations),
+                                    text = if (activeTab == HomeTab.Podcast) "Discovering podcasts & shows..." else stringResource(R.string.loading_more_stations),
                                     style = MaterialTheme.typography.titleMedium,
                                     color = TextSecondary
                                 )
@@ -805,9 +494,15 @@ fun HomeScreen(
                             }
                         } else {
                             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                Text(stringResource(R.string.no_stations_found), style = MaterialTheme.typography.titleMedium, color = TextSecondary)
+                                Text(
+                                    text = if (activeTab == HomeTab.Podcast) "No podcasts found matching your search." else stringResource(R.string.no_stations_found),
+                                    style = MaterialTheme.typography.titleMedium,
+                                    color = TextSecondary
+                                )
                                 Spacer(modifier = Modifier.height(6.dp))
-                                Text(stringResource(R.string.add_station_prompt), style = MaterialTheme.typography.bodyMedium, color = TextMuted)
+                                if (activeTab != HomeTab.Podcast) {
+                                    Text(stringResource(R.string.add_station_prompt), style = MaterialTheme.typography.bodyMedium, color = TextMuted)
+                                }
                             }
                         }
                     }

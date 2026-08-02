@@ -214,9 +214,9 @@ fun AlarmDialog(
                     Spacer(modifier = Modifier.width(8.dp))
                     Button(
                         onClick = {
-                            val activeStationName = currentStation?.name ?: targetStationName
-                            val activeStationUrl = currentStation?.streamUrl ?: targetStationUrl
-                            val activeStationId = currentStation?.id ?: targetStationId
+                            val activeStationName = currentStation?.name ?: targetStationName.ifBlank { "BBC World Service" }
+                            val activeStationUrl = currentStation?.streamUrl ?: targetStationUrl.ifBlank { "https://stream.live.vc.bbcmedia.co.uk/bbc_world_service" }
+                            val activeStationId = currentStation?.id ?: targetStationId.ifBlank { "bbc_world_service" }
 
                             RadioAlarmManager.setAlarm(
                                 context = context,

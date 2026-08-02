@@ -34,6 +34,42 @@ class RadioRepository(private val dao: RadioDao) {
         return onlineList
     }
 
+    suspend fun discoverOnlinePodcasts(
+        query: String = "",
+        genre: String = "",
+        country: String = "",
+        offset: Int = 0,
+        limit: Int = 40
+    ): List<RadioStation> {
+        val result = iTunesPodcastService.fetchPodcasts(
+            limit = limit,
+            offset = offset,
+            searchQuery = query,
+            genre = genre,
+            country = country
+        )
+        val allItems = result.podcasts + result.liveRadioStations
+        if (allItems.isNotEmpty()) {
+            dao.saveStationsToCache(allItems)
+        }
+        return result.podcasts
+    }
+
+    suspend fun getiTunesLiveRadioStations(
+        query: String = "",
+        genre: String = "",
+        country: String = ""
+    ): List<RadioStation> {
+        val result = iTunesPodcastService.fetchPodcasts(
+            limit = 30,
+            offset = 0,
+            searchQuery = query,
+            genre = genre,
+            country = country
+        )
+        return result.liveRadioStations
+    }
+
     fun getFavoriteStations(): Flow<List<RadioStation>> = dao.getFavoriteStations()
     fun getRecentStations(): Flow<List<RadioStation>> = dao.getRecentStations()
 

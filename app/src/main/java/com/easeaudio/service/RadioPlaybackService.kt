@@ -25,6 +25,17 @@ class RadioPlaybackService : MediaSessionService() {
         return RadioPlayerManager.sharedMediaSession
     }
 
+    override fun onTaskRemoved(rootIntent: android.content.Intent?) {
+        try {
+            val playerManager = RadioPlayerManager.getInstance(applicationContext)
+            playerManager.stopPlayer()
+        } catch (e: Exception) {
+            android.util.Log.w("RadioPlaybackService", "Error stopping player on task removed: ${e.message}")
+        }
+        stopSelf()
+        super.onTaskRemoved(rootIntent)
+    }
+
     override fun onDestroy() {
         // Do NOT release the singleton here. The PlayerManager is shared with the ViewModel
         // and Activity. Releasing it inside the service would null sharedMediaSession and

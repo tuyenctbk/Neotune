@@ -38,6 +38,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.easeaudio.R
 import com.easeaudio.data.RadioStation
@@ -51,6 +52,8 @@ fun MiniPlayer(
     isLoading: Boolean,
     streamTitle: String?,
     waveAmplitudes: List<Float>,
+    currentPosition: Long = 0L,
+    totalDuration: Long = 0L,
     onTogglePlay: () -> Unit,
     onToggleFavorite: () -> Unit,
     onOpenFullPlayer: () -> Unit,
@@ -114,18 +117,7 @@ fun MiniPlayer(
 
                     // Title & Stream Info
                     Column(
-                        modifier = Modifier
-                            .weight(1f)
-                            .combinedClickable(
-                                onClick = {
-                                    if (!streamTitle.isNullOrBlank()) {
-                                        onOpenTrackOptions()
-                                    } else {
-                                        onOpenFullPlayer()
-                                    }
-                                },
-                                onDoubleClick = { onOpenFullPlayer() }
-                            )
+                        modifier = Modifier.weight(1f)
                     ) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Text(
@@ -151,13 +143,35 @@ fun MiniPlayer(
                             )
                         }
 
-                        Text(
-                            text = if (isLoading) stringResource(R.string.buffering_stream) else (streamTitle ?: station.genre),
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = if (isLoading) NeonCyan else TextSecondary,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
+                        if (station.isPodcast && totalDuration > 0L && !isLoading) {
+                            Spacer(modifier = Modifier.height(3.dp))
+                            val progress = (currentPosition.toFloat() / totalDuration.toFloat()).coerceIn(0f, 1f)
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                LinearProgressIndicator(
+                                    progress = { progress },
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .height(3.dp)
+                                        .clip(RoundedCornerShape(2.dp)),
+                                    color = NeonPurple,
+                                    trackColor = DarkSurface
+                                )
+                                Spacer(modifier = Modifier.width(6.dp))
+                                Text(
+                                    text = "${formatDurationShort(currentPosition)} / ${formatDurationShort(totalDuration)}",
+                                    style = MaterialTheme.typography.labelSmall.copy(fontSize = 10.sp),
+                                    color = TextMuted
+                                )
+                            }
+                        } else {
+                            Text(
+                                text = if (isLoading) stringResource(R.string.buffering_stream) else (streamTitle ?: station.genre),
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = if (isLoading) NeonCyan else TextSecondary,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        }
                     }
 
                     // Mini Wave Visualizer
@@ -249,5 +263,19 @@ fun MiniPlayer(
                 }
             }
         }
+    }
+}
+
+private fun formatDurationShort(ms: Long): String {
+    if (ms <= 0L) return "00:00"
+    val totalSeconds = ms / 1000
+    val minutes = totalSeconds / 60
+    val seconds = totalSeconds % 60
+    val hours = minutes / 60
+    return if (hours > 0) {
+        val remMinutes = minutes % 60
+        String.format(java.util.Locale.US, "%d:%02d:%02d", hours, remMinutes, seconds)
+    } else {
+        String.format(java.util.Locale.US, "%02d:%02d", minutes, seconds)
     }
 }

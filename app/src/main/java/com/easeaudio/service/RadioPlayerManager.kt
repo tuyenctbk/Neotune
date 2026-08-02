@@ -154,6 +154,34 @@ class RadioPlayerManager(private val context: Context) {
     private val _totalDuration = MutableStateFlow(0L)
     val totalDuration: StateFlow<Long> = _totalDuration.asStateFlow()
 
+    // Playback Speed (1.0x, 1.25x, 1.5x, 2.0x)
+    private val _playbackSpeed = MutableStateFlow(1.0f)
+    val playbackSpeed: StateFlow<Float> = _playbackSpeed.asStateFlow()
+
+    fun setPlaybackSpeed(speed: Float) {
+        _playbackSpeed.value = speed
+        exoPlayer?.playbackParameters = androidx.media3.common.PlaybackParameters(speed)
+    }
+
+    fun skipBackward(ms: Long = 15000L) {
+        exoPlayer?.let { player ->
+            val current = player.currentPosition
+            val newPos = (current - ms).coerceAtLeast(0L)
+            player.seekTo(newPos)
+            _currentPosition.value = newPos
+        }
+    }
+
+    fun skipForward(ms: Long = 30000L) {
+        exoPlayer?.let { player ->
+            val current = player.currentPosition
+            val duration = player.duration.coerceAtLeast(0L)
+            val newPos = if (duration > 0) (current + ms).coerceAtMost(duration) else current + ms
+            player.seekTo(newPos)
+            _currentPosition.value = newPos
+        }
+    }
+
     private var sleepTimerJob: Job? = null
     private var waveAnimationJob: Job? = null
     private var positionPollingJob: Job? = null
@@ -206,10 +234,17 @@ class RadioPlayerManager(private val context: Context) {
             .build()
 
         val httpDataSourceFactory = DefaultHttpDataSource.Factory()
-            .setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
+            .setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36")
+            .setDefaultRequestProperties(
+                mapOf(
+                    "Accept" to "*/*",
+                    "Accept-Language" to "en-US,en;q=0.9",
+                    "User-Agent" to "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
+                )
+            )
             .setAllowCrossProtocolRedirects(true)
-            .setConnectTimeoutMs(10000)
-            .setReadTimeoutMs(10000)
+            .setConnectTimeoutMs(15000)
+            .setReadTimeoutMs(15000)
 
         val mediaSourceFactory = DefaultMediaSourceFactory(context.applicationContext)
             .setDataSourceFactory(httpDataSourceFactory)
@@ -361,12 +396,24 @@ class RadioPlayerManager(private val context: Context) {
                         _playbackErrorDetails.value = details
                         _isLoading.value = false
                         _isPlaying.value = false
+
+                        try {
+                            exoPlayer?.stop()
+                            exoPlayer?.clearMediaItems()
+                        } catch (e: Exception) {
+                            Log.w(TAG, "Error stopping player on failure: ${e.message}")
+                        }
+
                         val isConnected = networkStatus.value.isConnected
                         if (isConnected) {
                             _currentStation.value?.let { st ->
                                 _failedStationIds.value = _failedStationIds.value + st.id
                             }
-                            _playbackError.value = "${context.getString(R.string.unable_connect_error)} [${error.errorCodeName}]"
+                            _playbackError.value = if (httpCode == 403 || error.errorCode == PlaybackException.ERROR_CODE_IO_BAD_HTTP_STATUS) {
+                                context.getString(R.string.stream_offline_notice)
+                            } else {
+                                "${context.getString(R.string.unable_connect_error)} [${error.errorCodeName}]"
+                            }
                         } else {
                             _playbackError.value = context.getString(R.string.no_internet_error)
                         }
@@ -451,7 +498,7 @@ class RadioPlayerManager(private val context: Context) {
     private var isHealingAttempt = false
 
     private fun tryAutoHealStream(station: RadioStation, failedUrl: String?) {
-        if (isHealingAttempt) return
+        if (station.isPodcast || isHealingAttempt) return
         isHealingAttempt = true
         scope.launch(Dispatchers.IO) {
             try {
@@ -522,12 +569,14 @@ class RadioPlayerManager(private val context: Context) {
                 val isPlaylist = lower.endsWith(".m3u") || lower.endsWith(".pls") || 
                                  lower.contains(".m3u?") || lower.contains(".pls?") || 
                                  lower.endsWith(".m3u8") || lower.contains(".m3u8?")
+                val isDirectAudio = lower.endsWith(".mp3") || lower.endsWith(".m4a") || lower.endsWith(".aac") || lower.endsWith(".ogg") || lower.endsWith(".flac") || lower.endsWith(".wav")
 
                 val connection = (java.net.URL(currentUrl).openConnection() as java.net.HttpURLConnection).apply {
-                    connectTimeout = 5000
-                    readTimeout = 5000
-                    instanceFollowRedirects = false
-                    setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
+                    connectTimeout = 8000
+                    readTimeout = 8000
+                    instanceFollowRedirects = true
+                    setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36")
+                    setRequestProperty("Accept", "*/*")
                 }
                 val responseCode = connection.responseCode
                 if (responseCode in 300..399) {
@@ -541,9 +590,40 @@ class RadioPlayerManager(private val context: Context) {
                 }
 
                 if (responseCode in 200..299) {
-                    if (isPlaylist) {
-                        val content = connection.inputStream.bufferedReader().use { it.readText() }
+                    val contentType = (connection.contentType ?: "").lowercase()
+                    if (isDirectAudio || contentType.contains("audio") || contentType.contains("mpeg") || contentType.contains("ogg") || contentType.contains("aac") || contentType.contains("flac") || contentType.contains("wav")) {
                         connection.disconnect()
+                        return@withContext currentUrl
+                    }
+
+                    // Safely read at most 64KB of header text to resolve playlists/RSS XML without reading large binary audio streams into memory
+                    val content = try {
+                        connection.inputStream.bufferedReader().use { reader ->
+                            val charBuffer = CharArray(65536)
+                            val readCount = reader.read(charBuffer, 0, charBuffer.size)
+                            if (readCount > 0) String(charBuffer, 0, readCount) else ""
+                        }
+                    } catch (e: Exception) {
+                        ""
+                    } finally {
+                        connection.disconnect()
+                    }
+
+                    if (content.isNotBlank()) {
+                        // 1. Check for RSS / Podcast enclosure URL (latest episode MP3/AAC)
+                        if (content.contains("<rss", ignoreCase = true) || content.contains("<enclosure", ignoreCase = true) || content.contains("<channel", ignoreCase = true)) {
+                            val enclosureMatch = Regex("""<enclosure[^>]+url=["']([^"']+)["']""", RegexOption.IGNORE_CASE).find(content)
+                                ?: Regex("""<media:content[^>]+url=["']([^"']+)["']""", RegexOption.IGNORE_CASE).find(content)
+                                ?: Regex("""(https?://[^\s"'<>]+\.(?:mp3|m4a|aac|ogg)[^\s"'<>]*)""", RegexOption.IGNORE_CASE).find(content)
+                            
+                            if (enclosureMatch != null) {
+                                val resolvedMediaUrl = enclosureMatch.groupValues[1].trim().replace("&amp;", "&")
+                                Log.i(TAG, "Resolved podcast RSS feed $rawUrl to playable audio URL: $resolvedMediaUrl")
+                                return@withContext resolvedMediaUrl
+                            }
+                        }
+
+                        // 2. Check for M3U / PLS playlist
                         if (lower.contains(".pls") || content.contains("[playlist]", ignoreCase = true)) {
                             val match = Regex("""File\d+=(http[s]?://[^\s\r\n]+)""", RegexOption.IGNORE_CASE).find(content)
                             if (match != null) {
@@ -557,8 +637,6 @@ class RadioPlayerManager(private val context: Context) {
                         if (firstHttpLine != null) {
                             return@withContext firstHttpLine.trim()
                         }
-                    } else {
-                        connection.disconnect()
                     }
                     return@withContext currentUrl
                 }
@@ -581,6 +659,17 @@ class RadioPlayerManager(private val context: Context) {
         _isLoading.value = true
         _streamTitle.value = station.name
         isFallbackAttempt = isFallback
+
+        // Immediately stop previous playback so old podcast/stream stops playing instantly while resolving new URL
+        exoPlayer?.let { player ->
+            try {
+                player.stop()
+                player.clearMediaItems()
+            } catch (e: Exception) {
+                Log.w(TAG, "Error stopping previous player: ${e.message}")
+            }
+        }
+        _isPlaying.value = false
 
         try {
             val intent = Intent(context, RadioPlaybackService::class.java)
@@ -605,6 +694,14 @@ class RadioPlayerManager(private val context: Context) {
 
                 player.setMediaItem(mediaItem)
                 player.prepare()
+                if (station.isPodcast) {
+                    val progress = com.easeaudio.data.PodcastProgressManager.getProgress(context, station.streamUrl.ifBlank { station.id })
+                    if (progress != null && progress.positionMs > 3000L) {
+                        player.seekTo(progress.positionMs)
+                        _currentPosition.value = progress.positionMs
+                        Log.i(TAG, "Resumed podcast '${station.name}' at position ${progress.positionMs / 1000}s")
+                    }
+                }
                 player.play()
             }
         }
@@ -631,6 +728,19 @@ class RadioPlayerManager(private val context: Context) {
                 }
             }
         }
+    }
+
+    fun stopPlayer() {
+        exoPlayer?.let { player ->
+            try {
+                player.stop()
+                player.clearMediaItems()
+            } catch (e: Exception) {
+                Log.w(TAG, "Error stopping ExoPlayer: ${e.message}")
+            }
+        }
+        _isPlaying.value = false
+        _isLoading.value = false
     }
 
     fun retryCurrentStation() {
@@ -715,12 +825,28 @@ class RadioPlayerManager(private val context: Context) {
     private fun startPositionPolling() {
         positionPollingJob?.cancel()
         positionPollingJob = scope.launch {
+            var saveCounter = 0
             while (isActive) {
                 delay(1000L)
                 exoPlayer?.let { p ->
-                    _currentPosition.value = p.currentPosition.coerceAtLeast(0L)
+                    val pos = p.currentPosition.coerceAtLeast(0L)
+                    _currentPosition.value = pos
                     val dur = p.duration
                     _totalDuration.value = if (dur > 0L) dur else 0L
+
+                    saveCounter++
+                    if (saveCounter % 3 == 0) {
+                        val current = _currentStation.value
+                        if (current != null && current.isPodcast && pos > 0L) {
+                            com.easeaudio.data.PodcastProgressManager.saveProgress(
+                                context = context,
+                                stationIdOrUrl = current.streamUrl.ifBlank { current.id },
+                                positionMs = pos,
+                                durationMs = dur.coerceAtLeast(0L),
+                                episodeTitle = current.name
+                            )
+                        }
+                    }
                 }
             }
         }
@@ -822,7 +948,8 @@ class RadioPlayerManager(private val context: Context) {
                     val station = currentStationList.find { it.id == stationId } ?: knownStations[stationId] ?: continue
                     
                     Log.d(TAG, "Starting silent connectivity check for station: ${station.name}")
-                    val isReachable = checkStreamUrlReachable(station.streamUrl)
+                    val isCurrentFailingStation = (stationId == _currentStation.value?.id && _playbackError.value != null)
+                    val isReachable = if (isCurrentFailingStation) false else checkStreamUrlReachable(station.streamUrl)
                     
                     if (isReachable) {
                         Log.i(TAG, "Station ${station.name} is now reachable silently. Removing from failed set.")

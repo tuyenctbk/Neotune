@@ -6,6 +6,8 @@ import androidx.lifecycle.viewModelScope
 import com.easeaudio.data.RadioDatabase
 import com.easeaudio.data.RadioRepository
 import com.easeaudio.data.RadioStation
+import com.easeaudio.data.PodcastEpisode
+import com.easeaudio.data.PodcastEpisodeService
 import com.easeaudio.service.RadioPlayerManager
 import com.easeaudio.R
 import kotlinx.coroutines.FlowPreview
@@ -20,6 +22,52 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
 
     private val _searchQuery = MutableStateFlow("")
     val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()
+
+    private val _selectedTab = MutableStateFlow(com.easeaudio.ui.screens.HomeTab.Radio)
+    val selectedTab: StateFlow<com.easeaudio.ui.screens.HomeTab> = _selectedTab.asStateFlow()
+
+    private val _currentEpisodesList = MutableStateFlow<List<PodcastEpisode>>(emptyList())
+    val currentEpisodesList: StateFlow<List<PodcastEpisode>> = _currentEpisodesList.asStateFlow()
+
+    private val _currentEpisode = MutableStateFlow<PodcastEpisode?>(null)
+    val currentEpisode: StateFlow<PodcastEpisode?> = _currentEpisode.asStateFlow()
+
+    private val _isLoadingEpisodes = MutableStateFlow(false)
+    val isLoadingEpisodes: StateFlow<Boolean> = _isLoadingEpisodes.asStateFlow()
+
+    private val _showEpisodesSheet = MutableStateFlow(false)
+    val showEpisodesSheet: StateFlow<Boolean> = _showEpisodesSheet.asStateFlow()
+
+    fun setShowEpisodesSheet(show: Boolean) {
+        _showEpisodesSheet.value = show
+    }
+
+    fun loadEpisodesForShow(show: RadioStation) {
+        viewModelScope.launch {
+            _isLoadingEpisodes.value = true
+            try {
+                val episodes = PodcastEpisodeService.fetchEpisodes(show, maxEpisodes = 1000)
+                _currentEpisodesList.value = episodes
+                if (_currentEpisode.value == null && episodes.isNotEmpty()) {
+                    _currentEpisode.value = episodes.first()
+                }
+            } catch (e: Exception) {
+                android.util.Log.e("RadioViewModel", "Failed to load episodes: ${e.message}")
+            } finally {
+                _isLoadingEpisodes.value = false
+            }
+        }
+    }
+
+    fun playEpisode(show: RadioStation, episode: PodcastEpisode) {
+        _currentEpisode.value = episode
+        val updatedStation = show.copy(
+            name = "${show.name}: ${episode.title}",
+            streamUrl = episode.audioUrl,
+            imageUrl = episode.artworkUrl.ifBlank { show.imageUrl }
+        )
+        playStation(updatedStation)
+    }
 
     private val _selectedGenre = MutableStateFlow("All")
     val selectedGenre: StateFlow<String> = _selectedGenre.asStateFlow()
@@ -97,7 +145,7 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
                     flag = "🌐",
                     code = "",
                     stationCount = apiData.sumOf { it.third },
-                    stationCountText = "> 50k stns"
+                    stationCountText = "50k+ Radio & Podcasts"
                 )
 
                 // Convert API triples -> CountryDisplay, sorted by stationCount descending
@@ -105,9 +153,8 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
                     .map { (name, isoCode, count) ->
                         val flag = com.easeaudio.data.RadioBrowserService.isoToFlagEmoji(isoCode)
                         val countText = when {
-                            count >= 1000 -> "${"%,d".format(count)} stns"
-                            count >= 100  -> "$count stns"
-                            else          -> "~$count stns"
+                            count >= 1000 -> "${"%,d".format(count)} Radio + Podcasts"
+                            else          -> "$count Radio + Podcasts"
                         }
                         CountryDisplay(
                             name = name,
@@ -132,18 +179,32 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
 
     val availableGenres = listOf(
         GenreDisplay("All", R.string.genre_all),
-        GenreDisplay("News & Reports", R.string.news_reports),
+        GenreDisplay("80s & 90s", R.string.genre_80s_90s),
+        GenreDisplay("News & Talk", R.string.genre_news_talk),
         GenreDisplay("Lo-Fi & Chill", R.string.lofi_chill),
-        GenreDisplay("Pop", R.string.pop),
-        GenreDisplay("Jazz", R.string.jazz),
-        GenreDisplay("Rock", R.string.rock),
-        GenreDisplay("Hip Hop", R.string.hip_hop),
+        GenreDisplay("Pop & Hits", R.string.genre_pop_top40),
+        GenreDisplay("Jazz & Blues", R.string.genre_jazz_blues),
+        GenreDisplay("Rock & Metal", R.string.genre_rock_metal),
+        GenreDisplay("Hip Hop & R&B", R.string.genre_hiphop_rnb),
+        GenreDisplay("EDM & Dance", R.string.genre_edm_dance),
+        GenreDisplay("Latin & Reggae", R.string.genre_latin_reggae),
         GenreDisplay("Classical", R.string.classical),
-        GenreDisplay("Ambient", R.string.ambient),
-        GenreDisplay("EDM", R.string.edm),
-        GenreDisplay("House", R.string.house),
+        GenreDisplay("Sports", R.string.genre_sports),
         GenreDisplay("Country", R.string.country_genre),
+        GenreDisplay("Ambient", R.string.ambient),
         GenreDisplay("Custom", R.string.custom),
+    )
+
+    val availablePodcastTopics = listOf(
+        GenreDisplay("All", R.string.genre_all),
+        GenreDisplay("Technology", R.string.topic_technology),
+        GenreDisplay("True Crime", R.string.topic_true_crime),
+        GenreDisplay("Business", R.string.topic_business),
+        GenreDisplay("Comedy", R.string.topic_comedy),
+        GenreDisplay("Health", R.string.topic_health),
+        GenreDisplay("Society", R.string.topic_society),
+        GenreDisplay("Science", R.string.topic_science),
+        GenreDisplay("News", R.string.topic_news)
     )
 
     val availableEqPresets = listOf(
@@ -203,8 +264,9 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
     val stations: StateFlow<List<RadioStation>> = combine(
         repository.getAllStations(),
         _onlineDiscoveredStations,
+        _selectedTab,
         filterStateFlow
-    ) { localStations, onlineList, filter ->
+    ) { localStations, onlineList, currentTab, filter ->
         val query = filter.query
         val genre = filter.genre
         val country = filter.country
@@ -213,18 +275,19 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
         val addedIds = mutableSetOf<String>()
         val localMap = localStations.associateBy { it.id }
 
-        // 1. Prioritize active user search match if station is custom or local
+        // 1. Prioritize active user custom stations matching currentTab
         val localMatches = localStations.filter { local ->
-            local.isCustom && filterAndBlockManager.shouldIncludeStation(local)
+            local.isCustom && (if (currentTab == com.easeaudio.ui.screens.HomeTab.Podcast) local.isPodcast else !local.isPodcast) && filterAndBlockManager.shouldIncludeStation(local)
         }
         localMatches.forEach { station ->
             mergedList.add(station)
             addedIds.add(station.id)
         }
 
-        // 2. Add online discovered stations in their stable discovered order, filtering blocked & adult content
+        // 2. Add online discovered stations in their stable discovered order, matching currentTab
         onlineList.forEach { online ->
-            if (!addedIds.contains(online.id) && filterAndBlockManager.shouldIncludeStation(online)) {
+            val matchesTab = if (currentTab == com.easeaudio.ui.screens.HomeTab.Podcast) online.isPodcast else !online.isPodcast
+            if (matchesTab && !addedIds.contains(online.id) && filterAndBlockManager.shouldIncludeStation(online)) {
                 val localCopy = localMap[online.id]
                 val mergedStation = online.copy(
                     isFavorite = localCopy?.isFavorite ?: online.isFavorite,
@@ -236,57 +299,45 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
             }
         }
 
-        // 3. Add default curated stations and other cached local stations that were not in onlineList
+        // 3. Add default curated stations and other cached local stations matching currentTab
         localStations.forEach { local ->
-            if (!addedIds.contains(local.id) && filterAndBlockManager.shouldIncludeStation(local)) {
+            val matchesTab = if (currentTab == com.easeaudio.ui.screens.HomeTab.Podcast) local.isPodcast else !local.isPodcast
+            if (matchesTab && !addedIds.contains(local.id) && filterAndBlockManager.shouldIncludeStation(local)) {
                 mergedList.add(local)
                 addedIds.add(local.id)
             }
         }
 
-        // Filter merged results
+        // Filter merged results strictly
         val filteredList = mergedList.filter { station ->
+            val isOnlineMatch = onlineList.any { it.id == station.id }
             val matchesQuery = query.isBlank() ||
                     station.name.contains(query, ignoreCase = true) ||
                     station.genre.contains(query, ignoreCase = true) ||
                     station.country.contains(query, ignoreCase = true)
 
-            val isOnlineMatch = onlineList.any { it.id == station.id }
-
             val matchesCountry = when (country) {
                 "Global", "All" -> true
-                else -> station.country.contains(country, ignoreCase = true) || isOnlineMatch
+                else -> station.country.contains(country, ignoreCase = true)
             }
 
-            val matchesGenre = when (genre) {
-                "All" -> true
-                "Custom" -> station.isCustom
-                "Podcasts", "Podcast" -> station.genre.contains("Podcast", ignoreCase = true) ||
-                        station.genre.contains("Talk", ignoreCase = true) ||
-                        station.genre.contains("Audiobook", ignoreCase = true) ||
-                        station.genre.contains("Story", ignoreCase = true) ||
-                        station.genre.contains("Drama", ignoreCase = true) ||
-                        station.genre.contains("Interview", ignoreCase = true)
-                "News & Reports" -> station.genre.contains("News", ignoreCase = true) ||
-                        station.genre.contains("Report", ignoreCase = true) ||
-                        station.genre.contains("Talk", ignoreCase = true) ||
-                        station.genre.contains("Info", ignoreCase = true) ||
-                        station.genre.contains("Politic", ignoreCase = true) ||
-                        station.genre.contains("Speech", ignoreCase = true)
-                "Lo-Fi & Chill" -> station.genre.contains("Lo-Fi", ignoreCase = true) ||
-                        station.genre.contains("Chill", ignoreCase = true) ||
-                        station.genre.contains("Lofi", ignoreCase = true) ||
-                        station.genre.contains("Lounge", ignoreCase = true) ||
-                        station.genre.contains("Ambient", ignoreCase = true)
-                "Jazz" -> station.genre.contains("Jazz", ignoreCase = true)
-                "Rock" -> station.genre.contains("Rock", ignoreCase = true)
-                "Classical" -> station.genre.contains("Classic", ignoreCase = true) || station.genre.contains("Piano", ignoreCase = true) || station.genre.contains("Orchestra", ignoreCase = true) || station.genre.contains("Symphony", ignoreCase = true)
-                "Ambient" -> station.genre.contains("Ambient", ignoreCase = true) || station.genre.contains("Drone", ignoreCase = true)
-                "EDM" -> station.genre.contains("EDM", ignoreCase = true) || station.genre.contains("Dance", ignoreCase = true) || station.genre.contains("House", ignoreCase = true) || station.genre.contains("Techno", ignoreCase = true) || station.genre.contains("Club", ignoreCase = true)
-                "House" -> station.genre.contains("House", ignoreCase = true) || station.genre.contains("Deep", ignoreCase = true)
-                "Pop" -> station.genre.contains("Pop", ignoreCase = true) || station.genre.contains("Hit", ignoreCase = true) || station.genre.contains("Top 40", ignoreCase = true) || station.genre.contains("Top40", ignoreCase = true)
-                "Hip Hop" -> station.genre.contains("Hip", ignoreCase = true) || station.genre.contains("Rap", ignoreCase = true) || station.genre.contains("Urban", ignoreCase = true)
-                "Country" -> station.genre.contains("Country", ignoreCase = true) || station.genre.contains("Folk", ignoreCase = true)
+            val matchesGenre = when {
+                currentTab == com.easeaudio.ui.screens.HomeTab.Podcast -> true
+                genre == "All" -> true
+                genre == "Custom" -> station.isCustom
+                genre == "80s & 90s" -> station.genre.contains("80s", ignoreCase = true) || station.genre.contains("90s", ignoreCase = true) || station.genre.contains("Retro", ignoreCase = true) || station.genre.contains("Oldies", ignoreCase = true)
+                genre == "News & Talk" || genre == "News & Reports" -> station.genre.contains("News", ignoreCase = true) || station.genre.contains("Report", ignoreCase = true) || station.genre.contains("Talk", ignoreCase = true) || station.genre.contains("Info", ignoreCase = true)
+                genre == "Lo-Fi & Chill" -> station.genre.contains("Lo-Fi", ignoreCase = true) || station.genre.contains("Chill", ignoreCase = true) || station.genre.contains("Lofi", ignoreCase = true) || station.genre.contains("Lounge", ignoreCase = true)
+                genre == "Jazz & Blues" || genre == "Jazz" -> station.genre.contains("Jazz", ignoreCase = true) || station.genre.contains("Blues", ignoreCase = true)
+                genre == "Rock & Metal" || genre == "Rock" -> station.genre.contains("Rock", ignoreCase = true) || station.genre.contains("Metal", ignoreCase = true)
+                genre == "Pop & Hits" || genre == "Pop" -> station.genre.contains("Pop", ignoreCase = true) || station.genre.contains("Hit", ignoreCase = true) || station.genre.contains("Top 40", ignoreCase = true) || station.genre.contains("Top40", ignoreCase = true)
+                genre == "EDM & Dance" || genre == "EDM" -> station.genre.contains("EDM", ignoreCase = true) || station.genre.contains("Dance", ignoreCase = true) || station.genre.contains("House", ignoreCase = true) || station.genre.contains("Techno", ignoreCase = true)
+                genre == "Hip Hop & R&B" || genre == "Hip Hop" -> station.genre.contains("Hip", ignoreCase = true) || station.genre.contains("Rap", ignoreCase = true) || station.genre.contains("Urban", ignoreCase = true) || station.genre.contains("R&B", ignoreCase = true) || station.genre.contains("RnB", ignoreCase = true)
+                genre == "Latin & Reggae" -> station.genre.contains("Latin", ignoreCase = true) || station.genre.contains("Salsa", ignoreCase = true) || station.genre.contains("Reggae", ignoreCase = true) || station.genre.contains("Reggaeton", ignoreCase = true)
+                genre == "Sports" -> station.genre.contains("Sport", ignoreCase = true)
+                genre == "Classical" -> station.genre.contains("Classic", ignoreCase = true) || station.genre.contains("Piano", ignoreCase = true) || station.genre.contains("Orchestra", ignoreCase = true)
+                genre == "Ambient" -> station.genre.contains("Ambient", ignoreCase = true) || station.genre.contains("Drone", ignoreCase = true)
+                genre == "Country" -> station.genre.contains("Country", ignoreCase = true) || station.genre.contains("Folk", ignoreCase = true)
                 else -> station.genre.contains(genre, ignoreCase = true)
             }
 
@@ -305,7 +356,7 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
         } else {
             filteredList
         }
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+    }.flowOn(kotlinx.coroutines.Dispatchers.Default).stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     // Equalizer state
     private val _activeEqPreset = MutableStateFlow("Balanced")
@@ -375,6 +426,14 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
         recents.filter { filterAndBlockManager.shouldIncludeStation(it) }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
+    val recentRadioStations: StateFlow<List<RadioStation>> = recentStations
+        .map { list -> list.filter { !it.isPodcast } }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    val recentPodcastStations: StateFlow<List<RadioStation>> = recentStations
+        .map { list -> list.filter { it.isPodcast } }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
     val blockedStations: StateFlow<List<RadioStation>> = combine(
         repository.getAllStations(),
         filterAndBlockManager.blockedStationIds
@@ -385,6 +444,14 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
     fun setSearchQuery(query: String) {
         _searchQuery.value = query
         discoverStationsOnline(query, _selectedGenre.value, _selectedCountry.value)
+    }
+
+    fun setSelectedTab(tab: com.easeaudio.ui.screens.HomeTab) {
+        if (_selectedTab.value != tab) {
+            _selectedTab.value = tab
+            _selectedGenre.value = "All"
+            discoverStationsOnline(_searchQuery.value, "All", _selectedCountry.value)
+        }
     }
 
     fun setSelectedGenre(genre: String) {
@@ -411,17 +478,30 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
             _isDiscoveryError.value = false
             _canLoadMore.value = true
             try {
-                val code = _availableCountries.value.find { it.name.equals(country, ignoreCase = true) }?.code ?: ""
-                val results = repository.discoverOnlineStations(
-                    query = query,
-                    genre = genre,
-                    country = country,
-                    countryCode = code,
-                    offset = 0,
-                    limit = pageSize
-                )
+                val isPodcastMode = _selectedTab.value == com.easeaudio.ui.screens.HomeTab.Podcast || genre.equals("Podcasts", ignoreCase = true) || genre.equals("Podcast", ignoreCase = true)
+                val results = if (isPodcastMode) {
+                    repository.discoverOnlinePodcasts(
+                        query = query,
+                        genre = genre,
+                        country = country,
+                        offset = 0,
+                        limit = pageSize
+                    )
+                } else {
+                    val code = _availableCountries.value.find { it.name.equals(country, ignoreCase = true) }?.code ?: ""
+                    val radioBrowserResults = repository.discoverOnlineStations(
+                        query = query,
+                        genre = genre,
+                        country = country,
+                        countryCode = code,
+                        offset = 0,
+                        limit = pageSize
+                    )
+                    val iTunesRadioResults = repository.getiTunesLiveRadioStations(query = query, genre = genre, country = country)
+                    (radioBrowserResults + iTunesRadioResults).distinctBy { "${it.name}_${it.streamUrl}" }
+                }
                 _onlineDiscoveredStations.value = results
-                _canLoadMore.value = results.size >= pageSize
+                _canLoadMore.value = results.size >= 10
                 _isDiscoveryError.value = results.isEmpty() && query.isBlank() && genre == "All" && (country == "Global" || country == "All")
             } catch (e: Exception) {
                 // Keep existing discovered stations when offline instead of wiping the list
@@ -448,22 +528,34 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
             _isLoadingMore.value = true
             try {
                 val currentOffset = _onlineDiscoveredStations.value.size
-                val code = _availableCountries.value.find { it.name.equals(_selectedCountry.value, ignoreCase = true) }?.code ?: ""
-                val newResults = repository.discoverOnlineStations(
-                    query = _searchQuery.value,
-                    genre = _selectedGenre.value,
-                    country = _selectedCountry.value,
-                    countryCode = code,
-                    offset = currentOffset,
-                    limit = pageSize
-                )
+                val currentGenre = _selectedGenre.value
+                val isPodcastMode = _selectedTab.value == com.easeaudio.ui.screens.HomeTab.Podcast || currentGenre.equals("Podcasts", ignoreCase = true) || currentGenre.equals("Podcast", ignoreCase = true)
+                
+                val newResults = if (isPodcastMode) {
+                    repository.discoverOnlinePodcasts(
+                        query = _searchQuery.value,
+                        genre = currentGenre,
+                        offset = currentOffset,
+                        limit = pageSize
+                    )
+                } else {
+                    val code = _availableCountries.value.find { it.name.equals(_selectedCountry.value, ignoreCase = true) }?.code ?: ""
+                    repository.discoverOnlineStations(
+                        query = _searchQuery.value,
+                        genre = currentGenre,
+                        country = _selectedCountry.value,
+                        countryCode = code,
+                        offset = currentOffset,
+                        limit = pageSize
+                    )
+                }
                 if (newResults.isEmpty()) {
                     _canLoadMore.value = false
                 } else {
                     val existingIds = _onlineDiscoveredStations.value.map { it.id }.toSet()
                     val filteredNew = newResults.filter { !existingIds.contains(it.id) }
                     _onlineDiscoveredStations.value = _onlineDiscoveredStations.value + filteredNew
-                    _canLoadMore.value = newResults.size >= pageSize
+                    _canLoadMore.value = filteredNew.isNotEmpty() && newResults.size >= 10
                 }
             } catch (e: Exception) {
                 _canLoadMore.value = false
@@ -482,14 +574,39 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
         }
         lastPlaybackClickTimestamp = now
 
-        if (playerManager.currentStation.value?.id == station.id) {
-            if (!playerManager.isLoading.value) {
-                playerManager.togglePlayPause()
+        if (station.isPodcast) {
+            viewModelScope.launch {
+                _isLoadingEpisodes.value = true
+                val episodes = PodcastEpisodeService.fetchEpisodes(station, maxEpisodes = 1000)
+                _currentEpisodesList.value = episodes
+                _isLoadingEpisodes.value = false
+
+                val targetEpisode = _currentEpisode.value?.takeIf { ep -> episodes.any { it.id == ep.id } }
+                    ?: episodes.firstOrNull()
+
+                if (targetEpisode != null) {
+                    _currentEpisode.value = targetEpisode
+                    val updatedStation = station.copy(
+                        name = "${station.name}: ${targetEpisode.title}",
+                        streamUrl = targetEpisode.audioUrl,
+                        imageUrl = targetEpisode.artworkUrl.ifBlank { station.imageUrl }
+                    )
+                    playerManager.playStation(updatedStation)
+                    repository.recordStationListened(updatedStation)
+                } else {
+                    playerManager.playStation(station)
+                }
             }
         } else {
-            playerManager.playStation(station)
-            viewModelScope.launch {
-                repository.recordStationListened(station)
+            if (playerManager.currentStation.value?.id == station.id) {
+                if (!playerManager.isLoading.value) {
+                    playerManager.togglePlayPause()
+                }
+            } else {
+                playerManager.playStation(station)
+                viewModelScope.launch {
+                    repository.recordStationListened(station)
+                }
             }
         }
     }
@@ -581,11 +698,33 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun playNextStation() {
+        val currentEpisodes = _currentEpisodesList.value
+        val curEp = _currentEpisode.value
+        val currentShow = playerManager.currentStation.value
+        if (_selectedTab.value == com.easeaudio.ui.screens.HomeTab.Podcast && currentEpisodes.isNotEmpty() && curEp != null && currentShow != null) {
+            val curIdx = currentEpisodes.indexOfFirst { it.id == curEp.id }
+            if (curIdx != -1 && curIdx < currentEpisodes.size - 1) {
+                val nextEp = currentEpisodes[curIdx + 1]
+                playEpisode(currentShow, nextEp)
+                return
+            }
+        }
         val currentList = stations.value
         playerManager.playNextStation(currentList)
     }
 
     fun playPreviousStation() {
+        val currentEpisodes = _currentEpisodesList.value
+        val curEp = _currentEpisode.value
+        val currentShow = playerManager.currentStation.value
+        if (_selectedTab.value == com.easeaudio.ui.screens.HomeTab.Podcast && currentEpisodes.isNotEmpty() && curEp != null && currentShow != null) {
+            val curIdx = currentEpisodes.indexOfFirst { it.id == curEp.id }
+            if (curIdx > 0) {
+                val prevEp = currentEpisodes[curIdx - 1]
+                playEpisode(currentShow, prevEp)
+                return
+            }
+        }
         val currentList = stations.value
         playerManager.playPreviousStation(currentList)
     }

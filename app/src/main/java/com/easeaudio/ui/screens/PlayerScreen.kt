@@ -7,12 +7,14 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.QueueMusic
 import androidx.compose.material.icons.automirrored.filled.VolumeDown
 import androidx.compose.material.icons.automirrored.filled.VolumeOff
 import androidx.compose.material.icons.automirrored.filled.VolumeUp
@@ -62,6 +64,8 @@ fun PlayerScreen(
     onVolumeChange: (Float) -> Unit,
     onOpenSleepTimer: () -> Unit,
     onOpenEqualizer: () -> Unit,
+    onOpenTrackOptions: () -> Unit = {},
+    onOpenScreensaver: () -> Unit = {},
     onRetryStream: () -> Unit = {},
     onPlayNextStation: () -> Unit = {},
     onPlayPreviousStation: () -> Unit = {},
@@ -69,6 +73,9 @@ fun PlayerScreen(
     onSeek: ((Long) -> Unit)? = null,
     currentPosition: Long = 0L,
     totalDuration: Long = 0L,
+    playbackSpeed: Float = 1.0f,
+    onPlaybackSpeedChange: ((Float) -> Unit)? = null,
+    onOpenEpisodes: (() -> Unit)? = null,
     onBack: () -> Unit
 ) {
     if (station == null) {
@@ -133,21 +140,49 @@ fun PlayerScreen(
                     fontWeight = FontWeight.Bold
                 )
 
-                var isFavFocused by remember { mutableStateOf(false) }
-                val showFavFocus = isFavFocused
-                IconButton(
-                    onClick = onToggleFavorite,
-                    modifier = Modifier
-                        .onFocusChanged { isFavFocused = it.isFocused }
-                        .clip(CircleShape)
-                        .background(if (showFavFocus) FavoriteHeartColor else Color.Transparent)
-                        .testTag("btn_player_favorite")
-                ) {
-                    Icon(
-                        imageVector = if (station.isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
-                        contentDescription = "Favorite",
-                        tint = if (showFavFocus) DarkBackground else (if (station.isFavorite) FavoriteHeartColor else TextMuted)
-                    )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    var isFavFocused by remember { mutableStateOf(false) }
+                    val showFavFocus = isFavFocused
+                    IconButton(
+                        onClick = onToggleFavorite,
+                        modifier = Modifier
+                            .onFocusChanged { isFavFocused = it.isFocused }
+                            .clip(CircleShape)
+                            .background(if (showFavFocus) FavoriteHeartColor else Color.Transparent)
+                            .testTag("btn_player_favorite")
+                    ) {
+                        Icon(
+                            imageVector = if (station.isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
+                            contentDescription = "Favorite",
+                            tint = if (showFavFocus) DarkBackground else (if (station.isFavorite) FavoriteHeartColor else TextMuted)
+                        )
+                    }
+
+                    IconButton(
+                        onClick = onOpenScreensaver,
+                        modifier = Modifier
+                            .clip(CircleShape)
+                            .testTag("btn_player_screensaver")
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Bedtime,
+                            contentDescription = "Bedtime Dock",
+                            tint = NeonPurple
+                        )
+                    }
+
+                    IconButton(
+                        onClick = onOpenTrackOptions,
+                        modifier = Modifier
+                            .clip(CircleShape)
+                            .testTag("btn_player_more_options")
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.MoreVert,
+                            contentDescription = "More Options",
+                            tint = TextPrimary
+                        )
+                    }
                 }
             }
         }
@@ -159,18 +194,18 @@ fun PlayerScreen(
         ) {
             val isPodcast = station?.isPodcast == true
             val maxScreenHeight = maxHeight
-            val isCompact = maxScreenHeight < 650.dp
-            val artSize = if (isCompact) 180.dp else 240.dp
+            val isCompact = maxScreenHeight < 680.dp
+            val artSize = if (isCompact) 150.dp else 195.dp
 
             Column(
                 modifier = Modifier
                     .fillMaxHeight()
                     .widthIn(max = 500.dp)
                     .align(Alignment.TopCenter)
-                    .padding(horizontal = 24.dp)
+                    .padding(horizontal = 20.dp)
                     .verticalScroll(rememberScrollState()),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.SpaceEvenly
+                verticalArrangement = Arrangement.SpaceBetween
             ) {
                 Spacer(modifier = Modifier.height(8.dp))
 
@@ -327,6 +362,43 @@ fun PlayerScreen(
                                 style = MaterialTheme.typography.labelSmall,
                                 color = TextMuted
                             )
+                        }
+
+                        if (currentPosition > 5000L) {
+                            Spacer(modifier = Modifier.height(6.dp))
+                            Surface(
+                                shape = RoundedCornerShape(8.dp),
+                                color = DarkSurfaceVariant.copy(alpha = 0.9f),
+                                border = BorderStroke(1.dp, NeonPurple.copy(alpha = 0.5f))
+                            ) {
+                                Row(
+                                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 3.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Filled.History,
+                                        contentDescription = null,
+                                        tint = NeonPurple,
+                                        modifier = Modifier.size(13.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(5.dp))
+                                    Text(
+                                        text = "Resumed at ${formatDuration(currentPosition)}",
+                                        style = MaterialTheme.typography.labelSmall.copy(fontSize = 11.sp),
+                                        color = TextPrimary
+                                    )
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text(
+                                        text = stringResource(R.string.restart),
+                                        style = MaterialTheme.typography.labelSmall.copy(fontSize = 11.sp, fontWeight = FontWeight.Bold),
+                                        color = NeonCyan,
+                                        modifier = Modifier
+                                            .clip(RoundedCornerShape(4.dp))
+                                            .clickable { onSeek?.invoke(0L) }
+                                            .padding(horizontal = 4.dp, vertical = 2.dp)
+                                    )
+                                }
+                            }
                         }
                     }
                 } else if (!isPodcast) {
@@ -529,17 +601,17 @@ fun PlayerScreen(
 
                     if (isPodcast && onSeekRelative != null) {
                         IconButton(
-                            onClick = { onSeekRelative(15000L) },
+                            onClick = { onSeekRelative(30000L) },
                             modifier = Modifier.size(44.dp)
                         ) {
                             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                 Icon(
-                                    imageVector = Icons.Filled.Forward10,
-                                    contentDescription = "Forward 15s",
+                                    imageVector = Icons.Filled.Forward30,
+                                    contentDescription = "Forward 30s",
                                     tint = NeonPurple,
                                     modifier = Modifier.size(26.dp)
                                 )
-                                Text("+15s", fontSize = 9.sp, color = NeonPurple)
+                                Text("+30s", fontSize = 9.sp, color = NeonPurple)
                             }
                         }
                     }
@@ -563,13 +635,62 @@ fun PlayerScreen(
                     }
                 }
 
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(6.dp))
 
-                // Shortcut Pills for Sleep Timer & Equalizer
+                // Shortcut Pills for Sleep Timer, Equalizer, Playback Speed, and Episodes List
                 Row(
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .horizontalScroll(rememberScrollState()),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
+                    if (isPodcast && onOpenEpisodes != null) {
+                        AssistChip(
+                            onClick = onOpenEpisodes,
+                            leadingIcon = {
+                                Icon(
+                                    imageVector = Icons.AutoMirrored.Filled.QueueMusic,
+                                    contentDescription = "Episodes",
+                                    tint = NeonPurple,
+                                    modifier = Modifier.size(16.dp)
+                                )
+                            },
+                            label = { Text("Episodes", color = TextPrimary) },
+                            colors = AssistChipDefaults.assistChipColors(containerColor = DarkSurfaceVariant),
+                            border = AssistChipDefaults.assistChipBorder(borderColor = CardBorder, enabled = true)
+                        )
+                    }
+                    if (isPodcast && onPlaybackSpeedChange != null) {
+                        val speedText = when (playbackSpeed) {
+                            1.25f -> "1.25x"
+                            1.5f -> "1.5x"
+                            2.0f -> "2.0x"
+                            else -> "1.0x"
+                        }
+                        AssistChip(
+                            onClick = {
+                                val nextSpeed = when (playbackSpeed) {
+                                    1.0f -> 1.25f
+                                    1.25f -> 1.5f
+                                    1.5f -> 2.0f
+                                    else -> 1.0f
+                                }
+                                onPlaybackSpeedChange(nextSpeed)
+                            },
+                            leadingIcon = {
+                                Icon(
+                                    imageVector = Icons.Filled.Speed,
+                                    contentDescription = "Speed",
+                                    tint = NeonPurple,
+                                    modifier = Modifier.size(16.dp)
+                                )
+                            },
+                            label = { Text(speedText, color = TextPrimary) },
+                            colors = AssistChipDefaults.assistChipColors(containerColor = DarkSurfaceVariant),
+                            border = AssistChipDefaults.assistChipBorder(borderColor = CardBorder, enabled = true)
+                        )
+                    }
                     var isEqFocused by remember { mutableStateOf(false) }
                     val showEqFocus = isEqFocused
                     val activePresetLabel = eqPresets.find { it.key == activeEqPreset }?.labelResId?.let { stringResource(it) } ?: activeEqPreset

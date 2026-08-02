@@ -25,6 +25,8 @@ import androidx.compose.material.icons.filled.WifiOff
 import androidx.compose.material.icons.filled.SignalCellularAlt
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -155,6 +157,8 @@ fun MainAppContent(
     val stations by viewModel.stations.collectAsState()
     val favoriteStations by viewModel.favoriteStations.collectAsState()
     val recentStations by viewModel.recentStations.collectAsState()
+    val recentRadioStations by viewModel.recentRadioStations.collectAsState()
+    val recentPodcastStations by viewModel.recentPodcastStations.collectAsState()
 
     val currentStation by viewModel.playerManager.currentStation.collectAsState()
     val isCurrentStationFavorite = favoriteStations.any { it.id == currentStation?.id }
@@ -169,11 +173,18 @@ fun MainAppContent(
     val sleepTimerRemaining by viewModel.playerManager.sleepTimerMinutesRemaining.collectAsState()
     val currentPlaybackPosition by viewModel.playerManager.currentPosition.collectAsState()
     val totalPlaybackDuration by viewModel.playerManager.totalDuration.collectAsState()
+    val playbackSpeed by viewModel.playerManager.playbackSpeed.collectAsState()
+
+    val currentEpisodesList by viewModel.currentEpisodesList.collectAsState()
+    val currentEpisode by viewModel.currentEpisode.collectAsState()
+    val isLoadingEpisodes by viewModel.isLoadingEpisodes.collectAsState()
+    val showEpisodesSheet by viewModel.showEpisodesSheet.collectAsState()
 
     val networkStatus by viewModel.networkStatus.collectAsState()
     val remoteConfig by viewModel.remoteConfig.collectAsState()
 
     val searchQuery by viewModel.searchQuery.collectAsState()
+    val selectedTab by viewModel.selectedTab.collectAsState()
     val selectedGenre by viewModel.selectedGenre.collectAsState()
     val selectedCountry by viewModel.selectedCountry.collectAsState()
     val activeEqPreset by viewModel.activeEqPreset.collectAsState()
@@ -214,6 +225,11 @@ fun MainAppContent(
                     BottomNavBar(
                         currentRoute = currentRoute,
                         onNavigate = { route ->
+                            if (route == NavRoute.Radio.route || route == NavRoute.Home.route) {
+                                viewModel.setSelectedTab(com.easeaudio.ui.screens.HomeTab.Radio)
+                            } else if (route == NavRoute.Podcast.route) {
+                                viewModel.setSelectedTab(com.easeaudio.ui.screens.HomeTab.Podcast)
+                            }
                             navController.navigate(route) {
                                 popUpTo(navController.graph.startDestinationId) {
                                     saveState = true
@@ -247,6 +263,56 @@ fun MainAppContent(
                     }
 
                     composable(NavRoute.Home.route) {
+                        val activeRecentList = if (selectedTab == com.easeaudio.ui.screens.HomeTab.Podcast) recentPodcastStations else recentRadioStations
+                        HomeScreen(
+                            stations = stations,
+                            recentStations = activeRecentList,
+                            currentStation = syncedCurrentStation,
+                            isPlaying = isPlaying,
+                            isLoading = isLoading,
+                            isDiscoveringOnline = isDiscoveringOnline,
+                            failedStationIds = failedStationIds,
+                            searchQuery = searchQuery,
+                            selectedGenre = selectedGenre,
+                            availableGenres = viewModel.availableGenres,
+                            availablePodcastTopics = viewModel.availablePodcastTopics,
+                            selectedCountry = selectedCountry,
+                            availableCountries = availableCountries,
+                            isLoadingCountries = isLoadingCountries,
+                            sleepTimerRemaining = sleepTimerRemaining,
+                            networkStatus = networkStatus,
+                            remoteConfig = remoteConfig,
+                            isLoadingMore = isLoadingMore,
+                            canLoadMore = canLoadMore,
+                            isDiscoveryError = isDiscoveryError,
+                            streamTitle = streamTitle,
+                            initialTab = com.easeaudio.ui.screens.HomeTab.Radio,
+                            onPlayPause = { viewModel.togglePlayPause() },
+                            onNextStation = { viewModel.playNextStation() },
+                            onPreviousStation = { viewModel.playPreviousStation() },
+                            onSearchQueryChange = { viewModel.setSearchQuery(it) },
+                            onGenreSelect = { viewModel.setSelectedGenre(it) },
+                            onCountrySelect = { viewModel.setSelectedCountry(it) },
+                            onStationSelect = { station -> 
+                                FirebaseManager.logEvent("play_station", Bundle().apply { putString("station_name", station.name) })
+                                viewModel.playStation(station) 
+                            },
+                            onToggleFavorite = { station -> 
+                                FirebaseManager.logEvent("toggle_favorite", Bundle().apply { putString("station_name", station.name) })
+                                viewModel.toggleFavorite(station) 
+                            },
+                            onOpenAddStation = { viewModel.setShowAddStationDialog(true) },
+                            onOpenSleepTimer = { viewModel.setShowSleepTimerDialog(true) },
+                            onOpenEqualizer = { viewModel.setShowEqualizerDialog(true) },
+                            onOpenOnboarding = { navController.navigate(NavRoute.Onboarding.route) },
+                            onOpenBlockedDialog = { viewModel.setShowBlockedDialog(true) },
+                            onLoadMore = { viewModel.loadMoreStations() },
+                            onRefresh = { viewModel.refreshStations() },
+                            onRetryDiscovery = { viewModel.retryDiscovery() }
+                        )
+                    }
+
+                    composable(NavRoute.Radio.route) {
                         HomeScreen(
                             stations = stations,
                             recentStations = recentStations,
@@ -258,6 +324,7 @@ fun MainAppContent(
                             searchQuery = searchQuery,
                             selectedGenre = selectedGenre,
                             availableGenres = viewModel.availableGenres,
+                            availablePodcastTopics = viewModel.availablePodcastTopics,
                             selectedCountry = selectedCountry,
                             availableCountries = availableCountries,
                             isLoadingCountries = isLoadingCountries,
@@ -268,6 +335,56 @@ fun MainAppContent(
                             canLoadMore = canLoadMore,
                             isDiscoveryError = isDiscoveryError,
                             streamTitle = streamTitle,
+                            initialTab = com.easeaudio.ui.screens.HomeTab.Radio,
+                            onPlayPause = { viewModel.togglePlayPause() },
+                            onNextStation = { viewModel.playNextStation() },
+                            onPreviousStation = { viewModel.playPreviousStation() },
+                            onSearchQueryChange = { viewModel.setSearchQuery(it) },
+                            onGenreSelect = { viewModel.setSelectedGenre(it) },
+                            onCountrySelect = { viewModel.setSelectedCountry(it) },
+                            onStationSelect = { station -> 
+                                FirebaseManager.logEvent("play_station", Bundle().apply { putString("station_name", station.name) })
+                                viewModel.playStation(station) 
+                            },
+                            onToggleFavorite = { station -> 
+                                FirebaseManager.logEvent("toggle_favorite", Bundle().apply { putString("station_name", station.name) })
+                                viewModel.toggleFavorite(station) 
+                            },
+                            onOpenAddStation = { viewModel.setShowAddStationDialog(true) },
+                            onOpenSleepTimer = { viewModel.setShowSleepTimerDialog(true) },
+                            onOpenEqualizer = { viewModel.setShowEqualizerDialog(true) },
+                            onOpenOnboarding = { navController.navigate(NavRoute.Onboarding.route) },
+                            onOpenBlockedDialog = { viewModel.setShowBlockedDialog(true) },
+                            onLoadMore = { viewModel.loadMoreStations() },
+                            onRefresh = { viewModel.refreshStations() },
+                            onRetryDiscovery = { viewModel.retryDiscovery() }
+                        )
+                    }
+
+                    composable(NavRoute.Podcast.route) {
+                        HomeScreen(
+                            stations = stations,
+                            recentStations = recentStations,
+                            currentStation = syncedCurrentStation,
+                            isPlaying = isPlaying,
+                            isLoading = isLoading,
+                            isDiscoveringOnline = isDiscoveringOnline,
+                            failedStationIds = failedStationIds,
+                            searchQuery = searchQuery,
+                            selectedGenre = selectedGenre,
+                            availableGenres = viewModel.availableGenres,
+                            availablePodcastTopics = viewModel.availablePodcastTopics,
+                            selectedCountry = selectedCountry,
+                            availableCountries = availableCountries,
+                            isLoadingCountries = isLoadingCountries,
+                            sleepTimerRemaining = sleepTimerRemaining,
+                            networkStatus = networkStatus,
+                            remoteConfig = remoteConfig,
+                            isLoadingMore = isLoadingMore,
+                            canLoadMore = canLoadMore,
+                            isDiscoveryError = isDiscoveryError,
+                            streamTitle = streamTitle,
+                            initialTab = com.easeaudio.ui.screens.HomeTab.Podcast,
                             onPlayPause = { viewModel.togglePlayPause() },
                             onNextStation = { viewModel.playNextStation() },
                             onPreviousStation = { viewModel.playPreviousStation() },
@@ -311,6 +428,41 @@ fun MainAppContent(
                         )
                     }
 
+                    composable(NavRoute.Settings.route) {
+                        var showCountryDialog by remember { mutableStateOf(false) }
+                        var showAlarmDialog by remember { mutableStateOf(false) }
+
+                        com.easeaudio.ui.screens.SettingsScreen(
+                            sleepTimerRemaining = sleepTimerRemaining,
+                            selectedCountry = selectedCountry,
+                            onOpenCountryPicker = { showCountryDialog = true },
+                            onOpenEqualizer = { viewModel.setShowEqualizerDialog(true) },
+                            onOpenSleepTimer = { viewModel.setShowSleepTimerDialog(true) },
+                            onOpenRadioAlarm = { showAlarmDialog = true },
+                            onOpenAppearance = { /* Appearance settings */ },
+                            onOpenOnboarding = { navController.navigate(NavRoute.Onboarding.route) },
+                            onOpenBlockedDialog = { viewModel.setShowBlockedDialog(true) },
+                            onOpenAttribution = { /* Attribution */ }
+                        )
+
+                        if (showCountryDialog) {
+                            com.easeaudio.ui.components.CountrySelectionDialog(
+                                selectedCountry = selectedCountry,
+                                countries = availableCountries,
+                                isLoading = isLoadingCountries,
+                                onSelectCountry = { viewModel.setSelectedCountry(it) },
+                                onDismiss = { showCountryDialog = false }
+                            )
+                        }
+
+                        if (showAlarmDialog) {
+                            com.easeaudio.ui.components.AlarmDialog(
+                                currentStation = syncedCurrentStation,
+                                onDismiss = { showAlarmDialog = false }
+                            )
+                        }
+                    }
+
                     composable(NavRoute.Screensaver.route) {
                         ScreensaverScreen(
                             currentStation = syncedCurrentStation,
@@ -342,6 +494,8 @@ fun MainAppContent(
                             isLoading = isLoading,
                             streamTitle = streamTitle,
                             waveAmplitudes = waveAmplitudes,
+                            currentPosition = currentPlaybackPosition,
+                            totalDuration = totalPlaybackDuration,
                             onTogglePlay = { viewModel.togglePlayPause() },
                             onToggleFavorite = { syncedCurrentStation?.let { viewModel.toggleFavorite(it) } },
                             onOpenFullPlayer = { isFullPlayerVisible = true },
@@ -392,12 +546,20 @@ fun MainAppContent(
                 hasNotificationPermission = hasNotificationPermission,
                 currentPosition = currentPlaybackPosition,
                 totalDuration = totalPlaybackDuration,
+                playbackSpeed = playbackSpeed,
+                onPlaybackSpeedChange = { speed -> viewModel.playerManager.setPlaybackSpeed(speed) },
+                onOpenEpisodes = { viewModel.setShowEpisodesSheet(true) },
                 onRequestNotificationPermission = onRequestNotificationPermission,
                 onTogglePlay = { viewModel.togglePlayPause() },
                 onToggleFavorite = { syncedCurrentStation?.let { viewModel.toggleFavorite(it) } },
                 onVolumeChange = { viewModel.playerManager.setVolume(it) },
                 onOpenSleepTimer = { viewModel.setShowSleepTimerDialog(true) },
                 onOpenEqualizer = { viewModel.setShowEqualizerDialog(true) },
+                onOpenTrackOptions = { showTrackActionSheet = true },
+                onOpenScreensaver = {
+                    isFullPlayerVisible = false
+                    navController.navigate(NavRoute.Screensaver.route)
+                },
                 onRetryStream = { viewModel.retryCurrentStation() },
                 onPlayNextStation = { viewModel.playNextStation() },
                 onPlayPreviousStation = { viewModel.playPreviousStation() },
@@ -452,6 +614,20 @@ fun MainAppContent(
                 onUnblockStation = { stationId -> viewModel.unblockStation(stationId) },
                 onClearAllBlocked = { viewModel.clearAllBlockedStations() },
                 onDismiss = { viewModel.setShowBlockedDialog(false) }
+            )
+        }
+
+        if (showEpisodesSheet && syncedCurrentStation != null) {
+            com.easeaudio.ui.components.PodcastEpisodesSheet(
+                show = syncedCurrentStation!!,
+                episodes = currentEpisodesList,
+                currentEpisode = currentEpisode,
+                isPlaying = isPlaying,
+                isLoading = isLoading || isLoadingEpisodes,
+                onSelectEpisode = { episode ->
+                    viewModel.playEpisode(syncedCurrentStation!!, episode)
+                },
+                onDismiss = { viewModel.setShowEpisodesSheet(false) }
             )
         }
 

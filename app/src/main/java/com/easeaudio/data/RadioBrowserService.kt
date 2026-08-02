@@ -199,13 +199,18 @@ object RadioBrowserService {
                         
                         if (!isAdult && name.isNotBlank() && streamUrl.isNotBlank() && (streamUrl.startsWith("http://") || streamUrl.startsWith("https://"))) {
                             val imageUrl = if (favicon.startsWith("http")) favicon else getRandomDefaultImage(tags)
-                            val formattedGenre = tags.split(",").firstOrNull()?.replaceFirstChar { it.uppercase() } ?: "Music"
+                            val rawGenre = tags.split(",").firstOrNull { t ->
+                                val lower = t.trim().lowercase()
+                                lower != "radio" && lower != "live" && lower != "online" && lower != "stream"
+                            }?.trim()?.replaceFirstChar { it.uppercase() } ?: "Music"
+
+                            val finalGenre = if (rawGenre.length > 20) "Music" else rawGenre
 
                             stations.add(
                                 RadioStation(
                                     id = id,
                                     name = name,
-                                    genre = if (formattedGenre.length > 20) "Music" else formattedGenre,
+                                    genre = finalGenre,
                                     country = if (country.isBlank()) "Global" else country,
                                     streamUrl = streamUrl,
                                     imageUrl = imageUrl,
@@ -241,16 +246,18 @@ object RadioBrowserService {
 
     private fun mapGenreToTag(genreTag: String): String {
         return when (genreTag) {
-            "Podcasts", "Podcast" -> "podcast"
-            "News & Reports" -> "news"
+            "80s & 90s" -> "80s"
+            "News & Talk", "News & Reports" -> "news"
             "Lo-Fi & Chill" -> "chill"
-            "Jazz" -> "jazz"
-            "Rock" -> "rock"
+            "Jazz & Blues", "Jazz" -> "jazz"
+            "Rock & Metal", "Rock" -> "rock"
             "Classical" -> "classical"
             "Ambient" -> "ambient"
-            "EDM" -> "edm"
-            "Pop" -> "pop"
-            "Hip Hop" -> "hip hop"
+            "EDM & Dance", "EDM" -> "edm"
+            "Pop & Hits", "Pop" -> "pop"
+            "Hip Hop & R&B", "Hip Hop" -> "hiphop"
+            "Latin & Reggae" -> "latin"
+            "Sports" -> "sports"
             "House" -> "house"
             "Country" -> "country"
             "All", "Custom" -> ""

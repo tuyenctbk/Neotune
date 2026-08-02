@@ -8,25 +8,28 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Bedtime
 import androidx.compose.material.icons.filled.Explore
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.Radio
 import androidx.compose.material.icons.outlined.Bedtime
 import androidx.compose.material.icons.outlined.Explore
 import androidx.compose.material.icons.outlined.FavoriteBorder
+import androidx.compose.material.icons.outlined.Mic
 import androidx.compose.material.icons.outlined.Radio
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
 import androidx.annotation.StringRes
 import androidx.compose.ui.res.stringResource
 import com.easeaudio.R
-import com.easeaudio.ui.theme.DarkSurface
 import com.easeaudio.ui.theme.DarkSurfaceVariant
 import com.easeaudio.ui.theme.NeonCyan
+import com.easeaudio.ui.theme.NeonPurple
 import com.easeaudio.ui.theme.TextMuted
+
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.outlined.Settings
 
 sealed class NavRoute(
     val route: String,
@@ -35,8 +38,11 @@ sealed class NavRoute(
     val unselectedIcon: ImageVector,
     val testTag: String
 ) {
-    object Home : NavRoute("home", R.string.nav_tuner, Icons.Filled.Radio, Icons.Outlined.Radio, "nav_tuner")
+    object Home : NavRoute("home", R.string.nav_radio, Icons.Filled.Radio, Icons.Outlined.Radio, "nav_radio")
+    object Radio : NavRoute("radio", R.string.nav_radio, Icons.Filled.Radio, Icons.Outlined.Radio, "nav_radio")
+    object Podcast : NavRoute("podcast", R.string.nav_podcast, Icons.Filled.Mic, Icons.Outlined.Mic, "nav_podcast")
     object Favorites : NavRoute("favorites", R.string.nav_favorites, Icons.Filled.Favorite, Icons.Outlined.FavoriteBorder, "nav_favorites")
+    object Settings : NavRoute("settings", R.string.nav_settings, Icons.Filled.Settings, Icons.Outlined.Settings, "nav_settings")
     object Screensaver : NavRoute("screensaver", R.string.nav_dock, Icons.Filled.Bedtime, Icons.Outlined.Bedtime, "nav_screensaver")
     object Onboarding : NavRoute("onboarding", R.string.nav_onboarding, Icons.Filled.Explore, Icons.Outlined.Explore, "nav_onboarding")
 }
@@ -46,7 +52,7 @@ fun BottomNavBar(
     currentRoute: String,
     onNavigate: (String) -> Unit
 ) {
-    val items = listOf(NavRoute.Home, NavRoute.Favorites, NavRoute.Screensaver)
+    val items = listOf(NavRoute.Radio, NavRoute.Podcast, NavRoute.Favorites, NavRoute.Settings)
 
     NavigationBar(
         modifier = Modifier
@@ -56,8 +62,9 @@ fun BottomNavBar(
         tonalElevation = NavigationBarDefaults.Elevation
     ) {
         items.forEach { item ->
-            val isSelected = currentRoute == item.route
+            val isSelected = currentRoute == item.route || (item.route == "radio" && currentRoute == "home")
             val localizedTitle = stringResource(item.titleRes)
+            val selectedAccent = if (item.route == "podcast") NeonPurple else NeonCyan
             NavigationBarItem(
                 modifier = Modifier.testTag(item.testTag),
                 selected = isSelected,
@@ -70,8 +77,8 @@ fun BottomNavBar(
                 },
                 label = { Text(localizedTitle) },
                 colors = NavigationBarItemDefaults.colors(
-                    selectedIconColor = NeonCyan,
-                    selectedTextColor = NeonCyan,
+                    selectedIconColor = selectedAccent,
+                    selectedTextColor = selectedAccent,
                     indicatorColor = DarkSurfaceVariant,
                     unselectedIconColor = TextMuted,
                     unselectedTextColor = TextMuted
