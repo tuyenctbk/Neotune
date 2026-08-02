@@ -75,7 +75,7 @@ fun TrackActionSheet(
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
-                            imageVector = if (isPodcast) Icons.Filled.Mic else Icons.Filled.Radio,
+                            imageVector = if (isPodcast) Icons.Filled.MusicNote else Icons.Filled.PlayArrow,
                             contentDescription = null,
                             tint = if (isPodcast) NeonPurple else NeonCyan,
                             modifier = Modifier.size(20.dp)
