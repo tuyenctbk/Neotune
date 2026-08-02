@@ -779,6 +779,11 @@ fun HomeScreen(
         com.easeaudio.ui.components.TrackActionSheet(
             trackTitle = streamTitle!!,
             stationName = currentStation?.name ?: "Radio",
+            stationGenre = currentStation?.genre ?: "",
+            isFavorite = currentStation?.isFavorite ?: false,
+            onToggleFavorite = { currentStation?.let { onToggleFavorite(it) } },
+            onSetAsAlarmStation = { showAlarmDialog = true },
+            onBlockStation = { currentStation?.let { onBlockStation(it.id) } },
             onDismiss = { showTrackActionSheet = false }
         )
     }

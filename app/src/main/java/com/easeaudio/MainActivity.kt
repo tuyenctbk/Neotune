@@ -353,6 +353,7 @@ fun MainAppContent(
                     com.easeaudio.ui.components.TrackActionSheet(
                         trackTitle = streamTitle!!,
                         stationName = syncedCurrentStation?.name ?: "Radio",
+                        stationGenre = syncedCurrentStation?.genre ?: "",
                         isFavorite = syncedCurrentStation?.isFavorite ?: false,
                         onToggleFavorite = syncedCurrentStation?.let { { viewModel.toggleFavorite(it) } },
                         onSetAsAlarmStation = syncedCurrentStation?.let { st ->

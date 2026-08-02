@@ -37,6 +37,7 @@ import java.net.URLEncoder
 fun TrackActionSheet(
     trackTitle: String,
     stationName: String,
+    stationGenre: String = "",
     isFavorite: Boolean = false,
     onToggleFavorite: (() -> Unit)? = null,
     onSetAsAlarmStation: (() -> Unit)? = null,
@@ -44,6 +45,9 @@ fun TrackActionSheet(
     onDismiss: () -> Unit
 ) {
     val context = LocalContext.current
+    val isPodcast = stationGenre.contains("Podcast", ignoreCase = true) ||
+            stationGenre.contains("Talk", ignoreCase = true) ||
+            stationGenre.contains("Audiobook", ignoreCase = true)
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -67,20 +71,20 @@ fun TrackActionSheet(
                         modifier = Modifier
                             .size(36.dp)
                             .clip(CircleShape)
-                            .background(NeonCyan.copy(alpha = 0.15f)),
+                            .background(if (isPodcast) NeonPurple.copy(alpha = 0.15f) else NeonCyan.copy(alpha = 0.15f)),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
-                            imageVector = Icons.Filled.MusicNote,
+                            imageVector = if (isPodcast) Icons.Filled.Mic else Icons.Filled.Radio,
                             contentDescription = null,
-                            tint = NeonCyan,
+                            tint = if (isPodcast) NeonPurple else NeonCyan,
                             modifier = Modifier.size(20.dp)
                         )
                     }
                     Spacer(modifier = Modifier.width(12.dp))
                     Column {
                         Text(
-                            text = stringResource(R.string.track_options),
+                            text = stringResource(if (isPodcast) R.string.podcast_options else R.string.station_options),
                             style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
                             color = TextPrimary
                         )

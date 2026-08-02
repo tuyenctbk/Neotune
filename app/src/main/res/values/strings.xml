@@ -258,4 +258,6 @@
     <string name="podcasts_and_shows">Podcasts &amp; Shows</string>
     <string name="live_radio_broadcast">LIVE RADIO BROADCAST</string>
     <string name="on_demand_podcast">ON-DEMAND PODCAST</string>
+    <string name="podcast_options">Podcast Options</string>
+    <string name="station_options">Radio Station Options</string>
 </resources>
