@@ -598,14 +598,6 @@ class RadioPlayerManager(private val context: Context) {
 
                 player.setMediaItem(mediaItem)
                 player.prepare()
-
-                if (station.isPodcast) {
-                    val savedPos = com.easeaudio.data.PodcastProgressManager.getProgress(context, station.id)
-                    if (savedPos > 5000L) {
-                        player.seekTo(savedPos)
-                    }
-                }
-
                 player.play()
             }
         }
@@ -614,11 +606,6 @@ class RadioPlayerManager(private val context: Context) {
     fun togglePlayPause() {
         exoPlayer?.let { player ->
             if (player.isPlaying) {
-                _currentStation.value?.let { current ->
-                    if (current.isPodcast && player.currentPosition > 0L) {
-                        com.easeaudio.data.PodcastProgressManager.saveProgress(context, current.id, player.currentPosition)
-                    }
-                }
                 player.pause()
             } else {
                 // Bug #6: mediaItemCount is always >= 1 after the first playStation() call
@@ -663,11 +650,6 @@ class RadioPlayerManager(private val context: Context) {
         exoPlayer?.let { player ->
             val targetPos = (player.currentPosition + offsetMs).coerceAtLeast(0L)
             player.seekTo(targetPos)
-            _currentStation.value?.let { current ->
-                if (current.isPodcast) {
-                    com.easeaudio.data.PodcastProgressManager.saveProgress(context, current.id, targetPos)
-                }
-            }
         }
     }
 
