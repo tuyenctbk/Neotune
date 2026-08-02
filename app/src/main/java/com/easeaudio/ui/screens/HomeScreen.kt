@@ -895,16 +895,18 @@ fun StationCard(
                     }
                 } else {
                     Row(verticalAlignment = Alignment.CenterVertically) {
+                        val subtitleText = if (station.country.isNotBlank()) {
+                            "${station.genre} • ${station.country}"
+                        } else {
+                            station.genre
+                        }
                         Text(
-                            text = station.genre,
+                            text = subtitleText,
                             style = MaterialTheme.typography.bodyMedium,
-                            color = TextSecondary
-                        )
-                        Text(" • ", color = TextMuted)
-                        Text(
-                            text = station.country,
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = TextMuted
+                            color = TextSecondary,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier.weight(1f, fill = false)
                         )
                         if (station.bitrate.isNotBlank()) {
                             Spacer(modifier = Modifier.width(6.dp))
@@ -916,6 +918,7 @@ fun StationCard(
                                     text = station.bitrate.replace("kbps", "k").trim(),
                                     style = MaterialTheme.typography.labelSmall.copy(fontSize = 10.sp, fontWeight = FontWeight.Bold),
                                     color = NeonCyan,
+                                    maxLines = 1,
                                     modifier = Modifier.padding(horizontal = 5.dp, vertical = 2.dp)
                                 )
                             }
