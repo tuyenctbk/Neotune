@@ -79,50 +79,50 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
 
     /** Fallback countries shown instantly while the API call loads (sorted by station count desc) */
     private val fallbackCountries = listOf(
-        CountryDisplay("Global",         "🌐", "",   50000, "> 50k stns"),
-        CountryDisplay("United States",  "🇺🇸", "US", 5000,  "> 5,000 stns"),
-        CountryDisplay("Germany",        "🇩🇪", "DE", 3000,  "> 3,000 stns"),
-        CountryDisplay("United Kingdom", "🇬🇧", "GB", 2000,  "> 2,000 stns"),
-        CountryDisplay("France",         "🇫🇷", "FR", 2000,  "> 2,000 stns"),
-        CountryDisplay("Spain",          "🇪🇸", "ES", 1000,  "> 1,000 stns"),
-        CountryDisplay("Italy",          "🇮🇹", "IT", 1000,  "> 1,000 stns"),
-        CountryDisplay("Canada",         "🇨🇦", "CA", 800,   "> 800 stns"),
-        CountryDisplay("Brazil",         "🇧🇷", "BR", 800,   "> 800 stns"),
-        CountryDisplay("Australia",      "🇦🇺", "AU", 500,   "> 500 stns"),
-        CountryDisplay("Mexico",         "🇲🇽", "MX", 500,   "> 500 stns"),
-        CountryDisplay("Argentina",      "🇦🇷", "AR", 400,   "> 400 stns"),
-        CountryDisplay("Netherlands",    "🇳🇱", "NL", 400,   "> 400 stns"),
-        CountryDisplay("Poland",         "🇵🇱", "PL", 400,   "> 400 stns"),
-        CountryDisplay("Ukraine",        "🇺🇦", "UA", 300,   "> 300 stns"),
-        CountryDisplay("Switzerland",    "🇨🇭", "CH", 300,   "> 300 stns"),
-        CountryDisplay("Austria",        "🇦🇹", "AT", 300,   "> 300 stns"),
-        CountryDisplay("Belgium",        "🇧🇪", "BE", 300,   "> 300 stns"),
-        CountryDisplay("Turkey",         "🇹🇷", "TR", 200,   "> 200 stns"),
-        CountryDisplay("Sweden",         "🇸🇪", "SE", 200,   "> 200 stns"),
-        CountryDisplay("Japan",          "🇯🇵", "JP", 200,   "> 200 stns"),
-        CountryDisplay("India",          "🇮🇳", "IN", 200,   "> 200 stns"),
-        CountryDisplay("Norway",         "🇳🇴", "NO", 150,   "> 150 stns"),
-        CountryDisplay("Czech Republic", "🇨🇿", "CZ", 150,   "> 150 stns"),
-        CountryDisplay("Portugal",       "🇵🇹", "PT", 150,   "> 150 stns"),
-        CountryDisplay("Greece",         "🇬🇷", "GR", 150,   "> 150 stns"),
-        CountryDisplay("Ireland",        "🇮🇪", "IE", 100,   "> 100 stns"),
-        CountryDisplay("Chile",          "🇨🇱", "CL", 100,   "> 100 stns"),
-        CountryDisplay("Colombia",       "🇨🇴", "CO", 100,   "> 100 stns"),
-        CountryDisplay("South Africa",   "🇿🇦", "ZA", 100,   "> 100 stns"),
-        CountryDisplay("New Zealand",    "🇳🇿", "NZ", 80,    "> 80 stns"),
-        CountryDisplay("Saudi Arabia",   "🇸🇦", "SA", 50,    "~50 stns"),
-        CountryDisplay("Vietnam",        "🇻🇳", "VN", 50,    "> 50 stns"),
-        CountryDisplay("Indonesia",      "🇮🇩", "ID", 50,    "> 50 stns"),
-        CountryDisplay("United Arab Emirates", "🇦🇪", "AE", 40, "~40 stns"),
-        CountryDisplay("Thailand",       "🇹🇭", "TH", 40,    "> 40 stns"),
-        CountryDisplay("Qatar",          "🇶🇦", "QA", 30,    "~30 stns"),
-        CountryDisplay("Philippines",    "🇵🇭", "PH", 30,    "> 30 stns"),
-        CountryDisplay("Malaysia",       "🇲🇾", "MY", 30,    "> 30 stns"),
-        CountryDisplay("Israel",         "🇮🇱", "IL", 30,    "~30 stns"),
-        CountryDisplay("Singapore",      "🇸🇬", "SG", 20,    "~20 stns"),
-        CountryDisplay("South Korea",    "🇰🇷", "KR", 20,    "~20 stns"),
-        CountryDisplay("Nigeria",        "🇳🇬", "NG", 20,    "~20 stns"),
-        CountryDisplay("Egypt",          "🇪🇬", "EG", 15,    "~15 stns")
+        CountryDisplay("Global",         "🌐", "",   50000, "> 50k Radio stations"),
+        CountryDisplay("United States",  "🇺🇸", "US", 5000,  "> 5,000 Radio stations"),
+        CountryDisplay("Germany",        "🇩🇪", "DE", 3000,  "> 3,000 Radio stations"),
+        CountryDisplay("United Kingdom", "🇬🇧", "GB", 2000,  "> 2,000 Radio stations"),
+        CountryDisplay("France",         "🇫🇷", "FR", 2000,  "> 2,000 Radio stations"),
+        CountryDisplay("Spain",          "🇪🇸", "ES", 1000,  "> 1,000 Radio stations"),
+        CountryDisplay("Italy",          "🇮🇹", "IT", 1000,  "> 1,000 Radio stations"),
+        CountryDisplay("Canada",         "🇨🇦", "CA", 800,   "> 800 Radio stations"),
+        CountryDisplay("Brazil",         "🇧🇷", "BR", 800,   "> 800 Radio stations"),
+        CountryDisplay("Australia",      "🇦🇺", "AU", 500,   "> 500 Radio stations"),
+        CountryDisplay("Mexico",         "🇲🇽", "MX", 500,   "> 500 Radio stations"),
+        CountryDisplay("Argentina",      "🇦🇷", "AR", 400,   "> 400 Radio stations"),
+        CountryDisplay("Netherlands",    "🇳🇱", "NL", 400,   "> 400 Radio stations"),
+        CountryDisplay("Poland",         "🇵🇱", "PL", 400,   "> 400 Radio stations"),
+        CountryDisplay("Ukraine",        "🇺🇦", "UA", 300,   "> 300 Radio stations"),
+        CountryDisplay("Switzerland",    "🇨🇭", "CH", 300,   "> 300 Radio stations"),
+        CountryDisplay("Austria",        "🇦🇹", "AT", 300,   "> 300 Radio stations"),
+        CountryDisplay("Belgium",        "🇧🇪", "BE", 300,   "> 300 Radio stations"),
+        CountryDisplay("Turkey",         "🇹🇷", "TR", 200,   "> 200 Radio stations"),
+        CountryDisplay("Sweden",         "🇸🇪", "SE", 200,   "> 200 Radio stations"),
+        CountryDisplay("Japan",          "🇯🇵", "JP", 200,   "> 200 Radio stations"),
+        CountryDisplay("India",          "🇮🇳", "IN", 200,   "> 200 Radio stations"),
+        CountryDisplay("Norway",         "🇳🇴", "NO", 150,   "> 150 Radio stations"),
+        CountryDisplay("Czech Republic", "🇨🇿", "CZ", 150,   "> 150 Radio stations"),
+        CountryDisplay("Portugal",       "🇵🇹", "PT", 150,   "> 150 Radio stations"),
+        CountryDisplay("Greece",         "🇬🇷", "GR", 150,   "> 150 Radio stations"),
+        CountryDisplay("Ireland",        "🇮🇪", "IE", 100,   "> 100 Radio stations"),
+        CountryDisplay("Chile",          "🇨🇱", "CL", 100,   "> 100 Radio stations"),
+        CountryDisplay("Colombia",       "🇨🇴", "CO", 100,   "> 100 Radio stations"),
+        CountryDisplay("South Africa",   "🇿🇦", "ZA", 100,   "> 100 Radio stations"),
+        CountryDisplay("New Zealand",    "🇳🇿", "NZ", 80,    "> 80 Radio stations"),
+        CountryDisplay("Saudi Arabia",   "🇸🇦", "SA", 50,    "~50 Radio stations"),
+        CountryDisplay("Vietnam",        "🇻🇳", "VN", 50,    "> 50 Radio stations"),
+        CountryDisplay("Indonesia",      "🇮🇩", "ID", 50,    "> 50 Radio stations"),
+        CountryDisplay("United Arab Emirates", "🇦🇪", "AE", 40, "~40 Radio stations"),
+        CountryDisplay("Thailand",       "🇹🇭", "TH", 40,    "> 40 Radio stations"),
+        CountryDisplay("Qatar",          "🇶🇦", "QA", 30,    "~30 Radio stations"),
+        CountryDisplay("Philippines",    "🇵🇭", "PH", 30,    "> 30 Radio stations"),
+        CountryDisplay("Malaysia",       "🇲🇾", "MY", 30,    "> 30 Radio stations"),
+        CountryDisplay("Israel",         "🇮🇱", "IL", 30,    "~30 Radio stations"),
+        CountryDisplay("Singapore",      "🇸🇬", "SG", 20,    "~20 Radio stations"),
+        CountryDisplay("South Korea",    "🇰🇷", "KR", 20,    "~20 Radio stations"),
+        CountryDisplay("Nigeria",        "🇳🇬", "NG", 20,    "~20 Radio stations"),
+        CountryDisplay("Egypt",          "🇪🇬", "EG", 15,    "~15 Radio stations")
     )
 
     private val _availableCountries = MutableStateFlow(fallbackCountries)
@@ -145,7 +145,7 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
                     flag = "🌐",
                     code = "",
                     stationCount = apiData.sumOf { it.third },
-                    stationCountText = "50k+ Radio & Podcasts"
+                    stationCountText = "50k+ Radio stations"
                 )
 
                 // Convert API triples -> CountryDisplay, sorted by stationCount descending
@@ -153,8 +153,8 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
                     .map { (name, isoCode, count) ->
                         val flag = com.easeaudio.data.RadioBrowserService.isoToFlagEmoji(isoCode)
                         val countText = when {
-                            count >= 1000 -> "${"%,d".format(count)} Radio + Podcasts"
-                            else          -> "$count Radio + Podcasts"
+                            count >= 1000 -> "${"%,d".format(count)} Radio stations"
+                            else          -> "$count Radio stations"
                         }
                         CountryDisplay(
                             name = name,
@@ -483,7 +483,7 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
                     repository.discoverOnlinePodcasts(
                         query = query,
                         genre = genre,
-                        country = country,
+                        country = "",
                         offset = 0,
                         limit = pageSize
                     )
@@ -566,16 +566,25 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     private var lastPlaybackClickTimestamp = 0L
+    private var lastPlaybackClickStationId = ""
+    private var podcastFetchJob: Job? = null
 
     fun playStation(station: RadioStation) {
         val now = System.currentTimeMillis()
-        if (now - lastPlaybackClickTimestamp < 400L) {
+        val isSameStation = playerManager.currentStation.value?.id == station.id || lastPlaybackClickStationId == station.id
+        
+        // Only debounce if tapping the exact same station repeatedly
+        if (isSameStation && (now - lastPlaybackClickTimestamp < 400L)) {
             return
         }
         lastPlaybackClickTimestamp = now
+        lastPlaybackClickStationId = station.id
+
+        // Cancel any pending podcast episode fetch job when a new station is selected
+        podcastFetchJob?.cancel()
 
         if (station.isPodcast) {
-            viewModelScope.launch {
+            podcastFetchJob = viewModelScope.launch {
                 _isLoadingEpisodes.value = true
                 val episodes = PodcastEpisodeService.fetchEpisodes(station, maxEpisodes = 1000)
                 _currentEpisodesList.value = episodes

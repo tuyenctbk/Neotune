@@ -55,7 +55,7 @@ class FilterAndBlockManager private constructor(context: Context) {
 
     private fun loadBlockedStations() {
         val savedSet = prefs.getStringSet(KEY_BLOCKED_IDS, emptySet()) ?: emptySet()
-        _blockedStationIds.value = savedSet
+        _blockedStationIds.value = HashSet(savedSet)
     }
 
     private fun loadFilterConfig() {
@@ -70,7 +70,7 @@ class FilterAndBlockManager private constructor(context: Context) {
             filterPoliticsContent = politics,
             filterReligiousContent = religious,
             filterBrokenStreams = broken,
-            customKeywords = keywords
+            customKeywords = HashSet(keywords)
         )
     }
 

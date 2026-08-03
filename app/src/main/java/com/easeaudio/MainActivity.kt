@@ -429,13 +429,11 @@ fun MainAppContent(
                     }
 
                     composable(NavRoute.Settings.route) {
-                        var showCountryDialog by remember { mutableStateOf(false) }
                         var showAlarmDialog by remember { mutableStateOf(false) }
 
                         com.easeaudio.ui.screens.SettingsScreen(
                             sleepTimerRemaining = sleepTimerRemaining,
                             selectedCountry = selectedCountry,
-                            onOpenCountryPicker = { showCountryDialog = true },
                             onOpenEqualizer = { viewModel.setShowEqualizerDialog(true) },
                             onOpenSleepTimer = { viewModel.setShowSleepTimerDialog(true) },
                             onOpenRadioAlarm = { showAlarmDialog = true },
@@ -444,16 +442,6 @@ fun MainAppContent(
                             onOpenBlockedDialog = { viewModel.setShowBlockedDialog(true) },
                             onOpenAttribution = { /* Attribution */ }
                         )
-
-                        if (showCountryDialog) {
-                            com.easeaudio.ui.components.CountrySelectionDialog(
-                                selectedCountry = selectedCountry,
-                                countries = availableCountries,
-                                isLoading = isLoadingCountries,
-                                onSelectCountry = { viewModel.setSelectedCountry(it) },
-                                onDismiss = { showCountryDialog = false }
-                            )
-                        }
 
                         if (showAlarmDialog) {
                             com.easeaudio.ui.components.AlarmDialog(

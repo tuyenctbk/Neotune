@@ -61,20 +61,11 @@ fun SettingsScreen(
 
             // Audio & Playback Section
             item {
-                SettingsSectionHeader(title = "Audio & Region")
+                SettingsSectionHeader(title = "Audio & Playback")
             }
 
             item {
                 SettingsCard {
-                    SettingsItem(
-                        icon = Icons.Filled.Language,
-                        iconTint = NeonCyan,
-                        title = "Country & Region",
-                        subtitle = "Active region: $selectedCountry",
-                        onClick = onOpenCountryPicker,
-                        testTag = "setting_country_region"
-                    )
-                    HorizontalDivider(color = DarkSurfaceVariant, thickness = 1.dp)
                     SettingsItem(
                         icon = Icons.Filled.Equalizer,
                         iconTint = NeonCyan,

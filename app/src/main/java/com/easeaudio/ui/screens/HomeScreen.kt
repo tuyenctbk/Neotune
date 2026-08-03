@@ -122,6 +122,7 @@ fun HomeScreen(
     var showCarMode by remember { mutableStateOf(false) }
     var showAlarmDialog by remember { mutableStateOf(false) }
     var showTrackActionSheet by remember { mutableStateOf(false) }
+    var showCountrySelectionDialog by remember { mutableStateOf(false) }
     var activeTab by remember(initialTab) { mutableStateOf(initialTab) }
     LaunchedEffect(initialTab) {
         activeTab = initialTab
@@ -249,6 +250,45 @@ fun HomeScreen(
                                     ),
                                     color = TextSecondary
                                 )
+                            }
+                        }
+
+                        if (activeTab == HomeTab.Radio) {
+                            var isCountryPillFocused by remember { mutableStateOf(false) }
+                            val currentCountryObj = availableCountries.find { it.name.equals(selectedCountry, ignoreCase = true) }
+                            val flagEmoji = currentCountryObj?.flag ?: if (selectedCountry.equals("Global", ignoreCase = true)) "🌐" else "🏳️"
+                            
+                            Surface(
+                                onClick = { showCountrySelectionDialog = true },
+                                shape = RoundedCornerShape(12.dp),
+                                color = if (isCountryPillFocused) DarkSurfaceVariant else DarkSurface,
+                                border = androidx.compose.foundation.BorderStroke(
+                                    width = if (isCountryPillFocused) 1.5.dp else 1.dp,
+                                    color = if (isCountryPillFocused) NeonCyan else CardBorder
+                                ),
+                                modifier = Modifier
+                                    .onFocusChanged { isCountryPillFocused = it.isFocused }
+                                    .testTag("btn_top_country_picker")
+                            ) {
+                                Row(
+                                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                                ) {
+                                    Text(
+                                        text = "$flagEmoji ${currentCountryObj?.name ?: selectedCountry}",
+                                        style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.SemiBold),
+                                        color = TextPrimary,
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis
+                                    )
+                                    Icon(
+                                        imageVector = Icons.Filled.ArrowDropDown,
+                                        contentDescription = "Select Country",
+                                        tint = NeonCyan,
+                                        modifier = Modifier.size(18.dp)
+                                    )
+                                }
                             }
                         }
                     }
@@ -588,6 +628,19 @@ fun HomeScreen(
         )
     }
 
+    if (showCountrySelectionDialog) {
+        com.easeaudio.ui.components.CountrySelectionDialog(
+            selectedCountry = selectedCountry,
+            countries = availableCountries,
+            isLoading = isLoadingCountries,
+            onSelectCountry = {
+                onCountrySelect(it)
+                showCountrySelectionDialog = false
+            },
+            onDismiss = { showCountrySelectionDialog = false }
+        )
+    }
+
     if (showTrackActionSheet && !streamTitle.isNullOrBlank()) {
         com.easeaudio.ui.components.TrackActionSheet(
             trackTitle = streamTitle!!,
@@ -616,21 +669,13 @@ fun StationCard(
     val isTv = rememberIsTv()
     var isFocused by remember { mutableStateOf(false) }
     val showFocus = isFocused
-    var lastCardClickTime by remember { androidx.compose.runtime.mutableLongStateOf(0L) }
-    val debouncedSelect = {
-        val now = System.currentTimeMillis()
-        if (now - lastCardClickTime > 400L) {
-            lastCardClickTime = now
-            onSelect()
-        }
-    }
     Surface(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 20.dp, vertical = 6.dp)
             .onFocusChanged { isFocused = it.isFocused }
             .clip(RoundedCornerShape(16.dp))
-            .clickable { debouncedSelect() }
+            .clickable { onSelect() }
             .border(
                 width = if (showFocus) 2.5.dp else if (isSelected) 1.dp else 0.dp,
                 color = if (showFocus) NeonCyan else if (isSelected) NeonCyan.copy(alpha = 0.5f) else Color.Transparent,

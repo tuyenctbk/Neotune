@@ -649,11 +649,16 @@ class RadioPlayerManager(private val context: Context) {
         return@withContext currentUrl
     }
 
+    private var playbackJob: Job? = null
+
     fun playStation(station: RadioStation) {
         playStationWithUrl(station, station.streamUrl, isFallback = false)
     }
 
     private fun playStationWithUrl(station: RadioStation, targetUrl: String, isFallback: Boolean) {
+        // Cancel any pending URL resolution / player prep job to prevent race conditions when switching quickly
+        playbackJob?.cancel()
+        
         _currentStation.value = station
         _playbackError.value = null
         _isLoading.value = true
@@ -678,7 +683,7 @@ class RadioPlayerManager(private val context: Context) {
             Log.e(TAG, "Failed to start RadioPlaybackService", e)
         }
 
-        scope.launch {
+        playbackJob = scope.launch {
             val resolvedUrl = resolveDirectStreamUrl(targetUrl)
             exoPlayer?.let { player ->
                 val mediaMetadata = MediaMetadata.Builder()

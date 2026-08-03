@@ -73,6 +73,14 @@ class NetworkQualityManager(private val context: Context) {
         }
     }
 
+    fun unregisterNetworkCallback() {
+        try {
+            connectivityManager.unregisterNetworkCallback(networkCallback)
+        } catch (e: Exception) {
+            Log.w(TAG, "Failed to unregister network callback: ${e.message}")
+        }
+    }
+
     private fun updateNetworkStatus() {
         scope.launch {
             _networkStatus.value = evaluateCurrentNetwork()
