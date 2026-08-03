@@ -21,7 +21,6 @@ import androidx.compose.material.icons.filled.Bedtime
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Language
-import androidx.compose.material.icons.filled.Public
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material.icons.filled.Favorite
@@ -171,7 +170,7 @@ fun HomeScreen(
                                 Icon(
                                     painter = androidx.compose.ui.res.painterResource(id = R.drawable.ic_favicon),
                                     contentDescription = "NeoTune Logo",
-                                    tint = NeonCyan,
+                                    tint = Color.Unspecified,
                                     modifier = Modifier.size(36.dp)
                                 )
                                 Spacer(modifier = Modifier.width(10.dp))
@@ -186,23 +185,19 @@ fun HomeScreen(
                                 )
                             }
 
-                            // Top-Right Action (Country Picker only)
+                            // Top-Right Action (Country Picker)
                             if (uiState.selectedTab == HomeTab.Radio) {
                                 val currentCountryObj = uiState.availableCountries.find { it.name == uiState.selectedCountry }
                                 val isGlobal = uiState.selectedCountry == "Global" || uiState.selectedCountry == "All" || currentCountryObj?.code?.isEmpty() == true
                                 val flag = currentCountryObj?.flag ?: "🌐"
 
-                                Box(
-                                    modifier = Modifier
-                                        .clip(CircleShape)
-                                        .clickable { showCountryDialog = true }
-                                        .padding(8.dp)
-                                        .testTag("btn_header_country_picker"),
-                                    contentAlignment = Alignment.Center
+                                IconButton(
+                                    onClick = { showCountryDialog = true },
+                                    modifier = Modifier.testTag("btn_header_country_picker")
                                 ) {
                                     if (isGlobal) {
                                         Icon(
-                                            imageVector = Icons.Filled.Public,
+                                            imageVector = Icons.Filled.Language,
                                             contentDescription = "Global",
                                             tint = TextPrimary,
                                             modifier = Modifier.size(24.dp)

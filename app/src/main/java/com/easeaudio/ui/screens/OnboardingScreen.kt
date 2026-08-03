@@ -23,6 +23,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material.icons.outlined.Notifications
@@ -306,7 +307,7 @@ private fun SlideGlobalRadio() {
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
-                    imageVector = Icons.Filled.Public,
+                    imageVector = Icons.Filled.Language,
                     contentDescription = null,
                     tint = NeonCyan,
                     modifier = Modifier.size(52.dp)
@@ -689,9 +690,9 @@ private fun SlideGenreDiscovery(
                         val isGlobal = country.name.equals("Global", ignoreCase = true) || country.code.isBlank()
                         if (isGlobal) {
                             Icon(
-                                imageVector = Icons.Filled.Public,
+                                imageVector = Icons.Filled.Language,
                                 contentDescription = null,
-                                tint = if (isSelected) NeonCyan else TextPrimary,
+                                tint = NeonCyan,
                                 modifier = Modifier.size(16.dp)
                             )
                         } else {

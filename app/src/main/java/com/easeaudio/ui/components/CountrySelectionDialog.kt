@@ -13,7 +13,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.Public
+import androidx.compose.material.icons.filled.Language
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -218,9 +218,9 @@ fun CountrySelectionDialog(
                                         val isGlobal = country.name.equals("Global", ignoreCase = true) || country.code.isBlank()
                                         if (isGlobal) {
                                             Icon(
-                                                imageVector = Icons.Filled.Public,
+                                                imageVector = Icons.Filled.Language,
                                                 contentDescription = null,
-                                                tint = if (isSelected) NeonCyan else TextPrimary,
+                                                tint = NeonCyan,
                                                 modifier = Modifier.size(20.dp)
                                             )
                                         } else {
