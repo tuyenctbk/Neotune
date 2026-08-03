@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">NeoTune</string>
-    <string name="app_description">Global Live Radio &amp; Chill Beats</string>
+    <string name="app_description">Globalni radio, podcasti i Lo-Fi</string>
     <string name="nav_tuner">Tuner</string>
     <string name="nav_radio">Radio</string>
     <string name="nav_podcast">Podcast</string>
     <string name="nav_favorites">Favorites</string>
     <string name="nav_dock">Dock</string>
-    <string name="nav_settings">Options</string>
+    <string name="nav_settings">Postavke</string>
     <string name="search_placeholder">Search station, genre, country…</string>
     <string name="recent_streams">Recent Streams</string>
     <string name="no_recent_streams">No recent streams played yet.</string>
@@ -244,4 +244,19 @@
     <string name="episodes_available">%1$d Episodes Available</string>
     <string name="loading_podcast_episodes">Loading podcast episodes…</string>
     <string name="no_episodes_available">No episodes available for this show.</string>
+    <string name="onboarding_podcast_title">Podcasti i emisije</string>
+    <string name="onboarding_podcast_subtitle">Istražite golemu kolekciju podcasta na zahtjev u raznim temama i žanrovima.</string>
+    <string name="onboarding_podcast_badge1">1M+ Epizoda</string>
+    <string name="onboarding_podcast_badge2">Pametno otkrivanje</string>
+    <string name="onboarding_audio_title">Pro Audio i EQ</string>
+    <string name="onboarding_audio_subtitle">Prilagodite svoj zvuk naprednim ekvilajzerom, DSP profilima i tajmerom za spavanje.</string>
+    <string name="media_service_label">Pozadinska medijska usluga</string>
+    <string name="notification_lockscreen_label">Sustavna obavijest i zaključani zaslon</string>
+    <string name="more_countries_label">Više zemalja…</string>
+    <string name="status_active">AKTIVNO</string>
+    <string name="status_ready">SPREMNO</string>
+    <string name="no_countries_matched">Nisu pronađene zemlje koje odgovaraju \"%1$s\"</string>
+    <string name="resumed_at">Nastavljeno u %1$s</string>
+    <string name="share_app_text">📻 Slušam globalni radio uživo i podcaste na NeoTuneu! Preuzmite aplikaciju: %1$s</string>
+    <string name="radio_stations_count_text">50k+ Radio postaja</string>
 </resources>

@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">NeoTune</string>
-    <string name="app_description">Global Live Radio &amp; Chill Beats</string>
+    <string name="app_description">عالمی ریڈیو، پوڈکاسٹ اور لو فائی</string>
     <string name="nav_tuner">Tuner</string>
     <string name="nav_radio">Radio</string>
     <string name="nav_podcast">Podcast</string>
     <string name="nav_favorites">Favorites</string>
     <string name="nav_dock">Dock</string>
-    <string name="nav_settings">Options</string>
+    <string name="nav_settings">ترتیبات</string>
     <string name="search_placeholder">Search station, genre, country…</string>
     <string name="recent_streams">Recent Streams</string>
     <string name="no_recent_streams">No recent streams played yet.</string>
@@ -244,4 +244,19 @@
     <string name="episodes_available">%1$d Episodes Available</string>
     <string name="loading_podcast_episodes">Loading podcast episodes…</string>
     <string name="no_episodes_available">No episodes available for this show.</string>
+    <string name="onboarding_podcast_title">پوڈکاسٹ اور شوز</string>
+    <string name="onboarding_podcast_subtitle">مختلف موضوعات اور اصناف میں آن ڈیمانڈ پوڈکاسٹ کے وسیع مجموعے کو دریافت کریں۔</string>
+    <string name="onboarding_podcast_badge1">10 لاکھ سے زیادہ اقساط</string>
+    <string name="onboarding_podcast_badge2">سمارٹ ڈسکوری</string>
+    <string name="onboarding_audio_title">پرو آڈیو اور EQ</string>
+    <string name="onboarding_audio_subtitle">ایڈوانسڈ ایکولائزر، DSP پروفائلز، اور سلیپ ٹائمر کے ساتھ اپنی آواز کو حسب ضرورت بنائیں۔</string>
+    <string name="media_service_label">بیک گراؤنڈ میڈیا سروس</string>
+    <string name="notification_lockscreen_label">سسٹم نوٹیفکیشن اور لاک اسکرین</string>
+    <string name="more_countries_label">مزید ممالک…</string>
+    <string name="status_active">فعال</string>
+    <string name="status_ready">تیار</string>
+    <string name="no_countries_matched">\"%1$s\" سے مماثل کوئی ملک نہیں ملا</string>
+    <string name="resumed_at">پر دوبارہ شروع ہوا %1$s</string>
+    <string name="share_app_text">📻 NeoTune پر عالمی لائیو ریڈیو اور پوڈکاسٹ سن رہے ہیں! ایپ ڈاؤن لوڈ کریں: %1$s</string>
+    <string name="radio_stations_count_text">50 ہزار سے زیادہ ریڈیو اسٹیشنز</string>
 </resources>

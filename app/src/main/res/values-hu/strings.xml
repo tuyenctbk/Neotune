@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">NeoTune</string>
-    <string name="app_description">Global Live Radio &amp; Chill Beats</string>
+    <string name="app_description">Globális rádió, podcastok és Lo-Fi</string>
     <string name="nav_tuner">Tuner</string>
     <string name="nav_radio">Radio</string>
     <string name="nav_podcast">Podcast</string>
     <string name="nav_favorites">Favorites</string>
     <string name="nav_dock">Dock</string>
-    <string name="nav_settings">Options</string>
+    <string name="nav_settings">Beállítások</string>
     <string name="search_placeholder">Search station, genre, country…</string>
     <string name="recent_streams">Recent Streams</string>
     <string name="no_recent_streams">No recent streams played yet.</string>
@@ -244,4 +244,19 @@
     <string name="episodes_available">%1$d Episodes Available</string>
     <string name="loading_podcast_episodes">Loading podcast episodes…</string>
     <string name="no_episodes_available">No episodes available for this show.</string>
+    <string name="onboarding_podcast_title">Podcastok és műsorok</string>
+    <string name="onboarding_podcast_subtitle">Fedezze fel az igény szerinti podcastok hatalmas gyűjteményét különféle témákban és műfajokban.</string>
+    <string name="onboarding_podcast_badge1">1M+ Epizód</string>
+    <string name="onboarding_podcast_badge2">Intelligens felfedezés</string>
+    <string name="onboarding_audio_title">Pro Audio és EQ</string>
+    <string name="onboarding_audio_subtitle">Szabja személyre hangzását a fejlett Equalizer, DSP profilok és elalváskapcsoló segítségével.</string>
+    <string name="media_service_label">Háttér média szolgáltatás</string>
+    <string name="notification_lockscreen_label">Rendszerértesítés és záróképernyő</string>
+    <string name="more_countries_label">További országok…</string>
+    <string name="status_active">AKTÍV</string>
+    <string name="status_ready">KÉSZ</string>
+    <string name="no_countries_matched">Nincs a(z) \"%1$s\" kifejezésnek megfelelő ország</string>
+    <string name="resumed_at">Folytatva ekkor: %1$s</string>
+    <string name="share_app_text">📻 Globális élő rádiót és podcastokat hallgatok a NeoTune-on! Töltse le az alkalmazást: %1$s</string>
+    <string name="radio_stations_count_text">50k+ Rádióállomás</string>
 </resources>

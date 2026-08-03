@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">NeoTune</string>
-    <string name="app_description">Global Live Radio &amp; Chill Beats</string>
+    <string name="app_description">ಜಾಗತಿಕ ರೇಡಿಯೋ, ಪಾಡ್‌ಕಾಸ್ಟ್‌ಗಳು ಮತ್ತು ಲೋ-ಫೈ</string>
     <string name="nav_tuner">Tuner</string>
     <string name="nav_radio">Radio</string>
     <string name="nav_podcast">Podcast</string>
     <string name="nav_favorites">Favorites</string>
     <string name="nav_dock">Dock</string>
-    <string name="nav_settings">Options</string>
+    <string name="nav_settings">ಸೆಟ್ಟಿಂಗ್‌ಗಳು</string>
     <string name="search_placeholder">Search station, genre, country…</string>
     <string name="recent_streams">Recent Streams</string>
     <string name="no_recent_streams">No recent streams played yet.</string>
@@ -244,4 +244,19 @@
     <string name="episodes_available">%1$d Episodes Available</string>
     <string name="loading_podcast_episodes">Loading podcast episodes…</string>
     <string name="no_episodes_available">No episodes available for this show.</string>
+    <string name="onboarding_podcast_title">ಪಾಡ್‌ಕಾಸ್ಟ್‌ಗಳು ಮತ್ತು ಶೋಗಳು</string>
+    <string name="onboarding_podcast_subtitle">ವಿವಿಧ ವಿಷಯಗಳು ಮತ್ತು ಪ್ರಕಾರಗಳಲ್ಲಿ ಬೇಡಿಕೆಯ ಮೇರೆಗೆ ಪಾಡ್‌ಕಾಸ್ಟ್‌ಗಳ ದೊಡ್ಡ ಸಂಗ್ರಹವನ್ನು ಅನ್ವೇಷಿಸಿ.</string>
+    <string name="onboarding_podcast_badge1">10 ಲಕ್ಷ+ ಸಂಚಿಕೆಗಳು</string>
+    <string name="onboarding_podcast_badge2">ಸ್ಮಾರ್ಟ್ ಡಿಸ್ಕವರಿ</string>
+    <string name="onboarding_audio_title">ಪ್ರೊ ಆಡಿಯೋ ಮತ್ತು EQ</string>
+    <string name="onboarding_audio_subtitle">ಸುಧಾರಿತ ಈಕ್ವಲೈಜರ್, DSP ಪ್ರೊಫೈಲ್‌ಗಳು ಮತ್ತು ಸ್ಲೀಪ್ ಟೈಮರ್‌ನೊಂದಿಗೆ ನಿಮ್ಮ ಧ್ವನಿಯನ್ನು ಕಸ್ಟಮೈಸ್ ಮಾಡಿ.</string>
+    <string name="media_service_label">ಹಿನ್ನೆಲೆ ಮಾಧ್ಯಮ ಸೇವೆ</string>
+    <string name="notification_lockscreen_label">ಸಿಸ್ಟಮ್ ಅಧಿಸೂಚನೆ ಮತ್ತು ಲಾಕ್‌ಸ್ಕ್ರೀನ್</string>
+    <string name="more_countries_label">ಹೆಚ್ಚಿನ ದೇಶಗಳು…</string>
+    <string name="status_active">ಸಕ್ರಿಯ</string>
+    <string name="status_ready">ಸಿದ್ಧ</string>
+    <string name="no_countries_matched">\"%1$s\" ಗೆ ಹೊಂದಿಕೆಯಾಗುವ ಯಾವುದೇ ದೇಶಗಳು ಕಂಡುಬಂದಿಲ್ಲ</string>
+    <string name="resumed_at">%1$s ಕ್ಕೆ ಪುನರಾರಂಭಿಸಲಾಗಿದೆ</string>
+    <string name="share_app_text">📻 NeoTune ನಲ್ಲಿ ಜಾಗತಿಕ ಲೈವ್ ರೇಡಿಯೋ ಮತ್ತು ಪಾಡ್‌ಕಾಸ್ಟ್‌ಗಳನ್ನು ಕೇಳುತ್ತಿದ್ದೇನೆ! ಅಪ್ಲಿಕೇಶನ್ ಡೌನ್‌ಲೋಡ್ ಮಾಡಿ: %1$s</string>
+    <string name="radio_stations_count_text">50k+ ರೇಡಿಯೋ ಕೇಂದ್ರಗಳು</string>
 </resources>

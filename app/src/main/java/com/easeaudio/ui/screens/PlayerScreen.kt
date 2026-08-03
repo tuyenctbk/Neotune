@@ -101,8 +101,6 @@ fun PlayerScreen(
         label = "artPulse"
     )
 
-    val isTv = com.easeaudio.ui.theme.rememberIsTv()
-
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         containerColor = DarkBackground,
@@ -116,23 +114,22 @@ fun PlayerScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 var isBackFocused by remember { mutableStateOf(false) }
-                val showBackFocus = isBackFocused
                 IconButton(
                     onClick = onBack,
                     modifier = Modifier
                         .onFocusChanged { isBackFocused = it.isFocused }
                         .clip(CircleShape)
-                        .background(if (showBackFocus) NeonCyan else Color.Transparent)
+                        .background(if (isBackFocused) NeonCyan else Color.Transparent)
                         .testTag("btn_player_back")
                 ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack, 
                         contentDescription = stringResource(R.string.close), 
-                        tint = if (showBackFocus) DarkBackground else TextPrimary
+                        tint = if (isBackFocused) DarkBackground else TextPrimary
                     )
                 }
 
-                val isPodcast = station?.isPodcast == true
+                val isPodcast = station.isPodcast
                 Text(
                     text = stringResource(if (isPodcast) R.string.on_demand_podcast else R.string.live_radio_broadcast),
                     style = MaterialTheme.typography.labelLarge,
@@ -142,46 +139,73 @@ fun PlayerScreen(
 
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     var isFavFocused by remember { mutableStateOf(false) }
-                    val showFavFocus = isFavFocused
                     IconButton(
                         onClick = onToggleFavorite,
                         modifier = Modifier
                             .onFocusChanged { isFavFocused = it.isFocused }
                             .clip(CircleShape)
-                            .background(if (showFavFocus) FavoriteHeartColor else Color.Transparent)
+                            .background(if (isFavFocused) FavoriteHeartColor else Color.Transparent)
                             .testTag("btn_player_favorite")
                     ) {
                         Icon(
                             imageVector = if (station.isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
                             contentDescription = "Favorite",
-                            tint = if (showFavFocus) DarkBackground else (if (station.isFavorite) FavoriteHeartColor else TextMuted)
+                            tint = if (isFavFocused) DarkBackground else (if (station.isFavorite) FavoriteHeartColor else TextMuted)
                         )
                     }
 
+                    var isSleepFocused by remember { mutableStateOf(false) }
                     IconButton(
-                        onClick = onOpenScreensaver,
+                        onClick = onOpenSleepTimer,
                         modifier = Modifier
+                            .onFocusChanged { isSleepFocused = it.isFocused }
                             .clip(CircleShape)
-                            .testTag("btn_player_screensaver")
+                            .background(if (isSleepFocused) NeonPurple else Color.Transparent)
+                            .testTag("btn_player_sleep_timer")
                     ) {
                         Icon(
                             imageVector = Icons.Filled.Bedtime,
-                            contentDescription = "Bedtime Dock",
-                            tint = NeonPurple
+                            contentDescription = "Sleep Timer",
+                            tint = if (isSleepFocused) DarkBackground else (if (sleepTimerRemaining != null) NeonPurple else TextMuted)
                         )
                     }
 
-                    IconButton(
-                        onClick = onOpenTrackOptions,
-                        modifier = Modifier
-                            .clip(CircleShape)
-                            .testTag("btn_player_more_options")
-                    ) {
-                        Icon(
-                            imageVector = Icons.Filled.MoreVert,
-                            contentDescription = "More Options",
-                            tint = TextPrimary
-                        )
+                    var showPlayerMenu by remember { mutableStateOf(false) }
+                    Box {
+                        IconButton(
+                            onClick = { showPlayerMenu = true },
+                            modifier = Modifier.clip(CircleShape)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.MoreVert,
+                                contentDescription = "More Options",
+                                tint = TextPrimary
+                            )
+                        }
+                        
+                        DropdownMenu(
+                            expanded = showPlayerMenu,
+                            onDismissRequest = { showPlayerMenu = false },
+                            modifier = Modifier.background(DarkSurfaceVariant)
+                        ) {
+                            DropdownMenuItem(
+                                text = { Text("Screensaver Mode", color = TextPrimary) },
+                                leadingIcon = { Icon(Icons.Filled.Tv, contentDescription = null, tint = NeonCyan) },
+                                onClick = {
+                                    showPlayerMenu = false
+                                    onOpenScreensaver()
+                                }
+                            )
+                            HorizontalDivider(color = CardBorder, thickness = 1.dp)
+                            DropdownMenuItem(
+                                text = { Text(stringResource(R.string.track_options), color = TextPrimary) },
+                                leadingIcon = { Icon(Icons.Filled.Settings, contentDescription = null, tint = TextMuted) },
+                                onClick = {
+                                    showPlayerMenu = false
+                                    onOpenTrackOptions()
+                                }
+                            )
+                        }
                     }
                 }
             }
@@ -192,7 +216,7 @@ fun PlayerScreen(
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
-            val isPodcast = station?.isPodcast == true
+            val isPodcast = station.isPodcast
             val maxScreenHeight = maxHeight
             val isCompact = maxScreenHeight < 680.dp
             val artSize = if (isCompact) 150.dp else 195.dp
@@ -286,47 +310,46 @@ fun PlayerScreen(
 
                     Spacer(modifier = Modifier.height(2.dp))
 
-                // Metadata row — radio only (bitrate/codec/country irrelevant for podcasts)
-                if (!isPodcast) {
-                    Row(
-                        horizontalArrangement = Arrangement.Center,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = station.country,
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = TextSecondary
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Box(
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(4.dp))
-                                .background(DarkSurfaceVariant)
-                                .padding(horizontal = 6.dp, vertical = 2.dp)
+                    if (!isPodcast) {
+                        Row(
+                            horizontalArrangement = Arrangement.Center,
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
-                                text = station.bitrate,
-                                style = MaterialTheme.typography.labelSmall,
-                                color = TextMuted,
-                                fontWeight = FontWeight.SemiBold
+                                text = station.country,
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = TextSecondary
                             )
-                        }
-                        Spacer(modifier = Modifier.width(6.dp))
-                        Box(
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(4.dp))
-                                .background(DarkSurfaceVariant)
-                                .padding(horizontal = 6.dp, vertical = 2.dp)
-                        ) {
-                            Text(
-                                text = station.codec,
-                                style = MaterialTheme.typography.labelSmall,
-                                color = TextMuted,
-                                fontWeight = FontWeight.SemiBold
-                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Box(
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(4.dp))
+                                    .background(DarkSurfaceVariant)
+                                    .padding(horizontal = 6.dp, vertical = 2.dp)
+                            ) {
+                                Text(
+                                    text = station.bitrate,
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = TextMuted,
+                                    fontWeight = FontWeight.SemiBold
+                                )
+                            }
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Box(
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(4.dp))
+                                    .background(DarkSurfaceVariant)
+                                    .padding(horizontal = 6.dp, vertical = 2.dp)
+                            ) {
+                                Text(
+                                    text = station.codec,
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = TextMuted,
+                                    fontWeight = FontWeight.SemiBold
+                                )
+                            }
                         }
                     }
-                }
                 }
 
                 Spacer(modifier = Modifier.height(12.dp))
@@ -383,7 +406,7 @@ fun PlayerScreen(
                                     )
                                     Spacer(modifier = Modifier.width(5.dp))
                                     Text(
-                                        text = "Resumed at ${formatDuration(currentPosition)}",
+                                        text = stringResource(R.string.resumed_at, formatDuration(currentPosition)),
                                         style = MaterialTheme.typography.labelSmall.copy(fontSize = 11.sp),
                                         color = TextPrimary
                                     )
@@ -402,7 +425,6 @@ fun PlayerScreen(
                         }
                     }
                 } else if (!isPodcast) {
-                    // Live waveform bars (radio only)
                     val barColors = WaveformAnimationColors
                     Row(
                         modifier = Modifier
@@ -531,19 +553,18 @@ fun PlayerScreen(
                     horizontalArrangement = Arrangement.spacedBy(if (isPodcast) 12.dp else 24.dp)
                 ) {
                     var isPrevFocused by remember { mutableStateOf(false) }
-                    val showPrevFocus = isPrevFocused
                     IconButton(
                         onClick = onPlayPreviousStation,
                         modifier = Modifier
                             .size(44.dp)
                             .onFocusChanged { isPrevFocused = it.isFocused }
                             .clip(CircleShape)
-                            .background(if (showPrevFocus) NeonCyan else Color.Transparent)
+                            .background(if (isPrevFocused) NeonCyan else Color.Transparent)
                     ) {
                         Icon(
                             imageVector = Icons.Filled.SkipPrevious,
                             contentDescription = "Previous Station",
-                            tint = if (showPrevFocus) DarkBackground else TextPrimary,
+                            tint = if (isPrevFocused) DarkBackground else TextPrimary,
                             modifier = Modifier.size(28.dp)
                         )
                     }
@@ -567,17 +588,16 @@ fun PlayerScreen(
 
                     // Play / Pause Transport Button
                     var isPlayFocused by remember { mutableStateOf(false) }
-                    val showPlayFocus = isPlayFocused
                     Box(
                         modifier = Modifier
                             .size(68.dp)
                             .onFocusChanged { isPlayFocused = it.isFocused }
                             .clip(CircleShape)
-                            .background(if (showPlayFocus) NeonCyan else Color.White)
+                            .background(if (isPlayFocused) NeonCyan else Color.White)
                             .clickable(onClick = onTogglePlay)
                             .border(
-                                width = if (showPlayFocus) 3.dp else 0.dp,
-                                color = if (showPlayFocus) Color.White else Color.Transparent,
+                                width = if (isPlayFocused) 3.dp else 0.dp,
+                                color = if (isPlayFocused) Color.White else Color.Transparent,
                                 shape = CircleShape
                             )
                             .testTag("btn_player_toggle_play"),
@@ -586,7 +606,7 @@ fun PlayerScreen(
                         if (isLoading) {
                             CircularProgressIndicator(
                                 modifier = Modifier.size(30.dp),
-                                color = if (showPlayFocus) NeonCyan else DarkBackground,
+                                color = if (isPlayFocused) NeonCyan else DarkBackground,
                                 strokeWidth = 3.dp
                             )
                         } else {
@@ -617,19 +637,18 @@ fun PlayerScreen(
                     }
 
                     var isNextFocused by remember { mutableStateOf(false) }
-                    val showNextFocus = isNextFocused
                     IconButton(
                         onClick = onPlayNextStation,
                         modifier = Modifier
                             .size(44.dp)
                             .onFocusChanged { isNextFocused = it.isFocused }
                             .clip(CircleShape)
-                            .background(if (showNextFocus) NeonCyan else Color.Transparent)
+                            .background(if (isNextFocused) NeonCyan else Color.Transparent)
                     ) {
                         Icon(
                             imageVector = Icons.Filled.SkipNext,
                             contentDescription = if (isPodcast) "Next Episode" else "Next Station",
-                            tint = if (showNextFocus) DarkBackground else TextPrimary,
+                            tint = if (isNextFocused) DarkBackground else TextPrimary,
                             modifier = Modifier.size(28.dp)
                         )
                     }
@@ -637,7 +656,7 @@ fun PlayerScreen(
 
                 Spacer(modifier = Modifier.height(6.dp))
 
-                // Shortcut Pills for Sleep Timer, Equalizer, Playback Speed, and Episodes List
+                // Shortcut Pills
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -692,7 +711,6 @@ fun PlayerScreen(
                         )
                     }
                     var isEqFocused by remember { mutableStateOf(false) }
-                    val showEqFocus = isEqFocused
                     val activePresetLabel = eqPresets.find { it.key == activeEqPreset }?.labelResId?.let { stringResource(it) } ?: activeEqPreset
                     AssistChip(
                         onClick = onOpenEqualizer,
@@ -700,48 +718,19 @@ fun PlayerScreen(
                             Icon(
                                 imageVector = Icons.Filled.Equalizer,
                                 contentDescription = null,
-                                tint = if (showEqFocus) DarkBackground else NeonCyan,
+                                tint = if (isEqFocused) DarkBackground else NeonCyan,
                                 modifier = Modifier.size(16.dp)
                             )
                         },
-                        label = { Text(stringResource(R.string.eq_label, activePresetLabel), color = if (showEqFocus) DarkBackground else TextPrimary, fontSize = 12.sp) },
+                        label = { Text(stringResource(R.string.eq_label, activePresetLabel), color = if (isEqFocused) DarkBackground else TextPrimary, fontSize = 12.sp) },
                         colors = AssistChipDefaults.assistChipColors(
-                            containerColor = if (showEqFocus) NeonCyan else DarkSurfaceVariant
+                            containerColor = if (isEqFocused) NeonCyan else DarkSurfaceVariant
                         ),
                         border = AssistChipDefaults.assistChipBorder(
                             enabled = true,
-                            borderColor = if (showEqFocus) Color.White else CardBorder
+                            borderColor = if (isEqFocused) Color.White else CardBorder
                         ),
                         modifier = Modifier.onFocusChanged { isEqFocused = it.isFocused }
-                    )
-
-                    var isSleepFocused by remember { mutableStateOf(false) }
-                    val showSleepFocus = isSleepFocused
-                    AssistChip(
-                        onClick = onOpenSleepTimer,
-                        leadingIcon = {
-                            Icon(
-                                imageVector = Icons.Filled.Bedtime,
-                                contentDescription = null,
-                                tint = if (showSleepFocus) DarkBackground else (if (sleepTimerRemaining != null) DarkBackground else TextMuted),
-                                modifier = Modifier.size(16.dp)
-                            )
-                        },
-                        label = {
-                            Text(
-                                text = if (sleepTimerRemaining != null) stringResource(R.string.sleeping_in, sleepTimerRemaining) else stringResource(R.string.sleep_timer),
-                                color = if (showSleepFocus) DarkBackground else (if (sleepTimerRemaining != null) DarkBackground else TextPrimary),
-                                fontSize = 12.sp
-                            )
-                        },
-                        colors = AssistChipDefaults.assistChipColors(
-                            containerColor = if (showSleepFocus) NeonCyan else (if (sleepTimerRemaining != null) ActivePill else DarkSurfaceVariant)
-                        ),
-                        border = AssistChipDefaults.assistChipBorder(
-                            enabled = true,
-                            borderColor = if (showSleepFocus) Color.White else (if (sleepTimerRemaining != null) Color.White else CardBorder)
-                        ),
-                        modifier = Modifier.onFocusChanged { isSleepFocused = it.isFocused }
                     )
                 }
 

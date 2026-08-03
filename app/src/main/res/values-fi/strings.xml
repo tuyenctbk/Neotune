@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">NeoTune</string>
-    <string name="app_description">Global Live Radio &amp; Chill Beats</string>
+    <string name="app_description">Maailmanlaajuinen radio, podcastit &amp; Lo-Fi</string>
     <string name="nav_tuner">Tuner</string>
     <string name="nav_radio">Radio</string>
     <string name="nav_podcast">Podcast</string>
     <string name="nav_favorites">Favorites</string>
     <string name="nav_dock">Dock</string>
-    <string name="nav_settings">Options</string>
+    <string name="nav_settings">Asetukset</string>
     <string name="search_placeholder">Search station, genre, country…</string>
     <string name="recent_streams">Recent Streams</string>
     <string name="no_recent_streams">No recent streams played yet.</string>
@@ -244,4 +244,19 @@
     <string name="episodes_available">%1$d Episodes Available</string>
     <string name="loading_podcast_episodes">Loading podcast episodes…</string>
     <string name="no_episodes_available">No episodes available for this show.</string>
+    <string name="onboarding_podcast_title">Podcastit &amp; ohjelmat</string>
+    <string name="onboarding_podcast_subtitle">Tutustu valtavaan on-demand-podcast-kokoelmaan eri aiheista ja tyylilajeista.</string>
+    <string name="onboarding_podcast_badge1">1M+ Jaksoa</string>
+    <string name="onboarding_podcast_badge2">Älykäs löytäminen</string>
+    <string name="onboarding_audio_title">Pro-ääni &amp; EQ</string>
+    <string name="onboarding_audio_subtitle">Mukauta äänesi edistyneellä taajuuskorjaimella, DSP-profiileilla ja uniajastimella.</string>
+    <string name="media_service_label">Taustamedian palvelu</string>
+    <string name="notification_lockscreen_label">Järjestelmän ilmoitus &amp; lukitusnäyttö</string>
+    <string name="more_countries_label">Lisää maita…</string>
+    <string name="status_active">AKTIIVINEN</string>
+    <string name="status_ready">VALMIS</string>
+    <string name="no_countries_matched">Hakua \"%1$s\" vastaavia maita ei löytynyt</string>
+    <string name="resumed_at">Jatkettu klo %1$s</string>
+    <string name="share_app_text">📻 Kuuntelen maailmanlaajuista suoraa radiota &amp; podcasteja NeoTunessa! Lataa sovellus: %1$s</string>
+    <string name="radio_stations_count_text">50k+ Radioasemaa</string>
 </resources>

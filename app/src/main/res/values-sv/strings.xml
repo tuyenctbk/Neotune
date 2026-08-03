@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">NeoTune</string>
-    <string name="app_description">Global Live Radio &amp; Chill Beats</string>
+    <string name="app_description">Global radio, podcaster &amp; Lo-Fi</string>
     <string name="nav_tuner">Tuner</string>
     <string name="nav_radio">Radio</string>
     <string name="nav_podcast">Podcast</string>
     <string name="nav_favorites">Favorites</string>
     <string name="nav_dock">Dock</string>
-    <string name="nav_settings">Options</string>
+    <string name="nav_settings">Inställningar</string>
     <string name="search_placeholder">Search station, genre, country…</string>
     <string name="recent_streams">Recent Streams</string>
     <string name="no_recent_streams">No recent streams played yet.</string>
@@ -244,4 +244,19 @@
     <string name="episodes_available">%1$d Episodes Available</string>
     <string name="loading_podcast_episodes">Loading podcast episodes…</string>
     <string name="no_episodes_available">No episodes available for this show.</string>
+    <string name="onboarding_podcast_title">Podcaster &amp; program</string>
+    <string name="onboarding_podcast_subtitle">Utforska en enorm samling av on-demand podcaster inom olika ämnen och genrer.</string>
+    <string name="onboarding_podcast_badge1">1M+ Avsnitt</string>
+    <string name="onboarding_podcast_badge2">Smart upptäckt</string>
+    <string name="onboarding_audio_title">Pro Audio &amp; EQ</string>
+    <string name="onboarding_audio_subtitle">Anpassa ditt ljud med avancerad Equalizer, DSP-profiler och insomningstimer.</string>
+    <string name="media_service_label">Bakgrundsmedietjänst</string>
+    <string name="notification_lockscreen_label">Systemavisering &amp; låsskärm</string>
+    <string name="more_countries_label">Fler länder…</string>
+    <string name="status_active">AKTIV</string>
+    <string name="status_ready">KLAR</string>
+    <string name="no_countries_matched">Inga länder hittades som matchar \"%1$s\"</string>
+    <string name="resumed_at">Återupptogs kl. %1$s</string>
+    <string name="share_app_text">📻 Lyssnar på global liveradio &amp; podcaster på NeoTune! Ladda ner appen: %1$s</string>
+    <string name="radio_stations_count_text">50k+ Radiostationer</string>
 </resources>

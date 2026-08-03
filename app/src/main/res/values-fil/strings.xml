@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">NeoTune</string>
-    <string name="app_description">Global Live Radio &amp; Chill Beats</string>
+    <string name="app_description">Global Radio, Podcast at Lo-Fi</string>
     <string name="nav_tuner">Tuner</string>
     <string name="nav_radio">Radio</string>
     <string name="nav_podcast">Podcast</string>
     <string name="nav_favorites">Favorites</string>
     <string name="nav_dock">Dock</string>
-    <string name="nav_settings">Options</string>
+    <string name="nav_settings">Mga Setting</string>
     <string name="search_placeholder">Search station, genre, country…</string>
     <string name="recent_streams">Recent Streams</string>
     <string name="no_recent_streams">No recent streams played yet.</string>
@@ -244,4 +244,19 @@
     <string name="episodes_available">%1$d Episodes Available</string>
     <string name="loading_podcast_episodes">Loading podcast episodes…</string>
     <string name="no_episodes_available">No episodes available for this show.</string>
+    <string name="onboarding_podcast_title">Mga Podcast at Show</string>
+    <string name="onboarding_podcast_subtitle">Galugarin ang malawak na koleksyon ng mga on-demand na podcast sa iba\'t ibang paksa at genre.</string>
+    <string name="onboarding_podcast_badge1">1M+ na Episode</string>
+    <string name="onboarding_podcast_badge2">Matalinong Pagdiskubre</string>
+    <string name="onboarding_audio_title">Pro Audio at EQ</string>
+    <string name="onboarding_audio_subtitle">I-customize ang iyong tunog gamit ang advanced na Equalizer, mga DSP profile, at sleep timer.</string>
+    <string name="media_service_label">Serbisyo ng Background Media</string>
+    <string name="notification_lockscreen_label">Notification ng System at Lockscreen</string>
+    <string name="more_countries_label">Higit Pang Mga Bansa…</string>
+    <string name="status_active">AKTIBO</string>
+    <string name="status_ready">HANDA NA</string>
+    <string name="no_countries_matched">Walang nahanap na mga bansa na tumutugma sa \"%1$s\"</string>
+    <string name="resumed_at">Ipinagpatuloy sa ganap na %1$s</string>
+    <string name="share_app_text">📻 Pakikinig sa global live radio at mga podcast sa NeoTune! I-download ang app: %1$s</string>
+    <string name="radio_stations_count_text">50k+ na Radio station</string>
 </resources>

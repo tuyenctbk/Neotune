@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">NeoTune</string>
-    <string name="app_description">Global Live Radio &amp; Chill Beats</string>
+    <string name="app_description">ਗਲੋਬਲ ਰੇਡੀਓ, ਪੌਡਕਾਸਟ ਅਤੇ ਲੋ-ਫਾਈ</string>
     <string name="nav_tuner">Tuner</string>
     <string name="nav_radio">Radio</string>
     <string name="nav_podcast">Podcast</string>
     <string name="nav_favorites">Favorites</string>
     <string name="nav_dock">Dock</string>
-    <string name="nav_settings">Options</string>
+    <string name="nav_settings">ਸੈਟਿੰਗਾਂ</string>
     <string name="search_placeholder">Search station, genre, country…</string>
     <string name="recent_streams">Recent Streams</string>
     <string name="no_recent_streams">No recent streams played yet.</string>
@@ -244,4 +244,19 @@
     <string name="episodes_available">%1$d Episodes Available</string>
     <string name="loading_podcast_episodes">Loading podcast episodes…</string>
     <string name="no_episodes_available">No episodes available for this show.</string>
+    <string name="onboarding_podcast_title">ਪੌਡਕਾਸਟ ਅਤੇ ਸ਼ੋਅ</string>
+    <string name="onboarding_podcast_subtitle">ਵੱਖ-ਵੱਖ ਵਿਸ਼ਿਆਂ ਅਤੇ ਸ਼ੈਲੀਆਂ ਵਿੱਚ ਆਨ-ਡਿਮਾਂਡ ਪੌਡਕਾਸਟਾਂ ਦੇ ਵਿਸ਼ਾਲ ਸੰਗ੍ਰਹਿ ਦੀ ਪੜਚੋਲ ਕਰੋ।</string>
+    <string name="onboarding_podcast_badge1">10 ਲੱਖ+ ਐਪੀਸੋਡ</string>
+    <string name="onboarding_podcast_badge2">ਸਮਾਰਟ ਡਿਸਕਵਰੀ</string>
+    <string name="onboarding_audio_title">ਪ੍ਰੋ ਆਡੀਓ ਅਤੇ EQ</string>
+    <string name="onboarding_audio_subtitle">ਉੱਨਤ ਇਕੁਇਲਾਈਜ਼ਰ, DSP ਪ੍ਰੋਫਾਈਲਾਂ ਅਤੇ ਸਲੀਪ ਟਾਈਮਰ ਨਾਲ ਆਪਣੀ ਆਵਾਜ਼ ਨੂੰ ਅਨੁਕੂਲਿਤ ਕਰੋ।</string>
+    <string name="media_service_label">ਬੈਕਗ੍ਰਾਊਂਡ ਮੀਡੀਆ ਸੇਵਾ</string>
+    <string name="notification_lockscreen_label">ਸਿਸਟਮ ਨੋਟੀਫਿਕੇਸ਼ਨ ਅਤੇ ਲਾਕਸਕ੍ਰੀਨ</string>
+    <string name="more_countries_label">ਹੋਰ ਦੇਸ਼…</string>
+    <string name="status_active">ਸਰਗਰਮ</string>
+    <string name="status_ready">ਤਿਆਰ</string>
+    <string name="no_countries_matched">\"%1$s\" ਨਾਲ ਮੇਲ ਖਾਂਦਾ ਕੋਈ ਦੇਸ਼ ਨਹੀਂ ਮਿਲਿਆ</string>
+    <string name="resumed_at">%1$s ਤੇ ਮੁੜ ਸ਼ੁਰੂ ਹੋਇਆ</string>
+    <string name="share_app_text">📻 NeoTune ਤੇ ਗਲੋਬਲ ਲਾਈਵ ਰੇਡੀਓ ਅਤੇ ਪੌਡਕਾਸਟ ਸੁਣ ਰਿਹਾ ਹਾਂ! ਐਪ ਡਾਊਨਲੋਡ ਕਰੋ: %1$s</string>
+    <string name="radio_stations_count_text">50k+ ਰੇਡੀਓ ਸਟੇਸ਼ਨ</string>
 </resources>

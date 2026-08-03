@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">NeoTune</string>
-    <string name="app_description">Мировое живое радио и расслабляющие биты</string>
+    <string name="app_description">Мировое радио, подкасты и Lo-Fi</string>
     <string name="nav_tuner">Тюнер</string>
     <string name="nav_radio">Radio</string>
     <string name="nav_podcast">Podcast</string>
     <string name="nav_favorites">Избранное</string>
     <string name="nav_dock">Док</string>
-    <string name="nav_settings">Options</string>
+    <string name="nav_settings">Настройки</string>
     <string name="search_placeholder">Поиск по станции, жанру, стране…</string>
     <string name="recent_streams">Недавние трансляции</string>
     <string name="no_recent_streams">Недавних трансляций ещё не было.</string>
@@ -244,4 +244,19 @@
     <string name="episodes_available">%1$d Episodes Available</string>
     <string name="loading_podcast_episodes">Loading podcast episodes…</string>
     <string name="no_episodes_available">No episodes available for this show.</string>
+    <string name="onboarding_podcast_title">Подкасты и шоу</string>
+    <string name="onboarding_podcast_subtitle">Исследуйте огромную коллекцию подкастов по запросу на различные темы и жанры.</string>
+    <string name="onboarding_podcast_badge1">1М+ Эпизодов</string>
+    <string name="onboarding_podcast_badge2">Умный поиск</string>
+    <string name="onboarding_audio_title">Про-аудио и EQ</string>
+    <string name="onboarding_audio_subtitle">Настройте звук с помощью продвинутого эквалайзера, DSP-профилей и таймера сна.</string>
+    <string name="media_service_label">Фоновая медиа-служба</string>
+    <string name="notification_lockscreen_label">Системное уведомление и экран блокировки</string>
+    <string name="more_countries_label">Другие страны…</string>
+    <string name="status_active">АКТИВНО</string>
+    <string name="status_ready">ГОТОВО</string>
+    <string name="no_countries_matched">Страны, соответствующие \"%1$s\", не найдены</string>
+    <string name="resumed_at">Возобновлено в %1$s</string>
+    <string name="share_app_text">📻 Слушаю мировое живое радио и подкасты на NeoTune! Скачать приложение: %1$s</string>
+    <string name="radio_stations_count_text">50к+ Радиостанций</string>
 </resources>

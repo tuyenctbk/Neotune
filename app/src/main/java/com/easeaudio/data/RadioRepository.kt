@@ -4,21 +4,21 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 
-class RadioRepository(private val dao: RadioDao) {
+class RadioRepository(private val dao: RadioDao) : IRadioRepository {
 
-    val defaultStations = emptyList<RadioStation>()
+    override val defaultStations = emptyList<RadioStation>()
 
-    fun getAllStations(): Flow<List<RadioStation>> {
+    override fun getAllStations(): Flow<List<RadioStation>> {
         return dao.getAllStations()
     }
 
-    suspend fun discoverOnlineStations(
-        query: String = "",
-        genre: String = "",
-        country: String = "",
-        countryCode: String = "",
-        offset: Int = 0,
-        limit: Int = 40
+    override suspend fun discoverOnlineStations(
+        query: String,
+        genre: String,
+        country: String,
+        countryCode: String,
+        offset: Int,
+        limit: Int
     ): List<RadioStation> {
         val onlineList = RadioBrowserService.fetchTopStations(
             limit = limit,
@@ -34,12 +34,12 @@ class RadioRepository(private val dao: RadioDao) {
         return onlineList
     }
 
-    suspend fun discoverOnlinePodcasts(
-        query: String = "",
-        genre: String = "",
-        country: String = "",
-        offset: Int = 0,
-        limit: Int = 40
+    override suspend fun discoverOnlinePodcasts(
+        query: String,
+        genre: String,
+        country: String,
+        offset: Int,
+        limit: Int
     ): List<RadioStation> {
         val result = iTunesPodcastService.fetchPodcasts(
             limit = limit,
@@ -55,10 +55,10 @@ class RadioRepository(private val dao: RadioDao) {
         return result.podcasts
     }
 
-    suspend fun getiTunesLiveRadioStations(
-        query: String = "",
-        genre: String = "",
-        country: String = ""
+    override suspend fun getiTunesLiveRadioStations(
+        query: String,
+        genre: String,
+        country: String
     ): List<RadioStation> {
         val result = iTunesPodcastService.fetchPodcasts(
             limit = 30,
@@ -70,25 +70,25 @@ class RadioRepository(private val dao: RadioDao) {
         return result.liveRadioStations
     }
 
-    fun getFavoriteStations(): Flow<List<RadioStation>> = dao.getFavoriteStations()
-    fun getRecentStations(): Flow<List<RadioStation>> = dao.getRecentStations()
+    override fun getFavoriteStations(): Flow<List<RadioStation>> = dao.getFavoriteStations()
+    override fun getRecentStations(): Flow<List<RadioStation>> = dao.getRecentStations()
 
-    suspend fun toggleFavorite(station: RadioStation) {
+    override suspend fun toggleFavorite(station: RadioStation) {
         val newFav = !station.isFavorite
         val updated = station.copy(isFavorite = newFav)
         dao.insertOrUpdateStation(updated)
     }
 
-    suspend fun recordStationListened(station: RadioStation) {
+    override suspend fun recordStationListened(station: RadioStation) {
         val updated = station.copy(lastListenedTimestamp = System.currentTimeMillis())
         dao.insertOrUpdateStation(updated)
     }
 
-    suspend fun addCustomStation(station: RadioStation) {
+    override suspend fun addCustomStation(station: RadioStation) {
         dao.insertOrUpdateStation(station)
     }
 
-    suspend fun deleteCustomStation(station: RadioStation) {
+    override suspend fun deleteCustomStation(station: RadioStation) {
         dao.deleteStation(station)
     }
 }

@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">NeoTune</string>
-    <string name="app_description">Global Live Radio &amp; Chill Beats</string>
+    <string name="app_description">Üleilmne raadio, podcastid ja Lo-Fi</string>
     <string name="nav_tuner">Tuner</string>
     <string name="nav_radio">Radio</string>
     <string name="nav_podcast">Podcast</string>
     <string name="nav_favorites">Favorites</string>
     <string name="nav_dock">Dock</string>
-    <string name="nav_settings">Options</string>
+    <string name="nav_settings">Seaded</string>
     <string name="search_placeholder">Search station, genre, country…</string>
     <string name="recent_streams">Recent Streams</string>
     <string name="no_recent_streams">No recent streams played yet.</string>
@@ -244,4 +244,19 @@
     <string name="episodes_available">%1$d Episodes Available</string>
     <string name="loading_podcast_episodes">Loading podcast episodes…</string>
     <string name="no_episodes_available">No episodes available for this show.</string>
+    <string name="onboarding_podcast_title">Podcastid ja saated</string>
+    <string name="onboarding_podcast_subtitle">Avastage tohutut nõudmisel podcastide kogu erinevatel teemadel ja žanrites.</string>
+    <string name="onboarding_podcast_badge1">1M+ Episoodi</string>
+    <string name="onboarding_podcast_badge2">Nutikas avastamine</string>
+    <string name="onboarding_audio_title">Pro Audio ja EQ</string>
+    <string name="onboarding_audio_subtitle">Kohandage oma heli täiustatud ekvalaiseri, DSP-profiilide ja unetaimeriga.</string>
+    <string name="media_service_label">Taustameedia teenus</string>
+    <string name="notification_lockscreen_label">Süsteemi teavitus ja lukustuskuva</string>
+    <string name="more_countries_label">Rohkem riike…</string>
+    <string name="status_active">AKTIIVNE</string>
+    <string name="status_ready">VALMIS</string>
+    <string name="no_countries_matched">Riiike, mis vastavad otsingule \"%1$s\", ei leitud</string>
+    <string name="resumed_at">Jätkati kell %1$s</string>
+    <string name="share_app_text">📻 Kuulan üleilmset otseraadiot ja podcaste NeoTune\'is! Laadi äpp alla: %1$s</string>
+    <string name="radio_stations_count_text">50k+ Raadiojaama</string>
 </resources>

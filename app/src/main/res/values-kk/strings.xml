@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">NeoTune</string>
-    <string name="app_description">Global Live Radio &amp; Chill Beats</string>
+    <string name="app_description">Жаһანдық радио, подкасттар және Lo-Fi</string>
     <string name="nav_tuner">Tuner</string>
     <string name="nav_radio">Radio</string>
     <string name="nav_podcast">Podcast</string>
     <string name="nav_favorites">Favorites</string>
     <string name="nav_dock">Dock</string>
-    <string name="nav_settings">Options</string>
+    <string name="nav_settings">Параметрлер</string>
     <string name="search_placeholder">Search station, genre, country…</string>
     <string name="recent_streams">Recent Streams</string>
     <string name="no_recent_streams">No recent streams played yet.</string>
@@ -244,4 +244,19 @@
     <string name="episodes_available">%1$d Episodes Available</string>
     <string name="loading_podcast_episodes">Loading podcast episodes…</string>
     <string name="no_episodes_available">No episodes available for this show.</string>
+    <string name="onboarding_podcast_title">Подкасттар мен шоулар</string>
+    <string name="onboarding_podcast_subtitle">Әртүрлі тақырыптар мен жанрлардағы сұранысқа ие подкасттардың үлкен жиынтығын зерттеңіз.</string>
+    <string name="onboarding_podcast_badge1">1М+ Эпизод</string>
+    <string name="onboarding_podcast_badge2">Ақылды іздеу</string>
+    <string name="onboarding_audio_title">Pro Audio және EQ</string>
+    <string name="onboarding_audio_subtitle">Дыбысты кеңейтілген эквалайзер, DSP профильдері және ұйқы таймерімен реტтеңіз.</string>
+    <string name="media_service_label">Фондық медиа қызметі</string>
+    <string name="notification_lockscreen_label">Жүйелік хабарландыру және құлыптау экраны</string>
+    <string name="more_countries_label">Көбірек елдер…</string>
+    <string name="status_active">БЕЛСЕНДІ</string>
+    <string name="status_ready">ДАЙЫН</string>
+    <string name="no_countries_matched">«%1$s» сұрауына сәйкес келетін елдер табылмады</string>
+    <string name="resumed_at">%1$s уақытында жалғастырылды</string>
+    <string name="share_app_text">📻 NeoTune-де жаһანдық тікелей радио мен подкасттарды тыңдаудамын! Қолданбаны жүктеп алыңыз: %1$s</string>
+    <string name="radio_stations_count_text">50к+ Радиостанция</string>
 </resources>

@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">NeoTune</string>
-    <string name="app_description">Global Live Radio &amp; Chill Beats</string>
+    <string name="app_description">ഗ്ലോബൽ റേഡിയോ, പോഡ്‌കാസ്റ്റുകൾ &amp; ലോ-ഫൈ</string>
     <string name="nav_tuner">Tuner</string>
     <string name="nav_radio">Radio</string>
     <string name="nav_podcast">Podcast</string>
     <string name="nav_favorites">Favorites</string>
     <string name="nav_dock">Dock</string>
-    <string name="nav_settings">Options</string>
+    <string name="nav_settings">ക്രമീകരണങ്ങൾ</string>
     <string name="search_placeholder">Search station, genre, country…</string>
     <string name="recent_streams">Recent Streams</string>
     <string name="no_recent_streams">No recent streams played yet.</string>
@@ -244,4 +244,19 @@
     <string name="episodes_available">%1$d Episodes Available</string>
     <string name="loading_podcast_episodes">Loading podcast episodes…</string>
     <string name="no_episodes_available">No episodes available for this show.</string>
+    <string name="onboarding_podcast_title">പോഡ്‌കാസ്റ്റുകൾ &amp; ഷോകൾ</string>
+    <string name="onboarding_podcast_subtitle">വിവിധ വിഷയങ്ങളിലും വിഭാഗങ്ങളിലും ഉടനീളമുള്ള ഓൺ-ഡിമാൻഡ് പോഡ്‌കാസ്റ്റുകളുടെ വലിയ ശേഖരം പര്യവേക്ഷണം ചെയ്യുക.</string>
+    <string name="onboarding_podcast_badge1">10 ലക്ഷം+ എപ്പിസോഡുകൾ</string>
+    <string name="onboarding_podcast_badge2">സ്മാർട്ട് ഡിസ്കവറി</string>
+    <string name="onboarding_audio_title">പ്രോ ഓഡിയോ &amp; EQ</string>
+    <string name="onboarding_audio_subtitle">അഡ്വാൻസ്ഡ് ഇക്വലൈസർ, DSP പ്രൊഫൈലുകൾ, സ്ലീപ്പ് ടൈമർ എന്നിവ ഉപയോഗിച്ച് നിങ്ങളുടെ ശബ്ദം ഇഷ്ടാനുസൃതമാക്കുക.</string>
+    <string name="media_service_label">ബാക്ക്ഗ്രൗണ്ട് മീഡിയ സർവീസ്</string>
+    <string name="notification_lockscreen_label">സിസ്റ്റം നോട്ടിഫിക്കേഷൻ &amp; ലോക്ക്സ്ക്രീൻ</string>
+    <string name="more_countries_label">കൂടുതൽ രാജ്യങ്ങൾ…</string>
+    <string name="status_active">സജീവം</string>
+    <string name="status_ready">തയ്യാറാണ്</string>
+    <string name="no_countries_matched">\"%1$s\" മായി പൊരുത്തപ്പെടുന്ന രാജ്യങ്ങളൊന്നും കണ്ടെത്തിയില്ല</string>
+    <string name="resumed_at">%1$s-ൽ പുനരാരംഭിച്ചു</string>
+    <string name="share_app_text">📻 NeoTune-ൽ ഗ്ലോബൽ ലൈവ് റേഡിയോയും പോഡ്‌കാസ്റ്റുകളും കേൾക്കുന്നു! ആപ്പ് ഡൗൺലോഡ് ചെയ്യുക: %1$s</string>
+    <string name="radio_stations_count_text">50k+ റേഡിയോ സ്റ്റേഷനുകൾ</string>
 </resources>

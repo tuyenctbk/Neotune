@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">NeoTune</string>
-    <string name="app_description">Global Live Radio &amp; Chill Beats</string>
+    <string name="app_description">ዓለም አቀፍ ሬዲዮ፣ ፖድካስቶች እና ሎ-ፋይ</string>
     <string name="nav_tuner">Tuner</string>
     <string name="nav_radio">Radio</string>
     <string name="nav_podcast">Podcast</string>
     <string name="nav_favorites">Favorites</string>
     <string name="nav_dock">Dock</string>
-    <string name="nav_settings">Options</string>
+    <string name="nav_settings">ቅንብሮች</string>
     <string name="search_placeholder">Search station, genre, country…</string>
     <string name="recent_streams">Recent Streams</string>
     <string name="no_recent_streams">No recent streams played yet.</string>
@@ -244,4 +244,19 @@
     <string name="episodes_available">%1$d Episodes Available</string>
     <string name="loading_podcast_episodes">Loading podcast episodes…</string>
     <string name="no_episodes_available">No episodes available for this show.</string>
+    <string name="onboarding_podcast_title">ፖድካስቶች እና ትርኢቶች</string>
+    <string name="onboarding_podcast_subtitle">በተለያዩ ርዕሰ ጉዳዮች እና ዘውጎች ውስጥ ያሉ በርካታ ፖድካስቶችን ያስሱ።</string>
+    <string name="onboarding_podcast_badge1">1M+ ክፍሎች</string>
+    <string name="onboarding_podcast_badge2">ብልህ ግኝት</string>
+    <string name="onboarding_audio_title">ፕሮ ኦዲዮ እና EQ</string>
+    <string name="onboarding_audio_subtitle">ድምጽዎን በላቁ አመጣጣኝ፣ የDSP መገለጫዎች እና የእንቅልፍ ሰዓት ቆጣሪ ያብጁ።</string>
+    <string name="media_service_label">የጀርባ ሚዲያ አገልግሎት</string>
+    <string name="notification_lockscreen_label">የስርዓት ማሳወቂያ እና መቆለፊያ ማያ ገጽ</string>
+    <string name="more_countries_label">ተጨማሪ አገሮች…</string>
+    <string name="status_active">ገባሪ</string>
+    <string name="status_ready">ዝግጁ</string>
+    <string name="no_countries_matched">ከ\"%1$s\" ጋር የሚዛመዱ አገሮች አልተገኙም</string>
+    <string name="resumed_at">በ%1$s ቀጥሏል</string>
+    <string name="share_app_text">📻 በNeoTune ላይ ዓለም አቀፍ ቀጥታ ሬዲዮ እና ፖድካስቶችን በማዳመጥ ላይ! መተግበሪያውን ያውርዱ፦ %1$s</string>
+    <string name="radio_stations_count_text">50k+ የሬዲዮ ጣቢያዎች</string>
 </resources>

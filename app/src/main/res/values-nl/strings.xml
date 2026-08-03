@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">NeoTune</string>
-    <string name="app_description">Global Live Radio &amp; Chill Beats</string>
+    <string name="app_description">Wereldwijde radio, podcasts &amp; Lo-Fi</string>
     <string name="nav_tuner">Tuner</string>
     <string name="nav_radio">Radio</string>
     <string name="nav_podcast">Podcast</string>
     <string name="nav_favorites">Favorites</string>
     <string name="nav_dock">Dock</string>
-    <string name="nav_settings">Options</string>
+    <string name="nav_settings">Instellingen</string>
     <string name="search_placeholder">Search station, genre, country…</string>
     <string name="recent_streams">Recent Streams</string>
     <string name="no_recent_streams">No recent streams played yet.</string>
@@ -244,4 +244,19 @@
     <string name="episodes_available">%1$d Episodes Available</string>
     <string name="loading_podcast_episodes">Loading podcast episodes…</string>
     <string name="no_episodes_available">No episodes available for this show.</string>
+    <string name="onboarding_podcast_title">Podcasts &amp; Shows</string>
+    <string name="onboarding_podcast_subtitle">Ontdek een enorme collectie on-demand podcasts over verschillende onderwerpen en genres.</string>
+    <string name="onboarding_podcast_badge1">1M+ Afleveringen</string>
+    <string name="onboarding_podcast_badge2">Slimme ontdekking</string>
+    <string name="onboarding_audio_title">Pro Audio &amp; EQ</string>
+    <string name="onboarding_audio_subtitle">Pas je geluid aan met een geavanceerde Equalizer, DSP-profielen en slaaptimer.</string>
+    <string name="media_service_label">Mediaservice op de achtergrond</string>
+    <string name="notification_lockscreen_label">Systeemmelding &amp; vergrendelscherm</string>
+    <string name="more_countries_label">Meer landen…</string>
+    <string name="status_active">ACTIEF</string>
+    <string name="status_ready">GEREED</string>
+    <string name="no_countries_matched">Geen landen gevonden die overeenkomen met \"%1$s\"</string>
+    <string name="resumed_at">Hervat om %1$s</string>
+    <string name="share_app_text">📻 Ik luister naar wereldwijde live radio &amp; podcasts op NeoTune! Download de app: %1$s</string>
+    <string name="radio_stations_count_text">50k+ Radiostations</string>
 </resources>

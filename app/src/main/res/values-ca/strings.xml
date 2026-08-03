@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">NeoTune</string>
-    <string name="app_description">Global Live Radio &amp; Chill Beats</string>
+    <string name="app_description">Ràdio global, pòdcasts i Lo-Fi</string>
     <string name="nav_tuner">Tuner</string>
     <string name="nav_radio">Radio</string>
     <string name="nav_podcast">Podcast</string>
     <string name="nav_favorites">Favorites</string>
     <string name="nav_dock">Dock</string>
-    <string name="nav_settings">Options</string>
+    <string name="nav_settings">Configuració</string>
     <string name="search_placeholder">Search station, genre, country…</string>
     <string name="recent_streams">Recent Streams</string>
     <string name="no_recent_streams">No recent streams played yet.</string>
@@ -244,4 +244,19 @@
     <string name="episodes_available">%1$d Episodes Available</string>
     <string name="loading_podcast_episodes">Loading podcast episodes…</string>
     <string name="no_episodes_available">No episodes available for this show.</string>
+    <string name="onboarding_podcast_title">Pòdcasts i programes</string>
+    <string name="onboarding_podcast_subtitle">Explora una vasta col·lecció de pòdcasts a la carta en diversos temes i gèneres.</string>
+    <string name="onboarding_podcast_badge1">1M+ Episodis</string>
+    <string name="onboarding_podcast_badge2">Descobriment intel·ligent</string>
+    <string name="onboarding_audio_title">Pro Audio i EQ</string>
+    <string name="onboarding_audio_subtitle">Personalitza el teu so amb equalitzador avançat, perfils DSP i temporitzador.</string>
+    <string name="media_service_label">Servei de mitjans en segon pla</string>
+    <string name="notification_lockscreen_label">Notificació del sistema i pantalla de bloqueig</string>
+    <string name="more_countries_label">Més països…</string>
+    <string name="status_active">ACTIU</string>
+    <string name="status_ready">LLERT</string>
+    <string name="no_countries_matched">No s\'han trobat països que coincideixin amb \"%1$s\"</string>
+    <string name="resumed_at">Repu en marxa a les %1$s</string>
+    <string name="share_app_text">📻 Escoltant ràdio en directe global i pòdcasts a NeoTune! Baixa l\'aplicació: %1$s</string>
+    <string name="radio_stations_count_text">50k+ Estacions de ràdio</string>
 </resources>

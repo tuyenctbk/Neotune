@@ -13,6 +13,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Public
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -170,7 +171,7 @@ fun CountrySelectionDialog(
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text = "No countries found matching \"$searchQuery\"",
+                            text = stringResource(R.string.no_countries_matched, searchQuery),
                             style = MaterialTheme.typography.bodyMedium,
                             color = TextMuted
                         )
@@ -214,7 +215,17 @@ fun CountrySelectionDialog(
                                         verticalAlignment = Alignment.CenterVertically,
                                         modifier = Modifier.weight(1f)
                                     ) {
-                                        Text(text = country.flag, fontSize = 20.sp)
+                                        val isGlobal = country.name.equals("Global", ignoreCase = true) || country.code.isBlank()
+                                        if (isGlobal) {
+                                            Icon(
+                                                imageVector = Icons.Filled.Public,
+                                                contentDescription = null,
+                                                tint = if (isSelected) NeonCyan else TextPrimary,
+                                                modifier = Modifier.size(20.dp)
+                                            )
+                                        } else {
+                                            Text(text = country.flag, fontSize = 20.sp)
+                                        }
                                         Spacer(modifier = Modifier.width(12.dp))
                                         Text(
                                             text = country.name,

@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">NeoTune</string>
-    <string name="app_description">Global Live Radio &amp; Chill Beats</string>
+    <string name="app_description">全球電台、播客與 Lo-Fi</string>
     <string name="nav_tuner">Tuner</string>
     <string name="nav_radio">Radio</string>
     <string name="nav_podcast">Podcast</string>
     <string name="nav_favorites">Favorites</string>
     <string name="nav_dock">Dock</string>
-    <string name="nav_settings">Options</string>
+    <string name="nav_settings">設定</string>
     <string name="search_placeholder">Search station, genre, country…</string>
     <string name="recent_streams">Recent Streams</string>
     <string name="no_recent_streams">No recent streams played yet.</string>
@@ -244,4 +244,19 @@
     <string name="episodes_available">%1$d Episodes Available</string>
     <string name="loading_podcast_episodes">Loading podcast episodes…</string>
     <string name="no_episodes_available">No episodes available for this show.</string>
+    <string name="onboarding_podcast_title">播客與節目</string>
+    <string name="onboarding_podcast_subtitle">探索涵蓋各種主題和流派的海量點播播客資源。</string>
+    <string name="onboarding_podcast_badge1">100萬+ 集節目</string>
+    <string name="onboarding_podcast_badge2">智慧發現</string>
+    <string name="onboarding_audio_title">專業音訊與等化器</string>
+    <string name="onboarding_audio_subtitle">透過高級等化器、DSP 配置和睡眠定時器自定義您的音效。</string>
+    <string name="media_service_label">後台媒體服務</string>
+    <string name="notification_lockscreen_label">系統通知與鎖屏</string>
+    <string name="more_countries_label">更多國家…</string>
+    <string name="status_active">啟用</string>
+    <string name="status_ready">就緒</string>
+    <string name="no_countries_matched">未找到匹配「%1$s」的國家</string>
+    <string name="resumed_at">於 %1$s 恢復</string>
+    <string name="share_app_text">📻 正在 NeoTune 上收聽全球直播電台與播客！下載應用：%1$s</string>
+    <string name="radio_stations_count_text">5萬+ 廣播電台</string>
 </resources>

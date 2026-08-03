@@ -1,13 +1,13 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
     <string name="app_name">NeoTune</string>
-    <string name="app_description">Global Live Radio &amp; Chill Beats</string>
+    <string name="app_description">Global Radio, Podcasts &amp; Lo-Fi</string>
     <string name="nav_tuner">Tuner</string>
     <string name="nav_radio">Radio</string>
     <string name="nav_podcast">Podcast</string>
     <string name="nav_favorites">Favorites</string>
     <string name="nav_dock">Dock</string>
-    <string name="nav_settings">Options</string>
+    <string name="nav_settings">Settings</string>
     <string name="search_placeholder">Search station, genre, country…</string>
     <string name="recent_streams">Recent Streams</string>
     <string name="no_recent_streams">No recent streams played yet.</string>
@@ -101,15 +101,15 @@
     <string name="data_provider_gratitude">We are grateful to the Radio Browser community and Apple iTunes Podcast Directory for making these global directories of radio stations and podcasts freely available.</string>
     <string name="dismiss">Dismiss</string>
 
-    <!-- Network status banners (previously hardcoded in MainActivity.kt) -->
+    <!-- Network status banners -->
     <string name="banner_offline">You\'re Offline</string>
     <string name="banner_back_online">Back Online</string>
     <string name="banner_weak_connection">Weak Connection</string>
 
-    <!-- Featured station label (previously hardcoded in HomeScreen.kt) -->
+    <!-- Featured station label -->
     <string name="featured_station">FEATURED STATION</string>
 
-    <!-- Appearance / Theme screen (previously hardcoded in Vietnamese in HomeScreen.kt) -->
+    <!-- Appearance / Theme screen -->
     <string name="appearance_subtitle">Interface &amp; Color palette for your space</string>
     <string name="theme_section_cafe">☕ CAFE &amp; RESTAURANT (WARM, ELEGANT)</string>
     <string name="theme_section_cafe_desc">Warm-toned interface, easy on the eyes, ideal for background music</string>
@@ -119,10 +119,10 @@
     <string name="theme_section_youth_desc">Dynamic, artistic, bold for youthful spaces</string>
     <string name="in_use">In Use</string>
 
-    <!-- Mini player badge (previously hardcoded in MiniPlayer.kt) -->
+    <!-- Mini player badge -->
     <string name="live_badge">LIVE</string>
 
-    <!-- Network reconnection message (previously hardcoded in RadioPlayerManager.kt) -->
+    <!-- Network reconnection message -->
     <string name="waiting_network_reconnect">Waiting for network reconnection…</string>
     <!-- Discovery error messages -->
     <string name="network_error_title">Network error or API limit reached.</string>
@@ -138,22 +138,32 @@
     
     <!-- Slide 1: Global Live Radio -->
     <string name="onboarding_slide1_title">Global Live Radio</string>
-    <string name="onboarding_slide1_subtitle">Discover thousands of live radio stations worldwide, curated chill streams, ambient beats, and crystal-clear audio.</string>
+    <string name="onboarding_slide1_subtitle">Discover thousands of live radio stations worldwide, curated chill streams, and crystal-clear audio.</string>
     <string name="onboarding_slide1_badge1">50,000+ Stations</string>
     <string name="onboarding_slide1_badge2">Global Direct Streams</string>
     <string name="onboarding_slide1_badge3">Zero Ad Interruption</string>
-    
+
+    <!-- New Slide: Podcasts & Shows -->
+    <string name="onboarding_podcast_title">Podcasts &amp; Shows</string>
+    <string name="onboarding_podcast_subtitle">Explore a vast collection of on-demand podcasts across various topics and genres.</string>
+    <string name="onboarding_podcast_badge1">1M+ Episodes</string>
+    <string name="onboarding_podcast_badge2">Smart Discovery</string>
+
     <!-- Slide 2: Background Playback Controls -->
-    <string name="onboarding_slide2_title">Background Playback Controls</string>
-    <string name="onboarding_slide2_subtitle">Keep the radio playing seamlessly while using other apps, taking a drive, or when your device screen is locked.</string>
+    <string name="onboarding_slide2_title">Background Controls</string>
+    <string name="onboarding_slide2_subtitle">Keep the audio playing seamlessly while using other apps or when your device screen is locked.</string>
     <string name="onboarding_slide2_grant_btn">Enable Notification Permission</string>
     <string name="onboarding_slide2_granted">Notification Permission Granted ✓</string>
-    <string name="onboarding_slide2_explanation">NeoTune requests notification permission to display live playback controls on your lockscreen and status bar, ensuring continuous radio streaming without OS interruption. This permission is completely optional.</string>
+    <string name="onboarding_slide2_explanation">NeoTune requests notification permission to display live playback controls on your lockscreen and status bar.</string>
     <string name="onboarding_slide2_optional_note">You can enable permission now or skip and enable it anytime later.</string>
     <string name="onboarding_slide2_why_needed">Why is this permission needed?</string>
     <string name="onboarding_slide2_feature1">System Lockscreen Media Widget</string>
     <string name="onboarding_slide2_feature2">Persistent Status Bar Controls</string>
     <string name="onboarding_slide2_feature3">Auto Reconnect &amp; Buffer Protection</string>
+
+    <!-- New Slide: Pro Audio & EQ -->
+    <string name="onboarding_audio_title">Pro Audio &amp; EQ</string>
+    <string name="onboarding_audio_subtitle">Customize your sound with advanced Equalizer, DSP profiles, and sleep timer.</string>
 
     <!-- Playtime Permission Reminder -->
     <string name="playtime_permission_reminder_title">Enable Lockscreen &amp; Background Controls</string>
@@ -162,8 +172,8 @@
     <string name="playtime_permission_dismiss">Not Now</string>
 
     <!-- Slide 3: Country & Region Discovery -->
-    <string name="onboarding_slide3_title">Country &amp; Region Discovery</string>
-    <string name="onboarding_slide3_subtitle">Select your preferred country or region to discover top local and global radio stations.</string>
+    <string name="onboarding_slide3_title">Country &amp; Region</string>
+    <string name="onboarding_slide3_subtitle">Select your preferred country or region to discover top local and global stations.</string>
     <string name="onboarding_slide3_select_country">Select Preferred Country / Region</string>
     <string name="onboarding_slide3_select_genres">Pick your preferred styles:</string>
     <string name="onboarding_slide3_start_listening">Start Listening</string>
@@ -216,6 +226,7 @@
     <string name="select_country">Select Country / Region</string>
     <string name="discovering_countries">Discovering countries…</string>
     <string name="country_count">%d countries available</string>
+    <string name="no_countries_matched">No countries found matching \"%1$s\"</string>
 
     <!-- Content Filters & Blocklist -->
     <string name="content_filters_blocklist">Content Filters &amp; Blocklist</string>
@@ -262,6 +273,7 @@
     <string name="not_now_btn">Not Now</string>
 
     <string name="share_track_message">🎶 Listening to \"%1$s\" on %2$s via NeoTune Radio!\n\nDownload NeoTune: %3$s</string>
+    <string name="share_app_text">📻 Listening to global live radio &amp; podcasts on NeoTune! Download the app: %1$s</string>
     <string name="share_track_chooser">Share Track</string>
 
     <!-- Podcasts -->
@@ -289,9 +301,18 @@
     <string name="topic_science">Science</string>
     <string name="topic_news">News</string>
 
-    <!-- Hardcoded string replacements -->
+    <!-- General Labels -->
     <string name="restart">Restart</string>
+    <string name="resumed_at">Resumed at %1$s</string>
     <string name="episodes_available">%1$d Episodes Available</string>
     <string name="loading_podcast_episodes">Loading podcast episodes…</string>
     <string name="no_episodes_available">No episodes available for this show.</string>
+    <string name="media_service_label">Background Media Service</string>
+    <string name="notification_lockscreen_label">System Notification &amp; Lockscreen</string>
+    <string name="more_countries_label">More Countries...</string>
+    <string name="status_active">ACTIVE</string>
+    <string name="status_ready">READY</string>
+    <string name="radio_stations_count_text">50k+ Radio stations</string>
+    <string name="five_band_equalizer">5-Band Precision Equalizer</string>
+    <string name="custom_playback_speed">Custom Playback Speed</string>
 </resources>

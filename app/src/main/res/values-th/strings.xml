@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">NeoTune</string>
-    <string name="app_description">Global Live Radio &amp; Chill Beats</string>
+    <string name="app_description">วิทยุทั่วโลก, พอดแคสต์ &amp; Lo-Fi</string>
     <string name="nav_tuner">Tuner</string>
     <string name="nav_radio">Radio</string>
     <string name="nav_podcast">Podcast</string>
     <string name="nav_favorites">Favorites</string>
     <string name="nav_dock">Dock</string>
-    <string name="nav_settings">Options</string>
+    <string name="nav_settings">การตั้งค่า</string>
     <string name="search_placeholder">Search station, genre, country…</string>
     <string name="recent_streams">Recent Streams</string>
     <string name="no_recent_streams">No recent streams played yet.</string>
@@ -244,4 +244,19 @@
     <string name="episodes_available">%1$d Episodes Available</string>
     <string name="loading_podcast_episodes">Loading podcast episodes…</string>
     <string name="no_episodes_available">No episodes available for this show.</string>
+    <string name="onboarding_podcast_title">พอดแคสต์ &amp; รายการ</string>
+    <string name="onboarding_podcast_subtitle">สำรวจคอลเลกชันพอดแคสต์แบบออนดีมานด์มากมายในหัวข้อและประเภทต่างๆ</string>
+    <string name="onboarding_podcast_badge1">1 ล้าน+ ตอน</string>
+    <string name="onboarding_podcast_badge2">การค้นพบอัจฉริยะ</string>
+    <string name="onboarding_audio_title">เสียงระดับโปร &amp; EQ</string>
+    <string name="onboarding_audio_subtitle">ปรับแต่งเสียงของคุณด้วย Equalizer ขั้นสูง, โปรไฟล์ DSP และตัวตั้งเวลาปิด</string>
+    <string name="media_service_label">บริการสื่อพื้นหลัง</string>
+    <string name="notification_lockscreen_label">การแจ้งเตือนระบบ &amp; หน้าจอล็อก</string>
+    <string name="more_countries_label">ประเทศเพิ่มเติม…</string>
+    <string name="status_active">เปิดใช้งาน</string>
+    <string name="status_ready">พร้อม</string>
+    <string name="no_countries_matched">ไม่พบประเทศที่ตรงกับ \"%1$s\"</string>
+    <string name="resumed_at">กลับมาเล่นเมื่อ %1$s</string>
+    <string name="share_app_text">📻 กำลังฟังวิทยุสดทั่วโลกและพอดแคสต์บน NeoTune! ดาวน์โหลดแอป: %1$s</string>
+    <string name="radio_stations_count_text">50k+ สถานีวิทยุ</string>
 </resources>

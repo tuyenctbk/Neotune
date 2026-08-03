@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">NeoTune</string>
-    <string name="app_description">Global Live Radio &amp; Chill Beats</string>
+    <string name="app_description">గ్లోబల్ రేడియో, పాడ్‌కాస్ట్‌లు &amp; లో-ఫై</string>
     <string name="nav_tuner">Tuner</string>
     <string name="nav_radio">Radio</string>
     <string name="nav_podcast">Podcast</string>
     <string name="nav_favorites">Favorites</string>
     <string name="nav_dock">Dock</string>
-    <string name="nav_settings">Options</string>
+    <string name="nav_settings">సెట్టింగ్‌లు</string>
     <string name="search_placeholder">Search station, genre, country…</string>
     <string name="recent_streams">Recent Streams</string>
     <string name="no_recent_streams">No recent streams played yet.</string>
@@ -244,4 +244,19 @@
     <string name="episodes_available">%1$d Episodes Available</string>
     <string name="loading_podcast_episodes">Loading podcast episodes…</string>
     <string name="no_episodes_available">No episodes available for this show.</string>
+    <string name="onboarding_podcast_title">పాడ్‌కాస్ట్‌లు &amp; షోలు</string>
+    <string name="onboarding_podcast_subtitle">వివిధ అంశాలు మరియు శైలులలో ఆన్-డిమాండ్ పాడ్‌కాస్ట్‌ల భారీ సేకరణను అన్వేషించండి.</string>
+    <string name="onboarding_podcast_badge1">10 లక్షలకు పైగా ఎపిసోడ్‌లు</string>
+    <string name="onboarding_podcast_badge2">స్మార్ట్ డిస్కవరీ</string>
+    <string name="onboarding_audio_title">ప్రో ఆడియో &amp; EQ</string>
+    <string name="onboarding_audio_subtitle">అధునాతన ఈక్వలైజర్, DSP ప్రొఫైల్‌లు మరియు స్లీప్ టైమర్‌తో మీ ధ్వనిని అనుకూలీకరించుకోండి.</string>
+    <string name="media_service_label">బ్యాక్‌గ్రౌండ్ మీడియా సర్వీస్</string>
+    <string name="notification_lockscreen_label">సిస్టమ్ నోటిఫికేషన్ &amp; లాక్‌స్క్రీన్</string>
+    <string name="more_countries_label">మరిన్ని దేశాలు…</string>
+    <string name="status_active">యాక్టివ్</string>
+    <string name="status_ready">సిద్ధం</string>
+    <string name="no_countries_matched">\"%1$s\" తో సరిపోలే దేశాలేవీ కనుగొనబడలేదు</string>
+    <string name="resumed_at">%1$s వద్ద పునఃప్రారంభించబడింది</string>
+    <string name="share_app_text">📻 NeoTune లో గ్లోబల్ లైవ్ రేడియో &amp; పాడ్‌కాస్ట్‌లు వింటున్నాను! యాప్‌ని డౌన్‌లోడ్ చేయండి: %1$s</string>
+    <string name="radio_stations_count_text">50వేలకు పైగా రేడియో స్టేషన్లు</string>
 </resources>

@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">NeoTune</string>
-    <string name="app_description">Global Live Radio &amp; Chill Beats</string>
+    <string name="app_description">Radio global, podcasts e Lo-Fi</string>
     <string name="nav_tuner">Tuner</string>
     <string name="nav_radio">Radio</string>
     <string name="nav_podcast">Podcast</string>
     <string name="nav_favorites">Favorites</string>
     <string name="nav_dock">Dock</string>
-    <string name="nav_settings">Options</string>
+    <string name="nav_settings">Axustes</string>
     <string name="search_placeholder">Search station, genre, country…</string>
     <string name="recent_streams">Recent Streams</string>
     <string name="no_recent_streams">No recent streams played yet.</string>
@@ -244,4 +244,19 @@
     <string name="episodes_available">%1$d Episodes Available</string>
     <string name="loading_podcast_episodes">Loading podcast episodes…</string>
     <string name="no_episodes_available">No episodes available for this show.</string>
+    <string name="onboarding_podcast_title">Podcasts e programas</string>
+    <string name="onboarding_podcast_subtitle">Explora unha vasta colección de podcasts baixo demanda en varios temas e xéneros.</string>
+    <string name="onboarding_podcast_badge1">1M+ Episodios</string>
+    <string name="onboarding_podcast_badge2">Descubrimento intelixente</string>
+    <string name="onboarding_audio_title">Pro Audio e EQ</string>
+    <string name="onboarding_audio_subtitle">Personaliza o teu son con ecualizador avanzado, perfís DSP e temporizador.</string>
+    <string name="media_service_label">Servizo de medios en segundo plano</string>
+    <string name="notification_lockscreen_label">Notificación do sistema e pantalla de bloqueo</string>
+    <string name="more_countries_label">Máis países…</string>
+    <string name="status_active">ACTIVO</string>
+    <string name="status_ready">LISTO</string>
+    <string name="no_countries_matched">Non se atoparon países que coincidan con \"%1$s\"</string>
+    <string name="resumed_at">Reanudado ás %1$s</string>
+    <string name="share_app_text">📻 Escoitando radio en directo global e podcasts en NeoTune! Descarga a aplicación: %1$s</string>
+    <string name="radio_stations_count_text">50k+ Estacións de radio</string>
 </resources>

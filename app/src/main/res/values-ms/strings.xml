@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">NeoTune</string>
-    <string name="app_description">Global Live Radio &amp; Chill Beats</string>
+    <string name="app_description">Radio Global, Podcast &amp; Lo-Fi</string>
     <string name="nav_tuner">Tuner</string>
     <string name="nav_radio">Radio</string>
     <string name="nav_podcast">Podcast</string>
     <string name="nav_favorites">Favorites</string>
     <string name="nav_dock">Dock</string>
-    <string name="nav_settings">Options</string>
+    <string name="nav_settings">Tetapan</string>
     <string name="search_placeholder">Search station, genre, country…</string>
     <string name="recent_streams">Recent Streams</string>
     <string name="no_recent_streams">No recent streams played yet.</string>
@@ -244,4 +244,19 @@
     <string name="episodes_available">%1$d Episodes Available</string>
     <string name="loading_podcast_episodes">Loading podcast episodes…</string>
     <string name="no_episodes_available">No episodes available for this show.</string>
+    <string name="onboarding_podcast_title">Podcast &amp; Rancangan</string>
+    <string name="onboarding_podcast_subtitle">Terokai koleksi podcast atas permintaan yang luas merangkumi pelbagai topik dan genre.</string>
+    <string name="onboarding_podcast_badge1">1Jt+ Episod</string>
+    <string name="onboarding_podcast_badge2">Penemuan Pintar</string>
+    <string name="onboarding_audio_title">Audio Pro &amp; EQ</string>
+    <string name="onboarding_audio_subtitle">Sesuaikan bunyi anda dengan penyama lanjutan, profil DSP dan pemasa tidur.</string>
+    <string name="media_service_label">Perkhidmatan Media Latar Belakang</string>
+    <string name="notification_lockscreen_label">Pemberitahuan Sistem &amp; Skrin Kunci</string>
+    <string name="more_countries_label">Lebih Banyak Negara…</string>
+    <string name="status_active">AKTIF</string>
+    <string name="status_ready">SEDIA</string>
+    <string name="no_countries_matched">Tiada negara ditemui yang sepadan dengan \"%1$s\"</string>
+    <string name="resumed_at">Disambung semula pada %1$s</string>
+    <string name="share_app_text">📻 Mendengar radio siaran langsung global &amp; podcast di NeoTune! Muat turun aplikasi: %1$s</string>
+    <string name="radio_stations_count_text">50k+ Stesen radio</string>
 </resources>

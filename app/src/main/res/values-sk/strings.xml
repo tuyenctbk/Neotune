@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">NeoTune</string>
-    <string name="app_description">Global Live Radio &amp; Chill Beats</string>
+    <string name="app_description">Globálne rádio, podcasty a Lo-Fi</string>
     <string name="nav_tuner">Tuner</string>
     <string name="nav_radio">Radio</string>
     <string name="nav_podcast">Podcast</string>
     <string name="nav_favorites">Favorites</string>
     <string name="nav_dock">Dock</string>
-    <string name="nav_settings">Options</string>
+    <string name="nav_settings">Nastavenia</string>
     <string name="search_placeholder">Search station, genre, country…</string>
     <string name="recent_streams">Recent Streams</string>
     <string name="no_recent_streams">No recent streams played yet.</string>
@@ -244,4 +244,19 @@
     <string name="episodes_available">%1$d Episodes Available</string>
     <string name="loading_podcast_episodes">Loading podcast episodes…</string>
     <string name="no_episodes_available">No episodes available for this show.</string>
+    <string name="onboarding_podcast_title">Podcasty a relácie</string>
+    <string name="onboarding_podcast_subtitle">Preskúmajte rozsiahlu zbierku podcastov na vyžiadanie z rôznych tém a žánrov.</string>
+    <string name="onboarding_podcast_badge1">1M+ Epizód</string>
+    <string name="onboarding_podcast_badge2">Inteligentné objavovanie</string>
+    <string name="onboarding_audio_title">Pro Audio a EQ</string>
+    <string name="onboarding_audio_subtitle">Prispôsobte si zvuk pomocou pokročilého ekvalizéra, DSP profilov a časovača vypnutia.</string>
+    <string name="media_service_label">Služba médií na pozadí</string>
+    <string name="notification_lockscreen_label">Systémové oznámenie a uzamknutá obrazovka</string>
+    <string name="more_countries_label">Ďalšie krajiny…</string>
+    <string name="status_active">AKTÍVNE</string>
+    <string name="status_ready">PRIPRAVENÉ</string>
+    <string name="no_countries_matched">Neboli nájdené žiadne krajiny zodpovedajúce \"%1$s\"</string>
+    <string name="resumed_at">Obnovené o %1$s</string>
+    <string name="share_app_text">📻 Počúvam globálne živé rádio a podcasty na NeoTune! Stiahnite si aplikáciu: %1$s</string>
+    <string name="radio_stations_count_text">50k+ Rádiových staníc</string>
 </resources>

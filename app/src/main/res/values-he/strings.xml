@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">NeoTune</string>
-    <string name="app_description">Global Live Radio &amp; Chill Beats</string>
+    <string name="app_description">רדיו עולמי, פודקאסטים ו-Lo-Fi</string>
     <string name="nav_tuner">Tuner</string>
     <string name="nav_radio">Radio</string>
     <string name="nav_podcast">Podcast</string>
     <string name="nav_favorites">Favorites</string>
     <string name="nav_dock">Dock</string>
-    <string name="nav_settings">Options</string>
+    <string name="nav_settings">הגדרות</string>
     <string name="search_placeholder">Search station, genre, country…</string>
     <string name="recent_streams">Recent Streams</string>
     <string name="no_recent_streams">No recent streams played yet.</string>
@@ -244,4 +244,19 @@
     <string name="episodes_available">%1$d Episodes Available</string>
     <string name="loading_podcast_episodes">Loading podcast episodes…</string>
     <string name="no_episodes_available">No episodes available for this show.</string>
+    <string name="onboarding_podcast_title">פודקאסטים ותוכניות</string>
+    <string name="onboarding_podcast_subtitle">חקור אוסף עצום של פודקאסטים לפי דרישה במגוון נושאים וז\'אנרים.</string>
+    <string name="onboarding_podcast_badge1">יותר ממיליון פרקים</string>
+    <string name="onboarding_podcast_badge2">גילוי חכם</string>
+    <string name="onboarding_audio_title">אודיו מקצועי ו-EQ</string>
+    <string name="onboarding_audio_subtitle">התאם אישית את הסאונד שלך עם אקולייזר מתקדם, פרופילי DSP וטיימר שינה.</string>
+    <string name="media_service_label">שירות מדיה ברקע</string>
+    <string name="notification_lockscreen_label">התראת מערכת ומסך נעילה</string>
+    <string name="more_countries_label">מדינות נוספות…</string>
+    <string name="status_active">פעיל</string>
+    <string name="status_ready">מוכן</string>
+    <string name="no_countries_matched">לא נמצאו מדינות התואמות ל-\"%1$s\"</string>
+    <string name="resumed_at">חודש ב-%1$s</string>
+    <string name="share_app_text">📻 מאזין לרדיו עולמי בשידור חי ולפודקאסטים ב-NeoTune! הורד את האפליקציה: %1$s</string>
+    <string name="radio_stations_count_text">יותר מ-50 אלף תחנות רדיו</string>
 </resources>

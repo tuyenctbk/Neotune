@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">NeoTune</string>
-    <string name="app_description">Global Live Radio &amp; Chill Beats</string>
+    <string name="app_description">உலகளாவிய வானொலி, பாட்காஸ்ட்கள் &amp; லோ-ஃபை</string>
     <string name="nav_tuner">Tuner</string>
     <string name="nav_radio">Radio</string>
     <string name="nav_podcast">Podcast</string>
     <string name="nav_favorites">Favorites</string>
     <string name="nav_dock">Dock</string>
-    <string name="nav_settings">Options</string>
+    <string name="nav_settings">அமைப்புகள்</string>
     <string name="search_placeholder">Search station, genre, country…</string>
     <string name="recent_streams">Recent Streams</string>
     <string name="no_recent_streams">No recent streams played yet.</string>
@@ -244,4 +244,19 @@
     <string name="episodes_available">%1$d Episodes Available</string>
     <string name="loading_podcast_episodes">Loading podcast episodes…</string>
     <string name="no_episodes_available">No episodes available for this show.</string>
+    <string name="onboarding_podcast_title">பாட்காஸ்ட்கள் &amp; நிகழ்ச்சிகள்</string>
+    <string name="onboarding_podcast_subtitle">பல்வேறு தலைப்புகள் மற்றும் வகைகளில் தேவைக்கேற்ப பாட்காஸ்ட்களின் பெரிய தொகுப்பை ஆராயுங்கள்.</string>
+    <string name="onboarding_podcast_badge1">10 லட்சம்+ எபிசோடுகள்</string>
+    <string name="onboarding_podcast_badge2">ஸ்மார்ட் டிஸ்கவரி</string>
+    <string name="onboarding_audio_title">ப்ரோ ஆடியோ &amp; EQ</string>
+    <string name="onboarding_audio_subtitle">மேம்பட்ட ஈக்வலைசர், டிஎஸ்பி ப்ரொஃபைல்கள் மற்றும் ஸ்லீப் டைமர் மூலம் உங்கள் ஒலியைத் தனிப்பயனாக்குங்கள்.</string>
+    <string name="media_service_label">பின்னணி ஊடக சேவை</string>
+    <string name="notification_lockscreen_label">சிஸ்டம் அறிவிப்பு &amp; லாக்ஸ்கிரீன்</string>
+    <string name="more_countries_label">கூடுதல் நாடுகள்…</string>
+    <string name="status_active">செயலில் உள்ளது</string>
+    <string name="status_ready">தயார்</string>
+    <string name="no_countries_matched">\"%1$s\" உடன் பொருந்தும் நாடுகள் எதுவும் காணப்படவில்லை</string>
+    <string name="resumed_at">%1$s மணிக்கு மீண்டும் தொடங்கப்பட்டது</string>
+    <string name="share_app_text">📻 NeoTune இல் உலகளாவிய நேரடி வானொலி மற்றும் பாட்காஸ்ட்களைக் கேட்டுக்கொண்டிருக்கிறேன்! பயன்பாட்டைப் பதிவிறக்கவும்: %1$s</string>
+    <string name="radio_stations_count_text">50k+ வானொலி நிலையங்கள்</string>
 </resources>

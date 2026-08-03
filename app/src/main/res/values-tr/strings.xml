@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">NeoTune</string>
-    <string name="app_description">Global Live Radio &amp; Chill Beats</string>
+    <string name="app_description">Küresel Radyo, Podcastler ve Lo-Fi</string>
     <string name="nav_tuner">Tuner</string>
     <string name="nav_radio">Radio</string>
     <string name="nav_podcast">Podcast</string>
     <string name="nav_favorites">Favorites</string>
     <string name="nav_dock">Dock</string>
-    <string name="nav_settings">Options</string>
+    <string name="nav_settings">Ayarlar</string>
     <string name="search_placeholder">Search station, genre, country…</string>
     <string name="recent_streams">Recent Streams</string>
     <string name="no_recent_streams">No recent streams played yet.</string>
@@ -244,4 +244,19 @@
     <string name="episodes_available">%1$d Episodes Available</string>
     <string name="loading_podcast_episodes">Loading podcast episodes…</string>
     <string name="no_episodes_available">No episodes available for this show.</string>
+    <string name="onboarding_podcast_title">Podcastler ve Programlar</string>
+    <string name="onboarding_podcast_subtitle">Çeşitli konu ve türlerde geniş bir isteğe bağlı podcast koleksiyonunu keşfedin.</string>
+    <string name="onboarding_podcast_badge1">1M+ Bölüm</string>
+    <string name="onboarding_podcast_badge2">Akıllı Keşif</string>
+    <string name="onboarding_audio_title">Profesyonel Ses ve EQ</string>
+    <string name="onboarding_audio_subtitle">Gelişmiş Ekolayzır, DSP profilleri ve uyku zamanlayıcısı ile sesinizi özelleştirin.</string>
+    <string name="media_service_label">Arka Plan Medya Hizmeti</string>
+    <string name="notification_lockscreen_label">Sistem Bildirimi ve Kilit Ekranı</string>
+    <string name="more_countries_label">Daha Fazla Ülke…</string>
+    <string name="status_active">AKTİF</string>
+    <string name="status_ready">HAZIR</string>
+    <string name="no_countries_matched">\"%1$s\" ile eşleşen ülke bulunamadı</string>
+    <string name="resumed_at">%1$s zamanında devam ettirildi</string>
+    <string name="share_app_text">📻 NeoTune\'da küresel canlı radyo ve podcastleri dinliyorum! Uygulamayı indir: %1$s</string>
+    <string name="radio_stations_count_text">50 bin+ Radyo istasyonu</string>
 </resources>

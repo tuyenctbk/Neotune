@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">NeoTune</string>
-    <string name="app_description">全球直播电台与轻松节拍</string>
+    <string name="app_description">全球电台、播客与 Lo-Fi</string>
     <string name="nav_tuner">调谐器</string>
     <string name="nav_radio">Radio</string>
     <string name="nav_podcast">Podcast</string>
     <string name="nav_favorites">收藏</string>
     <string name="nav_dock">停靠</string>
-    <string name="nav_settings">Options</string>
+    <string name="nav_settings">设置</string>
     <string name="search_placeholder">搜索电台、流派、国家…</string>
     <string name="recent_streams">最近播放</string>
     <string name="no_recent_streams">暂无最近播放记录。</string>
@@ -244,4 +244,19 @@
     <string name="episodes_available">%1$d Episodes Available</string>
     <string name="loading_podcast_episodes">Loading podcast episodes…</string>
     <string name="no_episodes_available">No episodes available for this show.</string>
+    <string name="onboarding_podcast_title">播客与节目</string>
+    <string name="onboarding_podcast_subtitle">探索涵盖各种主题和流派的海量点播播客资源。</string>
+    <string name="onboarding_podcast_badge1">100万+ 集节目</string>
+    <string name="onboarding_podcast_badge2">智能发现</string>
+    <string name="onboarding_audio_title">专业音频与均衡器</string>
+    <string name="onboarding_audio_subtitle">通过高级均衡器、DSP 配置和睡眠定时器自定义您的音效。</string>
+    <string name="media_service_label">后台媒体服务</string>
+    <string name="notification_lockscreen_label">系统通知与锁屏</string>
+    <string name="more_countries_label">更多国家…</string>
+    <string name="status_active">激活</string>
+    <string name="status_ready">就绪</string>
+    <string name="no_countries_matched">未找到匹配“%1$s”的国家</string>
+    <string name="resumed_at">在 %1$s 恢复</string>
+    <string name="share_app_text">📻 正在 NeoTune 上收听全球直播电台与播客！下载应用：%1$s</string>
+    <string name="radio_stations_count_text">5万+ 广播电台</string>
 </resources>

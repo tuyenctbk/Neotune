@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">NeoTune</string>
-    <string name="app_description">Rádio ao vivo global e batidas relaxantes</string>
+    <string name="app_description">Rádio global, Podcasts e Lo-Fi</string>
     <string name="nav_tuner">Sintonizador</string>
     <string name="nav_radio">Radio</string>
     <string name="nav_podcast">Podcast</string>
     <string name="nav_favorites">Favoritos</string>
     <string name="nav_dock">Dock</string>
-    <string name="nav_settings">Options</string>
+    <string name="nav_settings">Definições</string>
     <string name="search_placeholder">Pesquisar estação, gênero, país…</string>
     <string name="recent_streams">Transmissões recentes</string>
     <string name="no_recent_streams">Nenhuma transmissão recente ainda.</string>
@@ -244,4 +244,19 @@
     <string name="episodes_available">%1$d Episodes Available</string>
     <string name="loading_podcast_episodes">Loading podcast episodes…</string>
     <string name="no_episodes_available">No episodes available for this show.</string>
+    <string name="onboarding_podcast_title">Podcasts e programas</string>
+    <string name="onboarding_podcast_subtitle">Explore uma vasta coleção de podcasts sob demanda sobre vários tópicos e gêneros.</string>
+    <string name="onboarding_podcast_badge1">1M+ Episódios</string>
+    <string name="onboarding_podcast_badge2">Descoberta inteligente</string>
+    <string name="onboarding_audio_title">Áudio Pro e EQ</string>
+    <string name="onboarding_audio_subtitle">Personalize seu som com equalizador avançado, perfis DSP e temporizador.</string>
+    <string name="media_service_label">Serviço de mídia em segundo plano</string>
+    <string name="notification_lockscreen_label">Notificação do sistema e tela de bloqueio</string>
+    <string name="more_countries_label">Mais países…</string>
+    <string name="status_active">ATIVO</string>
+    <string name="status_ready">PRONTO</string>
+    <string name="no_countries_matched">Nenhum país encontrado correspondente a \"%1$s\"</string>
+    <string name="resumed_at">Retomado às %1$s</string>
+    <string name="share_app_text">📻 Ouvindo rádio ao vivo global e podcasts no NeoTune! Baixe o app: %1$s</string>
+    <string name="radio_stations_count_text">50k+ Estações de rádio</string>
 </resources>

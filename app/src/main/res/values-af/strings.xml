@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">NeoTune</string>
-    <string name="app_description">Global Live Radio &amp; Chill Beats</string>
+    <string name="app_description">Wêreldwye radio, podsendings &amp; Lo-Fi</string>
     <string name="nav_tuner">Tuner</string>
     <string name="nav_radio">Radio</string>
     <string name="nav_podcast">Podcast</string>
     <string name="nav_favorites">Favorites</string>
     <string name="nav_dock">Dock</string>
-    <string name="nav_settings">Options</string>
+    <string name="nav_settings">Instellings</string>
     <string name="search_placeholder">Search station, genre, country…</string>
     <string name="recent_streams">Recent Streams</string>
     <string name="no_recent_streams">No recent streams played yet.</string>
@@ -244,4 +244,19 @@
     <string name="episodes_available">%1$d Episodes Available</string>
     <string name="loading_podcast_episodes">Loading podcast episodes…</string>
     <string name="no_episodes_available">No episodes available for this show.</string>
+    <string name="onboarding_podcast_title">Podsendings &amp; programme</string>
+    <string name="onboarding_podcast_subtitle">Verken \'n massiewe versameling on-demand podsendings oor verskeie onderwerpe en genres.</string>
+    <string name="onboarding_podcast_badge1">1M+ Episodes</string>
+    <string name="onboarding_podcast_badge2">Slim ontdekking</string>
+    <string name="onboarding_audio_title">Pro Audio &amp; EQ</string>
+    <string name="onboarding_audio_subtitle">Pas jou klank aan met gevorderde Equalizer, DSP-profiele en slaaptydhouer.</string>
+    <string name="media_service_label">Agtergrond-mediadiens</string>
+    <string name="notification_lockscreen_label">Stelselkennisgewing &amp; sluitskerm</string>
+    <string name="more_countries_label">Meer lande…</string>
+    <string name="status_active">AKTIEF</string>
+    <string name="status_ready">GEREED</string>
+    <string name="no_countries_matched">Geen lande gevind wat ooreenstem met \"%1$s\" nie</string>
+    <string name="resumed_at">Hervat om %1$s</string>
+    <string name="share_app_text">📻 Luister na wêreldwye regstreekse radio &amp; podsendings op NeoTune! Laai die toepassing af: %1$s</string>
+    <string name="radio_stations_count_text">50k+ Radiostasies</string>
 </resources>

@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">NeoTune</string>
-    <string name="app_description">Radio Toàn Cầu &amp; Nhạc Chill Phiêu</string>
+    <string name="app_description">Radio, Podcast &amp; Lo-Fi Toàn Cầu</string>
     <string name="nav_tuner">Bộ Dò Radio</string>
     <string name="nav_radio">Radio</string>
     <string name="nav_podcast">Podcast</string>
     <string name="nav_favorites">Yêu Thích</string>
     <string name="nav_dock">Màn Hình Chờ</string>
-    <string name="nav_settings">Options</string>
+    <string name="nav_settings">Cài đặt</string>
     <string name="search_placeholder">Tìm đài radio, thể loại, quốc gia...</string>
     <string name="recent_streams">Đài Nghe Gần Đây</string>
     <string name="no_recent_streams">Chưa có phát đài nào gần đây.</string>
@@ -244,4 +244,19 @@
     <string name="episodes_available">%1$d Episodes Available</string>
     <string name="loading_podcast_episodes">Loading podcast episodes…</string>
     <string name="no_episodes_available">No episodes available for this show.</string>
+    <string name="onboarding_podcast_title">Podcast &amp; Chương Trình</string>
+    <string name="onboarding_podcast_subtitle">Khám phá bộ sưu tập podcast theo yêu cầu khổng lồ với đa dạng chủ đề và thể loại.</string>
+    <string name="onboarding_podcast_badge1">1Tr+ Tập podcast</string>
+    <string name="onboarding_podcast_badge2">Khám phá Thông minh</string>
+    <string name="onboarding_audio_title">Âm thanh Chuyên nghiệp &amp; EQ</string>
+    <string name="onboarding_audio_subtitle">Tùy chỉnh âm thanh với Bộ cân bằng nâng cao, cấu hình DSP và hẹn giờ tắt.</string>
+    <string name="media_service_label">Dịch vụ Phương tiện Nền</string>
+    <string name="notification_lockscreen_label">Thông báo Hệ thống &amp; Màn hình khóa</string>
+    <string name="more_countries_label">Thêm Quốc gia...</string>
+    <string name="status_active">ĐANG HOẠT ĐỘNG</string>
+    <string name="status_ready">SẴN SÀNG</string>
+    <string name="no_countries_matched">Không tìm thấy quốc gia nào khớp với \"%1$s\"</string>
+    <string name="resumed_at">Tiếp tục lúc %1$s</string>
+    <string name="share_app_text">📻 Đang nghe radio trực tuyến toàn cầu &amp; podcast trên NeoTune! Tải ứng dụng tại: %1$s</string>
+    <string name="radio_stations_count_text">50k+ Đài Radio</string>
 </resources>

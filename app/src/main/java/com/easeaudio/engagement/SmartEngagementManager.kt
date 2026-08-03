@@ -6,6 +6,7 @@ import android.net.Uri
 import android.os.Build
 import android.util.Log
 import com.easeaudio.BuildConfig
+import com.easeaudio.R
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -265,14 +266,14 @@ class SmartEngagementManager private constructor(private val context: Context) {
     }
 
     fun launchShareIntent() {
-        val shareText = "📻 Listening to global live radio & ambient streams on NeoTune! Download the app: https://play.google.com/store/apps/details?id=${context.packageName}"
+        val shareText = context.getString(R.string.share_app_text, "https://play.google.com/store/apps/details?id=${context.packageName}")
         val intent = Intent(Intent.ACTION_SEND).apply {
             type = "text/plain"
-            putExtra(Intent.EXTRA_SUBJECT, "NeoTune - Global Live Radio")
+            putExtra(Intent.EXTRA_SUBJECT, context.getString(R.string.app_name))
             putExtra(Intent.EXTRA_TEXT, shareText)
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         }
-        val chooser = Intent.createChooser(intent, "Share NeoTune with Friends").apply {
+        val chooser = Intent.createChooser(intent, context.getString(R.string.share_app_header)).apply {
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         }
         context.startActivity(chooser)

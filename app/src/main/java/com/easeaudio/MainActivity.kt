@@ -33,7 +33,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -50,6 +52,7 @@ import com.easeaudio.ui.screens.HomeScreen
 import com.easeaudio.ui.screens.OnboardingScreen
 import com.easeaudio.ui.screens.PlayerScreen
 import com.easeaudio.ui.screens.ScreensaverScreen
+import com.easeaudio.ui.screens.AppearanceSelectionScreen
 import com.easeaudio.ui.theme.TuneveTheme
 import com.easeaudio.ui.theme.AppThemeState
 import android.content.pm.PackageManager
@@ -103,6 +106,9 @@ fun MainAppContent(
     val context = LocalContext.current
     val prefs = remember { context.getSharedPreferences("neotune_prefs", Context.MODE_PRIVATE) }
     val isOnboardingCompleted = remember { mutableStateOf(prefs.getBoolean("is_onboarding_completed", false)) }
+    
+    val uiState by viewModel.homeUiState.collectAsState()
+    
     val startDestination = if (isOnboardingCompleted.value) NavRoute.Home.route else NavRoute.Onboarding.route
 
     var hasNotificationPermission by remember {
@@ -154,64 +160,21 @@ fun MainAppContent(
         }
     }
 
-    val stations by viewModel.stations.collectAsState()
-    val favoriteStations by viewModel.favoriteStations.collectAsState()
-    val recentStations by viewModel.recentStations.collectAsState()
-    val recentRadioStations by viewModel.recentRadioStations.collectAsState()
-    val recentPodcastStations by viewModel.recentPodcastStations.collectAsState()
-
-    val currentStation by viewModel.playerManager.currentStation.collectAsState()
-    val isCurrentStationFavorite = favoriteStations.any { it.id == currentStation?.id }
-    val syncedCurrentStation = currentStation?.copy(isFavorite = isCurrentStationFavorite)
-    val isPlaying by viewModel.playerManager.isPlaying.collectAsState()
-    val isLoading by viewModel.playerManager.isLoading.collectAsState()
-    val playbackError by viewModel.playerManager.playbackError.collectAsState()
-    val playbackErrorDetails by viewModel.playerManager.playbackErrorDetails.collectAsState()
-    val streamTitle by viewModel.playerManager.streamTitle.collectAsState()
-    val waveAmplitudes by viewModel.playerManager.waveAmplitudes.collectAsState()
-    val volume by viewModel.playerManager.volume.collectAsState()
-    val sleepTimerRemaining by viewModel.playerManager.sleepTimerMinutesRemaining.collectAsState()
-    val currentPlaybackPosition by viewModel.playerManager.currentPosition.collectAsState()
-    val totalPlaybackDuration by viewModel.playerManager.totalDuration.collectAsState()
-    val playbackSpeed by viewModel.playerManager.playbackSpeed.collectAsState()
-
-    val currentEpisodesList by viewModel.currentEpisodesList.collectAsState()
-    val currentEpisode by viewModel.currentEpisode.collectAsState()
-    val isLoadingEpisodes by viewModel.isLoadingEpisodes.collectAsState()
-    val showEpisodesSheet by viewModel.showEpisodesSheet.collectAsState()
-
-    val networkStatus by viewModel.networkStatus.collectAsState()
-    val remoteConfig by viewModel.remoteConfig.collectAsState()
-
-    val searchQuery by viewModel.searchQuery.collectAsState()
-    val selectedTab by viewModel.selectedTab.collectAsState()
-    val selectedGenre by viewModel.selectedGenre.collectAsState()
-    val selectedCountry by viewModel.selectedCountry.collectAsState()
-    val activeEqPreset by viewModel.activeEqPreset.collectAsState()
-
-    val isLoadingMore by viewModel.isLoadingMore.collectAsState()
-    val isDiscoveringOnline by viewModel.isDiscoveringOnline.collectAsState()
-    val isDiscoveryError by viewModel.isDiscoveryError.collectAsState()
-    val canLoadMore by viewModel.canLoadMore.collectAsState()
-    val failedStationIds by viewModel.failedStationIds.collectAsState()
-    val availableCountries by viewModel.availableCountries.collectAsState()
-    val isLoadingCountries by viewModel.isLoadingCountries.collectAsState()
-
-    val showSleepTimerDialog by viewModel.showSleepTimerDialog.collectAsState()
-    val showEqualizerDialog by viewModel.showEqualizerDialog.collectAsState()
-    val showAddStationDialog by viewModel.showAddStationDialog.collectAsState()
+    val syncedCurrentStation = uiState.currentStation?.let { st ->
+        st.copy(isFavorite = uiState.favoriteStations.any { it.id == st.id })
+    }
 
     var isFullPlayerVisible by remember { mutableStateOf(value = false) }
     var showTrackActionSheet by remember { mutableStateOf(false) }
     val snackbarHostState = remember { SnackbarHostState() }
 
     // Show error toast/snackbar if stream error occurs
-    LaunchedEffect(playbackError, playbackErrorDetails) {
-        playbackErrorDetails?.let { details ->
+    LaunchedEffect(uiState.playbackError, uiState.playbackErrorDetails) {
+        uiState.playbackErrorDetails?.let { details ->
             Log.e("MainActivity", "Stream Error Captured: ${details.toUserSummary()} (Code: ${details.errorCodeName}, HTTP: ${details.httpStatusCode ?: "N/A"})")
             FirebaseManager.recordException(Exception("Stream Error: ${details.errorCodeName}"))
         }
-        playbackError?.let { err ->
+        uiState.playbackError?.let { err ->
             snackbarHostState.showSnackbar(err)
         }
     }
@@ -253,7 +216,7 @@ fun MainAppContent(
                 ) {
                     composable(NavRoute.Onboarding.route) {
                         OnboardingScreen(
-                            availableGenres = viewModel.availableGenres.map { it.key },
+                            availableGenres = uiState.availableGenres.map { it.key },
                             onGenreSelected = { genre -> viewModel.setSelectedGenre(genre) },
                             onGenresSelected = { genres -> viewModel.setPreferredGenres(genres) },
                             onCountrySelected = { country -> viewModel.setSelectedCountry(country) },
@@ -263,30 +226,8 @@ fun MainAppContent(
                     }
 
                     composable(NavRoute.Home.route) {
-                        val activeRecentList = if (selectedTab == com.easeaudio.ui.screens.HomeTab.Podcast) recentPodcastStations else recentRadioStations
                         HomeScreen(
-                            stations = stations,
-                            recentStations = activeRecentList,
-                            currentStation = syncedCurrentStation,
-                            isPlaying = isPlaying,
-                            isLoading = isLoading,
-                            isDiscoveringOnline = isDiscoveringOnline,
-                            failedStationIds = failedStationIds,
-                            searchQuery = searchQuery,
-                            selectedGenre = selectedGenre,
-                            availableGenres = viewModel.availableGenres,
-                            availablePodcastTopics = viewModel.availablePodcastTopics,
-                            selectedCountry = selectedCountry,
-                            availableCountries = availableCountries,
-                            isLoadingCountries = isLoadingCountries,
-                            sleepTimerRemaining = sleepTimerRemaining,
-                            networkStatus = networkStatus,
-                            remoteConfig = remoteConfig,
-                            isLoadingMore = isLoadingMore,
-                            canLoadMore = canLoadMore,
-                            isDiscoveryError = isDiscoveryError,
-                            streamTitle = streamTitle,
-                            initialTab = com.easeaudio.ui.screens.HomeTab.Radio,
+                            uiState = uiState,
                             onPlayPause = { viewModel.togglePlayPause() },
                             onNextStation = { viewModel.playNextStation() },
                             onPreviousStation = { viewModel.playPreviousStation() },
@@ -302,10 +243,6 @@ fun MainAppContent(
                                 viewModel.toggleFavorite(station) 
                             },
                             onOpenAddStation = { viewModel.setShowAddStationDialog(true) },
-                            onOpenSleepTimer = { viewModel.setShowSleepTimerDialog(true) },
-                            onOpenEqualizer = { viewModel.setShowEqualizerDialog(true) },
-                            onOpenOnboarding = { navController.navigate(NavRoute.Onboarding.route) },
-                            onOpenBlockedDialog = { viewModel.setShowBlockedDialog(true) },
                             onLoadMore = { viewModel.loadMoreStations() },
                             onRefresh = { viewModel.refreshStations() },
                             onRetryDiscovery = { viewModel.retryDiscovery() }
@@ -314,28 +251,7 @@ fun MainAppContent(
 
                     composable(NavRoute.Radio.route) {
                         HomeScreen(
-                            stations = stations,
-                            recentStations = recentStations,
-                            currentStation = syncedCurrentStation,
-                            isPlaying = isPlaying,
-                            isLoading = isLoading,
-                            isDiscoveringOnline = isDiscoveringOnline,
-                            failedStationIds = failedStationIds,
-                            searchQuery = searchQuery,
-                            selectedGenre = selectedGenre,
-                            availableGenres = viewModel.availableGenres,
-                            availablePodcastTopics = viewModel.availablePodcastTopics,
-                            selectedCountry = selectedCountry,
-                            availableCountries = availableCountries,
-                            isLoadingCountries = isLoadingCountries,
-                            sleepTimerRemaining = sleepTimerRemaining,
-                            networkStatus = networkStatus,
-                            remoteConfig = remoteConfig,
-                            isLoadingMore = isLoadingMore,
-                            canLoadMore = canLoadMore,
-                            isDiscoveryError = isDiscoveryError,
-                            streamTitle = streamTitle,
-                            initialTab = com.easeaudio.ui.screens.HomeTab.Radio,
+                            uiState = uiState,
                             onPlayPause = { viewModel.togglePlayPause() },
                             onNextStation = { viewModel.playNextStation() },
                             onPreviousStation = { viewModel.playPreviousStation() },
@@ -351,10 +267,6 @@ fun MainAppContent(
                                 viewModel.toggleFavorite(station) 
                             },
                             onOpenAddStation = { viewModel.setShowAddStationDialog(true) },
-                            onOpenSleepTimer = { viewModel.setShowSleepTimerDialog(true) },
-                            onOpenEqualizer = { viewModel.setShowEqualizerDialog(true) },
-                            onOpenOnboarding = { navController.navigate(NavRoute.Onboarding.route) },
-                            onOpenBlockedDialog = { viewModel.setShowBlockedDialog(true) },
                             onLoadMore = { viewModel.loadMoreStations() },
                             onRefresh = { viewModel.refreshStations() },
                             onRetryDiscovery = { viewModel.retryDiscovery() }
@@ -363,28 +275,7 @@ fun MainAppContent(
 
                     composable(NavRoute.Podcast.route) {
                         HomeScreen(
-                            stations = stations,
-                            recentStations = recentStations,
-                            currentStation = syncedCurrentStation,
-                            isPlaying = isPlaying,
-                            isLoading = isLoading,
-                            isDiscoveringOnline = isDiscoveringOnline,
-                            failedStationIds = failedStationIds,
-                            searchQuery = searchQuery,
-                            selectedGenre = selectedGenre,
-                            availableGenres = viewModel.availableGenres,
-                            availablePodcastTopics = viewModel.availablePodcastTopics,
-                            selectedCountry = selectedCountry,
-                            availableCountries = availableCountries,
-                            isLoadingCountries = isLoadingCountries,
-                            sleepTimerRemaining = sleepTimerRemaining,
-                            networkStatus = networkStatus,
-                            remoteConfig = remoteConfig,
-                            isLoadingMore = isLoadingMore,
-                            canLoadMore = canLoadMore,
-                            isDiscoveryError = isDiscoveryError,
-                            streamTitle = streamTitle,
-                            initialTab = com.easeaudio.ui.screens.HomeTab.Podcast,
+                            uiState = uiState,
                             onPlayPause = { viewModel.togglePlayPause() },
                             onNextStation = { viewModel.playNextStation() },
                             onPreviousStation = { viewModel.playPreviousStation() },
@@ -400,10 +291,6 @@ fun MainAppContent(
                                 viewModel.toggleFavorite(station) 
                             },
                             onOpenAddStation = { viewModel.setShowAddStationDialog(true) },
-                            onOpenSleepTimer = { viewModel.setShowSleepTimerDialog(true) },
-                            onOpenEqualizer = { viewModel.setShowEqualizerDialog(true) },
-                            onOpenOnboarding = { navController.navigate(NavRoute.Onboarding.route) },
-                            onOpenBlockedDialog = { viewModel.setShowBlockedDialog(true) },
                             onLoadMore = { viewModel.loadMoreStations() },
                             onRefresh = { viewModel.refreshStations() },
                             onRetryDiscovery = { viewModel.retryDiscovery() }
@@ -412,11 +299,11 @@ fun MainAppContent(
 
                     composable(NavRoute.Favorites.route) {
                         FavoritesScreen(
-                            favoriteStations = favoriteStations,
+                            favoriteStations = uiState.favoriteStations,
                             currentStation = syncedCurrentStation,
-                            isPlaying = isPlaying,
-                            isLoading = isLoading,
-                            failedStationIds = failedStationIds,
+                            isPlaying = uiState.isPlaying,
+                            isLoading = uiState.isLoading,
+                            failedStationIds = uiState.failedStationIds,
                             onStationSelect = { station -> 
                                 FirebaseManager.logEvent("play_station", Bundle().apply { putString("station_name", station.name) })
                                 viewModel.playStation(station) 
@@ -432,15 +319,15 @@ fun MainAppContent(
                         var showAlarmDialog by remember { mutableStateOf(false) }
 
                         com.easeaudio.ui.screens.SettingsScreen(
-                            sleepTimerRemaining = sleepTimerRemaining,
-                            selectedCountry = selectedCountry,
+                            sleepTimerRemaining = uiState.sleepTimerRemaining,
+                            selectedCountry = uiState.selectedCountry,
                             onOpenEqualizer = { viewModel.setShowEqualizerDialog(true) },
                             onOpenSleepTimer = { viewModel.setShowSleepTimerDialog(true) },
                             onOpenRadioAlarm = { showAlarmDialog = true },
-                            onOpenAppearance = { /* Appearance settings */ },
+                            onOpenAppearance = { viewModel.setShowAppearanceDialog(true) },
                             onOpenOnboarding = { navController.navigate(NavRoute.Onboarding.route) },
                             onOpenBlockedDialog = { viewModel.setShowBlockedDialog(true) },
-                            onOpenAttribution = { /* Attribution */ }
+                            onOpenAttribution = { viewModel.setShowAttributionDialog(true) }
                         )
 
                         if (showAlarmDialog) {
@@ -454,10 +341,10 @@ fun MainAppContent(
                     composable(NavRoute.Screensaver.route) {
                         ScreensaverScreen(
                             currentStation = syncedCurrentStation,
-                            isPlaying = isPlaying,
-                            streamTitle = streamTitle,
-                            waveAmplitudes = waveAmplitudes,
-                            sleepTimerRemaining = sleepTimerRemaining,
+                            isPlaying = uiState.isPlaying,
+                            streamTitle = uiState.streamTitle,
+                            waveAmplitudes = uiState.waveAmplitudes,
+                            sleepTimerRemaining = uiState.sleepTimerRemaining,
                             onTogglePlay = { viewModel.togglePlayPause() },
                             onOpenSleepTimer = { viewModel.setShowSleepTimerDialog(true) },
                             onToggleFavorite = { syncedCurrentStation?.let { viewModel.toggleFavorite(it) } }
@@ -465,25 +352,25 @@ fun MainAppContent(
                     }
                 }
 
-                // Mini Player floating bar (shown if station is selected and full player is collapsed)
+                // Mini Player
                 if (!isFullPlayerVisible && currentRoute != NavRoute.Screensaver.route && currentRoute != NavRoute.Onboarding.route) {
                     Column(
                         modifier = Modifier.align(Alignment.BottomCenter)
                     ) {
                         com.easeaudio.ui.components.NotificationPermissionReminder(
-                            visible = (currentStation != null && (isPlaying || isLoading) && !hasNotificationPermission && !isPlaytimePermissionDismissed && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU),
+                            visible = (uiState.currentStation != null && (uiState.isPlaying || uiState.isLoading) && !hasNotificationPermission && !isPlaytimePermissionDismissed && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU),
                             onRequestPermission = onRequestNotificationPermission,
                             onDismiss = { isPlaytimePermissionDismissed = true }
                         )
 
                         MiniPlayer(
                             station = syncedCurrentStation,
-                            isPlaying = isPlaying,
-                            isLoading = isLoading,
-                            streamTitle = streamTitle,
-                            waveAmplitudes = waveAmplitudes,
-                            currentPosition = currentPlaybackPosition,
-                            totalDuration = totalPlaybackDuration,
+                            isPlaying = uiState.isPlaying,
+                            isLoading = uiState.isLoading,
+                            streamTitle = uiState.streamTitle,
+                            waveAmplitudes = uiState.waveAmplitudes,
+                            currentPosition = uiState.currentPlaybackPosition,
+                            totalDuration = uiState.totalPlaybackDuration,
                             onTogglePlay = { viewModel.togglePlayPause() },
                             onToggleFavorite = { syncedCurrentStation?.let { viewModel.toggleFavorite(it) } },
                             onOpenFullPlayer = { isFullPlayerVisible = true },
@@ -492,10 +379,10 @@ fun MainAppContent(
                     }
                 }
 
-                if (showTrackActionSheet && !streamTitle.isNullOrBlank()) {
+                if (showTrackActionSheet && !uiState.streamTitle.isNullOrBlank()) {
                     val context = androidx.compose.ui.platform.LocalContext.current
                     com.easeaudio.ui.components.TrackActionSheet(
-                        trackTitle = streamTitle!!,
+                        trackTitle = uiState.streamTitle!!,
                         stationName = syncedCurrentStation?.name ?: "Radio",
                         stationGenre = syncedCurrentStation?.genre ?: "",
                         isFavorite = syncedCurrentStation?.isFavorite ?: false,
@@ -513,7 +400,7 @@ fun MainAppContent(
             }
         }
 
-        // Full Player Modal Overlay
+        // Full Player Modal
         AnimatedVisibility(
             visible = isFullPlayerVisible,
             enter = slideInVertically { it },
@@ -522,19 +409,19 @@ fun MainAppContent(
         ) {
             PlayerScreen(
                 station = syncedCurrentStation,
-                isPlaying = isPlaying,
-                isLoading = isLoading,
-                streamTitle = streamTitle,
-                waveAmplitudes = waveAmplitudes,
-                volume = volume,
-                sleepTimerRemaining = sleepTimerRemaining,
-                activeEqPreset = activeEqPreset,
+                isPlaying = uiState.isPlaying,
+                isLoading = uiState.isLoading,
+                streamTitle = uiState.streamTitle,
+                waveAmplitudes = uiState.waveAmplitudes,
+                volume = uiState.volume,
+                sleepTimerRemaining = uiState.sleepTimerRemaining,
+                activeEqPreset = uiState.activeEqPreset,
                 eqPresets = viewModel.eqPresets,
-                playbackError = playbackError,
+                playbackError = uiState.playbackError,
                 hasNotificationPermission = hasNotificationPermission,
-                currentPosition = currentPlaybackPosition,
-                totalDuration = totalPlaybackDuration,
-                playbackSpeed = playbackSpeed,
+                currentPosition = uiState.currentPlaybackPosition,
+                totalDuration = uiState.totalPlaybackDuration,
+                playbackSpeed = uiState.playbackSpeed,
                 onPlaybackSpeedChange = { speed -> viewModel.playerManager.setPlaybackSpeed(speed) },
                 onOpenEpisodes = { viewModel.setShowEpisodesSheet(true) },
                 onRequestNotificationPermission = onRequestNotificationPermission,
@@ -559,40 +446,37 @@ fun MainAppContent(
 
         val activePrompt by viewModel.smartEngagementManager.activePrompt.collectAsState()
         val updateInfo by viewModel.smartEngagementManager.updateInfo.collectAsState()
-        val showBlockedDialog by viewModel.showBlockedDialog.collectAsState()
-        val filterConfig by viewModel.filterConfig.collectAsState()
-        val blockedStations by viewModel.blockedStations.collectAsState()
 
         // Dialogs
-        if (showSleepTimerDialog) {
+        if (uiState.showSleepTimerDialog) {
             SleepTimerDialog(
-                activeTimerMinutes = sleepTimerRemaining,
+                activeTimerMinutes = uiState.sleepTimerRemaining,
                 onSelectMinutes = { mins -> viewModel.setSleepTimer(mins) },
                 onCancelTimer = { viewModel.cancelSleepTimer() },
                 onDismiss = { viewModel.setShowSleepTimerDialog(false) }
             )
         }
 
-        if (showEqualizerDialog) {
+        if (uiState.showEqualizerDialog) {
             EqualizerDialog(
-                activePreset = activeEqPreset,
+                activePreset = uiState.activeEqPreset,
                 presets = viewModel.eqPresets,
                 onSelectPreset = { preset -> viewModel.setEqPreset(preset) },
                 onDismiss = { viewModel.setShowEqualizerDialog(false) }
             )
         }
 
-        if (showAddStationDialog) {
+        if (uiState.showAddStationDialog) {
             AddStationDialog(
                 onAddStation = { name, url, genre -> viewModel.addCustomStation(name, url, genre) },
                 onDismiss = { viewModel.setShowAddStationDialog(false) }
             )
         }
 
-        if (showBlockedDialog) {
+        if (uiState.showBlockedDialog) {
             com.easeaudio.ui.components.BlockedStationsDialog(
-                filterConfig = filterConfig,
-                blockedStations = blockedStations,
+                filterConfig = uiState.filterConfig,
+                blockedStations = uiState.blockedStations,
                 onToggleAdultFilter = { enabled -> viewModel.setFilterAdultContent(enabled) },
                 onTogglePoliticsFilter = { enabled -> viewModel.setFilterPoliticsContent(enabled) },
                 onToggleReligiousFilter = { enabled -> viewModel.setFilterReligiousContent(enabled) },
@@ -605,21 +489,36 @@ fun MainAppContent(
             )
         }
 
-        if (showEpisodesSheet && syncedCurrentStation != null) {
+        if (uiState.showEpisodesSheet && syncedCurrentStation != null) {
             com.easeaudio.ui.components.PodcastEpisodesSheet(
-                show = syncedCurrentStation!!,
-                episodes = currentEpisodesList,
-                currentEpisode = currentEpisode,
-                isPlaying = isPlaying,
-                isLoading = isLoading || isLoadingEpisodes,
+                show = syncedCurrentStation,
+                episodes = uiState.currentEpisodesList,
+                currentEpisode = uiState.currentEpisode,
+                isPlaying = uiState.isPlaying,
+                isLoading = uiState.isLoading || uiState.isLoadingEpisodes,
                 onSelectEpisode = { episode ->
-                    viewModel.playEpisode(syncedCurrentStation!!, episode)
+                    viewModel.playEpisode(syncedCurrentStation, episode)
                 },
                 onDismiss = { viewModel.setShowEpisodesSheet(false) }
             )
         }
 
-        // Smart Engagement Dialog Prompts
+        if (uiState.showAppearanceDialog) {
+            AppearanceSelectionScreen(
+                currentTheme = AppThemeState.currentTheme,
+                themes = AppThemeState.ThemePresets,
+                onDismiss = { viewModel.setShowAppearanceDialog(false) },
+                onSelectTheme = { theme ->
+                    AppThemeState.saveTheme(context, theme.id)
+                }
+            )
+        }
+
+        if (uiState.showAttributionDialog) {
+            AttributionDialog(onDismiss = { viewModel.setShowAttributionDialog(false) })
+        }
+
+        // Smart Engagement Dialogs
         when (activePrompt) {
             com.easeaudio.engagement.EngagementPromptType.RATE_5_STARS -> {
                 RateAppDialog(

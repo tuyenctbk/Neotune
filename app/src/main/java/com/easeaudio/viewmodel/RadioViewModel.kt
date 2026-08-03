@@ -13,12 +13,30 @@ import com.easeaudio.R
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.Job
 import java.util.UUID
 
 class RadioViewModel(application: Application) : AndroidViewModel(application) {
 
-    val repository: RadioRepository = RadioRepository(RadioDatabase.getDatabase(application).radioDao())
+    val repository: com.easeaudio.data.IRadioRepository = RadioRepository(RadioDatabase.getDatabase(application).radioDao())
     val playerManager: RadioPlayerManager = RadioPlayerManager.getInstance(application)
+
+    // PlayerManager state flow delegations for Unidirectional Data Flow
+    val currentStation: StateFlow<RadioStation?> = playerManager.currentStation
+    val isPlaying: StateFlow<Boolean> = playerManager.isPlaying
+    val isLoading: StateFlow<Boolean> = playerManager.isLoading
+    val playbackError: StateFlow<String?> = playerManager.playbackError
+    val playbackErrorDetails: StateFlow<com.easeaudio.service.PlaybackErrorDetails?> = playerManager.playbackErrorDetails
+    val streamTitle: StateFlow<String?> = playerManager.streamTitle
+    val waveAmplitudes: StateFlow<List<Float>> = playerManager.waveAmplitudes
+    val volume: StateFlow<Float> = playerManager.volume
+    val sleepTimerRemaining: StateFlow<Int?> = playerManager.sleepTimerMinutesRemaining
+    val currentPlaybackPosition: StateFlow<Long> = playerManager.currentPosition
+    val totalPlaybackDuration: StateFlow<Long> = playerManager.totalDuration
+    val playbackSpeed: StateFlow<Float> = playerManager.playbackSpeed
+    val networkStatus: StateFlow<com.easeaudio.network.NetworkStatus> = playerManager.networkStatus
+    val remoteConfig: StateFlow<com.easeaudio.firebase.AppRemoteConfig> = playerManager.remoteConfig
+    val failedStationIds: StateFlow<Set<String>> = playerManager.failedStationIds
 
     private val _searchQuery = MutableStateFlow("")
     val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()
@@ -145,7 +163,7 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
                     flag = "🌐",
                     code = "",
                     stationCount = apiData.sumOf { it.third },
-                    stationCountText = "50k+ Radio stations"
+                    stationCountText = getApplication<Application>().getString(R.string.radio_stations_count_text)
                 )
 
                 // Convert API triples -> CountryDisplay, sorted by stationCount descending
@@ -383,6 +401,12 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
     private val _showBlockedDialog = MutableStateFlow(false)
     val showBlockedDialog: StateFlow<Boolean> = _showBlockedDialog.asStateFlow()
 
+    private val _showAppearanceDialog = MutableStateFlow(false)
+    val showAppearanceDialog: StateFlow<Boolean> = _showAppearanceDialog.asStateFlow()
+
+    private val _showAttributionDialog = MutableStateFlow(false)
+    val showAttributionDialog: StateFlow<Boolean> = _showAttributionDialog.asStateFlow()
+
     val smartEngagementManager = com.easeaudio.engagement.SmartEngagementManager.getInstance(application)
 
     init {
@@ -440,6 +464,110 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
     ) { all, blockedIds ->
         all.filter { blockedIds.contains(it.id) }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    val homeUiState: StateFlow<HomeUiState> = combine(
+        listOf(
+            stations,
+            recentStations,
+            recentRadioStations,
+            recentPodcastStations,
+            favoriteStations,
+            blockedStations,
+            failedStationIds,
+            currentStation,
+            isPlaying,
+            isLoading,
+            streamTitle,
+            waveAmplitudes,
+            volume,
+            currentPlaybackPosition,
+            totalPlaybackDuration,
+            playbackSpeed,
+            playbackError,
+            playbackErrorDetails,
+            isDiscoveringOnline,
+            isLoadingMore,
+            canLoadMore,
+            isDiscoveryError,
+            searchQuery,
+            selectedTab,
+            selectedGenre,
+            selectedCountry,
+            availableCountries,
+            isLoadingCountries,
+            filterConfig,
+            currentEpisodesList,
+            currentEpisode,
+            isLoadingEpisodes,
+            sleepTimerRemaining,
+            networkStatus,
+            remoteConfig,
+            activeEqPreset,
+            showSleepTimerDialog,
+            showEqualizerDialog,
+            showAddStationDialog,
+            showBlockedDialog,
+            showEpisodesSheet,
+            showAppearanceDialog,
+            showAttributionDialog
+        )
+    ) { array ->
+        HomeUiState(
+            stations = array[0] as List<RadioStation>,
+            recentStations = array[1] as List<RadioStation>,
+            recentRadioStations = array[2] as List<RadioStation>,
+            recentPodcastStations = array[3] as List<RadioStation>,
+            favoriteStations = array[4] as List<RadioStation>,
+            blockedStations = array[5] as List<RadioStation>,
+            failedStationIds = array[6] as Set<String>,
+            currentStation = array[7] as RadioStation?,
+            isPlaying = array[8] as Boolean,
+            isLoading = array[9] as Boolean,
+            streamTitle = array[10] as String?,
+            waveAmplitudes = array[11] as List<Float>,
+            volume = array[12] as Float,
+            currentPlaybackPosition = array[13] as Long,
+            totalPlaybackDuration = array[14] as Long,
+            playbackSpeed = array[15] as Float,
+            playbackError = array[16] as String?,
+            playbackErrorDetails = array[17] as com.easeaudio.service.PlaybackErrorDetails?,
+            isDiscoveringOnline = array[18] as Boolean,
+            isLoadingMore = array[19] as Boolean,
+            canLoadMore = array[20] as Boolean,
+            isDiscoveryError = array[21] as Boolean,
+            searchQuery = array[22] as String,
+            selectedTab = array[23] as com.easeaudio.ui.screens.HomeTab,
+            selectedGenre = array[24] as String,
+            selectedCountry = array[25] as String,
+            availableCountries = array[26] as List<CountryDisplay>,
+            isLoadingCountries = array[27] as Boolean,
+            filterConfig = array[28] as com.easeaudio.data.StationFilterConfig,
+            currentEpisodesList = array[29] as List<PodcastEpisode>,
+            currentEpisode = array[30] as PodcastEpisode?,
+            isLoadingEpisodes = array[31] as Boolean,
+            sleepTimerRemaining = array[32] as Int?,
+            networkStatus = array[33] as com.easeaudio.network.NetworkStatus,
+            remoteConfig = array[34] as com.easeaudio.firebase.AppRemoteConfig,
+            activeEqPreset = array[35] as String,
+            showSleepTimerDialog = array[36] as Boolean,
+            showEqualizerDialog = array[37] as Boolean,
+            showAddStationDialog = array[38] as Boolean,
+            showBlockedDialog = array[39] as Boolean,
+            showEpisodesSheet = array[40] as Boolean,
+            showAppearanceDialog = array[41] as Boolean,
+            showAttributionDialog = array[42] as Boolean,
+            availableGenres = availableGenres,
+            availablePodcastTopics = availablePodcastTopics
+        )
+    }.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5000),
+        HomeUiState(
+            availableGenres = availableGenres,
+            availablePodcastTopics = availablePodcastTopics,
+            availableCountries = fallbackCountries
+        )
+    )
 
     fun setSearchQuery(query: String) {
         _searchQuery.value = query
@@ -697,11 +825,6 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    val networkStatus = playerManager.networkStatus
-    val remoteConfig = playerManager.remoteConfig
-    val failedStationIds = playerManager.failedStationIds
-    val playbackError = playerManager.playbackError
-
     fun retryCurrentStation() {
         playerManager.retryCurrentStation()
     }
@@ -765,6 +888,14 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
 
     fun setShowAddStationDialog(show: Boolean) {
         _showAddStationDialog.value = show
+    }
+
+    fun setShowAppearanceDialog(show: Boolean) {
+        _showAppearanceDialog.value = show
+    }
+
+    fun setShowAttributionDialog(show: Boolean) {
+        _showAttributionDialog.value = show
     }
 
     override fun onCleared() {
