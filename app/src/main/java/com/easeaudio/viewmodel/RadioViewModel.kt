@@ -334,8 +334,9 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
                     station.genre.contains(query, ignoreCase = true) ||
                     station.country.contains(query, ignoreCase = true)
 
-            val matchesCountry = when (country) {
-                "Global", "All" -> true
+            val matchesCountry = when {
+                currentTab == com.easeaudio.ui.screens.HomeTab.Podcast -> true
+                country == "Global" || country == "All" -> true
                 else -> station.country.contains(country, ignoreCase = true)
             }
 
@@ -630,7 +631,8 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
                 }
                 _onlineDiscoveredStations.value = results
                 _canLoadMore.value = results.size >= 10
-                _isDiscoveryError.value = results.isEmpty() && query.isBlank() && genre == "All" && (country == "Global" || country == "All")
+                val countryMatchesGlobal = country == "Global" || country == "All"
+                _isDiscoveryError.value = results.isEmpty() && query.isBlank() && genre == "All" && (isPodcastMode || countryMatchesGlobal)
             } catch (e: Exception) {
                 // Keep existing discovered stations when offline instead of wiping the list
                 _isDiscoveryError.value = _onlineDiscoveredStations.value.isEmpty()
