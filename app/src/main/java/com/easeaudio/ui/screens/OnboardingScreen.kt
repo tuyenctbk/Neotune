@@ -28,6 +28,8 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material3.*
+import androidx.compose.material3.windowsizeclass.WindowSizeClass
+import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -44,6 +46,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
@@ -58,6 +61,7 @@ private val NeonBlue = Color(0xFF3B82F6)
 @Composable
 fun OnboardingScreen(
     availableGenres: List<String>,
+    windowSizeClass: WindowSizeClass,
     onGenreSelected: (String) -> Unit,
     onGenresSelected: (Set<String>) -> Unit = {},
     onCountrySelected: (String) -> Unit = {},
@@ -148,37 +152,39 @@ fun OnboardingScreen(
                 .fillMaxSize()
                 .padding(top = 70.dp, bottom = 100.dp)
         ) { page ->
-            when (page) {
-                0 -> SlideGlobalRadio()
-                1 -> SlidePodcasts()
-                2 -> SlideBackgroundControls(
-                    hasPermission = hasNotificationPermission,
-                    onRequestPermission = {
-                        onRequestNotificationPermission()
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                            hasNotificationPermission = ContextCompat.checkSelfPermission(
-                                context,
-                                Manifest.permission.POST_NOTIFICATIONS
-                            ) == PackageManager.PERMISSION_GRANTED
-                        }
-                    },
-                    isTv = isTv
-                )
-                3 -> SlideProAudio()
-                4 -> SlideGenreDiscovery(
-                    availableGenres = availableGenres,
-                    selectedGenres = selectedGenres,
-                    onGenreToggled = { genre ->
-                        selectedGenres = if (selectedGenres.contains(genre)) {
-                            if (selectedGenres.size > 1) selectedGenres - genre else selectedGenres
-                        } else {
-                            selectedGenres + genre
-                        }
-                    },
-                    selectedCountry = selectedCountry,
-                    onCountrySelected = { selectedCountry = it },
-                    isTv = isTv
-                )
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                when (page) {
+                    0 -> SlideGlobalRadio()
+                    1 -> SlidePodcasts()
+                    2 -> SlideBackgroundControls(
+                        hasPermission = hasNotificationPermission,
+                        onRequestPermission = {
+                            onRequestNotificationPermission()
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                                hasNotificationPermission = ContextCompat.checkSelfPermission(
+                                    context,
+                                    Manifest.permission.POST_NOTIFICATIONS
+                                ) == PackageManager.PERMISSION_GRANTED
+                            }
+                        },
+                        isTv = isTv
+                    )
+                    3 -> SlideProAudio()
+                    4 -> SlideGenreDiscovery(
+                        availableGenres = availableGenres,
+                        selectedGenres = selectedGenres,
+                        onGenreToggled = { genre ->
+                            selectedGenres = if (selectedGenres.contains(genre)) {
+                                if (selectedGenres.size > 1) selectedGenres - genre else selectedGenres
+                            } else {
+                                selectedGenres + genre
+                            }
+                        },
+                        selectedCountry = selectedCountry,
+                        onCountrySelected = { selectedCountry = it },
+                        isTv = isTv
+                    )
+                }
             }
         }
 
@@ -263,7 +269,9 @@ fun OnboardingScreen(
                 ) {
                     Text(
                         text = if (isLastPage) stringResource(R.string.onboarding_slide3_start_listening) else stringResource(R.string.onboarding_next),
-                        style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold)
+                        style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold),
+                        maxLines = 1,
+                        softWrap = false
                     )
                     Spacer(modifier = Modifier.width(6.dp))
                     Icon(
@@ -282,6 +290,7 @@ private fun SlideGlobalRadio() {
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .widthIn(max = 600.dp)
             .padding(horizontal = 24.dp)
             .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -347,6 +356,7 @@ private fun SlidePodcasts() {
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .widthIn(max = 600.dp)
             .padding(horizontal = 24.dp)
             .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -416,6 +426,7 @@ private fun SlideBackgroundControls(
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .widthIn(max = 600.dp)
             .padding(horizontal = 24.dp)
             .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -437,7 +448,10 @@ private fun SlideBackgroundControls(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.weight(1f)
+                    ) {
                         Box(
                             modifier = Modifier
                                 .size(40.dp)
@@ -457,18 +471,23 @@ private fun SlideBackgroundControls(
                             Text(
                                 text = stringResource(R.string.media_service_label),
                                 style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-                                color = TextPrimary
+                                color = TextPrimary,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
                             )
                             Text(
                                 text = stringResource(R.string.notification_lockscreen_label),
                                 style = MaterialTheme.typography.bodySmall,
-                                color = TextSecondary
+                                color = TextSecondary,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
                             )
                         }
                     }
 
                     Box(
                         modifier = Modifier
+                            .padding(start = 8.dp)
                             .clip(CircleShape)
                             .background(if (hasPermission) StatusGreen.copy(alpha = 0.2f) else DarkBackground)
                             .padding(horizontal = 10.dp, vertical = 4.dp)
@@ -476,7 +495,9 @@ private fun SlideBackgroundControls(
                         Text(
                             text = if (hasPermission) stringResource(R.string.status_active) else stringResource(R.string.status_ready),
                             style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
-                            color = if (hasPermission) StatusGreen else TextMuted
+                            color = if (hasPermission) StatusGreen else TextMuted,
+                            maxLines = 1,
+                            softWrap = false
                         )
                     }
                 }
@@ -539,6 +560,7 @@ private fun SlideProAudio() {
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .widthIn(max = 600.dp)
             .padding(horizontal = 24.dp)
             .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -611,6 +633,7 @@ private fun SlideGenreDiscovery(
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .widthIn(max = 600.dp)
             .padding(horizontal = 24.dp)
             .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -653,15 +676,15 @@ private fun SlideGenreDiscovery(
 
         val allCountriesList = remember {
             listOf(
-                com.easeaudio.viewmodel.CountryDisplay("Global", "🌐"),
-                com.easeaudio.viewmodel.CountryDisplay("Vietnam", "🇻🇳"),
-                com.easeaudio.viewmodel.CountryDisplay("United States", "🇺🇸"),
-                com.easeaudio.viewmodel.CountryDisplay("United Kingdom", "🇬🇧"),
-                com.easeaudio.viewmodel.CountryDisplay("Canada", "🇨🇦"),
-                com.easeaudio.viewmodel.CountryDisplay("Australia", "🇦🇺"),
-                com.easeaudio.viewmodel.CountryDisplay("Germany", "🇩🇪"),
-                com.easeaudio.viewmodel.CountryDisplay("Japan", "🇯🇵"),
-                com.easeaudio.viewmodel.CountryDisplay("Brazil", "🇧🇷")
+                com.easeaudio.viewmodel.CountryDisplay("Global", "🌐", ""),
+                com.easeaudio.viewmodel.CountryDisplay("Vietnam", "🇻🇳", "VN"),
+                com.easeaudio.viewmodel.CountryDisplay("United States", "🇺🇸", "US"),
+                com.easeaudio.viewmodel.CountryDisplay("United Kingdom", "🇬🇧", "GB"),
+                com.easeaudio.viewmodel.CountryDisplay("Canada", "🇨🇦", "CA"),
+                com.easeaudio.viewmodel.CountryDisplay("Australia", "🇦🇺", "AU"),
+                com.easeaudio.viewmodel.CountryDisplay("Germany", "🇩🇪", "DE"),
+                com.easeaudio.viewmodel.CountryDisplay("Japan", "🇯🇵", "JP"),
+                com.easeaudio.viewmodel.CountryDisplay("Brazil", "🇧🇷", "BR")
             )
         }
 

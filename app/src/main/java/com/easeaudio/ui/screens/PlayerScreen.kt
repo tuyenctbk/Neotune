@@ -21,6 +21,8 @@ import androidx.compose.material.icons.automirrored.filled.VolumeUp
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.*
+import androidx.compose.material3.windowsizeclass.WindowSizeClass
+import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -48,6 +50,7 @@ import android.Manifest
 @Composable
 fun PlayerScreen(
     station: RadioStation?,
+    windowSizeClass: WindowSizeClass,
     isPlaying: Boolean,
     isLoading: Boolean,
     streamTitle: String?,
@@ -216,526 +219,368 @@ fun PlayerScreen(
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
-            val isPodcast = station.isPodcast
-            val maxScreenHeight = maxHeight
-            val isCompact = maxScreenHeight < 680.dp
-            val artSize = if (isCompact) 150.dp else 195.dp
-
-            Column(
-                modifier = Modifier
-                    .fillMaxHeight()
-                    .widthIn(max = 500.dp)
-                    .align(Alignment.TopCenter)
-                    .padding(horizontal = 20.dp)
-                    .verticalScroll(rememberScrollState()),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.SpaceBetween
-            ) {
-                Spacer(modifier = Modifier.height(8.dp))
-
-                if (!hasNotificationPermission && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                    var isPlayerReminderDismissed by remember { mutableStateOf(false) }
-                    NotificationPermissionReminder(
-                        visible = !isPlayerReminderDismissed,
-                        onRequestPermission = onRequestNotificationPermission,
-                        onDismiss = { isPlayerReminderDismissed = true },
-                        modifier = Modifier.padding(bottom = 8.dp)
-                    )
-                }
-
-                // Station Artwork Frame
-                Box(
+            val isExpanded = windowSizeClass.widthSizeClass == WindowWidthSizeClass.Expanded
+            val isMedium = windowSizeClass.widthSizeClass == WindowWidthSizeClass.Medium
+            val useHorizontalLayout = isExpanded || (isMedium && maxWidth > maxHeight)
+            
+            if (useHorizontalLayout) {
+                Row(
                     modifier = Modifier
-                        .size(artSize)
-                        .scale(artScale)
-                        .clip(RoundedCornerShape(24.dp))
-                        .border(1.dp, Color(0x12FFFFFF), RoundedCornerShape(24.dp))
-                ) {
-                    AsyncImage(
-                        model = station.imageUrl,
-                        contentDescription = station.name,
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier.fillMaxSize()
-                    )
-
-                    if (isLoading) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .background(DarkBackground.copy(alpha = 0.65f)),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                CircularProgressIndicator(
-                                    color = NeonCyan,
-                                    strokeWidth = 3.dp,
-                                    modifier = Modifier.size(36.dp)
-                                )
-                                Spacer(modifier = Modifier.height(8.dp))
-                                Text(
-                                    text = stringResource(R.string.buffering_stream),
-                                    color = NeonCyan,
-                                    style = MaterialTheme.typography.labelLarge,
-                                    fontWeight = FontWeight.Bold
-                                )
-                            }
-                        }
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(12.dp))
-
-                // Title & Track Information
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(
-                        text = station.name,
-                        style = if (isCompact) MaterialTheme.typography.titleLarge else MaterialTheme.typography.headlineMedium,
-                        color = TextPrimary,
-                        textAlign = TextAlign.Center,
-                        fontWeight = FontWeight.Bold,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-
-                    Spacer(modifier = Modifier.height(4.dp))
-
-                    Text(
-                        text = if (isLoading) stringResource(R.string.buffering_stream) else (streamTitle ?: station.genre),
-                        style = MaterialTheme.typography.titleSmall,
-                        color = TextSecondary,
-                        textAlign = TextAlign.Center,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-
-                    Spacer(modifier = Modifier.height(2.dp))
-
-                    if (!isPodcast) {
-                        Row(
-                            horizontalArrangement = Arrangement.Center,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
-                                text = station.country,
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = TextSecondary
-                            )
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Box(
-                                modifier = Modifier
-                                    .clip(RoundedCornerShape(4.dp))
-                                    .background(DarkSurfaceVariant)
-                                    .padding(horizontal = 6.dp, vertical = 2.dp)
-                            ) {
-                                Text(
-                                    text = station.bitrate,
-                                    style = MaterialTheme.typography.labelSmall,
-                                    color = TextMuted,
-                                    fontWeight = FontWeight.SemiBold
-                                )
-                            }
-                            Spacer(modifier = Modifier.width(6.dp))
-                            Box(
-                                modifier = Modifier
-                                    .clip(RoundedCornerShape(4.dp))
-                                    .background(DarkSurfaceVariant)
-                                    .padding(horizontal = 6.dp, vertical = 2.dp)
-                            ) {
-                                Text(
-                                    text = station.codec,
-                                    style = MaterialTheme.typography.labelSmall,
-                                    color = TextMuted,
-                                    fontWeight = FontWeight.SemiBold
-                                )
-                            }
-                        }
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(12.dp))
-
-                // Podcast: seek slider with position labels — Radio: live waveform
-                if (isPodcast && totalDuration > 0L) {
-                    Column(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Slider(
-                            value = currentPosition.toFloat(),
-                            onValueChange = { onSeek?.invoke(it.toLong()) },
-                            valueRange = 0f..totalDuration.toFloat(),
-                            colors = SliderDefaults.colors(
-                                thumbColor = NeonPurple,
-                                activeTrackColor = NeonPurple,
-                                inactiveTrackColor = DarkSurfaceVariant
-                            ),
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            Text(
-                                text = formatDuration(currentPosition),
-                                style = MaterialTheme.typography.labelSmall,
-                                color = TextMuted
-                            )
-                            Text(
-                                text = formatDuration(totalDuration),
-                                style = MaterialTheme.typography.labelSmall,
-                                color = TextMuted
-                            )
-                        }
-
-                        if (currentPosition > 5000L) {
-                            Spacer(modifier = Modifier.height(6.dp))
-                            Surface(
-                                shape = RoundedCornerShape(8.dp),
-                                color = DarkSurfaceVariant.copy(alpha = 0.9f),
-                                border = BorderStroke(1.dp, NeonPurple.copy(alpha = 0.5f))
-                            ) {
-                                Row(
-                                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 3.dp),
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Filled.History,
-                                        contentDescription = null,
-                                        tint = NeonPurple,
-                                        modifier = Modifier.size(13.dp)
-                                    )
-                                    Spacer(modifier = Modifier.width(5.dp))
-                                    Text(
-                                        text = stringResource(R.string.resumed_at, formatDuration(currentPosition)),
-                                        style = MaterialTheme.typography.labelSmall.copy(fontSize = 11.sp),
-                                        color = TextPrimary
-                                    )
-                                    Spacer(modifier = Modifier.width(8.dp))
-                                    Text(
-                                        text = stringResource(R.string.restart),
-                                        style = MaterialTheme.typography.labelSmall.copy(fontSize = 11.sp, fontWeight = FontWeight.Bold),
-                                        color = NeonCyan,
-                                        modifier = Modifier
-                                            .clip(RoundedCornerShape(4.dp))
-                                            .clickable { onSeek?.invoke(0L) }
-                                            .padding(horizontal = 4.dp, vertical = 2.dp)
-                                    )
-                                }
-                            }
-                        }
-                    }
-                } else if (!isPodcast) {
-                    val barColors = WaveformAnimationColors
-                    Row(
-                        modifier = Modifier
-                            .height(36.dp)
-                            .fillMaxWidth(0.7f),
-                        horizontalArrangement = Arrangement.spacedBy(6.dp),
-                        verticalAlignment = Alignment.Bottom
-                    ) {
-                        waveAmplitudes.forEachIndexed { index, amp ->
-                            val barColor = barColors[index % barColors.size]
-                            Box(
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .fillMaxHeight(amp.coerceIn(0.12f, 1.0f))
-                                    .clip(CircleShape)
-                                    .background(
-                                        Brush.verticalGradient(
-                                            listOf(
-                                                barColor,
-                                                barColor.copy(alpha = 0.55f)
-                                            )
-                                        )
-                                    )
-                            )
-                        }
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(12.dp))
-
-                // Volume Slider
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        imageVector = if (volume == 0f) Icons.AutoMirrored.Filled.VolumeOff else Icons.AutoMirrored.Filled.VolumeDown,
-                        contentDescription = null,
-                        tint = TextMuted,
-                        modifier = Modifier.size(20.dp)
-                    )
-                    Slider(
-                        value = volume,
-                        onValueChange = onVolumeChange,
-                        colors = SliderDefaults.colors(
-                            thumbColor = NeonCyan,
-                            activeTrackColor = NeonCyan,
-                            inactiveTrackColor = DarkSurfaceVariant
-                        ),
-                        modifier = Modifier
-                            .weight(1f)
-                            .padding(horizontal = 12.dp)
-                            .testTag("slider_player_volume")
-                    )
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.VolumeUp,
-                        contentDescription = null,
-                        tint = TextMuted,
-                        modifier = Modifier.size(20.dp)
-                    )
-                }
-
-                if (playbackError != null) {
-                    Spacer(modifier = Modifier.height(10.dp))
-                    Surface(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clip(RoundedCornerShape(12.dp)),
-                        color = Color(0x22FF5252),
-                        border = BorderStroke(1.dp, Color(0xFFFF5252))
-                    ) {
-                        Column(
-                            modifier = Modifier.padding(12.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Icon(
-                                    imageVector = Icons.Filled.Warning,
-                                    contentDescription = null,
-                                    tint = Color(0xFFFF5252),
-                                    modifier = Modifier.size(18.dp)
-                                )
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Text(
-                                    text = stringResource(R.string.stream_offline_notice),
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = TextPrimary,
-                                    textAlign = TextAlign.Center
-                                )
-                            }
-                            Spacer(modifier = Modifier.height(8.dp))
-                            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                                Button(
-                                    onClick = onRetryStream,
-                                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF5252)),
-                                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp),
-                                    shape = RoundedCornerShape(8.dp),
-                                    modifier = Modifier.height(32.dp)
-                                ) {
-                                    Icon(Icons.Filled.Refresh, contentDescription = null, modifier = Modifier.size(14.dp))
-                                    Spacer(modifier = Modifier.width(4.dp))
-                                    Text(stringResource(R.string.retry_stream), fontSize = 12.sp)
-                                }
-                                OutlinedButton(
-                                    onClick = onPlayNextStation,
-                                    colors = ButtonDefaults.outlinedButtonColors(contentColor = NeonCyan),
-                                    border = BorderStroke(1.dp, NeonCyan),
-                                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp),
-                                    shape = RoundedCornerShape(8.dp),
-                                    modifier = Modifier.height(32.dp)
-                                ) {
-                                    Icon(Icons.Filled.SkipNext, contentDescription = null, modifier = Modifier.size(14.dp))
-                                    Spacer(modifier = Modifier.width(4.dp))
-                                    Text(stringResource(R.string.next_station), fontSize = 12.sp)
-                                }
-                            }
-                        }
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(12.dp))
-
-                // Transport Row (Previous, 15s Rewind, Play/Pause, 15s Forward, Next)
-                Row(
+                        .fillMaxSize()
+                        .padding(horizontal = 40.dp, vertical = 20.dp),
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(if (isPodcast) 12.dp else 24.dp)
+                    horizontalArrangement = Arrangement.spacedBy(40.dp)
                 ) {
-                    var isPrevFocused by remember { mutableStateOf(false) }
-                    IconButton(
-                        onClick = onPlayPreviousStation,
-                        modifier = Modifier
-                            .size(44.dp)
-                            .onFocusChanged { isPrevFocused = it.isFocused }
-                            .clip(CircleShape)
-                            .background(if (isPrevFocused) NeonCyan else Color.Transparent)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Filled.SkipPrevious,
-                            contentDescription = "Previous Station",
-                            tint = if (isPrevFocused) DarkBackground else TextPrimary,
-                            modifier = Modifier.size(28.dp)
-                        )
-                    }
-
-                    if (isPodcast && onSeekRelative != null) {
-                        IconButton(
-                            onClick = { onSeekRelative(-15000L) },
-                            modifier = Modifier.size(44.dp)
-                        ) {
-                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                Icon(
-                                    imageVector = Icons.Filled.Replay,
-                                    contentDescription = "Rewind 15s",
-                                    tint = NeonPurple,
-                                    modifier = Modifier.size(26.dp)
-                                )
-                                Text("15s", fontSize = 9.sp, color = NeonPurple)
-                            }
-                        }
-                    }
-
-                    // Play / Pause Transport Button
-                    var isPlayFocused by remember { mutableStateOf(false) }
                     Box(
                         modifier = Modifier
-                            .size(68.dp)
-                            .onFocusChanged { isPlayFocused = it.isFocused }
-                            .clip(CircleShape)
-                            .background(if (isPlayFocused) NeonCyan else Color.White)
-                            .clickable(onClick = onTogglePlay)
-                            .border(
-                                width = if (isPlayFocused) 3.dp else 0.dp,
-                                color = if (isPlayFocused) Color.White else Color.Transparent,
-                                shape = CircleShape
-                            )
-                            .testTag("btn_player_toggle_play"),
+                            .weight(1f)
+                            .aspectRatio(1f)
+                            .scale(artScale)
+                            .clip(RoundedCornerShape(32.dp))
+                            .border(1.dp, Color(0x12FFFFFF), RoundedCornerShape(32.dp)),
                         contentAlignment = Alignment.Center
                     ) {
+                        AsyncImage(
+                            model = station.imageUrl,
+                            contentDescription = station.name,
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier.fillMaxSize()
+                        )
                         if (isLoading) {
-                            CircularProgressIndicator(
-                                modifier = Modifier.size(30.dp),
-                                color = if (isPlayFocused) NeonCyan else DarkBackground,
-                                strokeWidth = 3.dp
-                            )
-                        } else {
-                            Icon(
-                                imageVector = if (isPlaying) Icons.Filled.Pause else Icons.Filled.PlayArrow,
-                                contentDescription = if (isPlaying) "Pause" else "Play",
-                                tint = DarkBackground,
-                                modifier = Modifier.size(36.dp)
-                            )
+                            CircularProgressIndicator(color = NeonCyan, strokeWidth = 4.dp)
                         }
                     }
 
-                    if (isPodcast && onSeekRelative != null) {
-                        IconButton(
-                            onClick = { onSeekRelative(30000L) },
-                            modifier = Modifier.size(44.dp)
-                        ) {
-                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                Icon(
-                                    imageVector = Icons.Filled.Forward30,
-                                    contentDescription = "Forward 30s",
-                                    tint = NeonPurple,
-                                    modifier = Modifier.size(26.dp)
-                                )
-                                Text("+30s", fontSize = 9.sp, color = NeonPurple)
+                    Column(
+                        modifier = Modifier
+                            .weight(1.2f)
+                            .fillMaxHeight(),
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        PlayerContent(
+                            station = station,
+                            isPlaying = isPlaying,
+                            isLoading = isLoading,
+                            streamTitle = streamTitle,
+                            waveAmplitudes = waveAmplitudes,
+                            volume = volume,
+                            sleepTimerRemaining = sleepTimerRemaining,
+                            activeEqPreset = activeEqPreset,
+                            eqPresets = eqPresets,
+                            playbackError = playbackError,
+                            currentPosition = currentPosition,
+                            totalDuration = totalDuration,
+                            playbackSpeed = playbackSpeed,
+                            onVolumeChange = onVolumeChange,
+                            onTogglePlay = onTogglePlay,
+                            onRetryStream = onRetryStream,
+                            onPlayNextStation = onPlayNextStation,
+                            onPlayPreviousStation = onPlayPreviousStation,
+                            onSeek = onSeek,
+                            onSeekRelative = onSeekRelative,
+                            onPlaybackSpeedChange = onPlaybackSpeedChange,
+                            onOpenEpisodes = onOpenEpisodes,
+                            onOpenSleepTimer = onOpenSleepTimer,
+                            onOpenEqualizer = onOpenEqualizer,
+                            isHorizontal = true
+                        )
+                    }
+                }
+            } else {
+                val maxScreenHeight = maxHeight
+                val isCompactHeight = maxScreenHeight < 680.dp
+                val artSize = if (isCompactHeight) 150.dp else 220.dp
+
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 24.dp)
+                        .verticalScroll(rememberScrollState()),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Spacer(modifier = Modifier.height(16.dp))
+                    
+                    if (!hasNotificationPermission && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        var isPlayerReminderDismissed by remember { mutableStateOf(false) }
+                        NotificationPermissionReminder(
+                            visible = !isPlayerReminderDismissed,
+                            onRequestPermission = onRequestNotificationPermission,
+                            onDismiss = { isPlayerReminderDismissed = true },
+                            modifier = Modifier.padding(bottom = 8.dp)
+                        )
+                    }
+
+                    Box(
+                        modifier = Modifier
+                            .size(artSize)
+                            .scale(artScale)
+                            .clip(RoundedCornerShape(24.dp))
+                            .border(1.dp, Color(0x12FFFFFF), RoundedCornerShape(24.dp))
+                    ) {
+                        AsyncImage(
+                            model = station.imageUrl,
+                            contentDescription = station.name,
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier.fillMaxSize()
+                        )
+                        if (isLoading) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .background(DarkBackground.copy(alpha = 0.6f)),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                CircularProgressIndicator(color = NeonCyan, strokeWidth = 3.dp)
                             }
                         }
                     }
 
-                    var isNextFocused by remember { mutableStateOf(false) }
-                    IconButton(
-                        onClick = onPlayNextStation,
-                        modifier = Modifier
-                            .size(44.dp)
-                            .onFocusChanged { isNextFocused = it.isFocused }
-                            .clip(CircleShape)
-                            .background(if (isNextFocused) NeonCyan else Color.Transparent)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Filled.SkipNext,
-                            contentDescription = if (isPodcast) "Next Episode" else "Next Station",
-                            tint = if (isNextFocused) DarkBackground else TextPrimary,
-                            modifier = Modifier.size(28.dp)
-                        )
-                    }
-                }
+                    Spacer(modifier = Modifier.height(24.dp))
 
-                Spacer(modifier = Modifier.height(6.dp))
-
-                // Shortcut Pills
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .horizontalScroll(rememberScrollState()),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    if (isPodcast && onOpenEpisodes != null) {
-                        AssistChip(
-                            onClick = onOpenEpisodes,
-                            leadingIcon = {
-                                Icon(
-                                    imageVector = Icons.AutoMirrored.Filled.QueueMusic,
-                                    contentDescription = "Episodes",
-                                    tint = NeonPurple,
-                                    modifier = Modifier.size(16.dp)
-                                )
-                            },
-                            label = { Text("Episodes", color = TextPrimary) },
-                            colors = AssistChipDefaults.assistChipColors(containerColor = DarkSurfaceVariant),
-                            border = AssistChipDefaults.assistChipBorder(borderColor = CardBorder, enabled = true)
-                        )
-                    }
-                    if (isPodcast && onPlaybackSpeedChange != null) {
-                        val speedText = when (playbackSpeed) {
-                            1.25f -> "1.25x"
-                            1.5f -> "1.5x"
-                            2.0f -> "2.0x"
-                            else -> "1.0x"
-                        }
-                        AssistChip(
-                            onClick = {
-                                val nextSpeed = when (playbackSpeed) {
-                                    1.0f -> 1.25f
-                                    1.25f -> 1.5f
-                                    1.5f -> 2.0f
-                                    else -> 1.0f
-                                }
-                                onPlaybackSpeedChange(nextSpeed)
-                            },
-                            leadingIcon = {
-                                Icon(
-                                    imageVector = Icons.Filled.Speed,
-                                    contentDescription = "Speed",
-                                    tint = NeonPurple,
-                                    modifier = Modifier.size(16.dp)
-                                )
-                            },
-                            label = { Text(speedText, color = TextPrimary) },
-                            colors = AssistChipDefaults.assistChipColors(containerColor = DarkSurfaceVariant),
-                            border = AssistChipDefaults.assistChipBorder(borderColor = CardBorder, enabled = true)
-                        )
-                    }
-                    var isEqFocused by remember { mutableStateOf(false) }
-                    val activePresetLabel = eqPresets.find { it.key == activeEqPreset }?.labelResId?.let { stringResource(it) } ?: activeEqPreset
-                    AssistChip(
-                        onClick = onOpenEqualizer,
-                        leadingIcon = {
-                            Icon(
-                                imageVector = Icons.Filled.Equalizer,
-                                contentDescription = null,
-                                tint = if (isEqFocused) DarkBackground else NeonCyan,
-                                modifier = Modifier.size(16.dp)
-                            )
-                        },
-                        label = { Text(stringResource(R.string.eq_label, activePresetLabel), color = if (isEqFocused) DarkBackground else TextPrimary, fontSize = 12.sp) },
-                        colors = AssistChipDefaults.assistChipColors(
-                            containerColor = if (isEqFocused) NeonCyan else DarkSurfaceVariant
-                        ),
-                        border = AssistChipDefaults.assistChipBorder(
-                            enabled = true,
-                            borderColor = if (isEqFocused) Color.White else CardBorder
-                        ),
-                        modifier = Modifier.onFocusChanged { isEqFocused = it.isFocused }
+                    PlayerContent(
+                        station = station,
+                        isPlaying = isPlaying,
+                        isLoading = isLoading,
+                        streamTitle = streamTitle,
+                        waveAmplitudes = waveAmplitudes,
+                        volume = volume,
+                        sleepTimerRemaining = sleepTimerRemaining,
+                        activeEqPreset = activeEqPreset,
+                        eqPresets = eqPresets,
+                        playbackError = playbackError,
+                        currentPosition = currentPosition,
+                        totalDuration = totalDuration,
+                        playbackSpeed = playbackSpeed,
+                        onVolumeChange = onVolumeChange,
+                        onTogglePlay = onTogglePlay,
+                        onRetryStream = onRetryStream,
+                        onPlayNextStation = onPlayNextStation,
+                        onPlayPreviousStation = onPlayPreviousStation,
+                        onSeek = onSeek,
+                        onSeekRelative = onSeekRelative,
+                        onPlaybackSpeedChange = onPlaybackSpeedChange,
+                        onOpenEpisodes = onOpenEpisodes,
+                        onOpenSleepTimer = onOpenSleepTimer,
+                        onOpenEqualizer = onOpenEqualizer,
+                        isHorizontal = false
                     )
                 }
-
-                Spacer(modifier = Modifier.height(16.dp))
             }
+        }
+    }
+}
+
+@Composable
+private fun PlayerContent(
+    station: RadioStation,
+    isPlaying: Boolean,
+    isLoading: Boolean,
+    streamTitle: String?,
+    waveAmplitudes: List<Float>,
+    volume: Float,
+    sleepTimerRemaining: Int?,
+    activeEqPreset: String,
+    eqPresets: List<EqPresetDisplay>,
+    playbackError: String?,
+    currentPosition: Long,
+    totalDuration: Long,
+    playbackSpeed: Float,
+    onVolumeChange: (Float) -> Unit,
+    onTogglePlay: () -> Unit,
+    onRetryStream: () -> Unit,
+    onPlayNextStation: () -> Unit,
+    onPlayPreviousStation: () -> Unit,
+    onSeek: ((Long) -> Unit)?,
+    onSeekRelative: ((Long) -> Unit)?,
+    onPlaybackSpeedChange: ((Float) -> Unit)?,
+    onOpenEpisodes: (() -> Unit)?,
+    onOpenSleepTimer: () -> Unit,
+    onOpenEqualizer: () -> Unit,
+    isHorizontal: Boolean
+) {
+    val isPodcast = station.isPodcast
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .then(if (isHorizontal) Modifier.verticalScroll(rememberScrollState()) else Modifier),
+        horizontalAlignment = if (isHorizontal) Alignment.Start else Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = station.name,
+            style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
+            color = TextPrimary,
+            textAlign = if (isHorizontal) TextAlign.Start else TextAlign.Center,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )
+        Text(
+            text = if (isLoading) stringResource(R.string.buffering_stream) else (streamTitle ?: station.genre),
+            style = MaterialTheme.typography.titleMedium,
+            color = if (isLoading) NeonCyan else TextSecondary,
+            textAlign = if (isHorizontal) TextAlign.Start else TextAlign.Center,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        if (!isPodcast) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Text(text = station.country, style = MaterialTheme.typography.bodyMedium, color = TextMuted)
+                Surface(shape = RoundedCornerShape(4.dp), color = DarkSurfaceVariant) {
+                    Text(
+                        text = station.bitrate, 
+                        modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = TextMuted
+                    )
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        if (isPodcast && totalDuration > 0L) {
+            Column(modifier = Modifier.fillMaxWidth()) {
+                Slider(
+                    value = currentPosition.toFloat(),
+                    onValueChange = { onSeek?.invoke(it.toLong()) },
+                    valueRange = 0f..totalDuration.toFloat(),
+                    colors = SliderDefaults.colors(thumbColor = NeonPurple, activeTrackColor = NeonPurple)
+                )
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                    Text(text = formatDuration(currentPosition), style = MaterialTheme.typography.labelSmall, color = TextMuted)
+                    Text(text = formatDuration(totalDuration), style = MaterialTheme.typography.labelSmall, color = TextMuted)
+                }
+                
+                if (currentPosition > 5000L) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = stringResource(R.string.resumed_at, formatDuration(currentPosition)),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = NeonPurple,
+                        modifier = Modifier.clickable { onSeek?.invoke(0L) }
+                    )
+                }
+            }
+        } else if (!isPodcast) {
+            val barColors = WaveformAnimationColors
+            Row(
+                modifier = Modifier.height(40.dp).fillMaxWidth(if (isHorizontal) 0.6f else 0.8f),
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                verticalAlignment = Alignment.Bottom
+            ) {
+                waveAmplitudes.forEachIndexed { index, amp ->
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxHeight(amp.coerceIn(0.1f, 1.0f))
+                            .clip(CircleShape)
+                            .background(barColors[index % barColors.size])
+                    )
+                }
+            }
+        }
+
+        if (playbackError != null) {
+            Spacer(modifier = Modifier.height(16.dp))
+            Button(onClick = onRetryStream, colors = ButtonDefaults.buttonColors(containerColor = Color.Red)) {
+                Text("Retry Connection", color = Color.White)
+            }
+        }
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            IconButton(onClick = onPlayPreviousStation) {
+                Icon(Icons.Filled.SkipPrevious, null, modifier = Modifier.size(32.dp), tint = TextPrimary)
+            }
+
+            if (isPodcast && onSeekRelative != null) {
+                IconButton(onClick = { onSeekRelative(-15000L) }) {
+                    Icon(Icons.Filled.Replay10, null, tint = NeonPurple)
+                }
+            }
+
+            Box(
+                modifier = Modifier
+                    .size(72.dp)
+                    .clip(CircleShape)
+                    .background(Color.White)
+                    .clickable { onTogglePlay() },
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = if (isPlaying) Icons.Filled.Pause else Icons.Filled.PlayArrow,
+                    contentDescription = null,
+                    tint = DarkBackground,
+                    modifier = Modifier.size(40.dp)
+                )
+            }
+
+            if (isPodcast && onSeekRelative != null) {
+                IconButton(onClick = { onSeekRelative(30000L) }) {
+                    Icon(Icons.Filled.Forward30, null, tint = NeonPurple)
+                }
+            }
+
+            IconButton(onClick = onPlayNextStation) {
+                Icon(Icons.Filled.SkipNext, null, modifier = Modifier.size(32.dp), tint = TextPrimary)
+            }
+        }
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(Icons.AutoMirrored.Filled.VolumeDown, null, tint = TextMuted, modifier = Modifier.size(20.dp))
+            Slider(
+                value = volume,
+                onValueChange = onVolumeChange,
+                modifier = Modifier.weight(1f).padding(horizontal = 12.dp),
+                colors = SliderDefaults.colors(thumbColor = NeonCyan, activeTrackColor = NeonCyan)
+            )
+            Icon(Icons.AutoMirrored.Filled.VolumeUp, null, tint = TextMuted, modifier = Modifier.size(20.dp))
+        }
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        Row(
+            modifier = Modifier.horizontalScroll(rememberScrollState()),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            if (isPodcast && onOpenEpisodes != null) {
+                AssistChip(
+                    onClick = onOpenEpisodes,
+                    label = { Text("Episodes") },
+                    leadingIcon = { Icon(Icons.AutoMirrored.Filled.QueueMusic, null, modifier = Modifier.size(16.dp)) }
+                )
+            }
+            if (isPodcast && onPlaybackSpeedChange != null) {
+                AssistChip(
+                    onClick = { onPlaybackSpeedChange(if (playbackSpeed >= 2f) 1f else playbackSpeed + 0.5f) },
+                    label = { Text("${playbackSpeed}x") },
+                    leadingIcon = { Icon(Icons.Filled.Speed, null, modifier = Modifier.size(16.dp)) }
+                )
+            }
+            val activePresetLabel = eqPresets.find { it.key == activeEqPreset }?.labelResId?.let { stringResource(it) } ?: activeEqPreset
+            AssistChip(
+                onClick = onOpenEqualizer,
+                label = { Text("EQ: $activePresetLabel") },
+                leadingIcon = { Icon(Icons.Filled.Tune, null, modifier = Modifier.size(16.dp)) }
+            )
+            AssistChip(
+                onClick = onOpenSleepTimer,
+                label = { Text(if (sleepTimerRemaining != null) "${sleepTimerRemaining}m" else "Timer") },
+                leadingIcon = { Icon(Icons.Filled.Bedtime, null, modifier = Modifier.size(16.dp)) },
+                colors = if (sleepTimerRemaining != null) AssistChipDefaults.assistChipColors(containerColor = ActivePill) else AssistChipDefaults.assistChipColors()
+            )
         }
     }
 }

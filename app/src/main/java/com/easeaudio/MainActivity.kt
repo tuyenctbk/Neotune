@@ -24,6 +24,10 @@ import androidx.compose.material.icons.filled.Wifi
 import androidx.compose.material.icons.filled.WifiOff
 import androidx.compose.material.icons.filled.SignalCellularAlt
 import androidx.compose.material3.*
+import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
+import androidx.compose.material3.windowsizeclass.WindowSizeClass
+import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
+import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.*
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -74,6 +78,7 @@ class MainActivity : ComponentActivity() {
         isPermissionGrantedState.value = isGranted
     }
 
+    @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
         super.onCreate(savedInstanceState)
@@ -84,9 +89,11 @@ class MainActivity : ComponentActivity() {
         FirebaseManager.initialize(applicationContext)
 
         setContent {
+            val windowSizeClass = calculateWindowSizeClass(this)
             TuneveTheme {
                 MainAppContent(
                     viewModel = viewModel,
+                    windowSizeClass = windowSizeClass,
                     onRequestNotificationPermission = {
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                             requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
@@ -101,6 +108,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun MainAppContent(
     viewModel: RadioViewModel,
+    windowSizeClass: WindowSizeClass,
     onRequestNotificationPermission: () -> Unit = {}
 ) {
     val context = LocalContext.current
@@ -128,12 +136,15 @@ fun MainAppContent(
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
             if (event == Lifecycle.Event.ON_RESUME) {
+                // Update notification permission state
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                     hasNotificationPermission = ContextCompat.checkSelfPermission(
                         context,
                         Manifest.permission.POST_NOTIFICATIONS
                     ) == PackageManager.PERMISSION_GRANTED
                 }
+                // Refresh recent streams when app comes to foreground
+                viewModel.refreshRecentStations()
             }
         }
         lifecycleOwner.lifecycle.addObserver(observer)
@@ -179,223 +190,252 @@ fun MainAppContent(
         }
     }
 
+    val showBottomBar = windowSizeClass.widthSizeClass == WindowWidthSizeClass.Compact && currentRoute != NavRoute.Onboarding.route && !isFullPlayerVisible
+    val showNavigationRail = windowSizeClass.widthSizeClass != WindowWidthSizeClass.Compact && currentRoute != NavRoute.Onboarding.route && !isFullPlayerVisible
+
     Box(modifier = Modifier.fillMaxSize()) {
-        Scaffold(
-            snackbarHost = { SnackbarHost(snackbarHostState) },
-            contentWindowInsets = WindowInsets(0, 0, 0, 0),
-            bottomBar = {
-                if (!isFullPlayerVisible && currentRoute != NavRoute.Onboarding.route) {
-                    BottomNavBar(
-                        currentRoute = currentRoute,
-                        onNavigate = { route ->
-                            if (route == NavRoute.Radio.route || route == NavRoute.Home.route) {
-                                viewModel.setSelectedTab(com.easeaudio.ui.screens.HomeTab.Radio)
-                            } else if (route == NavRoute.Podcast.route) {
-                                viewModel.setSelectedTab(com.easeaudio.ui.screens.HomeTab.Podcast)
+        Row(modifier = Modifier.fillMaxSize()) {
+            if (showNavigationRail) {
+                AppNavigationRail(
+                    currentRoute = currentRoute,
+                    onNavigate = { route ->
+                        if (route == NavRoute.Radio.route || route == NavRoute.Home.route) {
+                            viewModel.setSelectedTab(com.easeaudio.ui.screens.HomeTab.Radio)
+                        } else if (route == NavRoute.Podcast.route) {
+                            viewModel.setSelectedTab(com.easeaudio.ui.screens.HomeTab.Podcast)
+                        }
+                        navController.navigate(route) {
+                            popUpTo(navController.graph.startDestinationId) {
+                                saveState = true
                             }
-                            navController.navigate(route) {
-                                popUpTo(navController.graph.startDestinationId) {
-                                    saveState = true
-                                }
-                                launchSingleTop = true
-                                restoreState = true
-                            }
-                        },
-                    )
-                }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+                    }
+                )
             }
-        ) { innerPadding ->
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(innerPadding)
-            ) {
-                NavHost(
-                    navController = navController,
-                    startDestination = startDestination
+            
+            Scaffold(
+                snackbarHost = { SnackbarHost(snackbarHostState) },
+                contentWindowInsets = WindowInsets(0, 0, 0, 0),
+                bottomBar = {
+                    if (showBottomBar) {
+                        BottomNavBar(
+                            currentRoute = currentRoute,
+                            onNavigate = { route ->
+                                if (route == NavRoute.Radio.route || route == NavRoute.Home.route) {
+                                    viewModel.setSelectedTab(com.easeaudio.ui.screens.HomeTab.Radio)
+                                } else if (route == NavRoute.Podcast.route) {
+                                    viewModel.setSelectedTab(com.easeaudio.ui.screens.HomeTab.Podcast)
+                                }
+                                navController.navigate(route) {
+                                    popUpTo(navController.graph.startDestinationId) {
+                                        saveState = true
+                                    }
+                                    launchSingleTop = true
+                                    restoreState = true
+                                }
+                            },
+                        )
+                    }
+                }
+            ) { innerPadding ->
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(innerPadding)
                 ) {
-                    composable(NavRoute.Onboarding.route) {
-                        OnboardingScreen(
-                            availableGenres = uiState.availableGenres.map { it.key },
-                            onGenreSelected = { genre -> viewModel.setSelectedGenre(genre) },
-                            onGenresSelected = { genres -> viewModel.setPreferredGenres(genres) },
-                            onCountrySelected = { country -> viewModel.setSelectedCountry(country) },
-                            onRequestNotificationPermission = onRequestNotificationPermission,
-                            onCompleteOnboarding = completeOnboarding
-                        )
-                    }
+                    NavHost(
+                        navController = navController,
+                        startDestination = startDestination
+                    ) {
+                        composable(NavRoute.Onboarding.route) {
+                            OnboardingScreen(
+                                availableGenres = uiState.availableGenres.map { it.key },
+                                windowSizeClass = windowSizeClass,
+                                onGenreSelected = { genre -> viewModel.setSelectedGenre(genre) },
+                                onGenresSelected = { genres -> viewModel.setPreferredGenres(genres) },
+                                onCountrySelected = { country -> viewModel.setSelectedCountry(country) },
+                                onRequestNotificationPermission = onRequestNotificationPermission,
+                                onCompleteOnboarding = completeOnboarding
+                            )
+                        }
 
-                    composable(NavRoute.Home.route) {
-                        HomeScreen(
-                            uiState = uiState,
-                            onPlayPause = { viewModel.togglePlayPause() },
-                            onNextStation = { viewModel.playNextStation() },
-                            onPreviousStation = { viewModel.playPreviousStation() },
-                            onSearchQueryChange = { viewModel.setSearchQuery(it) },
-                            onGenreSelect = { viewModel.setSelectedGenre(it) },
-                            onCountrySelect = { viewModel.setSelectedCountry(it) },
-                            onStationSelect = { station -> 
-                                FirebaseManager.logEvent("play_station", Bundle().apply { putString("station_name", station.name) })
-                                viewModel.playStation(station) 
-                            },
-                            onToggleFavorite = { station -> 
-                                FirebaseManager.logEvent("toggle_favorite", Bundle().apply { putString("station_name", station.name) })
-                                viewModel.toggleFavorite(station) 
-                            },
-                            onOpenAddStation = { viewModel.setShowAddStationDialog(true) },
-                            onLoadMore = { viewModel.loadMoreStations() },
-                            onRefresh = { viewModel.refreshStations() },
-                            onRetryDiscovery = { viewModel.retryDiscovery() }
-                        )
-                    }
+                        composable(NavRoute.Home.route) {
+                            HomeScreen(
+                                uiState = uiState,
+                                windowSizeClass = windowSizeClass,
+                                onPlayPause = { viewModel.togglePlayPause() },
+                                onNextStation = { viewModel.playNextStation() },
+                                onPreviousStation = { viewModel.playPreviousStation() },
+                                onSearchQueryChange = { viewModel.setSearchQuery(it) },
+                                onGenreSelect = { viewModel.setSelectedGenre(it) },
+                                onCountrySelect = { viewModel.setSelectedCountry(it) },
+                                onStationSelect = { station -> 
+                                    FirebaseManager.logEvent("play_station", Bundle().apply { putString("station_name", station.name) })
+                                    viewModel.playStation(station) 
+                                },
+                                onToggleFavorite = { station -> 
+                                    FirebaseManager.logEvent("toggle_favorite", Bundle().apply { putString("station_name", station.name) })
+                                    viewModel.toggleFavorite(station) 
+                                },
+                                onOpenAddStation = { viewModel.setShowAddStationDialog(true) },
+                                onLoadMore = { viewModel.loadMoreStations() },
+                                onRefresh = { viewModel.refreshStations() },
+                                onRetryDiscovery = { viewModel.retryDiscovery() }
+                            )
+                        }
 
-                    composable(NavRoute.Radio.route) {
-                        HomeScreen(
-                            uiState = uiState,
-                            onPlayPause = { viewModel.togglePlayPause() },
-                            onNextStation = { viewModel.playNextStation() },
-                            onPreviousStation = { viewModel.playPreviousStation() },
-                            onSearchQueryChange = { viewModel.setSearchQuery(it) },
-                            onGenreSelect = { viewModel.setSelectedGenre(it) },
-                            onCountrySelect = { viewModel.setSelectedCountry(it) },
-                            onStationSelect = { station -> 
-                                FirebaseManager.logEvent("play_station", Bundle().apply { putString("station_name", station.name) })
-                                viewModel.playStation(station) 
-                            },
-                            onToggleFavorite = { station -> 
-                                FirebaseManager.logEvent("toggle_favorite", Bundle().apply { putString("station_name", station.name) })
-                                viewModel.toggleFavorite(station) 
-                            },
-                            onOpenAddStation = { viewModel.setShowAddStationDialog(true) },
-                            onLoadMore = { viewModel.loadMoreStations() },
-                            onRefresh = { viewModel.refreshStations() },
-                            onRetryDiscovery = { viewModel.retryDiscovery() }
-                        )
-                    }
+                        composable(NavRoute.Radio.route) {
+                            HomeScreen(
+                                uiState = uiState,
+                                windowSizeClass = windowSizeClass,
+                                onPlayPause = { viewModel.togglePlayPause() },
+                                onNextStation = { viewModel.playNextStation() },
+                                onPreviousStation = { viewModel.playPreviousStation() },
+                                onSearchQueryChange = { viewModel.setSearchQuery(it) },
+                                onGenreSelect = { viewModel.setSelectedGenre(it) },
+                                onCountrySelect = { viewModel.setSelectedCountry(it) },
+                                onStationSelect = { station -> 
+                                    FirebaseManager.logEvent("play_station", Bundle().apply { putString("station_name", station.name) })
+                                    viewModel.playStation(station) 
+                                },
+                                onToggleFavorite = { station -> 
+                                    FirebaseManager.logEvent("toggle_favorite", Bundle().apply { putString("station_name", station.name) })
+                                    viewModel.toggleFavorite(station) 
+                                },
+                                onOpenAddStation = { viewModel.setShowAddStationDialog(true) },
+                                onLoadMore = { viewModel.loadMoreStations() },
+                                onRefresh = { viewModel.refreshStations() },
+                                onRetryDiscovery = { viewModel.retryDiscovery() }
+                            )
+                        }
 
-                    composable(NavRoute.Podcast.route) {
-                        HomeScreen(
-                            uiState = uiState,
-                            onPlayPause = { viewModel.togglePlayPause() },
-                            onNextStation = { viewModel.playNextStation() },
-                            onPreviousStation = { viewModel.playPreviousStation() },
-                            onSearchQueryChange = { viewModel.setSearchQuery(it) },
-                            onGenreSelect = { viewModel.setSelectedGenre(it) },
-                            onCountrySelect = { viewModel.setSelectedCountry(it) },
-                            onStationSelect = { station -> 
-                                FirebaseManager.logEvent("play_station", Bundle().apply { putString("station_name", station.name) })
-                                viewModel.playStation(station) 
-                            },
-                            onToggleFavorite = { station -> 
-                                FirebaseManager.logEvent("toggle_favorite", Bundle().apply { putString("station_name", station.name) })
-                                viewModel.toggleFavorite(station) 
-                            },
-                            onOpenAddStation = { viewModel.setShowAddStationDialog(true) },
-                            onLoadMore = { viewModel.loadMoreStations() },
-                            onRefresh = { viewModel.refreshStations() },
-                            onRetryDiscovery = { viewModel.retryDiscovery() }
-                        )
-                    }
+                        composable(NavRoute.Podcast.route) {
+                            HomeScreen(
+                                uiState = uiState,
+                                windowSizeClass = windowSizeClass,
+                                onPlayPause = { viewModel.togglePlayPause() },
+                                onNextStation = { viewModel.playNextStation() },
+                                onPreviousStation = { viewModel.playPreviousStation() },
+                                onSearchQueryChange = { viewModel.setSearchQuery(it) },
+                                onGenreSelect = { viewModel.setSelectedGenre(it) },
+                                onCountrySelect = { viewModel.setSelectedCountry(it) },
+                                onStationSelect = { station -> 
+                                    FirebaseManager.logEvent("play_station", Bundle().apply { putString("station_name", station.name) })
+                                    viewModel.playStation(station) 
+                                },
+                                onToggleFavorite = { station -> 
+                                    FirebaseManager.logEvent("toggle_favorite", Bundle().apply { putString("station_name", station.name) })
+                                    viewModel.toggleFavorite(station) 
+                                },
+                                onOpenAddStation = { viewModel.setShowAddStationDialog(true) },
+                                onLoadMore = { viewModel.loadMoreStations() },
+                                onRefresh = { viewModel.refreshStations() },
+                                onRetryDiscovery = { viewModel.retryDiscovery() }
+                            )
+                        }
 
-                    composable(NavRoute.Favorites.route) {
-                        FavoritesScreen(
-                            favoriteStations = uiState.favoriteStations,
-                            currentStation = syncedCurrentStation,
-                            isPlaying = uiState.isPlaying,
-                            isLoading = uiState.isLoading,
-                            failedStationIds = uiState.failedStationIds,
-                            onStationSelect = { station -> 
-                                FirebaseManager.logEvent("play_station", Bundle().apply { putString("station_name", station.name) })
-                                viewModel.playStation(station) 
-                            },
-                            onToggleFavorite = { station -> 
-                                FirebaseManager.logEvent("toggle_favorite", Bundle().apply { putString("station_name", station.name) })
-                                viewModel.toggleFavorite(station) 
-                            }
-                        )
-                    }
-
-                    composable(NavRoute.Settings.route) {
-                        var showAlarmDialog by remember { mutableStateOf(false) }
-
-                        com.easeaudio.ui.screens.SettingsScreen(
-                            sleepTimerRemaining = uiState.sleepTimerRemaining,
-                            selectedCountry = uiState.selectedCountry,
-                            onOpenEqualizer = { viewModel.setShowEqualizerDialog(true) },
-                            onOpenSleepTimer = { viewModel.setShowSleepTimerDialog(true) },
-                            onOpenRadioAlarm = { showAlarmDialog = true },
-                            onOpenAppearance = { viewModel.setShowAppearanceDialog(true) },
-                            onOpenOnboarding = { navController.navigate(NavRoute.Onboarding.route) },
-                            onOpenBlockedDialog = { viewModel.setShowBlockedDialog(true) },
-                            onOpenAttribution = { viewModel.setShowAttributionDialog(true) }
-                        )
-
-                        if (showAlarmDialog) {
-                            com.easeaudio.ui.components.AlarmDialog(
+                        composable(NavRoute.Favorites.route) {
+                            FavoritesScreen(
+                                favoriteStations = uiState.favoriteStations,
                                 currentStation = syncedCurrentStation,
-                                onDismiss = { showAlarmDialog = false }
+                                isPlaying = uiState.isPlaying,
+                                isLoading = uiState.isLoading,
+                                failedStationIds = uiState.failedStationIds,
+                                onStationSelect = { station -> 
+                                    FirebaseManager.logEvent("play_station", Bundle().apply { putString("station_name", station.name) })
+                                    viewModel.playStation(station) 
+                                },
+                                onToggleFavorite = { station -> 
+                                    FirebaseManager.logEvent("toggle_favorite", Bundle().apply { putString("station_name", station.name) })
+                                    viewModel.toggleFavorite(station) 
+                                }
+                            )
+                        }
+
+                        composable(NavRoute.Settings.route) {
+                            var showAlarmDialog by remember { mutableStateOf(false) }
+
+                            com.easeaudio.ui.screens.SettingsScreen(
+                                sleepTimerRemaining = uiState.sleepTimerRemaining,
+                                selectedCountry = uiState.selectedCountry,
+                                onOpenEqualizer = { viewModel.setShowEqualizerDialog(true) },
+                                onOpenSleepTimer = { viewModel.setShowSleepTimerDialog(true) },
+                                onOpenRadioAlarm = { showAlarmDialog = true },
+                                onOpenAppearance = { viewModel.setShowAppearanceDialog(true) },
+                                onOpenOnboarding = { navController.navigate(NavRoute.Onboarding.route) },
+                                onOpenBlockedDialog = { viewModel.setShowBlockedDialog(true) },
+                                onOpenAttribution = { viewModel.setShowAttributionDialog(true) }
+                            )
+
+                            if (showAlarmDialog) {
+                                com.easeaudio.ui.components.AlarmDialog(
+                                    currentStation = syncedCurrentStation,
+                                    onDismiss = { showAlarmDialog = false }
+                                )
+                            }
+                        }
+
+                        composable(NavRoute.Screensaver.route) {
+                            ScreensaverScreen(
+                                currentStation = syncedCurrentStation,
+                                isPlaying = uiState.isPlaying,
+                                streamTitle = uiState.streamTitle,
+                                waveAmplitudes = uiState.waveAmplitudes,
+                                sleepTimerRemaining = uiState.sleepTimerRemaining,
+                                onTogglePlay = { viewModel.togglePlayPause() },
+                                onOpenSleepTimer = { viewModel.setShowSleepTimerDialog(true) },
+                                onToggleFavorite = { syncedCurrentStation?.let { viewModel.toggleFavorite(it) } }
                             )
                         }
                     }
 
-                    composable(NavRoute.Screensaver.route) {
-                        ScreensaverScreen(
-                            currentStation = syncedCurrentStation,
-                            isPlaying = uiState.isPlaying,
-                            streamTitle = uiState.streamTitle,
-                            waveAmplitudes = uiState.waveAmplitudes,
-                            sleepTimerRemaining = uiState.sleepTimerRemaining,
-                            onTogglePlay = { viewModel.togglePlayPause() },
-                            onOpenSleepTimer = { viewModel.setShowSleepTimerDialog(true) },
-                            onToggleFavorite = { syncedCurrentStation?.let { viewModel.toggleFavorite(it) } }
+                    // Mini Player
+                    if (!isFullPlayerVisible && currentRoute != NavRoute.Screensaver.route && currentRoute != NavRoute.Onboarding.route) {
+                        Column(
+                            modifier = Modifier.align(Alignment.BottomCenter)
+                        ) {
+                            com.easeaudio.ui.components.NotificationPermissionReminder(
+                                visible = (uiState.currentStation != null && (uiState.isPlaying || uiState.isLoading) && !hasNotificationPermission && !isPlaytimePermissionDismissed && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU),
+                                onRequestPermission = onRequestNotificationPermission,
+                                onDismiss = { isPlaytimePermissionDismissed = true }
+                            )
+
+                            MiniPlayer(
+                                station = syncedCurrentStation,
+                                isPlaying = uiState.isPlaying,
+                                isLoading = uiState.isLoading,
+                                streamTitle = uiState.streamTitle,
+                                waveAmplitudes = uiState.waveAmplitudes,
+                                currentPosition = uiState.currentPlaybackPosition,
+                                totalDuration = uiState.totalPlaybackDuration,
+                                onTogglePlay = { viewModel.togglePlayPause() },
+                                onToggleFavorite = { syncedCurrentStation?.let { viewModel.toggleFavorite(it) } },
+                                onOpenFullPlayer = { isFullPlayerVisible = true },
+                                onOpenTrackOptions = { showTrackActionSheet = true }
+                            )
+                        }
+                    }
+
+                    if (showTrackActionSheet && !uiState.streamTitle.isNullOrBlank()) {
+                        val context = androidx.compose.ui.platform.LocalContext.current
+                        com.easeaudio.ui.components.TrackActionSheet(
+                            trackTitle = uiState.streamTitle!!,
+                            stationName = syncedCurrentStation?.name ?: "Radio",
+                            stationGenre = syncedCurrentStation?.genre ?: "",
+                            isFavorite = syncedCurrentStation?.isFavorite ?: false,
+                            onToggleFavorite = syncedCurrentStation?.let { { viewModel.toggleFavorite(it) } },
+                            onSetAsAlarmStation = syncedCurrentStation?.let { st ->
+                                {
+                                    com.easeaudio.alarm.RadioAlarmManager.setWakeUpStation(context, st.id, st.name, st.streamUrl)
+                                    android.widget.Toast.makeText(context, context.getString(R.string.alarm_station_saved), android.widget.Toast.LENGTH_SHORT).show()
+                                }
+                            },
+                            onBlockStation = { syncedCurrentStation?.let { viewModel.blockStation(it.id) } },
+                            onDismiss = { showTrackActionSheet = false }
                         )
                     }
-                }
-
-                // Mini Player
-                if (!isFullPlayerVisible && currentRoute != NavRoute.Screensaver.route && currentRoute != NavRoute.Onboarding.route) {
-                    Column(
-                        modifier = Modifier.align(Alignment.BottomCenter)
-                    ) {
-                        com.easeaudio.ui.components.NotificationPermissionReminder(
-                            visible = (uiState.currentStation != null && (uiState.isPlaying || uiState.isLoading) && !hasNotificationPermission && !isPlaytimePermissionDismissed && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU),
-                            onRequestPermission = onRequestNotificationPermission,
-                            onDismiss = { isPlaytimePermissionDismissed = true }
-                        )
-
-                        MiniPlayer(
-                            station = syncedCurrentStation,
-                            isPlaying = uiState.isPlaying,
-                            isLoading = uiState.isLoading,
-                            streamTitle = uiState.streamTitle,
-                            waveAmplitudes = uiState.waveAmplitudes,
-                            currentPosition = uiState.currentPlaybackPosition,
-                            totalDuration = uiState.totalPlaybackDuration,
-                            onTogglePlay = { viewModel.togglePlayPause() },
-                            onToggleFavorite = { syncedCurrentStation?.let { viewModel.toggleFavorite(it) } },
-                            onOpenFullPlayer = { isFullPlayerVisible = true },
-                            onOpenTrackOptions = { showTrackActionSheet = true }
-                        )
-                    }
-                }
-
-                if (showTrackActionSheet && !uiState.streamTitle.isNullOrBlank()) {
-                    val context = androidx.compose.ui.platform.LocalContext.current
-                    com.easeaudio.ui.components.TrackActionSheet(
-                        trackTitle = uiState.streamTitle!!,
-                        stationName = syncedCurrentStation?.name ?: "Radio",
-                        stationGenre = syncedCurrentStation?.genre ?: "",
-                        isFavorite = syncedCurrentStation?.isFavorite ?: false,
-                        onToggleFavorite = syncedCurrentStation?.let { { viewModel.toggleFavorite(it) } },
-                        onSetAsAlarmStation = syncedCurrentStation?.let { st ->
-                            {
-                                com.easeaudio.alarm.RadioAlarmManager.setWakeUpStation(context, st.id, st.name, st.streamUrl)
-                                android.widget.Toast.makeText(context, context.getString(R.string.alarm_station_saved), android.widget.Toast.LENGTH_SHORT).show()
-                            }
-                        },
-                        onBlockStation = { syncedCurrentStation?.let { viewModel.blockStation(it.id) } },
-                        onDismiss = { showTrackActionSheet = false }
-                    )
                 }
             }
         }
@@ -409,6 +449,7 @@ fun MainAppContent(
         ) {
             PlayerScreen(
                 station = syncedCurrentStation,
+                windowSizeClass = windowSizeClass,
                 isPlaying = uiState.isPlaying,
                 isLoading = uiState.isLoading,
                 streamTitle = uiState.streamTitle,

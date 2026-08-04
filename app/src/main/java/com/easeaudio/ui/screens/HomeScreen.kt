@@ -48,6 +48,13 @@ import com.easeaudio.R
 import com.easeaudio.ads.AdMobBanner
 import com.easeaudio.data.RadioStation
 import com.easeaudio.ui.theme.*
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.material3.windowsizeclass.WindowSizeClass
+import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import com.easeaudio.viewmodel.HomeUiState
 
 enum class HomeTab {
@@ -58,6 +65,7 @@ enum class HomeTab {
 @Composable
 fun HomeScreen(
     uiState: HomeUiState,
+    windowSizeClass: WindowSizeClass,
     onPlayPause: () -> Unit,
     onNextStation: () -> Unit,
     onPreviousStation: () -> Unit,
@@ -72,7 +80,15 @@ fun HomeScreen(
     onRetryDiscovery: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
-    val listState = rememberLazyListState()
+    val isExpanded = windowSizeClass.widthSizeClass == WindowWidthSizeClass.Expanded
+    val isMedium = windowSizeClass.widthSizeClass == WindowWidthSizeClass.Medium
+    val columns = when {
+        isExpanded -> 4 // Optimize for TV and Large Tablets
+        isMedium -> 2
+        else -> 1
+    }
+
+    val gridState = rememberLazyGridState()
     var showCountryDialog by remember { mutableStateOf(false) }
     
     val isFabVisible by remember(uiState.searchQuery, uiState.stations) {
@@ -81,10 +97,10 @@ fun HomeScreen(
         }
     }
 
-    val shouldLoadMore by remember(listState) {
+    val shouldLoadMore by remember(gridState) {
         derivedStateOf {
-            val totalItemsCount = listState.layoutInfo.totalItemsCount
-            val lastVisibleItemIndex = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
+            val totalItemsCount = gridState.layoutInfo.totalItemsCount
+            val lastVisibleItemIndex = gridState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
             totalItemsCount > 0 && lastVisibleItemIndex >= totalItemsCount - 3
         }
     }
@@ -133,17 +149,18 @@ fun HomeScreen(
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
-            LazyColumn(
-                state = listState,
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(columns),
+                state = gridState,
                 modifier = Modifier
                     .fillMaxHeight()
-                    .widthIn(max = 800.dp)
+                    .widthIn(max = if (isExpanded) 1200.dp else 800.dp)
                     .align(Alignment.TopCenter),
                 contentPadding = PaddingValues(bottom = 80.dp)
             ) {
-                // AdMob Banner (Configured via Firebase Remote Config)
+                // AdMob Banner
                 if (uiState.remoteConfig.adsEnabled) {
-                    item {
+                    item(span = { GridItemSpan(columns) }) {
                         AdMobBanner(
                             adUnitId = uiState.remoteConfig.bannerAdUnitId,
                             modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
@@ -152,7 +169,7 @@ fun HomeScreen(
                 }
 
                 // App Header
-                item {
+                item(span = { GridItemSpan(columns) }) {
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -171,13 +188,13 @@ fun HomeScreen(
                                     painter = androidx.compose.ui.res.painterResource(id = R.drawable.ic_favicon),
                                     contentDescription = "NeoTune Logo",
                                     tint = Color.Unspecified,
-                                    modifier = Modifier.size(36.dp)
+                                    modifier = Modifier.size(if (isExpanded) 48.dp else 36.dp)
                                 )
                                 Spacer(modifier = Modifier.width(10.dp))
                                 Text(
                                     text = stringResource(R.string.app_name),
-                                    style = MaterialTheme.typography.headlineLarge.copy(
-                                        fontSize = 28.sp,
+                                    style = (if (isExpanded) MaterialTheme.typography.headlineLarge else MaterialTheme.typography.headlineMedium).copy(
+                                        fontSize = if (isExpanded) 36.sp else 28.sp,
                                         fontWeight = FontWeight.Black,
                                         letterSpacing = (-0.8).sp
                                     ),
@@ -185,7 +202,6 @@ fun HomeScreen(
                                 )
                             }
 
-                            // Top-Right Action (Country Picker)
                             if (uiState.selectedTab == HomeTab.Radio) {
                                 val currentCountryObj = uiState.availableCountries.find { it.name == uiState.selectedCountry }
                                 val isGlobal = uiState.selectedCountry == "Global" || uiState.selectedCountry == "All" || currentCountryObj?.code?.isEmpty() == true
@@ -213,13 +229,13 @@ fun HomeScreen(
                             text = stringResource(R.string.app_description),
                             style = MaterialTheme.typography.bodyMedium,
                             color = TextSecondary,
-                            modifier = Modifier.padding(start = 46.dp)
+                            modifier = Modifier.padding(start = if (isExpanded) 58.dp else 46.dp)
                         )
                     }
                 }
 
                 // Search Bar
-                item {
+                item(span = { GridItemSpan(columns) }) {
                     OutlinedTextField(
                         value = uiState.searchQuery,
                         onValueChange = onSearchQueryChange,
@@ -243,7 +259,7 @@ fun HomeScreen(
                 }
 
                 // Genre Filter Pills
-                item {
+                item(span = { GridItemSpan(columns) }) {
                     val activeGenreList = if (uiState.selectedTab == HomeTab.Podcast) uiState.availablePodcastTopics else uiState.availableGenres
                     LazyRow(
                         modifier = Modifier
@@ -289,13 +305,15 @@ fun HomeScreen(
                 // Recent Streams Section (Tab-filtered)
                 val activeRecentList = if (uiState.selectedTab == HomeTab.Radio) uiState.recentRadioStations else uiState.recentPodcastStations
                 if (activeRecentList.isNotEmpty() && uiState.searchQuery.isEmpty() && uiState.selectedGenre == "All") {
-                    item {
+                    item(span = { GridItemSpan(columns) }) {
                         Text(
                             text = stringResource(R.string.recent_streams),
                             style = MaterialTheme.typography.titleLarge,
                             color = TextPrimary,
                             modifier = Modifier.padding(horizontal = 20.dp, vertical = 12.dp)
                         )
+                    }
+                    item(span = { GridItemSpan(columns) }) {
                         LazyRow(
                             modifier = Modifier.fillMaxWidth(),
                             contentPadding = PaddingValues(horizontal = 20.dp),
@@ -315,7 +333,7 @@ fun HomeScreen(
                 // Featured Station Hero Banner
                 if (uiState.stations.isNotEmpty() && uiState.searchQuery.isEmpty() && uiState.selectedGenre == "All") {
                     val featured = uiState.stations.first()
-                    item {
+                    item(span = { GridItemSpan(columns) }) {
                         var isHeroFocused by remember { mutableStateOf(false) }
                         Surface(
                             modifier = Modifier
@@ -332,7 +350,7 @@ fun HomeScreen(
                                 .testTag("hero_featured_card"),
                             color = DarkSurface
                         ) {
-                            Box(modifier = Modifier.fillMaxWidth().height(160.dp)) {
+                            Box(modifier = Modifier.fillMaxWidth().height(if (isExpanded) 240.dp else 160.dp)) {
                                 AsyncImage(
                                     model = featured.imageUrl,
                                     contentDescription = featured.name,
@@ -353,7 +371,7 @@ fun HomeScreen(
                                 Row(
                                     modifier = Modifier
                                         .fillMaxSize()
-                                        .padding(16.dp),
+                                        .padding(if (isExpanded) 24.dp else 16.dp),
                                     verticalAlignment = Alignment.Bottom,
                                     horizontalArrangement = Arrangement.SpaceBetween
                                 ) {
@@ -366,7 +384,7 @@ fun HomeScreen(
                                         )
                                         Text(
                                             text = featured.name,
-                                            style = MaterialTheme.typography.titleLarge,
+                                            style = if (isExpanded) MaterialTheme.typography.headlineMedium else MaterialTheme.typography.titleLarge,
                                             color = TextPrimary,
                                             maxLines = 1,
                                             overflow = TextOverflow.Ellipsis
@@ -380,7 +398,7 @@ fun HomeScreen(
 
                                     Box(
                                         modifier = Modifier
-                                            .size(48.dp)
+                                            .size(if (isExpanded) 64.dp else 48.dp)
                                             .clip(CircleShape)
                                             .background(Color.White),
                                         contentAlignment = Alignment.Center
@@ -388,7 +406,7 @@ fun HomeScreen(
                                         val isFeaturedSelected = uiState.currentStation?.id == featured.id
                                         if (isFeaturedSelected && uiState.isLoading) {
                                             CircularProgressIndicator(
-                                                modifier = Modifier.size(24.dp),
+                                                modifier = Modifier.size(if (isExpanded) 32.dp else 24.dp),
                                                 color = DarkBackground,
                                                 strokeWidth = 2.5.dp
                                             )
@@ -396,7 +414,8 @@ fun HomeScreen(
                                             Icon(
                                                 imageVector = if (isFeaturedSelected && uiState.isPlaying) Icons.Filled.Pause else Icons.Filled.PlayArrow,
                                                 contentDescription = "Play Featured",
-                                                tint = DarkBackground
+                                                tint = DarkBackground,
+                                                modifier = Modifier.size(if (isExpanded) 32.dp else 24.dp)
                                             )
                                         }
                                     }
@@ -407,7 +426,7 @@ fun HomeScreen(
                 }
 
                 // Section Title
-                item {
+                item(span = { GridItemSpan(columns) }) {
                     Text(
                         text = if (uiState.selectedTab == HomeTab.Radio) stringResource(R.string.live_radio_stations) else stringResource(R.string.podcasts_and_shows),
                         style = MaterialTheme.typography.titleLarge,
@@ -418,7 +437,7 @@ fun HomeScreen(
 
                 // Empty or Initial Loading State
                 if (uiState.stations.isEmpty()) {
-                    item {
+                    item(span = { GridItemSpan(columns) }) {
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -489,7 +508,7 @@ fun HomeScreen(
                 }
 
                 if (uiState.isLoadingMore) {
-                    item {
+                    item(span = { GridItemSpan(columns) }) {
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -658,7 +677,11 @@ fun StationCard(
             Spacer(modifier = Modifier.width(14.dp))
 
             // Text Info
-            Column(modifier = Modifier.weight(1f)) {
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(end = 4.dp)
+            ) {
                 Text(
                     text = station.name,
                     style = MaterialTheme.typography.titleMedium,
@@ -675,7 +698,10 @@ fun StationCard(
                         fontWeight = FontWeight.Bold
                     )
                 } else if (isUnreachable) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
                         Icon(
                             imageVector = Icons.Filled.Warning,
                             contentDescription = null,
@@ -687,21 +713,32 @@ fun StationCard(
                             text = stringResource(R.string.stream_unreachable),
                             style = MaterialTheme.typography.labelSmall,
                             color = Color(0xFFFFB74D),
-                            fontWeight = FontWeight.Medium
+                            fontWeight = FontWeight.Medium,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
                         )
                     }
                 } else {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
                         Text(
                             text = station.genre,
                             style = MaterialTheme.typography.bodyMedium,
-                            color = TextSecondary
+                            color = TextSecondary,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier.weight(1f, fill = false)
                         )
                         Text(" • ", color = TextMuted)
                         Text(
                             text = station.country,
                             style = MaterialTheme.typography.bodyMedium,
-                            color = TextMuted
+                            color = TextMuted,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier.weight(1f, fill = false)
                         )
                     }
                 }
@@ -711,6 +748,7 @@ fun StationCard(
             IconButton(
                 onClick = onToggleFavorite,
                 modifier = Modifier
+                    .size(40.dp)
                     .focusProperties { canFocus = false }
                     .testTag("favorite_button_${station.id}")
             ) {

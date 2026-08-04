@@ -12,6 +12,7 @@ import com.easeaudio.service.RadioPlayerManager
 import com.easeaudio.R
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.Job
 import java.util.UUID
@@ -415,6 +416,8 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
         discoverCountries()
         // Trigger initial online discovery for top global working stations
         discoverStationsOnline("", "All", "Global")
+        // Initial load of recent stations
+        refreshRecentStations()
 
         viewModelScope.launch {
             stations.collect { list ->
@@ -443,21 +446,24 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
         favs.filter { filterAndBlockManager.shouldIncludeStation(it) }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
-    val recentStations: StateFlow<List<RadioStation>> = combine(
-        repository.getRecentStations(),
-        filterAndBlockManager.blockedStationIds,
-        filterAndBlockManager.filterConfig
-    ) { recents, _, _ ->
-        recents.filter { filterAndBlockManager.shouldIncludeStation(it) }
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+    private val _recentStations = MutableStateFlow<List<RadioStation>>(emptyList())
+    val recentStations: StateFlow<List<RadioStation>> = _recentStations.asStateFlow()
 
-    val recentRadioStations: StateFlow<List<RadioStation>> = recentStations
-        .map { list -> list.filter { !it.isPodcast } }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+    private val _recentRadioStations = MutableStateFlow<List<RadioStation>>(emptyList())
+    val recentRadioStations: StateFlow<List<RadioStation>> = _recentRadioStations.asStateFlow()
 
-    val recentPodcastStations: StateFlow<List<RadioStation>> = recentStations
-        .map { list -> list.filter { it.isPodcast } }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+    private val _recentPodcastStations = MutableStateFlow<List<RadioStation>>(emptyList())
+    val recentPodcastStations: StateFlow<List<RadioStation>> = _recentPodcastStations.asStateFlow()
+
+    fun refreshRecentStations() {
+        viewModelScope.launch {
+            val allRecents = repository.getRecentStations().first()
+            val filtered = allRecents.filter { filterAndBlockManager.shouldIncludeStation(it) }
+            _recentStations.value = filtered
+            _recentRadioStations.value = filtered.filter { !it.isPodcast }
+            _recentPodcastStations.value = filtered.filter { it.isPodcast }
+        }
+    }
 
     val blockedStations: StateFlow<List<RadioStation>> = combine(
         repository.getAllStations(),
@@ -581,6 +587,7 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
             _selectedGenre.value = "All"
             discoverStationsOnline(_searchQuery.value, "All", _selectedCountry.value)
         }
+        refreshRecentStations()
     }
 
     fun setSelectedGenre(genre: String) {
