@@ -1,0 +1,288 @@
+package com.easeaudio.ui.components
+
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.OpenInFull
+import androidx.compose.material.icons.filled.Pause
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.outlined.FavoriteBorder
+import androidx.compose.material3.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.focusProperties
+import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
+import com.easeaudio.R
+import com.easeaudio.data.RadioStation
+import com.easeaudio.ui.theme.*
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun MiniPlayer(
+    station: RadioStation?,
+    isPlaying: Boolean,
+    isLoading: Boolean,
+    streamTitle: String?,
+    waveAmplitudes: List<Float>,
+    currentPosition: Long = 0L,
+    totalDuration: Long = 0L,
+    onTogglePlay: () -> Unit,
+    onToggleFavorite: () -> Unit,
+    onOpenFullPlayer: () -> Unit,
+    onOpenTrackOptions: () -> Unit = {},
+    modifier: Modifier = Modifier
+) {
+    AnimatedVisibility(
+        visible = station != null,
+        enter = slideInVertically { it } + fadeIn(),
+        exit = slideOutVertically { it } + fadeOut(),
+        modifier = modifier
+    ) {
+        if (station != null) {
+            var isFocused by remember { mutableStateOf(false) }
+            val showFocus = isFocused
+            Surface(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 12.dp, vertical = 6.dp)
+                    .onFocusChanged { isFocused = it.isFocused }
+                    .clip(RoundedCornerShape(16.dp))
+                    .combinedClickable(
+                        onClick = { onOpenFullPlayer() },
+                        onDoubleClick = { onOpenFullPlayer() }
+                    )
+                    .border(
+                        width = if (showFocus) 2.5.dp else 0.dp,
+                        color = if (showFocus) NeonCyan else Color.Transparent,
+                        shape = RoundedCornerShape(16.dp)
+                    )
+                    .testTag("mini_player_bar"),
+                color = DarkSurfaceVariant,
+                tonalElevation = 8.dp,
+                shadowElevation = 6.dp
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    // Station Artwork (Clicking or double-clicking artwork opens Fullscreen)
+                    Box(
+                        modifier = Modifier
+                            .size(48.dp)
+                            .clip(RoundedCornerShape(10.dp))
+                            .combinedClickable(
+                                onClick = { onOpenFullPlayer() },
+                                onDoubleClick = { onOpenFullPlayer() }
+                            )
+                    ) {
+                        AsyncImage(
+                            model = station.imageUrl,
+                            contentDescription = station.name,
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier.fillMaxSize()
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.width(12.dp))
+
+                    // Title & Stream Info
+                    Column(
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(
+                                text = station.name,
+                                style = MaterialTheme.typography.titleMedium,
+                                color = TextPrimary,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                                modifier = Modifier.weight(1f, fill = false)
+                            )
+                            Spacer(modifier = Modifier.width(6.dp))
+                            // Badge
+                            val isPodcast = station.isPodcast
+                            Text(
+                                text = stringResource(if (isPodcast) R.string.badge_podcast else R.string.live_badge),
+                                style = MaterialTheme.typography.labelMedium,
+                                color = DarkBackground,
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(4.dp))
+                                    .background(if (isPodcast) NeonPurple else NeonPink)
+                                    .padding(horizontal = 4.dp, vertical = 1.dp)
+                            )
+                        }
+
+                        if (station.isPodcast && totalDuration > 0L && !isLoading) {
+                            Spacer(modifier = Modifier.height(3.dp))
+                            val progress = (currentPosition.toFloat() / totalDuration.toFloat()).coerceIn(0f, 1f)
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                LinearProgressIndicator(
+                                    progress = { progress },
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .height(3.dp)
+                                        .clip(RoundedCornerShape(2.dp)),
+                                    color = NeonPurple,
+                                    trackColor = DarkSurface
+                                )
+                                Spacer(modifier = Modifier.width(6.dp))
+                                Text(
+                                    text = "${formatDurationShort(currentPosition)} / ${formatDurationShort(totalDuration)}",
+                                    style = MaterialTheme.typography.labelSmall.copy(fontSize = 10.sp),
+                                    color = TextMuted
+                                )
+                            }
+                        } else {
+                            Text(
+                                text = if (isLoading) stringResource(R.string.buffering_stream) else (streamTitle ?: station.genre),
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = if (isLoading) NeonCyan else TextSecondary,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        }
+                    }
+
+                    // Mini Wave Visualizer
+                    if (isPlaying) {
+                        AudioVisualizerCanvas(
+                            waveAmplitudes = waveAmplitudes.take(5),
+                            isPlaying = isPlaying,
+                            modifier = Modifier
+                                .width(28.dp)
+                                .height(20.dp)
+                                .padding(horizontal = 2.dp),
+                            style = VisualizerStyle.ROUNDED_BARS,
+                            primaryColor = NeonCyan,
+                            secondaryColor = NeonPurple,
+                            accentColor = NeonPink
+                        )
+                    }
+
+                    // Favorite Button
+                    val haptic = LocalHapticFeedback.current
+                    var isFavFocused by remember { mutableStateOf(false) }
+                    IconButton(
+                        onClick = {
+                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                            onToggleFavorite()
+                        },
+                        modifier = Modifier
+                            .size(36.dp)
+                            .onFocusChanged { isFavFocused = it.isFocused }
+                            .clip(CircleShape)
+                            .background(if (isFavFocused) FavoriteHeartColor else Color.Transparent)
+                            .testTag("mini_player_favorite")
+                    ) {
+                        Icon(
+                            imageVector = if (station.isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
+                            contentDescription = "Favorite",
+                            tint = if (isFavFocused) DarkBackground else (if (station.isFavorite) FavoriteHeartColor else TextMuted),
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
+
+                    // Expand to Fullscreen Button
+                    var isExpandFocused by remember { mutableStateOf(false) }
+                    IconButton(
+                        onClick = {
+                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                            onOpenFullPlayer()
+                        },
+                        modifier = Modifier
+                            .size(36.dp)
+                            .onFocusChanged { isExpandFocused = it.isFocused }
+                            .clip(CircleShape)
+                            .background(if (isExpandFocused) NeonCyan else Color.Transparent)
+                            .testTag("mini_player_expand_fullscreen")
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.OpenInFull,
+                            contentDescription = "Fullscreen Player",
+                            tint = if (isExpandFocused) DarkBackground else TextMuted,
+                            modifier = Modifier.size(18.dp)
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.width(2.dp))
+
+                    // Play/Pause Button
+                    var isPlayFocused by remember { mutableStateOf(false) }
+                    IconButton(
+                        onClick = {
+                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                            onTogglePlay()
+                        },
+                        modifier = Modifier
+                            .size(40.dp)
+                            .onFocusChanged { isPlayFocused = it.isFocused }
+                            .clip(CircleShape)
+                            .background(if (isPlayFocused) NeonCyan else Color.White)
+                            .testTag("mini_player_play_pause")
+                    ) {
+                        if (isLoading) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(20.dp),
+                                color = DarkBackground,
+                                strokeWidth = 2.dp
+                            )
+                        } else {
+                            Icon(
+                                imageVector = if (isPlaying) Icons.Filled.Pause else Icons.Filled.PlayArrow,
+                                contentDescription = if (isPlaying) "Pause" else "Play",
+                                tint = DarkBackground
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+private fun formatDurationShort(ms: Long): String {
+    if (ms <= 0L) return "00:00"
+    val totalSeconds = ms / 1000
+    val minutes = totalSeconds / 60
+    val seconds = totalSeconds % 60
+    val hours = minutes / 60
+    return if (hours > 0) {
+        val remMinutes = minutes % 60
+        String.format(java.util.Locale.US, "%d:%02d:%02d", hours, remMinutes, seconds)
+    } else {
+        String.format(java.util.Locale.US, "%02d:%02d", minutes, seconds)
+    }
+}

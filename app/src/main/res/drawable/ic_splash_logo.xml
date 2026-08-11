@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="192dp"
+    android:height="192dp"
+    android:viewportWidth="192"
+    android:viewportHeight="192">
+
+    <!-- Left Cyan Pillar of 'N' -->
+    <path
+        android:fillColor="#38C7FF"
+        android:pathData="M 58,56 L 78,56 L 78,136 L 58,136 Z" />
+
+    <!-- Right Orange Pillar of 'N' -->
+    <path
+        android:fillColor="#FF8C38"
+        android:pathData="M 114,56 L 134,56 L 134,136 L 114,136 Z" />
+
+    <!-- Pink Diagonal Bar of 'N' -->
+    <path
+        android:fillColor="#FF538A"
+        android:pathData="M 58,56 L 78,56 L 134,136 L 114,136 Z" />
+
+</vector>
