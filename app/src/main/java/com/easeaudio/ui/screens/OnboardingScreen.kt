@@ -687,9 +687,9 @@ private fun SlideGenreDiscovery(
                 com.easeaudio.viewmodel.CountryDisplay("United Kingdom", "🇬🇧", "GB", 2000, "2k+"),
                 com.easeaudio.viewmodel.CountryDisplay("Canada", "🇨🇦", "CA", 800, "800+"),
                 com.easeaudio.viewmodel.CountryDisplay("Brazil", "🇧🇷", "BR", 800, "800+"),
+                com.easeaudio.viewmodel.CountryDisplay("France", "🇫🇷", "FR", 2000, "2k+"),
                 com.easeaudio.viewmodel.CountryDisplay("Australia", "🇦🇺", "AU", 500, "500+"),
-                com.easeaudio.viewmodel.CountryDisplay("Japan", "🇯🇵", "JP", 200, "200+"),
-                com.easeaudio.viewmodel.CountryDisplay("Vietnam", "🇻🇳", "VN", 50, "50+")
+                com.easeaudio.viewmodel.CountryDisplay("Japan", "🇯🇵", "JP", 200, "200+")
             ).sortedByDescending { it.stationCount }
         }
 

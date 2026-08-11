@@ -137,7 +137,6 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
         CountryDisplay("South Africa",   "🇿🇦", "ZA", 100,   "> 100 Radio stations"),
         CountryDisplay("New Zealand",    "🇳🇿", "NZ", 80,    "> 80 Radio stations"),
         CountryDisplay("Saudi Arabia",   "🇸🇦", "SA", 50,    "~50 Radio stations"),
-        CountryDisplay("Vietnam",        "🇻🇳", "VN", 50,    "> 50 Radio stations"),
         CountryDisplay("Indonesia",      "🇮🇩", "ID", 50,    "> 50 Radio stations"),
         CountryDisplay("United Arab Emirates", "🇦🇪", "AE", 40, "~40 Radio stations"),
         CountryDisplay("Thailand",       "🇹🇭", "TH", 40,    "> 40 Radio stations"),
