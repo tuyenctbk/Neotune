@@ -59,6 +59,7 @@ data class HomeUiState(
     val activeEqPreset: String = "Balanced",
     val isAudioBoosterEnabled: Boolean = true,
     val isBatterySaverEnabled: Boolean = false,
+    val isAutoPlayOnStartupEnabled: Boolean = true,
     val selectedLauncherIcon: String = "default",
     
     // UI Dialogs

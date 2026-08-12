@@ -250,20 +250,20 @@ fun MiniPlayer(
                             .size(40.dp)
                             .onFocusChanged { isPlayFocused = it.isFocused }
                             .clip(CircleShape)
-                            .background(if (isPlayFocused) NeonCyan else Color.White)
+                            .background(if (isPlayFocused) NeonCyan else PlayButtonContainer)
                             .testTag("mini_player_play_pause")
                     ) {
                         if (isLoading) {
                             CircularProgressIndicator(
                                 modifier = Modifier.size(20.dp),
-                                color = DarkBackground,
+                                color = PlayButtonContent,
                                 strokeWidth = 2.dp
                             )
                         } else {
                             Icon(
                                 imageVector = if (isPlaying) Icons.Filled.Pause else Icons.Filled.PlayArrow,
                                 contentDescription = if (isPlaying) "Pause" else "Play",
-                                tint = DarkBackground
+                                tint = PlayButtonContent
                             )
                         }
                     }

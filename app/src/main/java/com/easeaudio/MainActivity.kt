@@ -46,7 +46,12 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import android.content.Context
+import android.view.KeyEvent
+import android.view.WindowManager
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.input.key.onPreviewKeyEvent
+import kotlinx.coroutines.delay
 import com.easeaudio.viewmodel.RadioViewModel
 import com.easeaudio.network.QualityLevel
 import com.easeaudio.service.FirebaseManager
@@ -57,6 +62,7 @@ import com.easeaudio.ui.screens.OnboardingScreen
 import com.easeaudio.ui.screens.PlayerScreen
 import com.easeaudio.ui.screens.ScreensaverScreen
 import com.easeaudio.ui.screens.AppearanceSelectionScreen
+import com.easeaudio.ui.screens.CarModeScreen
 import com.easeaudio.ui.theme.TuneveTheme
 import com.easeaudio.ui.theme.AppThemeState
 import android.content.pm.PackageManager
@@ -101,6 +107,26 @@ class MainActivity : ComponentActivity() {
                     }
                 )
             }
+        }
+    }
+
+    override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
+        return when (keyCode) {
+            KeyEvent.KEYCODE_MEDIA_PLAY,
+            KeyEvent.KEYCODE_MEDIA_PAUSE,
+            KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE -> {
+                viewModel.togglePlayPause()
+                true
+            }
+            KeyEvent.KEYCODE_MEDIA_NEXT -> {
+                viewModel.playNextStation()
+                true
+            }
+            KeyEvent.KEYCODE_MEDIA_PREVIOUS -> {
+                viewModel.playPreviousStation()
+                true
+            }
+            else -> super.onKeyDown(keyCode, event)
         }
     }
 }
@@ -176,6 +202,35 @@ fun MainAppContent(
     }
 
     var isFullPlayerVisible by remember { mutableStateOf(value = false) }
+
+    // Keep screen awake while radio is playing (perfect for background TV listening)
+    val activity = context as? android.app.Activity
+    DisposableEffect(uiState.isPlaying) {
+        if (uiState.isPlaying) {
+            activity?.window?.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        } else {
+            activity?.window?.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        }
+        onDispose {
+            activity?.window?.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        }
+    }
+
+    // Android TV detection and auto screensaver activation
+    val isTv = remember {
+        val uiModeManager = context.getSystemService(Context.UI_MODE_SERVICE) as? android.app.UiModeManager
+        uiModeManager?.currentModeType == android.content.res.Configuration.UI_MODE_TYPE_TELEVISION
+    }
+    var lastInteractionTime by remember { mutableStateOf(System.currentTimeMillis()) }
+
+    LaunchedEffect(uiState.isPlaying, currentRoute, lastInteractionTime) {
+        if (isTv && uiState.isPlaying && currentRoute != NavRoute.Screensaver.route && currentRoute != NavRoute.Onboarding.route) {
+            delay(15000L) // Auto launch screensaver after 15 seconds of inactivity
+            isFullPlayerVisible = false
+            navController.navigate(NavRoute.Screensaver.route)
+        }
+    }
+
     var showTrackActionSheet by remember { mutableStateOf(false) }
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -200,10 +255,25 @@ fun MainAppContent(
         }
     }
 
-    val showBottomBar = windowSizeClass.widthSizeClass == WindowWidthSizeClass.Compact && currentRoute != NavRoute.Onboarding.route && !isFullPlayerVisible
-    val showNavigationRail = windowSizeClass.widthSizeClass != WindowWidthSizeClass.Compact && currentRoute != NavRoute.Onboarding.route && !isFullPlayerVisible
+    val showBottomBar = windowSizeClass.widthSizeClass == WindowWidthSizeClass.Compact && currentRoute != NavRoute.Onboarding.route && currentRoute != NavRoute.CarMode.route && currentRoute != NavRoute.Screensaver.route && !isFullPlayerVisible
+    val showNavigationRail = windowSizeClass.widthSizeClass != WindowWidthSizeClass.Compact && currentRoute != NavRoute.Onboarding.route && currentRoute != NavRoute.CarMode.route && currentRoute != NavRoute.Screensaver.route && !isFullPlayerVisible
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .pointerInput(Unit) {
+                awaitPointerEventScope {
+                    while (true) {
+                        awaitPointerEvent()
+                        lastInteractionTime = System.currentTimeMillis()
+                    }
+                }
+            }
+            .onPreviewKeyEvent {
+                lastInteractionTime = System.currentTimeMillis()
+                false
+            }
+    ) {
         Row(modifier = Modifier.fillMaxSize()) {
             if (showNavigationRail) {
                 AppNavigationRail(
@@ -439,6 +509,10 @@ fun MainAppContent(
                                 selectedCountry = uiState.selectedCountry,
                                 isBatterySaverEnabled = uiState.isBatterySaverEnabled,
                                 onToggleBatterySaver = { viewModel.toggleBatterySaver() },
+                                isAutoPlayOnStartupEnabled = uiState.isAutoPlayOnStartupEnabled,
+                                onToggleAutoPlayOnStartup = { viewModel.toggleAutoPlayOnStartup() },
+                                isLightMode = AppThemeState.isLightMode,
+                                onToggleLightMode = { AppThemeState.setLightMode(context, !AppThemeState.isLightMode) },
                                 onOpenEqualizer = { viewModel.setShowEqualizerDialog(true) },
                                 onOpenSleepTimer = { viewModel.setShowSleepTimerDialog(true) },
                                 onOpenRadioAlarm = { showAlarmDialog = true },
@@ -468,10 +542,25 @@ fun MainAppContent(
                                 onToggleFavorite = { syncedCurrentStation?.let { viewModel.toggleFavorite(it) } }
                             )
                         }
+
+                        composable(NavRoute.CarMode.route) {
+                            CarModeScreen(
+                                currentStation = syncedCurrentStation,
+                                isPlaying = uiState.isPlaying,
+                                waveAmplitudes = uiState.waveAmplitudes,
+                                stations = uiState.stations,
+                                onPlayPause = { viewModel.togglePlayPause() },
+                                onNextStation = { viewModel.playNextStation() },
+                                onPreviousStation = { viewModel.playPreviousStation() },
+                                onSelectStation = { viewModel.playStation(it) },
+                                onToggleFavorite = { viewModel.toggleFavorite(it) },
+                                onExitCarMode = { navController.popBackStack() }
+                            )
+                        }
                     }
 
                     // Mini Player
-                    if (!isFullPlayerVisible && currentRoute != NavRoute.Screensaver.route && currentRoute != NavRoute.Onboarding.route) {
+                    if (!isFullPlayerVisible && currentRoute != NavRoute.Screensaver.route && currentRoute != NavRoute.CarMode.route && currentRoute != NavRoute.Onboarding.route) {
                         Column(
                             modifier = Modifier.align(Alignment.BottomCenter)
                         ) {
@@ -555,6 +644,10 @@ fun MainAppContent(
                 onOpenScreensaver = {
                     isFullPlayerVisible = false
                     navController.navigate(NavRoute.Screensaver.route)
+                },
+                onOpenCarMode = {
+                    isFullPlayerVisible = false
+                    navController.navigate(NavRoute.CarMode.route)
                 },
                 onRetryStream = { viewModel.retryCurrentStation() },
                 onPlayNextStation = { viewModel.playNextStation() },

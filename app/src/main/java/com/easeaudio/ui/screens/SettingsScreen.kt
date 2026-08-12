@@ -32,6 +32,10 @@ fun SettingsScreen(
     onOpenCountryPicker: () -> Unit = {},
     isBatterySaverEnabled: Boolean = false,
     onToggleBatterySaver: () -> Unit = {},
+    isAutoPlayOnStartupEnabled: Boolean = true,
+    onToggleAutoPlayOnStartup: () -> Unit = {},
+    isLightMode: Boolean = false,
+    onToggleLightMode: () -> Unit = {},
     onOpenAppearance: () -> Unit,
     onOpenOnboarding: () -> Unit = {},
     onOpenBlockedDialog: () -> Unit,
@@ -145,6 +149,50 @@ fun SettingsScreen(
                                 )
                             )
                         }
+                        HorizontalDivider(color = DarkSurfaceVariant, thickness = 1.dp)
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp, vertical = 12.dp)
+                                .testTag("setting_auto_play"),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .size(40.dp)
+                                    .clip(RoundedCornerShape(10.dp))
+                                    .background(DarkSurfaceVariant),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Filled.PlayCircle,
+                                    contentDescription = null,
+                                    tint = NeonPurple,
+                                    modifier = Modifier.size(22.dp)
+                                )
+                            }
+                            Spacer(modifier = Modifier.width(14.dp))
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(
+                                    text = "Auto-Play on Startup",
+                                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
+                                    color = TextPrimary
+                                )
+                                Text(
+                                    text = "Resume the last played station/podcast on app launch",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = TextMuted
+                                )
+                            }
+                            Switch(
+                                checked = isAutoPlayOnStartupEnabled,
+                                onCheckedChange = { onToggleAutoPlayOnStartup() },
+                                colors = SwitchDefaults.colors(
+                                    checkedThumbColor = Color.Black,
+                                    checkedTrackColor = NeonPurple
+                                )
+                            )
+                        }
                     }
                 }
 
@@ -172,6 +220,50 @@ fun SettingsScreen(
                             onClick = onOpenOnboarding,
                             testTag = "setting_onboarding"
                         )
+                        HorizontalDivider(color = DarkSurfaceVariant, thickness = 1.dp)
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp, vertical = 12.dp)
+                                .testTag("setting_light_mode"),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .size(40.dp)
+                                    .clip(RoundedCornerShape(10.dp))
+                                    .background(DarkSurfaceVariant),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Filled.LightMode,
+                                    contentDescription = null,
+                                    tint = NeonPink,
+                                    modifier = Modifier.size(22.dp)
+                                )
+                            }
+                            Spacer(modifier = Modifier.width(14.dp))
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(
+                                    text = "Light Theme",
+                                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
+                                    color = TextPrimary
+                                )
+                                Text(
+                                    text = "Toggle comfortable light theme for long playback sessions",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = TextMuted
+                                )
+                            }
+                            Switch(
+                                checked = isLightMode,
+                                onCheckedChange = { onToggleLightMode() },
+                                colors = SwitchDefaults.colors(
+                                    checkedThumbColor = Color.Black,
+                                    checkedTrackColor = NeonPink
+                                )
+                            )
+                        }
                     }
                 }
 

@@ -31,12 +31,13 @@ fun TuneveTheme(
     )
     val view = LocalView.current
     if (!view.isInEditMode) {
+        val isLight = AppThemeState.isLightMode
         SideEffect {
             val window = (view.context as Activity).window
             window.statusBarColor = DarkBackground.toArgb()
             window.navigationBarColor = DarkBackground.toArgb()
-            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = false
-            WindowCompat.getInsetsController(window, view).isAppearanceLightNavigationBars = false
+            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = isLight
+            WindowCompat.getInsetsController(window, view).isAppearanceLightNavigationBars = isLight
         }
     }
 

@@ -24,6 +24,12 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.foundation.focusable
+import androidx.compose.ui.input.key.onKeyEvent
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.type
 import androidx.compose.ui.draw.blur
 import com.easeaudio.ui.components.AudioVisualizerCanvas
 import com.easeaudio.ui.components.VisualizerStyle
@@ -76,6 +82,12 @@ fun ScreensaverScreen(
     var isDimmed by remember { mutableStateOf(false) }
     var showOverlayControls by remember { mutableStateOf(true) }
 
+    val focusRequester = remember { FocusRequester() }
+
+    LaunchedEffect(Unit) {
+        focusRequester.requestFocus()
+    }
+
     LaunchedEffect(showOverlayControls) {
         if (showOverlayControls) {
             delay(6000L)
@@ -125,6 +137,18 @@ fun ScreensaverScreen(
         modifier = modifier
             .fillMaxSize()
             .background(DarkBackground)
+            .focusRequester(focusRequester)
+            .focusable()
+            .onKeyEvent { keyEvent ->
+                if (!showOverlayControls) {
+                    if (keyEvent.type == KeyEventType.KeyDown) {
+                        showOverlayControls = true
+                    }
+                    true
+                } else {
+                    false
+                }
+            }
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null

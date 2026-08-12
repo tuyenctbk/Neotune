@@ -669,6 +669,14 @@ class RadioPlayerManager(private val context: Context) {
         playStationWithUrl(station, station.streamUrl, isFallback = false)
     }
 
+    fun setPreloadedStation(station: RadioStation) {
+        _currentStation.value = station
+        _streamTitle.value = station.name
+        _playbackError.value = null
+        _isLoading.value = false
+        _isPlaying.value = false
+    }
+
     private fun playStationWithUrl(station: RadioStation, targetUrl: String, isFallback: Boolean) {
         // Cancel any pending URL resolution / player prep job to prevent race conditions when switching quickly
         playbackJob?.cancel()

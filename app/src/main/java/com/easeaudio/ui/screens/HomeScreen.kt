@@ -49,6 +49,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.graphics.Brush
@@ -971,6 +972,7 @@ fun StationCard(
                 .fillMaxWidth()
                 .padding(horizontal = 20.dp, vertical = 6.dp)
                 .onFocusChanged { isFocused = it.isFocused }
+                .scale(if (isFocused) 1.04f else 1.0f)
                 .clip(RoundedCornerShape(16.dp))
                 .combinedClickable(
                     onClick = {

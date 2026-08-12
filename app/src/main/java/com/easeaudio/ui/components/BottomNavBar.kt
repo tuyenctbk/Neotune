@@ -16,8 +16,10 @@ import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.Mic
 import androidx.compose.material.icons.outlined.Radio
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
 import androidx.annotation.StringRes
@@ -30,6 +32,7 @@ import com.easeaudio.ui.theme.TextMuted
 
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material.icons.filled.DirectionsCar
 
 sealed class NavRoute(
     val route: String,
@@ -45,6 +48,7 @@ sealed class NavRoute(
     object Settings : NavRoute("settings", R.string.nav_settings, Icons.Filled.Settings, Icons.Outlined.Settings, "nav_settings")
     object Screensaver : NavRoute("screensaver", R.string.nav_dock, Icons.Filled.Bedtime, Icons.Outlined.Bedtime, "nav_screensaver")
     object Onboarding : NavRoute("onboarding", R.string.nav_onboarding, Icons.Filled.Explore, Icons.Outlined.Explore, "nav_onboarding")
+    object CarMode : NavRoute("carmode", R.string.car_mode, Icons.Filled.DirectionsCar, Icons.Filled.DirectionsCar, "nav_carmode")
 }
 
 @Composable
@@ -65,8 +69,13 @@ fun BottomNavBar(
             val isSelected = currentRoute == item.route || (item.route == "radio" && currentRoute == "home")
             val localizedTitle = stringResource(item.titleRes)
             val selectedAccent = if (item.route == "podcast") NeonPurple else NeonCyan
+            var isFocused by remember { mutableStateOf(false) }
+            
             NavigationBarItem(
-                modifier = Modifier.testTag(item.testTag),
+                modifier = Modifier
+                    .onFocusChanged { isFocused = it.isFocused }
+                    .scale(if (isFocused) 1.08f else 1.0f)
+                    .testTag(item.testTag),
                 selected = isSelected,
                 onClick = { onNavigate(item.route) },
                 icon = {
@@ -79,9 +88,9 @@ fun BottomNavBar(
                 colors = NavigationBarItemDefaults.colors(
                     selectedIconColor = selectedAccent,
                     selectedTextColor = selectedAccent,
-                    indicatorColor = DarkSurfaceVariant,
-                    unselectedIconColor = TextMuted,
-                    unselectedTextColor = TextMuted
+                    indicatorColor = if (isFocused) selectedAccent.copy(alpha = 0.25f) else DarkSurfaceVariant,
+                    unselectedIconColor = if (isFocused) selectedAccent else TextMuted,
+                    unselectedTextColor = if (isFocused) selectedAccent else TextMuted
                 )
             )
         }

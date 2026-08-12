@@ -2,10 +2,12 @@ package com.easeaudio.ui.components
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.draw.scale
 import com.easeaudio.ui.theme.DarkSurfaceVariant
 import com.easeaudio.ui.theme.NeonCyan
 import com.easeaudio.ui.theme.NeonPurple
@@ -37,8 +39,12 @@ fun AppNavigationRail(
                 val isSelected = currentRoute == item.route || (item.route == "radio" && currentRoute == "home")
                 val localizedTitle = stringResource(item.titleRes)
                 val selectedAccent = if (item.route == "podcast") NeonPurple else NeonCyan
+                var isFocused by remember { mutableStateOf(false) }
                 
                 NavigationRailItem(
+                    modifier = Modifier
+                        .onFocusChanged { isFocused = it.isFocused }
+                        .scale(if (isFocused) 1.1f else 1.0f),
                     selected = isSelected,
                     onClick = { onNavigate(item.route) },
                     icon = {
@@ -56,9 +62,9 @@ fun AppNavigationRail(
                     colors = NavigationRailItemDefaults.colors(
                         selectedIconColor = selectedAccent,
                         selectedTextColor = selectedAccent,
-                        indicatorColor = DarkSurfaceVariant,
-                        unselectedIconColor = TextMuted,
-                        unselectedTextColor = TextMuted
+                        indicatorColor = if (isFocused) selectedAccent.copy(alpha = 0.25f) else DarkSurfaceVariant,
+                        unselectedIconColor = if (isFocused) selectedAccent else TextMuted,
+                        unselectedTextColor = if (isFocused) selectedAccent else TextMuted
                     )
                 )
             }

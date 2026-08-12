@@ -76,6 +76,7 @@ fun PlayerScreen(
     onOpenEqualizer: () -> Unit,
     onOpenTrackOptions: () -> Unit = {},
     onOpenScreensaver: () -> Unit = {},
+    onOpenCarMode: () -> Unit = {},
     onRetryStream: () -> Unit = {},
     onPlayNextStation: () -> Unit = {},
     onPlayPreviousStation: () -> Unit = {},
@@ -263,6 +264,15 @@ fun PlayerScreen(
                                 onClick = {
                                     showPlayerMenu = false
                                     onOpenScreensaver()
+                                }
+                            )
+                            HorizontalDivider(color = CardBorder, thickness = 1.dp)
+                            DropdownMenuItem(
+                                text = { Text(stringResource(R.string.car_mode), color = TextPrimary) },
+                                leadingIcon = { Icon(Icons.Filled.DirectionsCar, contentDescription = null, tint = NeonCyan) },
+                                onClick = {
+                                    showPlayerMenu = false
+                                    onOpenCarMode()
                                 }
                             )
                             HorizontalDivider(color = CardBorder, thickness = 1.dp)
@@ -724,13 +734,23 @@ private fun PlayerContent(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+            var isPrevFocused by remember { mutableStateOf(false) }
             IconButton(
                 onClick = {
                     haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                     onPlayPreviousStation()
-                }
+                },
+                modifier = Modifier
+                    .onFocusChanged { isPrevFocused = it.isFocused }
+                    .scale(if (isPrevFocused) 1.2f else 1.0f)
+                    .background(if (isPrevFocused) NeonCyan.copy(alpha = 0.2f) else Color.Transparent, CircleShape)
             ) {
-                Icon(Icons.Filled.SkipPrevious, null, modifier = Modifier.size(32.dp), tint = TextPrimary)
+                Icon(
+                    imageVector = Icons.Filled.SkipPrevious,
+                    contentDescription = "Previous Station",
+                    modifier = Modifier.size(32.dp),
+                    tint = if (isPrevFocused) NeonCyan else TextPrimary
+                )
             }
 
             if (isPodcast && onSeekRelative != null) {
@@ -744,11 +764,19 @@ private fun PlayerContent(
                 }
             }
 
+            var isPlayFocused by remember { mutableStateOf(false) }
             Box(
                 modifier = Modifier
                     .size(72.dp)
+                    .scale(if (isPlayFocused) 1.15f else 1.0f)
+                    .onFocusChanged { isPlayFocused = it.isFocused }
+                    .border(
+                        width = if (isPlayFocused) 3.dp else 0.dp,
+                        color = if (isPlayFocused) NeonCyan else Color.Transparent,
+                        shape = CircleShape
+                    )
                     .clip(CircleShape)
-                    .background(Color.White)
+                    .background(if (isPlayFocused) NeonCyan else PlayButtonContainer)
                     .clickable {
                         haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                         onTogglePlay()
@@ -757,8 +785,8 @@ private fun PlayerContent(
             ) {
                 Icon(
                     imageVector = if (isPlaying) Icons.Filled.Pause else Icons.Filled.PlayArrow,
-                    contentDescription = null,
-                    tint = DarkBackground,
+                    contentDescription = if (isPlaying) "Pause" else "Play",
+                    tint = if (isPlayFocused) Color.Black else PlayButtonContent,
                     modifier = Modifier.size(40.dp)
                 )
             }
@@ -774,13 +802,23 @@ private fun PlayerContent(
                 }
             }
 
+            var isNextFocused by remember { mutableStateOf(false) }
             IconButton(
                 onClick = {
                     haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                     onPlayNextStation()
-                }
+                },
+                modifier = Modifier
+                    .onFocusChanged { isNextFocused = it.isFocused }
+                    .scale(if (isNextFocused) 1.2f else 1.0f)
+                    .background(if (isNextFocused) NeonCyan.copy(alpha = 0.2f) else Color.Transparent, CircleShape)
             ) {
-                Icon(Icons.Filled.SkipNext, null, modifier = Modifier.size(32.dp), tint = TextPrimary)
+                Icon(
+                    imageVector = Icons.Filled.SkipNext,
+                    contentDescription = "Next Station",
+                    modifier = Modifier.size(32.dp),
+                    tint = if (isNextFocused) NeonCyan else TextPrimary
+                )
             }
         }
 

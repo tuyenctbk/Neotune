@@ -487,6 +487,9 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
     private val _isBatterySaverEnabled = MutableStateFlow(appPrefs.getBoolean("is_battery_saver_enabled", false))
     val isBatterySaverEnabled: StateFlow<Boolean> = _isBatterySaverEnabled.asStateFlow()
 
+    private val _isAutoPlayOnStartupEnabled = MutableStateFlow(appPrefs.getBoolean("is_auto_play_on_startup_enabled", true))
+    val isAutoPlayOnStartupEnabled: StateFlow<Boolean> = _isAutoPlayOnStartupEnabled.asStateFlow()
+
     private val _selectedLauncherIcon = MutableStateFlow(com.easeaudio.util.AppIconManager.getCurrentIconTheme(getApplication()))
     val selectedLauncherIcon: StateFlow<String> = _selectedLauncherIcon.asStateFlow()
 
@@ -512,13 +515,27 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
                 val recent = repository.getRecentStations().first()
                 val lastPlayed = recent.firstOrNull()
                 if (lastPlayed != null && playerManager.currentStation.value == null) {
-                    android.util.Log.i("RadioViewModel", "Auto-resuming last played station: ${lastPlayed.name}")
-                    playerManager.playStation(lastPlayed)
-                    snackbarMessage.emit("Auto-resumed '${lastPlayed.name}'")
+                    if (_isAutoPlayOnStartupEnabled.value) {
+                        android.util.Log.i("RadioViewModel", "Auto-resuming last played station: ${lastPlayed.name}")
+                        playerManager.playStation(lastPlayed)
+                        snackbarMessage.emit("Auto-resumed '${lastPlayed.name}'")
+                    } else {
+                        android.util.Log.i("RadioViewModel", "Preloading last played station without play: ${lastPlayed.name}")
+                        playerManager.setPreloadedStation(lastPlayed)
+                    }
                 }
             } catch (e: Exception) {
                 android.util.Log.w("RadioViewModel", "Failed to auto-resume station: ${e.message}")
             }
+        }
+    }
+
+    fun toggleAutoPlayOnStartup() {
+        val newValue = !_isAutoPlayOnStartupEnabled.value
+        _isAutoPlayOnStartupEnabled.value = newValue
+        appPrefs.edit().putBoolean("is_auto_play_on_startup_enabled", newValue).apply()
+        viewModelScope.launch {
+            snackbarMessage.emit(if (newValue) "Auto-Play on Startup Enabled" else "Auto-Play on Startup Disabled")
         }
     }
 
@@ -590,7 +607,8 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
             demotedStationIds,
             isBatterySaverEnabled,
             selectedLauncherIcon,
-            isAudioBoosterEnabled
+            isAudioBoosterEnabled,
+            isAutoPlayOnStartupEnabled
         )
     ) { array ->
         HomeUiState(
@@ -642,6 +660,7 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
             isBatterySaverEnabled = array[45] as Boolean,
             selectedLauncherIcon = array[46] as String,
             isAudioBoosterEnabled = array[47] as Boolean,
+            isAutoPlayOnStartupEnabled = array[48] as Boolean,
             availableGenres = availableGenres,
             availablePodcastTopics = availablePodcastTopics
         )

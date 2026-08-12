@@ -19,6 +19,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.foundation.border
+import androidx.compose.ui.draw.scale
 import com.easeaudio.R
 import com.easeaudio.data.RadioStation
 import com.easeaudio.ui.theme.*
@@ -153,14 +156,15 @@ fun FavoritesScreen(
                     ) {
                         LibraryFilter.values().forEach { filter ->
                             val isSelected = selectedFilter == filter
+                            var isPillFocused by remember { mutableStateOf(false) }
                             val label = when (filter) {
                                 LibraryFilter.ALL -> "All"
                                 LibraryFilter.RADIO -> "Radio"
                                 LibraryFilter.PODCASTS -> "Podcasts"
                             }
                             val bgColors = ButtonDefaults.buttonColors(
-                                containerColor = if (isSelected) NeonCyan else DarkSurface,
-                                contentColor = if (isSelected) DarkBackground else TextPrimary
+                                containerColor = if (isSelected) NeonCyan else if (isPillFocused) DarkSurfaceVariant else DarkSurface,
+                                contentColor = if (isSelected) DarkBackground else if (isPillFocused) NeonCyan else TextPrimary
                             )
                             Button(
                                 onClick = { selectedFilter = filter },
@@ -169,6 +173,13 @@ fun FavoritesScreen(
                                 contentPadding = PaddingValues(horizontal = 16.dp, vertical = 4.dp),
                                 modifier = Modifier
                                     .height(36.dp)
+                                    .onFocusChanged { isPillFocused = it.isFocused }
+                                    .scale(if (isPillFocused) 1.08f else 1.0f)
+                                    .border(
+                                        width = if (isPillFocused) 2.dp else 0.dp,
+                                        color = if (isPillFocused) NeonCyan else Color.Transparent,
+                                        shape = RoundedCornerShape(100.dp)
+                                    )
                                     .testTag("lib_filter_${filter.name.lowercase()}")
                             ) {
                                 Text(label, style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.Bold)
