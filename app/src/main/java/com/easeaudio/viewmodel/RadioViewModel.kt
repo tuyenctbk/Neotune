@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.isActive
 import java.util.UUID
 
 class RadioViewModel(application: Application) : AndroidViewModel(application) {
@@ -450,16 +451,15 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
         // BUG-6 fix: The old implementation used collect { while(playing && ...) } which
         // spawned a NEW parallel loop on every emission of isPlaying = true. Rapid
         // pause/resume caused duplicate listening-time recording and double engagement triggers.
-        // Fix: use distinctUntilChanged() and cancel the previous job before starting a new one.
+        // Fix: cancel the previous job before starting a new one.
         var listeningJob: Job? = null
         viewModelScope.launch {
-            playerManager.isPlaying.distinctUntilChanged().collect { playing ->
+            playerManager.isPlaying.collect { playing ->
                 listeningJob?.cancel()
                 if (playing) {
                     listeningJob = launch {
                         while (isActive) {
                             kotlinx.coroutines.delay(60_000L)
-                            if (!isActive) break
                             smartEngagementManager.recordListeningTime(60L)
                             smartEngagementManager.checkSmartTriggers(eventSource = "playback_timer")
                         }
