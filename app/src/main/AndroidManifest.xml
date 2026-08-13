@@ -103,11 +103,7 @@
             android:name="com.google.android.gms.ads.APPLICATION_ID"
             android:value="ca-app-pub-3940256099942544~3347511713"/>
 
-        <!-- Android Auto: declares this app as a media source for Auto.
-             Requires res/xml/automotive_app_desc.xml -->
-        <meta-data
-            android:name="com.google.android.gms.car.application"
-            android:resource="@xml/automotive_app_desc" />
+
 
         <service
             android:name=".service.RadioPlaybackService"

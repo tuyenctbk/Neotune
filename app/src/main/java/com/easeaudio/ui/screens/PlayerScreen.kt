@@ -655,7 +655,10 @@ private fun PlayerContent(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.weight(1f, fill = false)
+                    ) {
                         Icon(
                             imageVector = Icons.Filled.GraphicEq,
                             contentDescription = "Audio Frequency Visualizer",
@@ -667,11 +670,19 @@ private fun PlayerContent(
                             text = stringResource(R.string.audio_frequency_visualizer),
                             style = MaterialTheme.typography.labelSmall,
                             color = TextSecondary,
-                            fontWeight = FontWeight.SemiBold
+                            fontWeight = FontWeight.SemiBold,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
                         )
                     }
 
-                    Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                    Spacer(modifier = Modifier.width(6.dp))
+
+                    Row(
+                        modifier = Modifier.horizontalScroll(rememberScrollState()),
+                        horizontalArrangement = Arrangement.spacedBy(4.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
                         VisualizerStyle.entries.forEach { style ->
                             val selected = visualizerStyle == style
                             var isChipFocused by remember { mutableStateOf(false) }
@@ -696,7 +707,9 @@ private fun PlayerContent(
                                     },
                                     modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp),
                                     style = MaterialTheme.typography.labelSmall,
-                                    color = if (selected || isChipFocused) NeonCyan else TextMuted
+                                    color = if (selected || isChipFocused) NeonCyan else TextMuted,
+                                    maxLines = 1,
+                                    softWrap = false
                                 )
                             }
                         }
