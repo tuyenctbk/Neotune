@@ -85,7 +85,10 @@ class RadioPlayerManager(private val context: Context) {
     }
 
     private val TAG = "RadioPlayerManager"
-    private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
+    // BUG-3 fix: scope is @Volatile var so release() can cancel it and a potential
+    // re-initialization path can see the updated reference. SupervisorJob ensures one
+    // failing child coroutine (e.g. a crashed wave loop) does not cancel siblings.
+    @Volatile private var scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
 
 
 
@@ -192,7 +195,9 @@ class RadioPlayerManager(private val context: Context) {
         startSilentChecking()
     }
 
-    private var isFallbackAttempt = false
+    // BUG-4 fix: both flags are read/written from multiple threads (Main listener + IO coroutine);
+    // @Volatile ensures visibility across threads without heavier synchronization.
+    @Volatile private var isFallbackAttempt = false
 
     @OptIn(UnstableApi::class)
     private fun setupPlayer() {
@@ -509,7 +514,7 @@ class RadioPlayerManager(private val context: Context) {
         }
     }
 
-    private var isHealingAttempt = false
+    @Volatile private var isHealingAttempt = false
 
     private fun tryAutoHealStream(station: RadioStation, failedUrl: String?) {
         if (station.isPodcast || isHealingAttempt) return
@@ -1186,9 +1191,15 @@ class RadioPlayerManager(private val context: Context) {
     fun release() {
         releaseLocks()
         stopWaveAnimation()
+        stopPositionPolling()
         sleepTimerJob?.cancel()
         silentCheckJob?.cancel()
-        networkQualityManager.unregister()
+        networkQualityManager.unregisterNetworkCallback()
+        // BUG-3 fix: null exoPlayer BEFORE cancelling the scope so that any coroutine
+        // woken up from a delay() inside the scope sees null and exits gracefully,
+        // rather than crashing with a NullPointerException on a released ExoPlayer.
+        exoPlayer?.release()
+        exoPlayer = null
         scope.cancel()
         loudnessEnhancer?.release()
         loudnessEnhancer = null
@@ -1199,13 +1210,12 @@ class RadioPlayerManager(private val context: Context) {
         mediaSession?.release()
         mediaSession = null
         sharedMediaSession = null
-        exoPlayer?.release()
-        exoPlayer = null
         wifiLock = null
         synchronized(RadioPlayerManager::class.java) {
             instance = null
         }
     }
+
 
     private fun startSilentChecking() {
         silentCheckJob?.cancel()

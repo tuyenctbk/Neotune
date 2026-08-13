@@ -18,11 +18,15 @@ object RadioBrowserService {
     private val cacheMutex = Mutex()
 
     private suspend fun getActiveServers(): List<String> = withContext(Dispatchers.IO) {
+        // BUG-8 fix: check the cache BEFORE acquiring the mutex so the common case
+        // (cache already populated) returns immediately without blocking on the lock
+        // while another coroutine may be doing a slow DNS lookup.
+        if (cachedServers.isNotEmpty()) return@withContext cachedServers
+
         cacheMutex.withLock {
-            if (cachedServers.isNotEmpty()) {
-                return@withContext cachedServers
-            }
-            
+            // Double-check inside the lock in case another coroutine just populated it.
+            if (cachedServers.isNotEmpty()) return@withLock
+
             val defaultMirrors = listOf(
                 "http://all.api.radio-browser.info/json/stations",
                 "https://de1.api.radio-browser.info/json/stations",
@@ -30,7 +34,7 @@ object RadioBrowserService {
                 "https://at1.api.radio-browser.info/json/stations",
                 "https://fr1.api.radio-browser.info/json/stations"
             )
-            
+
             val servers = mutableListOf<String>()
             try {
                 val addresses = java.net.InetAddress.getAllByName("all.api.radio-browser.info")
@@ -53,7 +57,7 @@ object RadioBrowserService {
             } catch (e: Exception) {
                 Log.e(TAG, "DNS resolution of all.api.radio-browser.info failed, using default mirrors: ${e.message}")
             }
-            
+
             // Always ensure valid fallback mirrors are in the server list
             for (mirror in defaultMirrors) {
                 if (!servers.contains(mirror)) {
@@ -62,15 +66,18 @@ object RadioBrowserService {
             }
 
             cachedServers = servers
-            return@withContext servers
         }
+        return@withContext cachedServers
     }
 
     private fun executeHttpRequest(urlString: String, redirectCount: Int = 0): String? {
         if (redirectCount > 5) return null
-        try {
+        // OPT-5 fix: always disconnect in finally to prevent connection leaks on
+        // non-2xx/non-3xx responses (e.g. 404, 500) where the old code fell through.
+        var connection: HttpURLConnection? = null
+        return try {
             val url = URL(urlString)
-            val connection = (url.openConnection() as HttpURLConnection).apply {
+            connection = (url.openConnection() as HttpURLConnection).apply {
                 requestMethod = "GET"
                 connectTimeout = 5000
                 readTimeout = 5000
@@ -78,28 +85,32 @@ object RadioBrowserService {
                 setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) EaseAudioApp/1.0")
                 setRequestProperty("Accept", "application/json")
             }
-            
+
             val status = connection.responseCode
-            if (status in 200..299) {
-                val text = connection.inputStream.bufferedReader().use { it.readText() }
-                connection.disconnect()
-                return text
-            } else if (status in listOf(301, 302, 303, 307, 308)) {
-                val location = connection.getHeaderField("Location")
-                connection.disconnect()
-                if (!location.isNullOrBlank()) {
-                    val redirectUrl = if (location.startsWith("http")) location else {
-                        val base = URL(urlString)
-                        URL(base, location).toString()
-                    }
-                    return executeHttpRequest(redirectUrl, redirectCount + 1)
+            when {
+                status in 200..299 -> {
+                    val text = connection.inputStream.bufferedReader().use { it.readText() }
+                    text
                 }
+                status in listOf(301, 302, 303, 307, 308) -> {
+                    val location = connection.getHeaderField("Location")
+                    if (!location.isNullOrBlank()) {
+                        val redirectUrl = if (location.startsWith("http")) location else {
+                            val base = URL(urlString)
+                            URL(base, location).toString()
+                        }
+                        // Recurse for redirect — connection will be disconnected in finally.
+                        executeHttpRequest(redirectUrl, redirectCount + 1)
+                    } else null
+                }
+                else -> null
             }
-            connection.disconnect()
         } catch (e: Exception) {
             Log.e(TAG, "HTTP Request error for $urlString: ${e.message}")
+            null
+        } finally {
+            connection?.disconnect()
         }
-        return null
     }
 
     suspend fun fetchTopStations(

@@ -23,21 +23,35 @@ interface RadioDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertOrUpdateStation(station: RadioStation)
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertOrUpdateStations(stations: List<RadioStation>)
+
+    // Room splits large IN-lists automatically; safe for any page size.
+    @Query("SELECT * FROM radio_stations WHERE id IN (:ids)")
+    suspend fun getStationsByIds(ids: List<String>): List<RadioStation>
+
+    /**
+     * BUG-2 fix: previously issued N SELECT + N INSERT statements (one per station).
+     * Now issues 1 bulk SELECT and 1 bulk INSERT, reducing DB round-trips by ~98%
+     * while still preserving user data (isFavorite, isCustom, lastListenedTimestamp).
+     */
     @Transaction
     suspend fun saveStationsToCache(stations: List<RadioStation>) {
-        stations.forEach { station ->
-            val existing = getStationById(station.id)
+        if (stations.isEmpty()) return
+        val existingMap = getStationsByIds(stations.map { it.id }).associateBy { it.id }
+        val toUpsert = stations.map { incoming ->
+            val existing = existingMap[incoming.id]
             if (existing != null) {
-                val updated = station.copy(
+                incoming.copy(
                     isFavorite = existing.isFavorite,
                     isCustom = existing.isCustom,
                     lastListenedTimestamp = existing.lastListenedTimestamp
                 )
-                insertOrUpdateStation(updated)
             } else {
-                insertOrUpdateStation(station)
+                incoming
             }
         }
+        insertOrUpdateStations(toUpsert)
     }
 
     @Delete

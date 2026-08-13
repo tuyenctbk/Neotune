@@ -8,7 +8,9 @@ object PodcastCacheManager {
     private const val TAG = "PodcastCacheManager"
     private const val CACHE_TTL_MS = 60 * 60 * 1000L // 1 hour TTL
 
-    private val memoryCache = mutableMapOf<String, CacheEntry>()
+    // BUG-9 fix: plain mutableMapOf is not thread-safe; concurrent access from
+    // multiple Dispatchers.IO coroutines can cause ConcurrentModificationException.
+    private val memoryCache = java.util.concurrent.ConcurrentHashMap<String, CacheEntry>()
 
     private data class CacheEntry(
         val timestamp: Long,

@@ -9,10 +9,12 @@ import android.os.Build
 import android.util.Log
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+
 
 enum class QualityLevel {
     BEST_QUALITY_HD,      // Wi-Fi or fast 5G (Max audio bitrate, low latency buffer)
@@ -39,7 +41,10 @@ class NetworkQualityManager(private val context: Context) {
     private val _networkStatus = MutableStateFlow(evaluateCurrentNetwork())
     val networkStatus: StateFlow<NetworkStatus> = _networkStatus.asStateFlow()
 
-    private val scope = CoroutineScope(Dispatchers.Main)
+    // BUG-7 fix: use SupervisorJob so child failures don't kill the scope, and cancel
+    // the scope in unregisterNetworkCallback() to prevent it leaking indefinitely.
+    private val scopeJob = SupervisorJob()
+    private val scope = CoroutineScope(Dispatchers.Main + scopeJob)
 
     private val networkCallback = object : ConnectivityManager.NetworkCallback() {
         override fun onAvailable(network: Network) {
@@ -79,6 +84,8 @@ class NetworkQualityManager(private val context: Context) {
         } catch (e: Exception) {
             Log.w(TAG, "Failed to unregister network callback: ${e.message}")
         }
+        // Cancel the scope so pending updateNetworkStatus() launches don't run after teardown.
+        scopeJob.cancel()
     }
 
     private fun updateNetworkStatus() {
@@ -172,13 +179,6 @@ class NetworkQualityManager(private val context: Context) {
         }
     }
 
-    fun unregister() {
-        try {
-            connectivityManager.unregisterNetworkCallback(networkCallback)
-        } catch (e: Exception) {
-            // Ignored
-        }
-    }
 
     private data class Quadruple<A, B, C, D>(
         val first: A,
