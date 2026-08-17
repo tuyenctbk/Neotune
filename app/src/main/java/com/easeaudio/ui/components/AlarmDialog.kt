@@ -55,8 +55,8 @@ fun AlarmDialog(
                 .fillMaxWidth(0.92f)
                 .wrapContentHeight()
                 .clip(RoundedCornerShape(24.dp))
-                .border(1.dp, CardBorder, RoundedCornerShape(24.dp)),
-            color = DarkSurface
+                .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(24.dp)),
+            color = MaterialTheme.colorScheme.surface
         ) {
             Column(
                 modifier = Modifier
@@ -74,13 +74,13 @@ fun AlarmDialog(
                             modifier = Modifier
                                 .size(36.dp)
                                 .clip(CircleShape)
-                                .background(NeonCyan.copy(alpha = 0.15f)),
+                                .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)),
                             contentAlignment = Alignment.Center
                         ) {
                             Icon(
                                 imageVector = Icons.Filled.Alarm,
                                 contentDescription = null,
-                                tint = NeonCyan,
+                                tint = MaterialTheme.colorScheme.primary,
                                 modifier = Modifier.size(20.dp)
                             )
                         }
@@ -88,7 +88,7 @@ fun AlarmDialog(
                         Text(
                             text = stringResource(R.string.radio_alarm),
                             style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold, fontSize = 20.sp),
-                            color = TextPrimary
+                            color = MaterialTheme.colorScheme.onSurface
                         )
                     }
 
@@ -97,12 +97,12 @@ fun AlarmDialog(
                         modifier = Modifier
                             .size(32.dp)
                             .clip(CircleShape)
-                            .background(DarkSurfaceVariant)
+                            .background(MaterialTheme.colorScheme.surfaceVariant)
                     ) {
                         Icon(
                             imageVector = Icons.Filled.Close,
                             contentDescription = "Close",
-                            tint = TextMuted,
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.size(18.dp)
                         )
                     }
@@ -128,7 +128,7 @@ fun AlarmDialog(
                                 true
                             ).show()
                         },
-                    color = DarkBackground.copy(alpha = 0.8f)
+                    color = MaterialTheme.colorScheme.background.copy(alpha = 0.8f)
                 ) {
                     Row(
                         modifier = Modifier
@@ -138,14 +138,14 @@ fun AlarmDialog(
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(imageVector = Icons.Filled.AccessTime, contentDescription = null, tint = NeonCyan, modifier = Modifier.size(22.dp))
+                            Icon(imageVector = Icons.Filled.AccessTime, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(22.dp))
                             Spacer(modifier = Modifier.width(12.dp))
                             Column {
-                                Text(text = stringResource(R.string.alarm_time), style = MaterialTheme.typography.labelSmall, color = TextMuted)
-                                Text(text = timeString, style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold, fontSize = 24.sp), color = NeonCyan)
+                                Text(text = stringResource(R.string.alarm_time), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f))
+                                Text(text = timeString, style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold, fontSize = 24.sp), color = MaterialTheme.colorScheme.primary)
                             }
                         }
-                        Text(text = stringResource(R.string.tap_to_change), style = MaterialTheme.typography.labelSmall, color = TextMuted)
+                        Text(text = stringResource(R.string.tap_to_change), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f))
                     }
                 }
 
@@ -155,7 +155,7 @@ fun AlarmDialog(
                 Surface(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(14.dp),
-                    color = DarkSurfaceVariant.copy(alpha = 0.5f)
+                    color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
                 ) {
                     Row(
                         modifier = Modifier
@@ -163,14 +163,14 @@ fun AlarmDialog(
                             .padding(14.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Icon(imageVector = Icons.Filled.Radio, contentDescription = null, tint = NeonPurple, modifier = Modifier.size(20.dp))
+                        Icon(imageVector = Icons.Filled.Radio, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
                         Spacer(modifier = Modifier.width(12.dp))
                         Column {
-                            Text(text = stringResource(R.string.wake_station), style = MaterialTheme.typography.labelSmall, color = TextMuted)
+                            Text(text = stringResource(R.string.wake_station), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f))
                             Text(
                                 text = if (currentStation != null) currentStation.name else targetStationName,
                                 style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold),
-                                color = TextPrimary
+                                color = MaterialTheme.colorScheme.onSurface
                             )
                         }
                     }
@@ -187,16 +187,16 @@ fun AlarmDialog(
                     Text(
                         text = stringResource(R.string.enable_alarm),
                         style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Medium),
-                        color = TextPrimary
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                     Switch(
                         checked = isEnabled,
                         onCheckedChange = { isEnabled = it },
                         colors = SwitchDefaults.colors(
-                            checkedThumbColor = DarkBackground,
-                            checkedTrackColor = NeonCyan,
-                            uncheckedThumbColor = TextMuted,
-                            uncheckedTrackColor = DarkSurfaceVariant
+                            checkedThumbColor = MaterialTheme.colorScheme.background,
+                            checkedTrackColor = MaterialTheme.colorScheme.primary,
+                            uncheckedThumbColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                            uncheckedTrackColor = MaterialTheme.colorScheme.surfaceVariant
                         )
                     )
                 }
@@ -209,7 +209,7 @@ fun AlarmDialog(
                     horizontalArrangement = Arrangement.End
                 ) {
                     TextButton(onClick = onDismiss) {
-                        Text(text = stringResource(R.string.cancel), color = TextMuted)
+                        Text(text = stringResource(R.string.cancel), color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f))
                     }
                     Spacer(modifier = Modifier.width(8.dp))
                     Button(
@@ -236,7 +236,7 @@ fun AlarmDialog(
                             Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
                             onDismiss()
                         },
-                        colors = ButtonDefaults.buttonColors(containerColor = NeonCyan, contentColor = DarkBackground),
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary, contentColor = MaterialTheme.colorScheme.background),
                         shape = RoundedCornerShape(12.dp)
                     ) {
                         Text(text = stringResource(R.string.save), fontWeight = FontWeight.Bold)

@@ -45,9 +45,9 @@ fun RateAppDialog(
             modifier = Modifier
                 .fillMaxWidth(0.9f)
                 .clip(RoundedCornerShape(24.dp))
-                .border(1.dp, NeonCyan.copy(alpha = 0.4f), RoundedCornerShape(24.dp))
+                .border(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.4f), RoundedCornerShape(24.dp))
                 .testTag("dialog_rate_app"),
-            color = DarkSurface
+            color = MaterialTheme.colorScheme.surface
         ) {
             Column(
                 modifier = Modifier
@@ -67,7 +67,7 @@ fun RateAppDialog(
                             fontWeight = FontWeight.Bold,
                             letterSpacing = 1.2.sp
                         ),
-                        color = NeonCyan
+                        color = MaterialTheme.colorScheme.primary
                     )
                     IconButton(
                         onClick = onDismiss,
@@ -76,7 +76,7 @@ fun RateAppDialog(
                         Icon(
                             imageVector = Icons.Filled.Close,
                             contentDescription = "Close",
-                            tint = TextMuted,
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
                             modifier = Modifier.size(18.dp)
                         )
                     }
@@ -108,7 +108,7 @@ fun RateAppDialog(
                         fontWeight = FontWeight.Bold,
                         fontSize = 22.sp
                     ),
-                    color = TextPrimary,
+                    color = MaterialTheme.colorScheme.onSurface,
                     textAlign = TextAlign.Center
                 )
 
@@ -117,7 +117,7 @@ fun RateAppDialog(
                 Text(
                     text = stringResource(R.string.rate_us_desc),
                     style = MaterialTheme.typography.bodyMedium.copy(lineHeight = 20.sp),
-                    color = TextSecondary,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.padding(horizontal = 8.dp)
                 )
@@ -132,7 +132,7 @@ fun RateAppDialog(
                     (1..5).forEach { starIndex ->
                         val isSelected = starIndex <= selectedStars
                         val starColor by animateColorAsState(
-                            if (isSelected) StarGold else TextMuted.copy(alpha = 0.3f),
+                            if (isSelected) StarGold else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.3f),
                             label = "starColor"
                         )
 
@@ -156,8 +156,8 @@ fun RateAppDialog(
                 Button(
                     onClick = { onRateSubmitted(selectedStars) },
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = if (selectedStars >= 4) StarGold else NeonCyan,
-                        contentColor = DarkBackground
+                        containerColor = if (selectedStars >= 4) StarGold else MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.background
                     ),
                     shape = RoundedCornerShape(14.dp),
                     elevation = ButtonDefaults.buttonElevation(defaultElevation = 6.dp),
@@ -181,7 +181,7 @@ fun RateAppDialog(
                     Text(
                         text = stringResource(R.string.maybe_later_btn),
                         style = MaterialTheme.typography.labelLarge,
-                        color = TextMuted
+                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
                     )
                 }
             }

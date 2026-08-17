@@ -55,7 +55,7 @@ fun CarModeScreen(
 ) {
     Surface(
         modifier = Modifier.fillMaxSize(),
-        color = DarkBackground
+        color = MaterialTheme.colorScheme.background
     ) {
         Column(
             modifier = Modifier
@@ -73,35 +73,35 @@ fun CarModeScreen(
                     Icon(
                         imageVector = Icons.Filled.DirectionsCar,
                         contentDescription = null,
-                        tint = NeonCyan,
+                        tint = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.size(28.dp)
                     )
                     Spacer(modifier = Modifier.width(10.dp))
                     Text(
                         text = stringResource(R.string.car_mode_title),
                         style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Black, fontSize = 22.sp),
-                        color = NeonCyan
+                        color = MaterialTheme.colorScheme.primary
                     )
                 }
 
                 var isExitFocused by remember { mutableStateOf(false) }
                 Button(
                     onClick = onExitCarMode,
-                    colors = ButtonDefaults.buttonColors(containerColor = if (isExitFocused) NeonCyan.copy(alpha = 0.3f) else DarkSurfaceVariant),
+                    colors = ButtonDefaults.buttonColors(containerColor = if (isExitFocused) MaterialTheme.colorScheme.primary.copy(alpha = 0.3f) else MaterialTheme.colorScheme.surfaceVariant),
                     shape = CircleShape,
                     contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
                     modifier = Modifier
                         .onFocusChanged { isExitFocused = it.isFocused }
                         .border(
                             width = if (isExitFocused) 2.dp else 0.dp,
-                            color = if (isExitFocused) NeonCyan else Color.Transparent,
+                            color = if (isExitFocused) MaterialTheme.colorScheme.primary else Color.Transparent,
                             shape = CircleShape
                         )
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(imageVector = Icons.Filled.Close, contentDescription = null, tint = if (isExitFocused) NeonCyan else TextPrimary, modifier = Modifier.size(16.dp))
+                        Icon(imageVector = Icons.Filled.Close, contentDescription = null, tint = if (isExitFocused) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface, modifier = Modifier.size(16.dp))
                         Spacer(modifier = Modifier.width(6.dp))
-                        Text(text = stringResource(R.string.exit_car_mode), style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold), color = if (isExitFocused) NeonCyan else TextPrimary)
+                        Text(text = stringResource(R.string.exit_car_mode), style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold), color = if (isExitFocused) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface)
                     }
                 }
             }
@@ -112,7 +112,7 @@ fun CarModeScreen(
                     .fillMaxWidth()
                     .height(140.dp),
                 shape = RoundedCornerShape(24.dp),
-                color = DarkSurface
+                color = MaterialTheme.colorScheme.surface
             ) {
                 Box(modifier = Modifier.fillMaxSize()) {
                     Column(
@@ -125,7 +125,7 @@ fun CarModeScreen(
                         Text(
                             text = currentStation?.name ?: stringResource(R.string.no_station_selected),
                             style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold),
-                            color = TextPrimary,
+                            color = MaterialTheme.colorScheme.onSurface,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
                             textAlign = TextAlign.Center
@@ -134,7 +134,7 @@ fun CarModeScreen(
                         Text(
                             text = currentStation?.genre ?: "Radio",
                             style = MaterialTheme.typography.bodyMedium,
-                            color = NeonCyan,
+                            color = MaterialTheme.colorScheme.primary,
                             textAlign = TextAlign.Center
                         )
                         if (currentStation != null && isPlaying) {
@@ -161,14 +161,14 @@ fun CarModeScreen(
                                 .onFocusChanged { isFavFocused = it.isFocused }
                                 .border(
                                     width = if (isFavFocused) 2.dp else 0.dp,
-                                    color = if (isFavFocused) NeonCyan else Color.Transparent,
+                                    color = if (isFavFocused) MaterialTheme.colorScheme.primary else Color.Transparent,
                                     shape = CircleShape
                                 )
                         ) {
                             Icon(
                                 imageVector = if (currentStation.isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
                                 contentDescription = "Favorite",
-                                tint = if (currentStation.isFavorite) FavoriteHeartColor else if (isFavFocused) NeonCyan else TextMuted,
+                                tint = if (currentStation.isFavorite) FavoriteHeartColor else if (isFavFocused) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
                                 modifier = Modifier.size(28.dp)
                             )
                         }
@@ -191,14 +191,14 @@ fun CarModeScreen(
                         .onFocusChanged { isPrevFocused = it.isFocused }
                         .border(
                             width = if (isPrevFocused) 3.dp else 0.dp,
-                            color = if (isPrevFocused) NeonCyan else Color.Transparent,
+                            color = if (isPrevFocused) MaterialTheme.colorScheme.primary else Color.Transparent,
                             shape = CircleShape
                         )
                         .clickable(onClick = onPreviousStation),
-                    color = if (isPrevFocused) DarkSurfaceVariant.copy(alpha = 0.9f) else DarkSurfaceVariant
+                    color = if (isPrevFocused) MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.9f) else MaterialTheme.colorScheme.surfaceVariant
                 ) {
                     Box(contentAlignment = Alignment.Center) {
-                        Icon(imageVector = Icons.Filled.SkipPrevious, contentDescription = "Previous", tint = if (isPrevFocused) NeonCyan else TextPrimary, modifier = Modifier.size(36.dp))
+                        Icon(imageVector = Icons.Filled.SkipPrevious, contentDescription = "Previous", tint = if (isPrevFocused) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface, modifier = Modifier.size(36.dp))
                     }
                 }
 
@@ -215,13 +215,13 @@ fun CarModeScreen(
                             shape = CircleShape
                         )
                         .clickable(onClick = onPlayPause),
-                    color = NeonCyan
+                    color = MaterialTheme.colorScheme.primary
                 ) {
                     Box(contentAlignment = Alignment.Center) {
                         Icon(
                             imageVector = if (isPlaying) Icons.Filled.Pause else Icons.Filled.PlayArrow,
                             contentDescription = if (isPlaying) "Pause" else "Play",
-                            tint = DarkBackground,
+                            tint = MaterialTheme.colorScheme.background,
                             modifier = Modifier.size(48.dp)
                         )
                     }
@@ -236,14 +236,14 @@ fun CarModeScreen(
                         .onFocusChanged { isNextFocused = it.isFocused }
                         .border(
                             width = if (isNextFocused) 3.dp else 0.dp,
-                            color = if (isNextFocused) NeonCyan else Color.Transparent,
+                            color = if (isNextFocused) MaterialTheme.colorScheme.primary else Color.Transparent,
                             shape = CircleShape
                         )
                         .clickable(onClick = onNextStation),
-                    color = if (isNextFocused) DarkSurfaceVariant.copy(alpha = 0.9f) else DarkSurfaceVariant
+                    color = if (isNextFocused) MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.9f) else MaterialTheme.colorScheme.surfaceVariant
                 ) {
                     Box(contentAlignment = Alignment.Center) {
-                        Icon(imageVector = Icons.Filled.SkipNext, contentDescription = "Next", tint = if (isNextFocused) NeonCyan else TextPrimary, modifier = Modifier.size(36.dp))
+                        Icon(imageVector = Icons.Filled.SkipNext, contentDescription = "Next", tint = if (isNextFocused) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface, modifier = Modifier.size(36.dp))
                     }
                 }
             }
@@ -252,7 +252,7 @@ fun CarModeScreen(
             Text(
                 text = stringResource(R.string.quick_select),
                 style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold),
-                color = TextMuted,
+                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
                 modifier = Modifier.padding(start = 4.dp)
             )
 
@@ -275,11 +275,11 @@ fun CarModeScreen(
                             .onFocusChanged { isCardFocused = it.isFocused }
                             .border(
                                 width = if (isCardFocused) 2.dp else if (isSelected) 1.dp else 0.dp,
-                                color = if (isCardFocused) NeonCyan else if (isSelected) NeonCyan.copy(alpha = 0.5f) else Color.Transparent,
+                                color = if (isCardFocused) MaterialTheme.colorScheme.primary else if (isSelected) MaterialTheme.colorScheme.primary.copy(alpha = 0.5f) else Color.Transparent,
                                 shape = RoundedCornerShape(16.dp)
                             )
                             .clickable { onSelectStation(station) },
-                        color = if (isCardFocused) NeonCyan.copy(alpha = 0.25f) else if (isSelected) NeonCyan.copy(alpha = 0.2f) else DarkSurface
+                        color = if (isCardFocused) MaterialTheme.colorScheme.primary.copy(alpha = 0.25f) else if (isSelected) MaterialTheme.colorScheme.primary.copy(alpha = 0.2f) else MaterialTheme.colorScheme.surface
                     ) {
                         Box(
                             modifier = Modifier
@@ -292,7 +292,7 @@ fun CarModeScreen(
                                 style = MaterialTheme.typography.bodyLarge.copy(
                                     fontWeight = if (isSelected || isCardFocused) FontWeight.Bold else FontWeight.Medium
                                 ),
-                                color = if (isSelected || isCardFocused) NeonCyan else TextPrimary,
+                                color = if (isSelected || isCardFocused) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
                                 maxLines = 2,
                                 overflow = TextOverflow.Ellipsis
                             )

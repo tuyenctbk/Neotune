@@ -8,10 +8,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.draw.scale
-import com.easeaudio.ui.theme.DarkSurfaceVariant
-import com.easeaudio.ui.theme.NeonCyan
-import com.easeaudio.ui.theme.NeonPurple
-import com.easeaudio.ui.theme.TextMuted
 
 @Composable
 fun AppNavigationRail(
@@ -25,8 +21,8 @@ fun AppNavigationRail(
         modifier = modifier
             .fillMaxHeight()
             .width(80.dp),
-        containerColor = com.easeaudio.ui.theme.DarkBackground,
-        contentColor = TextMuted,
+        containerColor = MaterialTheme.colorScheme.background,
+        contentColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
         header = {
             Spacer(modifier = Modifier.height(24.dp))
         }
@@ -38,7 +34,7 @@ fun AppNavigationRail(
             items.forEach { item ->
                 val isSelected = currentRoute == item.route || (item.route == "radio" && currentRoute == "home")
                 val localizedTitle = stringResource(item.titleRes)
-                val selectedAccent = NeonCyan
+                val selectedAccent = MaterialTheme.colorScheme.primary
                 var isFocused by remember { mutableStateOf(false) }
                 
                 NavigationRailItem(
@@ -62,9 +58,9 @@ fun AppNavigationRail(
                     colors = NavigationRailItemDefaults.colors(
                         selectedIconColor = selectedAccent,
                         selectedTextColor = selectedAccent,
-                        indicatorColor = if (isFocused) selectedAccent.copy(alpha = 0.25f) else DarkSurfaceVariant,
-                        unselectedIconColor = if (isFocused) selectedAccent else TextMuted,
-                        unselectedTextColor = if (isFocused) selectedAccent else TextMuted
+                        indicatorColor = if (isFocused) selectedAccent.copy(alpha = 0.25f) else MaterialTheme.colorScheme.surfaceVariant,
+                        unselectedIconColor = if (isFocused) selectedAccent else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                        unselectedTextColor = if (isFocused) selectedAccent else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
                     )
                 )
             }

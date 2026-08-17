@@ -114,9 +114,9 @@ fun PodcastEpisodesSheet(
     
     ModalBottomSheet(
         onDismissRequest = onDismiss,
-        containerColor = DarkBackground,
+        containerColor = MaterialTheme.colorScheme.background,
         scrimColor = Color.Black.copy(alpha = 0.65f),
-        dragHandle = { BottomSheetDefaults.DragHandle(color = TextMuted) },
+        dragHandle = { BottomSheetDefaults.DragHandle(color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)) },
         modifier = modifier
     ) {
         AnimatedContent(
@@ -161,7 +161,7 @@ fun PodcastEpisodesSheet(
                             Text(
                                 text = show.name,
                                 style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
-                                color = TextPrimary,
+                                color = MaterialTheme.colorScheme.onSurface,
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis
                             )
@@ -169,7 +169,7 @@ fun PodcastEpisodesSheet(
                             Text(
                                 text = show.genre,
                                 style = MaterialTheme.typography.bodyMedium,
-                                color = TextSecondary,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis
                             )
@@ -177,13 +177,13 @@ fun PodcastEpisodesSheet(
                             Box(
                                 modifier = Modifier
                                     .clip(RoundedCornerShape(6.dp))
-                                    .background(NeonPurple.copy(alpha = 0.2f))
+                                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.2f))
                                     .padding(horizontal = 8.dp, vertical = 2.dp)
                             ) {
                                 Text(
                                     text = stringResource(R.string.episodes_available, episodes.size),
                                     style = MaterialTheme.typography.labelSmall,
-                                    color = NeonPurple,
+                                    color = MaterialTheme.colorScheme.primary,
                                     fontWeight = FontWeight.Bold
                                 )
                             }
@@ -192,16 +192,16 @@ fun PodcastEpisodesSheet(
                             Icon(
                                 imageVector = Icons.Filled.Close,
                                 contentDescription = stringResource(R.string.close),
-                                tint = TextMuted
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
                             )
                         }
                     }
 
-                    HorizontalDivider(color = DarkSurfaceVariant, thickness = 1.dp)
+                    HorizontalDivider(color = MaterialTheme.colorScheme.surfaceVariant, thickness = 1.dp)
                     Spacer(modifier = Modifier.height(8.dp))
 
                     // Episodes List
-                    if (episodes.isEmpty() && isLoading) {
+                            if (episodes.isEmpty() && isLoading) {
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -209,12 +209,12 @@ fun PodcastEpisodesSheet(
                             contentAlignment = Alignment.Center
                         ) {
                             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                CircularProgressIndicator(color = NeonPurple, strokeWidth = 3.dp)
+                                CircularProgressIndicator(color = MaterialTheme.colorScheme.primary, strokeWidth = 3.dp)
                                 Spacer(modifier = Modifier.height(12.dp))
                                 Text(
                                     text = stringResource(R.string.loading_podcast_episodes),
                                     style = MaterialTheme.typography.bodyMedium,
-                                    color = TextMuted
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
                                 )
                             }
                         }
@@ -228,7 +228,7 @@ fun PodcastEpisodesSheet(
                             Text(
                                 text = stringResource(R.string.no_episodes_available),
                                 style = MaterialTheme.typography.bodyMedium,
-                                color = TextMuted
+                                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
                             )
                         }
                     } else {
@@ -250,11 +250,11 @@ fun PodcastEpisodesSheet(
                                         .clickable { selectedDetailEpisode = episode }
                                         .border(
                                             width = if (isSelected) 1.5.dp else 0.dp,
-                                            color = if (isSelected) NeonPurple else Color.Transparent,
+                                            color = if (isSelected) MaterialTheme.colorScheme.primary else Color.Transparent,
                                             shape = RoundedCornerShape(14.dp)
                                         )
                                         .testTag("episode_item_${episode.id}"),
-                                    color = if (isSelected) DarkSurfaceVariant else DarkSurface
+                                    color = if (isSelected) MaterialTheme.colorScheme.surfaceVariant else MaterialTheme.colorScheme.surface
                                 ) {
                                     Row(
                                         modifier = Modifier
@@ -267,21 +267,21 @@ fun PodcastEpisodesSheet(
                                             modifier = Modifier
                                                 .size(42.dp)
                                                 .clip(CircleShape)
-                                                .background(if (isSelected) NeonPurple else DarkSurfaceVariant)
+                                                .background(if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant)
                                                 .clickable { onSelectEpisode(episode) },
                                             contentAlignment = Alignment.Center
                                         ) {
                                             if (isSelected && isLoading) {
                                                 CircularProgressIndicator(
                                                     modifier = Modifier.size(20.dp),
-                                                    color = DarkBackground,
+                                                    color = MaterialTheme.colorScheme.background,
                                                     strokeWidth = 2.5.dp
                                                 )
                                             } else {
                                                 Icon(
                                                     imageVector = if (isEpisodePlaying) Icons.Filled.Pause else Icons.Filled.PlayArrow,
                                                     contentDescription = if (isEpisodePlaying) "Pause" else "Play",
-                                                    tint = if (isSelected) DarkBackground else TextPrimary,
+                                                    tint = if (isSelected) MaterialTheme.colorScheme.background else MaterialTheme.colorScheme.onSurface,
                                                     modifier = Modifier.size(24.dp)
                                                 )
                                             }
@@ -297,7 +297,7 @@ fun PodcastEpisodesSheet(
                                                     fontSize = 15.sp,
                                                     fontWeight = if (isSelected) FontWeight.Bold else FontWeight.SemiBold
                                                 ),
-                                                color = if (isSelected) NeonPurple else TextPrimary,
+                                                color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
                                                 maxLines = 2,
                                                 overflow = TextOverflow.Ellipsis
                                             )
@@ -306,7 +306,7 @@ fun PodcastEpisodesSheet(
                                                 Text(
                                                     text = episode.description,
                                                     style = MaterialTheme.typography.bodySmall,
-                                                    color = TextMuted,
+                                                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
                                                     maxLines = 2,
                                                     overflow = TextOverflow.Ellipsis
                                                 )
@@ -317,24 +317,24 @@ fun PodcastEpisodesSheet(
                                                     Text(
                                                         text = episode.pubDate,
                                                         style = MaterialTheme.typography.labelSmall,
-                                                        color = TextSecondary
+                                                        color = MaterialTheme.colorScheme.onSurfaceVariant
                                                     )
                                                 }
                                                 if (episode.pubDate.isNotBlank() && episode.durationMs > 0L) {
-                                                    Text(" • ", style = MaterialTheme.typography.labelSmall, color = TextMuted)
+                                                    Text(" • ", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f))
                                                 }
                                                 if (episode.durationMs > 0L) {
                                                     Icon(
                                                         imageVector = Icons.Filled.Schedule,
                                                         contentDescription = null,
-                                                        tint = TextMuted,
+                                                        tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
                                                         modifier = Modifier.size(12.dp)
                                                     )
                                                     Spacer(modifier = Modifier.width(3.dp))
                                                     Text(
                                                         text = formatDurationMs(episode.durationMs),
                                                         style = MaterialTheme.typography.labelSmall,
-                                                        color = TextSecondary
+                                                        color = MaterialTheme.colorScheme.onSurfaceVariant
                                                     )
                                                 }
                                             }
@@ -346,7 +346,7 @@ fun PodcastEpisodesSheet(
                                         Icon(
                                             imageVector = Icons.Filled.ChevronRight,
                                             contentDescription = "Details",
-                                            tint = TextMuted,
+                                            tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
                                             modifier = Modifier.size(20.dp)
                                         )
                                     }
@@ -421,8 +421,8 @@ fun PodcastEpisodeDetailView(
             .background(
                 Brush.verticalGradient(
                     colors = listOf(
-                        NeonPurple.copy(alpha = 0.22f),
-                        DarkBackground
+                        MaterialTheme.colorScheme.primary.copy(alpha = 0.22f),
+                        MaterialTheme.colorScheme.background
                     )
                 )
             )
@@ -441,7 +441,7 @@ fun PodcastEpisodeDetailView(
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = "Back to List",
-                    tint = TextPrimary
+                    tint = MaterialTheme.colorScheme.onSurface
                 )
             }
             Spacer(modifier = Modifier.width(8.dp))
@@ -449,14 +449,14 @@ fun PodcastEpisodeDetailView(
                 Text(
                     text = show.name,
                     style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
-                    color = TextPrimary,
+                    color = MaterialTheme.colorScheme.onSurface,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
                 Text(
                     text = stringResource(R.string.episode_details),
                     style = MaterialTheme.typography.bodySmall,
-                    color = TextMuted
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
                 )
             }
         }
@@ -475,7 +475,7 @@ fun PodcastEpisodeDetailView(
                 modifier = Modifier
                     .size(90.dp)
                     .clip(RoundedCornerShape(12.dp))
-                    .border(1.dp, CardBorder, RoundedCornerShape(12.dp))
+                    .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(12.dp))
             )
             Spacer(modifier = Modifier.width(16.dp))
             Column(modifier = Modifier.weight(1f)) {
@@ -485,7 +485,7 @@ fun PodcastEpisodeDetailView(
                         fontWeight = FontWeight.Bold,
                         lineHeight = 24.sp
                     ),
-                    color = TextPrimary,
+                    color = MaterialTheme.colorScheme.onSurface,
                     maxLines = 3,
                     overflow = TextOverflow.Ellipsis
                 )
@@ -493,7 +493,7 @@ fun PodcastEpisodeDetailView(
                 Text(
                     text = "${episode.pubDate} • ${if (episode.durationMs > 0L) formatDurationMs(episode.durationMs) else "15m"}",
                     style = MaterialTheme.typography.bodySmall,
-                    color = TextSecondary
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
         }
@@ -527,7 +527,7 @@ fun PodcastEpisodeDetailView(
                     Icon(
                         imageVector = if (isSaved) Icons.Filled.CheckCircle else Icons.Filled.AddCircleOutline,
                         contentDescription = "Save Episode",
-                        tint = if (isSaved) NeonPurple else TextPrimary,
+                        tint = if (isSaved) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
                         modifier = Modifier.size(26.dp)
                     )
                 }
@@ -565,14 +565,14 @@ fun PodcastEpisodeDetailView(
                         CircularProgressIndicator(
                             progress = { downloadProgress },
                             modifier = Modifier.size(24.dp),
-                            color = NeonPurple,
+                            color = MaterialTheme.colorScheme.primary,
                             strokeWidth = 2.5.dp
                         )
                     } else {
                         Icon(
                             imageVector = if (isDownloaded) Icons.Filled.DownloadDone else Icons.Filled.ArrowCircleDown,
                             contentDescription = "Download Episode",
-                            tint = if (isDownloaded) Color(0xFF4CAF50) else TextPrimary,
+                            tint = if (isDownloaded) Color(0xFF4CAF50) else MaterialTheme.colorScheme.onSurface,
                             modifier = Modifier.size(26.dp)
                         )
                     }
@@ -596,7 +596,7 @@ fun PodcastEpisodeDetailView(
                     Icon(
                         imageVector = Icons.Filled.Share,
                         contentDescription = "Share",
-                        tint = TextPrimary,
+                        tint = MaterialTheme.colorScheme.onSurface,
                         modifier = Modifier.size(22.dp)
                     )
                 }
@@ -609,7 +609,7 @@ fun PodcastEpisodeDetailView(
                     Icon(
                         imageVector = Icons.Filled.MoreVert,
                         contentDescription = "Options",
-                        tint = TextSecondary,
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.size(22.dp)
                     )
                 }
@@ -618,15 +618,15 @@ fun PodcastEpisodeDetailView(
             // Giant Play/Pause FAB Button
             FloatingActionButton(
                 onClick = { onSelectEpisode(episode) },
-                containerColor = NeonPurple,
-                contentColor = DarkBackground,
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.background,
                 shape = CircleShape,
                 modifier = Modifier.size(54.dp)
             ) {
                 if (isSelected && isLoading) {
                     CircularProgressIndicator(
                         modifier = Modifier.size(24.dp),
-                        color = DarkBackground,
+                        color = MaterialTheme.colorScheme.background,
                         strokeWidth = 3.dp
                     )
                 } else {
@@ -652,14 +652,14 @@ fun PodcastEpisodeDetailView(
                 Box(
                     modifier = Modifier
                         .clip(RoundedCornerShape(20.dp))
-                        .background(DarkSurfaceVariant)
-                        .border(1.dp, CardBorder, RoundedCornerShape(20.dp))
+                        .background(MaterialTheme.colorScheme.surfaceVariant)
+                        .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(20.dp))
                         .padding(horizontal = 14.dp, vertical = 6.dp)
                 ) {
                     Text(
                         text = tag,
                         style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Medium),
-                        color = TextSecondary
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             }
@@ -672,13 +672,13 @@ fun PodcastEpisodeDetailView(
             Text(
                 text = stringResource(R.string.episode_description),
                 style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-                color = TextPrimary
+                color = MaterialTheme.colorScheme.onSurface
             )
             Spacer(modifier = Modifier.height(6.dp))
             Text(
                 text = episode.description.ifBlank { "No detailed description available for this episode. Tune in to listen to the full episode." },
                 style = MaterialTheme.typography.bodyMedium,
-                color = TextSecondary,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 lineHeight = 21.sp,
                 maxLines = if (descriptionExpanded) Int.MAX_VALUE else 3,
                 overflow = TextOverflow.Ellipsis
@@ -687,7 +687,7 @@ fun PodcastEpisodeDetailView(
             Text(
                 text = if (descriptionExpanded) "see less" else "... see more",
                 style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
-                color = NeonCyan,
+                color = MaterialTheme.colorScheme.primary,
                 modifier = Modifier
                     .clip(RoundedCornerShape(4.dp))
                     .clickable { descriptionExpanded = !descriptionExpanded }
@@ -717,24 +717,24 @@ fun PodcastEpisodeDetailView(
                     Text(
                         text = stringResource(R.string.chapters),
                         style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-                        color = TextPrimary
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                     Text(
                         text = stringResource(R.string.chapters_auto_generated),
                         style = MaterialTheme.typography.bodySmall,
-                        color = TextMuted
+                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
                     )
                 }
                 Box(
                     modifier = Modifier
                         .clip(RoundedCornerShape(6.dp))
-                        .background(NeonPurple.copy(alpha = 0.15f))
+                        .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.15f))
                         .padding(horizontal = 8.dp, vertical = 2.dp)
                 ) {
                     Text(
                         text = "${chapters.size} Chapters",
                         style = MaterialTheme.typography.labelSmall,
-                        color = NeonPurple,
+                        color = MaterialTheme.colorScheme.primary,
                         fontWeight = FontWeight.Bold
                     )
                 }
@@ -759,10 +759,10 @@ fun PodcastEpisodeDetailView(
                         }
                         .border(
                             width = if (isActive) 1.dp else 0.dp,
-                            color = if (isActive) NeonPurple.copy(alpha = 0.5f) else Color.Transparent,
+                            color = if (isActive) MaterialTheme.colorScheme.primary.copy(alpha = 0.5f) else Color.Transparent,
                             shape = RoundedCornerShape(10.dp)
                         ),
-                    color = if (isActive) NeonPurple.copy(alpha = 0.08f) else Color.Transparent
+                    color = if (isActive) MaterialTheme.colorScheme.primary.copy(alpha = 0.08f) else Color.Transparent
                 ) {
                     Row(
                         modifier = Modifier
@@ -775,13 +775,13 @@ fun PodcastEpisodeDetailView(
                             modifier = Modifier
                                 .size(28.dp)
                                 .clip(CircleShape)
-                                .background(if (isActive) NeonPurple else DarkSurfaceVariant),
+                                .background(if (isActive) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant),
                             contentAlignment = Alignment.Center
                         ) {
                             Icon(
                                 imageVector = if (isActive && isEpisodePlaying) Icons.Filled.VolumeUp else Icons.Filled.PlayArrow,
                                 contentDescription = null,
-                                tint = if (isActive) DarkBackground else TextMuted,
+                                tint = if (isActive) MaterialTheme.colorScheme.background else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
                                 modifier = Modifier.size(16.dp)
                             )
                         }
@@ -794,7 +794,7 @@ fun PodcastEpisodeDetailView(
                                 style = MaterialTheme.typography.bodyMedium.copy(
                                     fontWeight = if (isActive) FontWeight.Bold else FontWeight.Medium
                                 ),
-                                color = if (isActive) NeonPurple else TextPrimary,
+                                color = if (isActive) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis
                             )
@@ -802,14 +802,14 @@ fun PodcastEpisodeDetailView(
                             Text(
                                 text = "Starts at ${formatDurationMs(chapter.startTimeMs)}",
                                 style = MaterialTheme.typography.bodySmall,
-                                color = TextMuted
+                                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
                             )
                         }
                         
                         Text(
                             text = chapter.durationText,
                             style = MaterialTheme.typography.labelSmall,
-                            color = TextMuted
+                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
                         )
                     }
                 }
@@ -823,8 +823,8 @@ fun PodcastEpisodeDetailView(
     if (showMoreOptionsSheet) {
         ModalBottomSheet(
             onDismissRequest = { showMoreOptionsSheet = false },
-            containerColor = DarkSurface,
-            dragHandle = { BottomSheetDefaults.DragHandle(color = TextMuted) }
+            containerColor = MaterialTheme.colorScheme.surface,
+            dragHandle = { BottomSheetDefaults.DragHandle(color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)) }
         ) {
             Column(
                 modifier = Modifier
@@ -849,20 +849,20 @@ fun PodcastEpisodeDetailView(
                         Text(
                             text = episode.title,
                             style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-                            color = TextPrimary,
+                            color = MaterialTheme.colorScheme.onSurface,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )
                         Text(
                             text = "${show.name} • By ${show.country}",
                             style = MaterialTheme.typography.bodySmall,
-                            color = TextSecondary
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                 }
                 
                 Spacer(modifier = Modifier.height(20.dp))
-                HorizontalDivider(color = CardBorder)
+                HorizontalDivider(color = MaterialTheme.colorScheme.outline)
                 Spacer(modifier = Modifier.height(10.dp))
                 
                 // Options items
@@ -906,14 +906,14 @@ fun PodcastEpisodeDetailView(
                         Icon(
                             imageVector = icon,
                             contentDescription = null,
-                            tint = TextSecondary,
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.size(24.dp)
                         )
                         Spacer(modifier = Modifier.width(16.dp))
                         Text(
                             text = title,
                             style = MaterialTheme.typography.bodyLarge,
-                            color = TextPrimary
+                            color = MaterialTheme.colorScheme.onSurface
                         )
                     }
                 }

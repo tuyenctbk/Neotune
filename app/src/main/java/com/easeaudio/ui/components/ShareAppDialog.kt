@@ -37,9 +37,9 @@ fun ShareAppDialog(
             modifier = Modifier
                 .fillMaxWidth(0.9f)
                 .clip(RoundedCornerShape(24.dp))
-                .border(1.dp, NeonCyan.copy(alpha = 0.4f), RoundedCornerShape(24.dp))
+                .border(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.4f), RoundedCornerShape(24.dp))
                 .testTag("dialog_share_app"),
-            color = DarkSurface
+            color = MaterialTheme.colorScheme.surface
         ) {
             Column(
                 modifier = Modifier
@@ -59,7 +59,7 @@ fun ShareAppDialog(
                             fontWeight = FontWeight.Bold,
                             letterSpacing = 1.2.sp
                         ),
-                        color = NeonCyan
+                        color = MaterialTheme.colorScheme.primary
                     )
                     IconButton(
                         onClick = onDismiss,
@@ -68,7 +68,7 @@ fun ShareAppDialog(
                         Icon(
                             imageVector = Icons.Filled.Close,
                             contentDescription = "Close",
-                            tint = TextMuted,
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
                             modifier = Modifier.size(18.dp)
                         )
                     }
@@ -81,13 +81,13 @@ fun ShareAppDialog(
                     modifier = Modifier
                         .size(72.dp)
                         .clip(CircleShape)
-                        .background(NeonCyan.copy(alpha = 0.15f)),
+                        .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
                         imageVector = Icons.Filled.Share,
                         contentDescription = null,
-                        tint = NeonCyan,
+                        tint = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.size(38.dp)
                     )
                 }
@@ -100,7 +100,7 @@ fun ShareAppDialog(
                         fontWeight = FontWeight.Bold,
                         fontSize = 22.sp
                     ),
-                    color = TextPrimary,
+                    color = MaterialTheme.colorScheme.onSurface,
                     textAlign = TextAlign.Center
                 )
 
@@ -109,7 +109,7 @@ fun ShareAppDialog(
                 Text(
                     text = stringResource(R.string.share_app_desc),
                     style = MaterialTheme.typography.bodyMedium.copy(lineHeight = 20.sp),
-                    color = TextSecondary,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.padding(horizontal = 8.dp)
                 )
@@ -119,8 +119,8 @@ fun ShareAppDialog(
                 Button(
                     onClick = onShareConfirmed,
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = NeonCyan,
-                        contentColor = DarkBackground
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.background
                     ),
                     shape = RoundedCornerShape(14.dp),
                     elevation = ButtonDefaults.buttonElevation(defaultElevation = 6.dp),
@@ -150,7 +150,7 @@ fun ShareAppDialog(
                     Text(
                         text = stringResource(R.string.not_now_btn),
                         style = MaterialTheme.typography.labelLarge,
-                        color = TextMuted
+                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
                     )
                 }
             }

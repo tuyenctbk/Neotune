@@ -42,10 +42,10 @@ fun NotificationPermissionReminder(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp, vertical = 6.dp)
-                .border(1.dp, NeonCyan.copy(alpha = 0.5f), RoundedCornerShape(16.dp))
+                .border(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.5f), RoundedCornerShape(16.dp))
                 .testTag("banner_permission_reminder"),
             shape = RoundedCornerShape(16.dp),
-            color = DarkSurfaceVariant,
+            color = MaterialTheme.colorScheme.surfaceVariant,
             shadowElevation = 8.dp
         ) {
             Row(
@@ -63,13 +63,13 @@ fun NotificationPermissionReminder(
                         modifier = Modifier
                             .size(36.dp)
                             .clip(RoundedCornerShape(10.dp))
-                            .background(NeonCyan.copy(alpha = 0.15f)),
+                            .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
                             imageVector = Icons.Filled.NotificationsActive,
                             contentDescription = null,
-                            tint = NeonCyan,
+                            tint = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.size(20.dp)
                         )
                     }
@@ -81,13 +81,13 @@ fun NotificationPermissionReminder(
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 13.sp
                             ),
-                            color = TextPrimary
+                            color = MaterialTheme.colorScheme.onSurface
                         )
                         Spacer(modifier = Modifier.height(2.dp))
                         Text(
                             text = stringResource(R.string.playtime_permission_reminder_desc),
                             style = MaterialTheme.typography.bodySmall.copy(fontSize = 11.sp, lineHeight = 14.sp),
-                            color = TextSecondary,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                             maxLines = 2
                         )
                     }
@@ -99,8 +99,8 @@ fun NotificationPermissionReminder(
                     Button(
                         onClick = onRequestPermission,
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = NeonCyan,
-                            contentColor = DarkBackground
+                            containerColor = MaterialTheme.colorScheme.primary,
+                            contentColor = MaterialTheme.colorScheme.background
                         ),
                         shape = RoundedCornerShape(10.dp),
                         contentPadding = PaddingValues(horizontal = 10.dp, vertical = 4.dp),
@@ -123,7 +123,7 @@ fun NotificationPermissionReminder(
                         Icon(
                             imageVector = Icons.Filled.Close,
                             contentDescription = stringResource(R.string.playtime_permission_dismiss),
-                            tint = TextMuted,
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
                             modifier = Modifier.size(16.dp)
                         )
                     }

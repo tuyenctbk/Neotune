@@ -71,7 +71,7 @@ fun FavoritesScreen(
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
-        containerColor = DarkBackground
+        containerColor = MaterialTheme.colorScheme.background
     ) { innerPadding ->
         Box(
             modifier = Modifier
@@ -102,13 +102,13 @@ fun FavoritesScreen(
                         Text(
                             text = stringResource(R.string.your_favorite_stations),
                             style = MaterialTheme.typography.headlineLarge,
-                            color = TextPrimary,
+                            color = MaterialTheme.colorScheme.onSurface,
                             fontWeight = FontWeight.Bold
                         )
                         Text(
                             text = "${favoriteStations.size} ${stringResource(R.string.favorites)}",
                             style = MaterialTheme.typography.bodyMedium,
-                            color = TextSecondary
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                 }
@@ -119,15 +119,15 @@ fun FavoritesScreen(
                     OutlinedTextField(
                         value = searchQuery,
                         onValueChange = { searchQuery = it },
-                        placeholder = { Text(stringResource(R.string.search_placeholder), color = TextMuted) },
-                        leadingIcon = { Icon(imageVector = Icons.Filled.Search, contentDescription = null, tint = TextMuted) },
+                        placeholder = { Text(stringResource(R.string.search_placeholder), color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)) },
+                        leadingIcon = { Icon(imageVector = Icons.Filled.Search, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)) },
                         trailingIcon = {
                             if (searchQuery.isNotEmpty()) {
                                 IconButton(onClick = { searchQuery = "" }) {
                                     Icon(
                                         imageVector = Icons.Filled.Close,
                                         contentDescription = "Clear search",
-                                        tint = TextMuted
+                                        tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
                                     )
                                 }
                             }
@@ -135,14 +135,14 @@ fun FavoritesScreen(
                         singleLine = true,
                         shape = RoundedCornerShape(16.dp),
                         colors = OutlinedTextFieldDefaults.colors(
-                            focusedContainerColor = DarkSurface,
-                            unfocusedContainerColor = DarkSurface,
-                            focusedBorderColor = NeonCyan,
+                            focusedContainerColor = MaterialTheme.colorScheme.surface,
+                            unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+                            focusedBorderColor = MaterialTheme.colorScheme.primary,
                             unfocusedBorderColor = Color.Transparent,
                             disabledBorderColor = Color.Transparent,
                             errorBorderColor = Color.Transparent,
-                            focusedTextColor = TextPrimary,
-                            unfocusedTextColor = TextPrimary
+                            focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                            unfocusedTextColor = MaterialTheme.colorScheme.onSurface
                         ),
                         modifier = Modifier
                             .fillMaxWidth()
@@ -166,8 +166,8 @@ fun FavoritesScreen(
                                 LibraryFilter.PODCASTS -> "Podcasts"
                             }
                             val bgColors = ButtonDefaults.buttonColors(
-                                containerColor = if (isSelected) NeonCyan else if (isPillFocused) DarkSurfaceVariant else DarkSurface,
-                                contentColor = if (isSelected) DarkBackground else if (isPillFocused) NeonCyan else TextPrimary
+                                containerColor = if (isSelected) MaterialTheme.colorScheme.primary else if (isPillFocused) MaterialTheme.colorScheme.surfaceVariant else MaterialTheme.colorScheme.surface,
+                                contentColor = if (isSelected) MaterialTheme.colorScheme.background else if (isPillFocused) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
                             )
                             Button(
                                 onClick = { selectedFilter = filter },
@@ -180,7 +180,7 @@ fun FavoritesScreen(
                                     .scale(if (isPillFocused) 1.08f else 1.0f)
                                     .border(
                                         width = if (isPillFocused) 2.dp else 0.dp,
-                                        color = if (isPillFocused) NeonCyan else Color.Transparent,
+                                        color = if (isPillFocused) MaterialTheme.colorScheme.primary else Color.Transparent,
                                         shape = RoundedCornerShape(100.dp)
                                     )
                                     .testTag("lib_filter_${filter.name.lowercase()}")
@@ -202,14 +202,14 @@ fun FavoritesScreen(
                             Icon(
                                 imageVector = Icons.Outlined.FavoriteBorder,
                                 contentDescription = null,
-                                tint = TextMuted,
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
                                 modifier = Modifier.size(64.dp)
                             )
                             Spacer(modifier = Modifier.height(16.dp))
                             Text(
                                 text = stringResource(R.string.no_saved_favorites),
                                 style = MaterialTheme.typography.titleMedium,
-                                color = TextSecondary,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 fontWeight = FontWeight.Bold,
                                 textAlign = TextAlign.Center
                             )
@@ -227,14 +227,14 @@ fun FavoritesScreen(
                             Icon(
                                 imageVector = Icons.Filled.Search,
                                 contentDescription = null,
-                                tint = TextMuted,
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
                                 modifier = Modifier.size(64.dp)
                             )
                             Spacer(modifier = Modifier.height(16.dp))
                             Text(
                                 text = stringResource(R.string.no_matching_favorites),
                                 style = MaterialTheme.typography.titleMedium,
-                                color = TextSecondary,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 fontWeight = FontWeight.Bold,
                                 textAlign = TextAlign.Center
                             )

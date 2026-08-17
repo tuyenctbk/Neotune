@@ -22,8 +22,8 @@ fun AddStationDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        containerColor = DarkSurface,
-        title = { Text(stringResource(R.string.add_custom_station), color = TextPrimary) },
+        containerColor = MaterialTheme.colorScheme.surface,
+        title = { Text(stringResource(R.string.add_custom_station), color = MaterialTheme.colorScheme.onSurface) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 OutlinedTextField(
@@ -31,12 +31,12 @@ fun AddStationDialog(
                     onValueChange = { name = it },
                     label = { Text(stringResource(R.string.station_name)) },
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = NeonCyan,
-                        unfocusedBorderColor = TextMuted,
-                        focusedLabelColor = NeonCyan,
-                        unfocusedLabelColor = TextMuted,
-                        focusedTextColor = TextPrimary,
-                        unfocusedTextColor = TextPrimary
+                        focusedBorderColor = MaterialTheme.colorScheme.primary,
+                        unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                        focusedLabelColor = MaterialTheme.colorScheme.primary,
+                        unfocusedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                        focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                        unfocusedTextColor = MaterialTheme.colorScheme.onSurface
                     ),
                     modifier = Modifier.fillMaxWidth().testTag("add_station_name")
                 )
@@ -51,12 +51,12 @@ fun AddStationDialog(
                     isError = isError,
                     supportingText = if (isError) { { Text(stringResource(R.string.invalid_url_error)) } } else null,
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = NeonCyan,
-                        unfocusedBorderColor = TextMuted,
-                        focusedLabelColor = NeonCyan,
-                        unfocusedLabelColor = TextMuted,
-                        focusedTextColor = TextPrimary,
-                        unfocusedTextColor = TextPrimary
+                        focusedBorderColor = MaterialTheme.colorScheme.primary,
+                        unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                        focusedLabelColor = MaterialTheme.colorScheme.primary,
+                        unfocusedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                        focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                        unfocusedTextColor = MaterialTheme.colorScheme.onSurface
                     ),
                     modifier = Modifier.fillMaxWidth().testTag("add_station_url")
                 )
@@ -66,12 +66,12 @@ fun AddStationDialog(
                     onValueChange = { genre = it },
                     label = { Text(stringResource(R.string.genre)) },
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = NeonCyan,
-                        unfocusedBorderColor = TextMuted,
-                        focusedLabelColor = NeonCyan,
-                        unfocusedLabelColor = TextMuted,
-                        focusedTextColor = TextPrimary,
-                        unfocusedTextColor = TextPrimary
+                        focusedBorderColor = MaterialTheme.colorScheme.primary,
+                        unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                        focusedLabelColor = MaterialTheme.colorScheme.primary,
+                        unfocusedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                        focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                        unfocusedTextColor = MaterialTheme.colorScheme.onSurface
                     ),
                     modifier = Modifier.fillMaxWidth().testTag("add_station_genre")
                 )
@@ -86,15 +86,15 @@ fun AddStationDialog(
                         onAddStation(name, url, genre)
                     }
                 },
-                colors = ButtonDefaults.buttonColors(containerColor = NeonCyan),
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
                 modifier = Modifier.testTag("submit_add_station")
             ) {
-                Text(stringResource(R.string.add_custom_station), color = DarkBackground)
+                Text(stringResource(R.string.add_custom_station), color = MaterialTheme.colorScheme.background)
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text(stringResource(R.string.close), color = TextMuted)
+                Text(stringResource(R.string.close), color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f))
             }
         }
     )

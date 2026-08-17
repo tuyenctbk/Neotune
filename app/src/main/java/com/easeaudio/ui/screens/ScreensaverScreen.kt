@@ -152,7 +152,7 @@ fun ScreensaverScreen(
     BoxWithConstraints(
         modifier = modifier
             .fillMaxSize()
-            .background(DarkBackground)
+            .background(MaterialTheme.colorScheme.background)
             .focusRequester(containerFocusRequester)
             .focusable()
             .onKeyEvent { keyEvent ->
@@ -249,11 +249,11 @@ fun ScreensaverScreen(
                 if (sleepTimerRemaining != null) {
                     var isSleepPillFocused by remember { mutableStateOf(false) }
                     Surface(
-                        color = NeonCyan.copy(alpha = 0.15f),
+                        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.15f),
                         shape = RoundedCornerShape(20.dp),
                         border = BorderStroke(
                             width = if (isSleepPillFocused) 2.dp else 1.dp,
-                            color = if (isSleepPillFocused) NeonCyan else NeonCyan.copy(alpha = 0.4f)
+                            color = if (isSleepPillFocused) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.primary.copy(alpha = 0.4f)
                         ),
                         modifier = Modifier
                             .onFocusChanged {
@@ -273,14 +273,14 @@ fun ScreensaverScreen(
                             Icon(
                                 imageVector = Icons.Filled.Bedtime,
                                 contentDescription = null,
-                                tint = NeonCyan,
+                                tint = MaterialTheme.colorScheme.primary,
                                 modifier = Modifier.size(16.dp)
                             )
                             Spacer(modifier = Modifier.width(6.dp))
                             Text(
                                 text = stringResource(R.string.sleeping_in, sleepTimerRemaining),
                                 style = MaterialTheme.typography.labelSmall,
-                                color = TextPrimary,
+                                color = MaterialTheme.colorScheme.onSurface,
                                 fontWeight = FontWeight.Medium
                             )
                         }
@@ -302,10 +302,10 @@ fun ScreensaverScreen(
                         }
                         .scale(if (isDimFocused) 1.15f else 1.0f)
                         .clip(CircleShape)
-                        .background(if (isDimFocused) DarkSurfaceVariant else Color.Black.copy(alpha = 0.4f))
+                        .background(if (isDimFocused) MaterialTheme.colorScheme.surfaceVariant else Color.Black.copy(alpha = 0.4f))
                         .border(
                             width = if (isDimFocused) 2.5.dp else 0.dp,
-                            color = if (isDimFocused) NeonCyan else Color.Transparent,
+                            color = if (isDimFocused) MaterialTheme.colorScheme.primary else Color.Transparent,
                             shape = CircleShape
                         )
                         .testTag("btn_ambient_dim")
@@ -313,7 +313,7 @@ fun ScreensaverScreen(
                     Icon(
                         imageVector = if (isDimmed) Icons.Filled.LightMode else Icons.Outlined.BrightnessMedium,
                         contentDescription = stringResource(R.string.night_dim),
-                        tint = if (isDimmed) NeonCyan else TextSecondary
+                        tint = if (isDimmed) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             }
@@ -329,7 +329,7 @@ fun ScreensaverScreen(
                     text = currentTime,
                     fontSize = if (isCompactHeight) 46.sp else 64.sp,
                     fontWeight = FontWeight.ExtraLight,
-                    color = TextPrimary.copy(alpha = if (isDimmed) 0.7f else 0.95f),
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = if (isDimmed) 0.7f else 0.95f),
                     letterSpacing = 2.sp,
                     style = MaterialTheme.typography.displayLarge
                 )
@@ -339,7 +339,7 @@ fun ScreensaverScreen(
                 Text(
                     text = currentDate,
                     style = if (isCompactHeight) MaterialTheme.typography.titleSmall else MaterialTheme.typography.titleMedium,
-                    color = NeonCyan.copy(alpha = if (isDimmed) 0.6f else 0.85f),
+                    color = MaterialTheme.colorScheme.primary.copy(alpha = if (isDimmed) 0.6f else 0.85f),
                     fontWeight = FontWeight.Medium,
                     letterSpacing = 1.sp
                 )
@@ -360,7 +360,7 @@ fun ScreensaverScreen(
                 ) {
                     if (currentStation != null) {
                         Surface(
-                            color = DarkSurface.copy(alpha = if (isDimmed) 0.5f else 0.8f),
+                            color = MaterialTheme.colorScheme.surface.copy(alpha = if (isDimmed) 0.5f else 0.8f),
                             shape = RoundedCornerShape(20.dp),
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -379,14 +379,14 @@ fun ScreensaverScreen(
                                     Icon(
                                         imageVector = Icons.Filled.MusicNote,
                                         contentDescription = null,
-                                        tint = NeonCyan,
+                                        tint = MaterialTheme.colorScheme.primary,
                                         modifier = Modifier.size(16.dp)
                                     )
                                     Spacer(modifier = Modifier.width(6.dp))
                                     Text(
                                         text = streamTitle ?: currentStation.genre,
                                         style = if (isCompactHeight) MaterialTheme.typography.titleMedium else MaterialTheme.typography.titleLarge,
-                                        color = TextPrimary,
+                                        color = MaterialTheme.colorScheme.onSurface,
                                         fontWeight = FontWeight.Bold,
                                         textAlign = TextAlign.Center,
                                         maxLines = 1,
@@ -403,15 +403,15 @@ fun ScreensaverScreen(
                                     Text(
                                         text = currentStation.name,
                                         style = MaterialTheme.typography.bodyMedium,
-                                        color = TextSecondary,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                                         maxLines = 1,
                                         overflow = TextOverflow.Ellipsis
                                     )
-                                    Text("•", color = TextMuted)
+                                    Text("•", color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f))
                                     Text(
                                         text = currentStation.bitrate,
                                         style = MaterialTheme.typography.labelSmall,
-                                        color = NeonCyan,
+                                        color = MaterialTheme.colorScheme.primary,
                                         fontWeight = FontWeight.SemiBold
                                     )
                                 }
@@ -426,21 +426,21 @@ fun ScreensaverScreen(
                                         .height(30.dp)
                                         .fillMaxWidth(0.55f),
                                     style = VisualizerStyle.ROUNDED_BARS,
-                                    primaryColor = NeonCyan,
-                                    secondaryColor = NeonPurple,
-                                    accentColor = NeonPink
+                                    primaryColor = MaterialTheme.colorScheme.primary,
+                                    secondaryColor = MaterialTheme.colorScheme.secondary,
+                                    accentColor = MaterialTheme.colorScheme.tertiary
                                 )
                             }
                         }
                     } else {
                         Surface(
-                            color = DarkSurface.copy(alpha = 0.6f),
+                            color = MaterialTheme.colorScheme.surface.copy(alpha = 0.6f),
                             shape = RoundedCornerShape(18.dp),
                             modifier = Modifier.padding(8.dp)
                         ) {
                             Text(
                                 text = stringResource(R.string.tap_tuner_pick_station),
-                                color = TextSecondary,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 style = MaterialTheme.typography.bodyMedium,
                                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp)
                             )
@@ -452,7 +452,7 @@ fun ScreensaverScreen(
                     Text(
                         text = stringResource(R.string.tap_for_ambient_controls),
                         style = MaterialTheme.typography.labelSmall,
-                        color = TextMuted.copy(alpha = 0.7f),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
                         textAlign = TextAlign.Center
                     )
                 }
@@ -467,7 +467,7 @@ fun ScreensaverScreen(
                 Surface(
                     color = Color(0xFF101216).copy(alpha = 0.95f),
                     shape = RoundedCornerShape(24.dp),
-                    border = BorderStroke(1.dp, CardBorder.copy(alpha = 0.8f)),
+                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.8f)),
                     shadowElevation = 16.dp,
                     modifier = Modifier
                         .fillMaxWidth()
@@ -486,15 +486,15 @@ fun ScreensaverScreen(
                                 Text(
                                     text = currentStation.name,
                                     style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-                                    color = TextPrimary,
+                                    color = MaterialTheme.colorScheme.onSurface,
                                     maxLines = 1,
                                     overflow = TextOverflow.Ellipsis
                                 )
-                                Text(" • ", color = TextMuted)
+                                Text(" • ", color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f))
                                 Text(
                                     text = streamTitle ?: currentStation.genre,
                                     style = MaterialTheme.typography.bodySmall,
-                                    color = NeonCyan,
+                                    color = MaterialTheme.colorScheme.primary,
                                     maxLines = 1,
                                     overflow = TextOverflow.Ellipsis
                                 )
@@ -513,7 +513,7 @@ fun ScreensaverScreen(
                             Icon(
                                 imageVector = Icons.Outlined.Wallpaper,
                                 contentDescription = null,
-                                tint = TextMuted,
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
                                 modifier = Modifier
                                     .size(16.dp)
                                     .padding(end = 2.dp)
@@ -530,15 +530,15 @@ fun ScreensaverScreen(
 
                                 Surface(
                                     shape = RoundedCornerShape(20.dp),
-                                    color = if (isSelected) ActivePill else if (isChipFocused) DarkSurfaceVariant else DarkSurfaceVariant.copy(alpha = 0.45f),
+                                    color = if (isSelected) MaterialTheme.colorScheme.primaryContainer else if (isChipFocused) MaterialTheme.colorScheme.surfaceVariant else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.45f),
                                     border = BorderStroke(
                                         width = if (isChipFocused) 2.5.dp else if (isSelected) 1.5.dp else 1.dp,
                                         brush = if (isChipFocused) {
-                                            Brush.horizontalGradient(listOf(NeonCyan, Color.White, NeonCyan))
+                                            Brush.horizontalGradient(listOf(MaterialTheme.colorScheme.primary, Color.White, MaterialTheme.colorScheme.primary))
                                         } else if (isSelected) {
-                                            Brush.horizontalGradient(listOf(NeonCyan, NeonCyan.copy(alpha = 0.6f)))
+                                            Brush.horizontalGradient(listOf(MaterialTheme.colorScheme.primary, MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)))
                                         } else {
-                                            Brush.horizontalGradient(listOf(CardBorder, CardBorder))
+                                            Brush.horizontalGradient(listOf(MaterialTheme.colorScheme.outline, MaterialTheme.colorScheme.outline))
                                         }
                                     ),
                                     modifier = Modifier
@@ -550,7 +550,7 @@ fun ScreensaverScreen(
                                         .shadow(
                                             elevation = if (isChipFocused) 10.dp else 0.dp,
                                             shape = RoundedCornerShape(20.dp),
-                                            spotColor = NeonCyan
+                                            spotColor = MaterialTheme.colorScheme.primary
                                         )
                                         .clickable {
                                             selectedTheme = theme
@@ -565,7 +565,7 @@ fun ScreensaverScreen(
                                             Icon(
                                                 imageVector = Icons.Filled.Check,
                                                 contentDescription = null,
-                                                tint = DarkBackground,
+                                                tint = MaterialTheme.colorScheme.background,
                                                 modifier = Modifier.size(13.dp)
                                             )
                                             Spacer(modifier = Modifier.width(4.dp))
@@ -575,7 +575,7 @@ fun ScreensaverScreen(
                                             style = MaterialTheme.typography.labelSmall.copy(
                                                 fontWeight = if (isSelected || isChipFocused) FontWeight.Black else FontWeight.Medium
                                             ),
-                                            color = if (isSelected) DarkBackground else if (isChipFocused) Color.White else TextSecondary
+                                            color = if (isSelected) MaterialTheme.colorScheme.background else if (isChipFocused) Color.White else MaterialTheme.colorScheme.onSurfaceVariant
                                         )
                                     }
                                 }
@@ -604,13 +604,13 @@ fun ScreensaverScreen(
                                     .shadow(
                                         elevation = if (isTimerFocused) 10.dp else 0.dp,
                                         shape = CircleShape,
-                                        spotColor = NeonCyan
+                                        spotColor = MaterialTheme.colorScheme.primary
                                     )
                                     .clip(CircleShape)
-                                    .background(if (sleepTimerRemaining != null) ActivePill else if (isTimerFocused) DarkSurfaceVariant else DarkSurfaceVariant.copy(alpha = 0.6f))
+                                    .background(if (sleepTimerRemaining != null) MaterialTheme.colorScheme.primaryContainer else if (isTimerFocused) MaterialTheme.colorScheme.surfaceVariant else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f))
                                     .border(
                                         width = if (isTimerFocused) 2.5.dp else 0.dp,
-                                        color = if (isTimerFocused) NeonCyan else Color.Transparent,
+                                        color = if (isTimerFocused) MaterialTheme.colorScheme.primary else Color.Transparent,
                                         shape = CircleShape
                                     )
                                     .size(46.dp)
@@ -618,7 +618,7 @@ fun ScreensaverScreen(
                                 Icon(
                                     imageVector = Icons.Outlined.Bedtime,
                                     contentDescription = stringResource(R.string.sleep_timer),
-                                    tint = if (sleepTimerRemaining != null) DarkBackground else if (isTimerFocused) Color.White else TextSecondary,
+                                    tint = if (sleepTimerRemaining != null) MaterialTheme.colorScheme.onPrimaryContainer else if (isTimerFocused) Color.White else MaterialTheme.colorScheme.onSurfaceVariant,
                                     modifier = Modifier.size(20.dp)
                                 )
                             }
@@ -641,15 +641,15 @@ fun ScreensaverScreen(
                                     .shadow(
                                         elevation = if (isPlayFocused) 16.dp else 4.dp,
                                         shape = CircleShape,
-                                        spotColor = NeonCyan,
-                                        ambientColor = NeonCyan.copy(alpha = 0.6f)
+                                        spotColor = MaterialTheme.colorScheme.primary,
+                                        ambientColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
                                     )
                                     .clip(CircleShape)
-                                    .background(NeonCyan)
+                                    .background(MaterialTheme.colorScheme.primary)
                                     .border(
                                         width = if (isPlayFocused) 3.5.dp else 0.dp,
                                         brush = if (isPlayFocused) {
-                                            Brush.horizontalGradient(listOf(Color.White, NeonCyan, Color.White))
+                                            Brush.horizontalGradient(listOf(Color.White, MaterialTheme.colorScheme.primary, Color.White))
                                         } else Brush.horizontalGradient(listOf(Color.Transparent, Color.Transparent)),
                                         shape = CircleShape
                                     )
@@ -664,7 +664,7 @@ fun ScreensaverScreen(
                                 Icon(
                                     imageVector = if (isPlaying) Icons.Filled.Pause else Icons.Filled.PlayArrow,
                                     contentDescription = if (isPlaying) "Pause" else "Play",
-                                    tint = DarkBackground,
+                                    tint = MaterialTheme.colorScheme.background,
                                     modifier = Modifier.size(28.dp)
                                 )
                             }
@@ -685,13 +685,13 @@ fun ScreensaverScreen(
                                         .shadow(
                                             elevation = if (isFavFocused) 10.dp else 0.dp,
                                             shape = CircleShape,
-                                            spotColor = NeonCyan
+                                            spotColor = MaterialTheme.colorScheme.primary
                                         )
                                         .clip(CircleShape)
-                                        .background(if (isFavFocused) DarkSurfaceVariant else DarkSurfaceVariant.copy(alpha = 0.6f))
+                                        .background(if (isFavFocused) MaterialTheme.colorScheme.surfaceVariant else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f))
                                         .border(
                                             width = if (isFavFocused) 2.5.dp else 0.dp,
-                                            color = if (isFavFocused) NeonCyan else Color.Transparent,
+                                            color = if (isFavFocused) MaterialTheme.colorScheme.primary else Color.Transparent,
                                             shape = CircleShape
                                         )
                                         .size(46.dp)
@@ -699,7 +699,7 @@ fun ScreensaverScreen(
                                     Icon(
                                         imageVector = if (currentStation.isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
                                         contentDescription = "Favorite",
-                                        tint = if (currentStation.isFavorite) FavoriteHeartColor else if (isFavFocused) Color.White else TextSecondary,
+                                        tint = if (currentStation.isFavorite) FavoriteHeartColor else if (isFavFocused) Color.White else MaterialTheme.colorScheme.onSurfaceVariant,
                                         modifier = Modifier.size(20.dp)
                                     )
                                 }
@@ -714,6 +714,8 @@ fun ScreensaverScreen(
 
 @Composable
 private fun AuroraGradientCanvas(phase: Float) {
+    val primaryColor = MaterialTheme.colorScheme.primary
+    val secondaryColor = MaterialTheme.colorScheme.secondary
     Canvas(modifier = Modifier.fillMaxSize()) {
         val width = size.width
         val height = size.height
@@ -732,7 +734,7 @@ private fun AuroraGradientCanvas(phase: Float) {
         val yOffset1 = (sin(phase * 0.7f) * 100f)
         drawCircle(
             brush = Brush.radialGradient(
-                colors = listOf(NeonPurple.copy(alpha = 0.35f), Color.Transparent),
+                colors = listOf(secondaryColor.copy(alpha = 0.35f), Color.Transparent),
                 center = Offset(width * 0.3f + xOffset1, height * 0.35f + yOffset1),
                 radius = width * 0.8f
             )
@@ -742,7 +744,7 @@ private fun AuroraGradientCanvas(phase: Float) {
         val yOffset2 = (sin(phase * 0.9f) * 120f)
         drawCircle(
             brush = Brush.radialGradient(
-                colors = listOf(NeonCyan.copy(alpha = 0.3f), Color.Transparent),
+                colors = listOf(primaryColor.copy(alpha = 0.3f), Color.Transparent),
                 center = Offset(width * 0.7f + xOffset2, height * 0.65f + yOffset2),
                 radius = width * 0.75f
             )

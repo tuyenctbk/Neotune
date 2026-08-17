@@ -26,8 +26,8 @@ fun AttributionDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        containerColor = DarkSurface,
-        titleContentColor = TextPrimary,
+        containerColor = MaterialTheme.colorScheme.surface,
+        titleContentColor = MaterialTheme.colorScheme.onSurface,
         shape = RoundedCornerShape(24.dp),
         title = {
             Row(
@@ -37,7 +37,7 @@ fun AttributionDialog(
                 Icon(
                     imageVector = Icons.Filled.Info,
                     contentDescription = null,
-                    tint = NeonCyan,
+                    tint = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.size(28.dp)
                 )
                 Text(
@@ -55,12 +55,12 @@ fun AttributionDialog(
                 Text(
                     text = stringResource(id = R.string.data_provider_desc),
                     style = MaterialTheme.typography.bodyLarge,
-                    color = TextPrimary
+                    color = MaterialTheme.colorScheme.onSurface
                 )
                 Text(
                     text = stringResource(id = R.string.data_provider_gratitude),
                     style = MaterialTheme.typography.bodyMedium,
-                    color = TextSecondary
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
         },
@@ -68,8 +68,8 @@ fun AttributionDialog(
             Button(
                 onClick = onDismiss,
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = NeonCyan,
-                    contentColor = DarkBackground
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.background
                 ),
                 shape = RoundedCornerShape(12.dp),
                 modifier = Modifier

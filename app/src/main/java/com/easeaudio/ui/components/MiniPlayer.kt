@@ -83,11 +83,11 @@ fun MiniPlayer(
                     )
                     .border(
                         width = if (showFocus) 2.5.dp else 0.dp,
-                        color = if (showFocus) NeonCyan else Color.Transparent,
+                        color = if (showFocus) MaterialTheme.colorScheme.primary else Color.Transparent,
                         shape = RoundedCornerShape(16.dp)
                     )
                     .testTag("mini_player_bar"),
-                color = DarkSurfaceVariant,
+                color = MaterialTheme.colorScheme.surfaceVariant,
                 tonalElevation = 8.dp,
                 shadowElevation = 6.dp
             ) {
@@ -125,7 +125,7 @@ fun MiniPlayer(
                             Text(
                                 text = station.name,
                                 style = MaterialTheme.typography.titleMedium,
-                                color = TextPrimary,
+                                color = MaterialTheme.colorScheme.onSurface,
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis,
                                 modifier = Modifier.weight(1f, fill = false)
@@ -136,11 +136,11 @@ fun MiniPlayer(
                             Text(
                                 text = stringResource(if (isPodcast) R.string.badge_podcast else R.string.live_badge),
                                 style = MaterialTheme.typography.labelMedium,
-                                color = DarkBackground,
+                                color = MaterialTheme.colorScheme.background,
                                 fontWeight = FontWeight.Bold,
                                 modifier = Modifier
                                     .clip(RoundedCornerShape(4.dp))
-                                    .background(NeonCyan)
+                                    .background(MaterialTheme.colorScheme.primary)
                                     .padding(horizontal = 4.dp, vertical = 1.dp)
                             )
                         }
@@ -155,21 +155,21 @@ fun MiniPlayer(
                                         .weight(1f)
                                         .height(3.dp)
                                         .clip(RoundedCornerShape(2.dp)),
-                                    color = NeonCyan,
-                                    trackColor = DarkSurface
+                                    color = MaterialTheme.colorScheme.primary,
+                                    trackColor = MaterialTheme.colorScheme.surface
                                 )
                                 Spacer(modifier = Modifier.width(6.dp))
                                 Text(
                                     text = "${formatDurationShort(currentPosition)} / ${formatDurationShort(totalDuration)}",
                                     style = MaterialTheme.typography.labelSmall.copy(fontSize = 10.sp),
-                                    color = TextMuted
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
                                 )
                             }
                         } else {
                             Text(
                                 text = if (isLoading) stringResource(R.string.buffering_stream) else (streamTitle ?: station.genre),
                                 style = MaterialTheme.typography.bodyMedium,
-                                color = if (isLoading) NeonCyan else TextSecondary,
+                                color = if (isLoading) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis
                             )
@@ -186,9 +186,9 @@ fun MiniPlayer(
                                 .height(20.dp)
                                 .padding(horizontal = 2.dp),
                             style = VisualizerStyle.ROUNDED_BARS,
-                            primaryColor = NeonCyan,
-                            secondaryColor = NeonPurple,
-                            accentColor = NeonPink
+                            primaryColor = MaterialTheme.colorScheme.primary,
+                            secondaryColor = MaterialTheme.colorScheme.secondary,
+                            accentColor = MaterialTheme.colorScheme.tertiary
                         )
                     }
 
@@ -210,7 +210,7 @@ fun MiniPlayer(
                         Icon(
                             imageVector = if (station.isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
                             contentDescription = "Favorite",
-                            tint = if (isFavFocused) DarkBackground else (if (station.isFavorite) FavoriteHeartColor else TextMuted),
+                            tint = if (isFavFocused) MaterialTheme.colorScheme.background else (if (station.isFavorite) FavoriteHeartColor else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)),
                             modifier = Modifier.size(20.dp)
                         )
                     }
@@ -226,13 +226,13 @@ fun MiniPlayer(
                             .size(36.dp)
                             .onFocusChanged { isExpandFocused = it.isFocused }
                             .clip(CircleShape)
-                            .background(if (isExpandFocused) NeonCyan else Color.Transparent)
+                            .background(if (isExpandFocused) MaterialTheme.colorScheme.primary else Color.Transparent)
                             .testTag("mini_player_expand_fullscreen")
                     ) {
                         Icon(
                             imageVector = Icons.Filled.OpenInFull,
                             contentDescription = "Fullscreen Player",
-                            tint = if (isExpandFocused) DarkBackground else TextMuted,
+                            tint = if (isExpandFocused) MaterialTheme.colorScheme.background else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
                             modifier = Modifier.size(18.dp)
                         )
                     }
@@ -250,7 +250,7 @@ fun MiniPlayer(
                             .size(40.dp)
                             .onFocusChanged { isPlayFocused = it.isFocused }
                             .clip(CircleShape)
-                            .background(if (isPlayFocused) NeonCyan else PlayButtonContainer)
+                            .background(if (isPlayFocused) MaterialTheme.colorScheme.primary else PlayButtonContainer)
                             .testTag("mini_player_play_pause")
                     ) {
                         if (isLoading) {

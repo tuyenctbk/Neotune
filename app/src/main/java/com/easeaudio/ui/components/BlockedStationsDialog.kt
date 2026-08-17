@@ -64,9 +64,9 @@ fun BlockedStationsDialog(
                 .fillMaxWidth(0.92f)
                 .fillMaxHeight(0.88f)
                 .clip(RoundedCornerShape(24.dp))
-                .border(1.dp, NeonCyan.copy(alpha = 0.4f), RoundedCornerShape(24.dp))
+                .border(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.4f), RoundedCornerShape(24.dp))
                 .testTag("dialog_blocked_stations"),
-            color = DarkSurface
+            color = MaterialTheme.colorScheme.surface
         ) {
             Column(
                 modifier = Modifier
@@ -83,7 +83,7 @@ fun BlockedStationsDialog(
                         Icon(
                             imageVector = Icons.Filled.Shield,
                             contentDescription = null,
-                            tint = NeonCyan,
+                            tint = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.size(24.dp)
                         )
                         Spacer(modifier = Modifier.width(8.dp))
@@ -93,7 +93,7 @@ fun BlockedStationsDialog(
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 18.sp
                             ),
-                            color = TextPrimary
+                            color = MaterialTheme.colorScheme.onSurface
                         )
                     }
                     IconButton(
@@ -103,7 +103,7 @@ fun BlockedStationsDialog(
                         Icon(
                             imageVector = Icons.Filled.Close,
                             contentDescription = "Close",
-                            tint = TextMuted,
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
                             modifier = Modifier.size(18.dp)
                         )
                     }
@@ -123,7 +123,7 @@ fun BlockedStationsDialog(
                                 fontWeight = FontWeight.Bold,
                                 letterSpacing = 1.1.sp
                             ),
-                            color = NeonCyan
+                            color = MaterialTheme.colorScheme.primary
                         )
                     }
 
@@ -169,13 +169,13 @@ fun BlockedStationsDialog(
                                 fontWeight = FontWeight.Bold,
                                 letterSpacing = 1.1.sp
                             ),
-                            color = NeonCyan
+                            color = MaterialTheme.colorScheme.primary
                         )
                     }
 
                     item {
                         Card(
-                            colors = CardDefaults.cardColors(containerColor = DarkBackground.copy(alpha = 0.6f)),
+                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background.copy(alpha = 0.6f)),
                             shape = RoundedCornerShape(14.dp),
                             modifier = Modifier.fillMaxWidth()
                         ) {
@@ -187,7 +187,7 @@ fun BlockedStationsDialog(
                                 Text(
                                     text = stringResource(R.string.custom_filter_keywords_desc),
                                     style = MaterialTheme.typography.bodySmall,
-                                    color = TextSecondary
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
 
                                 Spacer(modifier = Modifier.height(10.dp))
@@ -204,17 +204,17 @@ fun BlockedStationsDialog(
                                             Text(
                                                 text = stringResource(R.string.add_keyword_hint),
                                                 style = MaterialTheme.typography.bodySmall,
-                                                color = TextMuted
+                                                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
                                             )
                                         },
                                         singleLine = true,
                                         modifier = Modifier.weight(1f),
                                         shape = RoundedCornerShape(10.dp),
                                         colors = OutlinedTextFieldDefaults.colors(
-                                            focusedBorderColor = NeonCyan,
-                                            unfocusedBorderColor = DarkSurfaceVariant,
-                                            focusedTextColor = TextPrimary,
-                                            unfocusedTextColor = TextPrimary
+                                            focusedBorderColor = MaterialTheme.colorScheme.primary,
+                                            unfocusedBorderColor = MaterialTheme.colorScheme.surfaceVariant,
+                                            focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                                            unfocusedTextColor = MaterialTheme.colorScheme.onSurface
                                         )
                                     )
 
@@ -228,8 +228,8 @@ fun BlockedStationsDialog(
                                             }
                                         },
                                         colors = ButtonDefaults.buttonColors(
-                                            containerColor = NeonCyan,
-                                            contentColor = DarkBackground
+                                            containerColor = MaterialTheme.colorScheme.primary,
+                                            contentColor = MaterialTheme.colorScheme.background
                                         ),
                                         shape = RoundedCornerShape(10.dp),
                                         contentPadding = PaddingValues(horizontal = 14.dp, vertical = 12.dp)
@@ -258,8 +258,8 @@ fun BlockedStationsDialog(
                                         filterConfig.customKeywords.forEach { keyword ->
                                             Surface(
                                                 shape = RoundedCornerShape(20.dp),
-                                                color = NeonCyan.copy(alpha = 0.15f),
-                                                border = androidx.compose.foundation.BorderStroke(1.dp, NeonCyan.copy(alpha = 0.4f))
+                                                color = MaterialTheme.colorScheme.primary.copy(alpha = 0.15f),
+                                                border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.4f))
                                             ) {
                                                 Row(
                                                     verticalAlignment = Alignment.CenterVertically,
@@ -268,20 +268,20 @@ fun BlockedStationsDialog(
                                                     Icon(
                                                         imageVector = Icons.Filled.Tag,
                                                         contentDescription = null,
-                                                        tint = NeonCyan,
+                                                        tint = MaterialTheme.colorScheme.primary,
                                                         modifier = Modifier.size(12.dp)
                                                     )
                                                     Spacer(modifier = Modifier.width(4.dp))
                                                     Text(
                                                         text = keyword,
                                                         style = MaterialTheme.typography.labelSmall,
-                                                        color = TextPrimary
+                                                        color = MaterialTheme.colorScheme.onSurface
                                                     )
                                                     Spacer(modifier = Modifier.width(6.dp))
                                                     Icon(
                                                         imageVector = Icons.Filled.Close,
                                                         contentDescription = "Remove",
-                                                        tint = TextMuted,
+                                                        tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
                                                         modifier = Modifier
                                                             .size(14.dp)
                                                             .clickable { onRemoveCustomKeyword(keyword) }
@@ -308,7 +308,7 @@ fun BlockedStationsDialog(
                                     Text(
                                         text = stringResource(R.string.no_custom_keywords),
                                         style = MaterialTheme.typography.bodySmall,
-                                        color = TextMuted
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
                                     )
                                 }
                             }
@@ -329,7 +329,7 @@ fun BlockedStationsDialog(
                                     fontWeight = FontWeight.Bold,
                                     letterSpacing = 1.1.sp
                                 ),
-                                color = NeonCyan
+                                color = MaterialTheme.colorScheme.primary
                             )
                             if (blockedStations.isNotEmpty()) {
                                 TextButton(
@@ -365,14 +365,14 @@ fun BlockedStationsDialog(
                                     Icon(
                                         imageVector = Icons.Filled.Block,
                                         contentDescription = null,
-                                        tint = TextMuted.copy(alpha = 0.4f),
+                                        tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f),
                                         modifier = Modifier.size(32.dp)
                                     )
                                     Spacer(modifier = Modifier.height(6.dp))
                                     Text(
                                         text = stringResource(R.string.no_blocked_stations),
                                         style = MaterialTheme.typography.bodyMedium,
-                                        color = TextMuted,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
                                         textAlign = TextAlign.Center
                                     )
                                 }
@@ -381,7 +381,7 @@ fun BlockedStationsDialog(
                     } else {
                         items(blockedStations, key = { it.id }) { station ->
                             Card(
-                                colors = CardDefaults.cardColors(containerColor = DarkBackground.copy(alpha = 0.6f)),
+                                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background.copy(alpha = 0.6f)),
                                 shape = RoundedCornerShape(12.dp),
                                 modifier = Modifier.fillMaxWidth()
                             ) {
@@ -396,14 +396,14 @@ fun BlockedStationsDialog(
                                         Text(
                                             text = station.name,
                                             style = MaterialTheme.typography.titleSmall,
-                                            color = TextPrimary,
+                                            color = MaterialTheme.colorScheme.onSurface,
                                             maxLines = 1,
                                             overflow = TextOverflow.Ellipsis
                                         )
                                         Text(
                                             text = "${station.genre} • ${station.country}",
                                             style = MaterialTheme.typography.bodySmall,
-                                            color = TextMuted,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
                                             maxLines = 1,
                                             overflow = TextOverflow.Ellipsis
                                         )
@@ -411,8 +411,8 @@ fun BlockedStationsDialog(
                                     Button(
                                         onClick = { onUnblockStation(station.id) },
                                         colors = ButtonDefaults.buttonColors(
-                                            containerColor = NeonCyan.copy(alpha = 0.15f),
-                                            contentColor = NeonCyan
+                                            containerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.15f),
+                                            contentColor = MaterialTheme.colorScheme.primary
                                         ),
                                         shape = RoundedCornerShape(8.dp),
                                         contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp),
@@ -435,8 +435,8 @@ fun BlockedStationsDialog(
                 Button(
                     onClick = onDismiss,
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = NeonCyan,
-                        contentColor = DarkBackground
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.background
                     ),
                     shape = RoundedCornerShape(12.dp),
                     modifier = Modifier
@@ -462,7 +462,7 @@ private fun FilterSwitchRow(
     onCheckedChange: (Boolean) -> Unit
 ) {
     Card(
-        colors = CardDefaults.cardColors(containerColor = DarkBackground.copy(alpha = 0.6f)),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background.copy(alpha = 0.6f)),
         shape = RoundedCornerShape(14.dp),
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -480,7 +480,7 @@ private fun FilterSwitchRow(
                 Icon(
                     imageVector = icon,
                     contentDescription = null,
-                    tint = TextMuted,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
                     modifier = Modifier.size(22.dp)
                 )
                 Spacer(modifier = Modifier.width(10.dp))
@@ -488,13 +488,13 @@ private fun FilterSwitchRow(
                     Text(
                         text = title,
                         style = MaterialTheme.typography.titleSmall,
-                        color = TextPrimary,
+                        color = MaterialTheme.colorScheme.onSurface,
                         fontWeight = FontWeight.SemiBold
                     )
                     Text(
                         text = description,
                         style = MaterialTheme.typography.bodySmall,
-                        color = TextSecondary
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             }
@@ -502,8 +502,8 @@ private fun FilterSwitchRow(
                 checked = isChecked,
                 onCheckedChange = onCheckedChange,
                 colors = SwitchDefaults.colors(
-                    checkedThumbColor = DarkBackground,
-                    checkedTrackColor = NeonCyan
+                    checkedThumbColor = MaterialTheme.colorScheme.background,
+                    checkedTrackColor = MaterialTheme.colorScheme.primary
                 )
             )
         }

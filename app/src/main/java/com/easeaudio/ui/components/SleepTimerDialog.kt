@@ -28,14 +28,14 @@ fun SleepTimerDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        containerColor = DarkSurface,
-        titleContentColor = TextPrimary,
+        containerColor = MaterialTheme.colorScheme.surface,
+        titleContentColor = MaterialTheme.colorScheme.onSurface,
         title = {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
                     imageVector = Icons.Filled.Bedtime,
                     contentDescription = null,
-                    tint = NeonPurple,
+                    tint = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.padding(end = 8.dp)
                 )
                 Text(stringResource(R.string.sleep_timer))
@@ -48,23 +48,26 @@ fun SleepTimerDialog(
                     Text(
                         text = stringResource(R.string.sleeping_in, activeTimerMinutes),
                         style = MaterialTheme.typography.bodyLarge,
-                        color = NeonCyan
+                        color = MaterialTheme.colorScheme.primary
                     )
                     Button(
                         onClick = onCancelTimer,
-                        colors = ButtonDefaults.buttonColors(containerColor = NeonPink, contentColor = DarkBackground),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.tertiary, 
+                            contentColor = MaterialTheme.colorScheme.background
+                        ),
                         modifier = Modifier
                             .fillMaxWidth()
                             .testTag("cancel_sleep_timer")
                     ) {
                         Text(stringResource(R.string.close))
                     }
-                    HorizontalDivider(color = CardBorder)
+                    HorizontalDivider(color = MaterialTheme.colorScheme.outline)
                 }
 
                 Text(
                     text = "Custom Duration: ${customMinutes.toInt()} minutes",
-                    color = TextPrimary,
+                    color = MaterialTheme.colorScheme.onSurface,
                     style = MaterialTheme.typography.bodyMedium
                 )
                 Slider(
@@ -72,15 +75,18 @@ fun SleepTimerDialog(
                     onValueChange = { customMinutes = it },
                     valueRange = 1f..120f,
                     colors = SliderDefaults.colors(
-                        thumbColor = NeonCyan,
-                        activeTrackColor = NeonCyan,
-                        inactiveTrackColor = CardBorder
+                        thumbColor = MaterialTheme.colorScheme.primary,
+                        activeTrackColor = MaterialTheme.colorScheme.primary,
+                        inactiveTrackColor = MaterialTheme.colorScheme.outline
                     ),
                     modifier = Modifier.testTag("sleep_timer_custom_slider")
                 )
                 Button(
                     onClick = { onSelectMinutes(customMinutes.toInt()) },
-                    colors = ButtonDefaults.buttonColors(containerColor = NeonCyan, contentColor = DarkBackground),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary, 
+                        contentColor = MaterialTheme.colorScheme.background
+                    ),
                     modifier = Modifier
                         .fillMaxWidth()
                         .testTag("btn_set_custom_timer")
@@ -88,9 +94,13 @@ fun SleepTimerDialog(
                     Text(stringResource(R.string.set_custom_timer))
                 }
 
-                HorizontalDivider(color = CardBorder, modifier = Modifier.padding(vertical = 4.dp))
+                HorizontalDivider(color = MaterialTheme.colorScheme.outline, modifier = Modifier.padding(vertical = 4.dp))
 
-                Text(stringResource(R.string.choose_preset_timer), color = TextSecondary, style = MaterialTheme.typography.labelMedium)
+                Text(
+                    stringResource(R.string.choose_preset_timer), 
+                    color = MaterialTheme.colorScheme.onSurfaceVariant, 
+                    style = MaterialTheme.typography.labelMedium
+                )
 
                 presets.chunked(3).forEach { row ->
                     Row(
@@ -107,11 +117,11 @@ fun SleepTimerDialog(
                                     .testTag("sleep_timer_$mins"),
                                 border = BorderStroke(
                                     width = if (isMinsFocused) 2.dp else 1.dp,
-                                    color = if (isMinsFocused) NeonCyan else CardBorder
+                                    color = if (isMinsFocused) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline
                                 ),
                                 colors = ButtonDefaults.outlinedButtonColors(
-                                    containerColor = if (isMinsFocused) NeonCyan.copy(alpha = 0.15f) else Color.Transparent,
-                                    contentColor = if (isMinsFocused) NeonCyan else TextPrimary
+                                    containerColor = if (isMinsFocused) MaterialTheme.colorScheme.primary.copy(alpha = 0.15f) else Color.Transparent,
+                                    contentColor = if (isMinsFocused) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
                                 )
                             ) {
                                 Text(stringResource(R.string.mins_abbreviation, mins))
@@ -126,7 +136,7 @@ fun SleepTimerDialog(
                 onClick = onDismiss,
                 modifier = Modifier.testTag("close_sleep_timer_dialog")
             ) {
-                Text(stringResource(R.string.close), color = TextMuted)
+                Text(stringResource(R.string.close), color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f))
             }
         }
     )

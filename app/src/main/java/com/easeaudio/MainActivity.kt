@@ -326,8 +326,8 @@ fun MainAppContent(
                     SnackbarHost(hostState = snackbarHostState) { data ->
                         Snackbar(
                             snackbarData = data,
-                            containerColor = com.easeaudio.ui.theme.DarkSurfaceVariant,
-                            contentColor = com.easeaudio.ui.theme.TextPrimary,
+                            containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                            contentColor = MaterialTheme.colorScheme.onSurface,
                             shape = androidx.compose.foundation.shape.RoundedCornerShape(12.dp)
                         )
                     }

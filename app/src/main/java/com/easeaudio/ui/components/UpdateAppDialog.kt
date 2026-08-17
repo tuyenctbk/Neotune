@@ -46,9 +46,9 @@ fun UpdateAppDialog(
             modifier = Modifier
                 .fillMaxWidth(0.9f)
                 .clip(RoundedCornerShape(24.dp))
-                .border(1.dp, NeonCyan.copy(alpha = 0.4f), RoundedCornerShape(24.dp))
+                .border(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.4f), RoundedCornerShape(24.dp))
                 .testTag("dialog_update_app"),
-            color = DarkSurface
+            color = MaterialTheme.colorScheme.surface
         ) {
             Column(
                 modifier = Modifier
@@ -68,7 +68,7 @@ fun UpdateAppDialog(
                             fontWeight = FontWeight.Bold,
                             letterSpacing = 1.2.sp
                         ),
-                        color = if (updateInfo.isForceUpdate) Color(0xFFFF5252) else NeonCyan
+                        color = if (updateInfo.isForceUpdate) Color(0xFFFF5252) else MaterialTheme.colorScheme.primary
                     )
                     if (!updateInfo.isForceUpdate) {
                         IconButton(
@@ -78,7 +78,7 @@ fun UpdateAppDialog(
                             Icon(
                                 imageVector = Icons.Filled.Close,
                                 contentDescription = "Close",
-                                tint = TextMuted,
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
                                 modifier = Modifier.size(18.dp)
                             )
                         }
@@ -92,13 +92,13 @@ fun UpdateAppDialog(
                     modifier = Modifier
                         .size(72.dp)
                         .clip(CircleShape)
-                        .background(if (updateInfo.isForceUpdate) Color(0xFFFF5252).copy(alpha = 0.15f) else NeonCyan.copy(alpha = 0.15f)),
+                        .background(if (updateInfo.isForceUpdate) Color(0xFFFF5252).copy(alpha = 0.15f) else MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
                         imageVector = Icons.Filled.SystemUpdate,
                         contentDescription = null,
-                        tint = if (updateInfo.isForceUpdate) Color(0xFFFF5252) else NeonCyan,
+                        tint = if (updateInfo.isForceUpdate) Color(0xFFFF5252) else MaterialTheme.colorScheme.primary,
                         modifier = Modifier.size(38.dp)
                     )
                 }
@@ -111,7 +111,7 @@ fun UpdateAppDialog(
                         fontWeight = FontWeight.Bold,
                         fontSize = 20.sp
                     ),
-                    color = TextPrimary,
+                    color = MaterialTheme.colorScheme.onSurface,
                     textAlign = TextAlign.Center
                 )
 
@@ -126,7 +126,7 @@ fun UpdateAppDialog(
                 Text(
                     text = descriptionText,
                     style = MaterialTheme.typography.bodyMedium.copy(lineHeight = 20.sp),
-                    color = TextSecondary,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.padding(horizontal = 8.dp)
                 )
@@ -136,8 +136,8 @@ fun UpdateAppDialog(
                 Button(
                     onClick = onUpdateConfirmed,
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = if (updateInfo.isForceUpdate) Color(0xFFFF5252) else NeonCyan,
-                        contentColor = DarkBackground
+                        containerColor = if (updateInfo.isForceUpdate) Color(0xFFFF5252) else MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.background
                     ),
                     shape = RoundedCornerShape(14.dp),
                     elevation = ButtonDefaults.buttonElevation(defaultElevation = 6.dp),
@@ -167,7 +167,7 @@ fun UpdateAppDialog(
                         Text(
                             text = stringResource(R.string.remind_later_btn),
                             style = MaterialTheme.typography.labelLarge,
-                            color = TextMuted
+                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
                         )
                     }
                 }

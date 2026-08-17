@@ -34,16 +34,16 @@ fun EqualizerDialog(
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        containerColor = DarkSurface,
+        containerColor = MaterialTheme.colorScheme.surface,
         title = {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
                     imageVector = Icons.Filled.Equalizer,
                     contentDescription = null,
-                    tint = NeonCyan,
+                    tint = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.padding(end = 8.dp)
                 )
-                Text(stringResource(R.string.equalizer), color = TextPrimary)
+                Text(stringResource(R.string.equalizer), color = MaterialTheme.colorScheme.onSurface)
             }
         },
         text = {
@@ -57,10 +57,10 @@ fun EqualizerDialog(
                         .clip(RoundedCornerShape(12.dp))
                         .border(
                             width = if (isBoosterFocused) 2.dp else 0.dp,
-                            color = if (isBoosterFocused) NeonCyan else Color.Transparent,
+                            color = if (isBoosterFocused) MaterialTheme.colorScheme.primary else Color.Transparent,
                             shape = RoundedCornerShape(12.dp)
                         ),
-                    color = DarkSurfaceVariant
+                    color = MaterialTheme.colorScheme.surfaceVariant
                 ) {
                     Row(
                         modifier = Modifier
@@ -71,13 +71,13 @@ fun EqualizerDialog(
                         Column(modifier = Modifier.weight(1f)) {
                             Text(
                                 text = stringResource(R.string.loudness_booster),
-                                color = TextPrimary,
+                                color = MaterialTheme.colorScheme.onSurface,
                                 style = MaterialTheme.typography.bodyMedium,
                                 fontWeight = FontWeight.SemiBold
                             )
                             Text(
                                 text = stringResource(R.string.normalize_stream_volume),
-                                color = TextMuted,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
                                 style = MaterialTheme.typography.labelSmall
                             )
                         }
@@ -85,17 +85,17 @@ fun EqualizerDialog(
                             checked = isAudioBoosterEnabled,
                             onCheckedChange = onToggleAudioBooster,
                             colors = SwitchDefaults.colors(
-                                checkedThumbColor = DarkBackground,
-                                checkedTrackColor = NeonCyan
+                                checkedThumbColor = MaterialTheme.colorScheme.background,
+                                checkedTrackColor = MaterialTheme.colorScheme.primary
                             ),
                             modifier = Modifier.testTag("switch_audio_booster")
                         )
                     }
                 }
 
-                Divider(color = CardBorder, thickness = 1.dp)
+                HorizontalDivider(color = MaterialTheme.colorScheme.outline, thickness = 1.dp)
 
-                Text(stringResource(R.string.select_tuning_profile), color = TextSecondary, style = MaterialTheme.typography.bodyMedium)
+                Text(stringResource(R.string.select_tuning_profile), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodyMedium)
 
                 // Presets
                 presets.forEach { preset ->
@@ -110,7 +110,7 @@ fun EqualizerDialog(
         },
         confirmButton = {
             TextButton(onClick = onDismiss) {
-                Text(stringResource(R.string.done), color = NeonCyan)
+                Text(stringResource(R.string.done), color = MaterialTheme.colorScheme.primary)
             }
         }
     )
@@ -131,11 +131,11 @@ fun EqPresetItem(
             .clickable { onClick() }
             .border(
                 width = if (isFocused) 2.dp else 0.dp,
-                color = if (isFocused) NeonCyan else Color.Transparent,
+                color = if (isFocused) MaterialTheme.colorScheme.primary else Color.Transparent,
                 shape = RoundedCornerShape(12.dp)
             )
             .testTag("eq_preset_${preset.key}"),
-        color = if (isSelected) ActivePill else if (isFocused) DarkSurfaceVariant.copy(alpha = 0.85f) else DarkSurfaceVariant
+        color = if (isSelected) MaterialTheme.colorScheme.primaryContainer else if (isFocused) MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.85f) else MaterialTheme.colorScheme.surfaceVariant
     ) {
         Row(
             modifier = Modifier
@@ -145,7 +145,7 @@ fun EqPresetItem(
         ) {
             Text(
                 text = stringResource(preset.labelResId),
-                color = if (isSelected) DarkBackground else TextPrimary,
+                color = if (isSelected) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurface,
                 fontWeight = if (isSelected || isFocused) FontWeight.Bold else FontWeight.Normal
             )
             if (isSelected) {
@@ -153,7 +153,7 @@ fun EqPresetItem(
                     modifier = Modifier
                         .size(10.dp)
                         .clip(CircleShape)
-                        .background(DarkBackground)
+                        .background(MaterialTheme.colorScheme.onPrimaryContainer)
                 )
             }
         }

@@ -32,15 +32,15 @@ fun NetworkAndConfigDialog(
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        containerColor = DarkSurface,
-        titleContentColor = TextPrimary,
+        containerColor = MaterialTheme.colorScheme.surface,
+        titleContentColor = MaterialTheme.colorScheme.onSurface,
         shape = RoundedCornerShape(24.dp),
         title = {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
                     imageVector = Icons.Filled.CloudDone,
                     contentDescription = null,
-                    tint = NeonCyan,
+                    tint = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.size(24.dp)
                 )
                 Spacer(modifier = Modifier.width(8.dp))
@@ -61,7 +61,7 @@ fun NetworkAndConfigDialog(
                     modifier = Modifier
                         .fillMaxWidth()
                         .clip(RoundedCornerShape(16.dp))
-                        .background(DarkSurfaceVariant)
+                        .background(MaterialTheme.colorScheme.surfaceVariant)
                         .padding(14.dp)
                 ) {
                     Column {
@@ -69,13 +69,13 @@ fun NetworkAndConfigDialog(
                             Icon(
                                 imageVector = if (networkStatus.isWifi) Icons.Filled.Wifi else Icons.Filled.CellTower,
                                 contentDescription = null,
-                                tint = NeonCyan,
+                                tint = MaterialTheme.colorScheme.primary,
                                 modifier = Modifier.size(20.dp)
                             )
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
                                 text = stringResource(R.string.network_label, networkStatus.label),
-                                color = TextPrimary,
+                                color = MaterialTheme.colorScheme.onSurface,
                                 fontWeight = FontWeight.SemiBold,
                                 fontSize = 14.sp
                             )
@@ -83,7 +83,7 @@ fun NetworkAndConfigDialog(
                         Spacer(modifier = Modifier.height(6.dp))
                         Text(
                             text = stringResource(R.string.auto_adaptive_buffer, networkStatus.minBufferMs / 1000, networkStatus.maxBufferMs / 1000),
-                            color = TextSecondary,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                             fontSize = 12.sp
                         )
                     }
@@ -94,20 +94,20 @@ fun NetworkAndConfigDialog(
                     modifier = Modifier
                         .fillMaxWidth()
                         .clip(RoundedCornerShape(16.dp))
-                        .background(DarkSurfaceVariant)
+                        .background(MaterialTheme.colorScheme.surfaceVariant)
                         .padding(14.dp)
                 ) {
                     Column {
                         Text(
                             text = stringResource(R.string.firebase_remote_config),
-                            color = NeonPurple,
+                            color = MaterialTheme.colorScheme.secondary,
                             fontWeight = FontWeight.SemiBold,
                             fontSize = 14.sp
                         )
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
                             text = stringResource(R.string.source_label, remoteConfig.configSource),
-                            color = TextMuted,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
                             fontSize = 11.sp
                         )
                         Spacer(modifier = Modifier.height(8.dp))
@@ -120,13 +120,13 @@ fun NetworkAndConfigDialog(
                             Column {
                                 Text(
                                     text = stringResource(R.string.admob_advertisements),
-                                    color = TextPrimary,
+                                    color = MaterialTheme.colorScheme.onSurface,
                                     fontSize = 13.sp,
                                     fontWeight = FontWeight.Medium
                                 )
                                 Text(
                                     text = stringResource(R.string.always_silent_ad),
-                                    color = TextMuted,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
                                     fontSize = 11.sp
                                 )
                             }
@@ -135,10 +135,10 @@ fun NetworkAndConfigDialog(
                                 checked = remoteConfig.adsEnabled,
                                 onCheckedChange = { onToggleSimulatedAds(it) },
                                 colors = SwitchDefaults.colors(
-                                    checkedThumbColor = DarkBackground,
-                                    checkedTrackColor = NeonCyan,
-                                    uncheckedThumbColor = TextMuted,
-                                    uncheckedTrackColor = CardBorder
+                                    checkedThumbColor = MaterialTheme.colorScheme.background,
+                                    checkedTrackColor = MaterialTheme.colorScheme.primary,
+                                    uncheckedThumbColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                                    uncheckedTrackColor = MaterialTheme.colorScheme.outline
                                 ),
                                 modifier = Modifier.testTag("switch_admob_ads")
                             )
@@ -150,7 +150,10 @@ fun NetworkAndConfigDialog(
         confirmButton = {
             Button(
                 onClick = onDismiss,
-                colors = ButtonDefaults.buttonColors(containerColor = NeonCyan, contentColor = DarkBackground),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary, 
+                    contentColor = MaterialTheme.colorScheme.background
+                ),
                 shape = RoundedCornerShape(12.dp)
             ) {
                 Text(stringResource(R.string.close), fontWeight = FontWeight.Bold)

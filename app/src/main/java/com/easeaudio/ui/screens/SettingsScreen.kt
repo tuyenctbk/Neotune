@@ -45,7 +45,7 @@ fun SettingsScreen(
 ) {
     Scaffold(
         modifier = modifier.fillMaxSize(),
-        containerColor = DarkBackground
+        containerColor = MaterialTheme.colorScheme.background
     ) { innerPadding ->
         Box(
             modifier = Modifier
@@ -68,7 +68,7 @@ fun SettingsScreen(
                             fontWeight = FontWeight.Bold,
                             letterSpacing = (-0.5).sp
                         ),
-                        color = TextPrimary,
+                        color = MaterialTheme.colorScheme.onSurface,
                         modifier = Modifier.padding(bottom = 8.dp)
                     )
                 }
@@ -82,44 +82,44 @@ fun SettingsScreen(
                     SettingsCard {
                         SettingsItem(
                             icon = Icons.Filled.Equalizer,
-                            iconTint = NeonCyan,
+                            iconTint = MaterialTheme.colorScheme.primary,
                             title = stringResource(R.string.equalizer),
                             subtitle = "Customize bass, treble & audio presets",
                             onClick = onOpenEqualizer,
                             testTag = "setting_equalizer"
                         )
-                        HorizontalDivider(color = DarkSurfaceVariant, thickness = 1.dp)
+                        HorizontalDivider(color = MaterialTheme.colorScheme.surfaceVariant, thickness = 1.dp)
                         SettingsItem(
                             icon = Icons.Filled.Bedtime,
-                            iconTint = if (sleepTimerRemaining != null) NeonCyan else TextMuted,
+                            iconTint = if (sleepTimerRemaining != null) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
                             title = stringResource(R.string.sleep_timer),
                             subtitle = sleepTimerRemaining?.let { stringResource(R.string.sleeping_in, it) } ?: "Set automatic sleep timer",
                             onClick = onOpenSleepTimer,
                             testTag = "setting_sleep_timer"
                         )
-                        HorizontalDivider(color = DarkSurfaceVariant, thickness = 1.dp)
+                        HorizontalDivider(color = MaterialTheme.colorScheme.surfaceVariant, thickness = 1.dp)
                         SettingsItem(
                             icon = Icons.Filled.Alarm,
-                            iconTint = NeonCyan,
+                            iconTint = MaterialTheme.colorScheme.primary,
                             title = stringResource(R.string.radio_alarm),
                             subtitle = "Wake up to your favorite live stream",
                             onClick = onOpenRadioAlarm,
                             testTag = "setting_radio_alarm"
                         )
-                        HorizontalDivider(color = DarkSurfaceVariant, thickness = 1.dp)
+                        HorizontalDivider(color = MaterialTheme.colorScheme.surfaceVariant, thickness = 1.dp)
                         SettingsSwitchItem(
                             icon = Icons.Filled.BatterySaver,
-                            iconTint = NeonCyan,
+                            iconTint = MaterialTheme.colorScheme.primary,
                             title = stringResource(R.string.battery_saver_mode),
                             subtitle = stringResource(R.string.battery_saver_mode_desc),
                             checked = isBatterySaverEnabled,
                             onCheckedChange = { onToggleBatterySaver() },
                             testTag = "setting_battery_saver"
                         )
-                        HorizontalDivider(color = DarkSurfaceVariant, thickness = 1.dp)
+                        HorizontalDivider(color = MaterialTheme.colorScheme.surfaceVariant, thickness = 1.dp)
                         SettingsSwitchItem(
                             icon = Icons.Filled.PlayCircle,
-                            iconTint = NeonCyan,
+                            iconTint = MaterialTheme.colorScheme.primary,
                             title = "Auto-Play on Startup",
                             subtitle = "Resume the last played station/podcast on app launch",
                             checked = isAutoPlayOnStartupEnabled,
@@ -138,25 +138,25 @@ fun SettingsScreen(
                     SettingsCard {
                         SettingsItem(
                             icon = Icons.Filled.Palette,
-                            iconTint = NeonCyan,
+                            iconTint = MaterialTheme.colorScheme.primary,
                             title = stringResource(R.string.appearance),
                             subtitle = "Themes, accent colors & languages",
                             onClick = onOpenAppearance,
                             testTag = "setting_appearance"
                         )
-                        HorizontalDivider(color = DarkSurfaceVariant, thickness = 1.dp)
+                        HorizontalDivider(color = MaterialTheme.colorScheme.surfaceVariant, thickness = 1.dp)
                         SettingsItem(
                             icon = Icons.Filled.Explore,
-                            iconTint = NeonCyan,
+                            iconTint = MaterialTheme.colorScheme.primary,
                             title = stringResource(R.string.onboarding_app_tour),
                             subtitle = "Replay onboarding walkthrough & setup",
                             onClick = onOpenOnboarding,
                             testTag = "setting_onboarding"
                         )
-                        HorizontalDivider(color = DarkSurfaceVariant, thickness = 1.dp)
+                        HorizontalDivider(color = MaterialTheme.colorScheme.surfaceVariant, thickness = 1.dp)
                         SettingsSwitchItem(
                             icon = Icons.Filled.LightMode,
-                            iconTint = NeonCyan,
+                            iconTint = MaterialTheme.colorScheme.primary,
                             title = "Light Theme",
                             subtitle = "Toggle comfortable light theme for long playback sessions",
                             checked = isLightMode,
@@ -175,16 +175,16 @@ fun SettingsScreen(
                     SettingsCard {
                         SettingsItem(
                             icon = Icons.Filled.Shield,
-                            iconTint = NeonCyan,
+                            iconTint = MaterialTheme.colorScheme.primary,
                             title = stringResource(R.string.content_filters_blocklist),
                             subtitle = "Manage hidden stations & safety filters",
                             onClick = onOpenBlockedDialog,
                             testTag = "setting_blocked_stations"
                         )
-                        HorizontalDivider(color = DarkSurfaceVariant, thickness = 1.dp)
+                        HorizontalDivider(color = MaterialTheme.colorScheme.surfaceVariant, thickness = 1.dp)
                         SettingsItem(
                             icon = Icons.Filled.Info,
-                            iconTint = TextMuted,
+                            iconTint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
                             title = stringResource(R.string.info),
                             subtitle = "Data providers & API attributions",
                             onClick = onOpenAttribution,
@@ -205,7 +205,7 @@ private fun SettingsSectionHeader(title: String) {
             fontWeight = FontWeight.Bold,
             letterSpacing = 1.2.sp
         ),
-        color = NeonCyan,
+        color = MaterialTheme.colorScheme.primary,
         modifier = Modifier.padding(start = 4.dp, top = 8.dp, bottom = 4.dp)
     )
 }
@@ -215,8 +215,8 @@ private fun SettingsCard(content: @Composable ColumnScope.() -> Unit) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
-        color = DarkSurface,
-        border = androidx.compose.foundation.BorderStroke(1.dp, CardBorder)
+        color = MaterialTheme.colorScheme.surface,
+        border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
     ) {
         Column(modifier = Modifier.fillMaxWidth()) {
             content()
@@ -239,7 +239,7 @@ private fun SettingsItem(
         modifier = Modifier
             .fillMaxWidth()
             .onFocusChanged { isFocused = it.isFocused }
-            .background(if (isFocused) NeonCyan.copy(alpha = 0.16f) else Color.Transparent)
+            .background(if (isFocused) MaterialTheme.colorScheme.primary.copy(alpha = 0.16f) else Color.Transparent)
             .clickable(onClick = onClick)
             .padding(horizontal = 16.dp, vertical = 14.dp)
             .testTag(testTag),
@@ -249,13 +249,13 @@ private fun SettingsItem(
             modifier = Modifier
                 .size(40.dp)
                 .clip(RoundedCornerShape(10.dp))
-                .background(if (isFocused) NeonCyan.copy(alpha = 0.28f) else DarkSurfaceVariant),
+                .background(if (isFocused) MaterialTheme.colorScheme.primary.copy(alpha = 0.28f) else MaterialTheme.colorScheme.surfaceVariant),
             contentAlignment = Alignment.Center
         ) {
             Icon(
                 imageVector = icon,
                 contentDescription = title,
-                tint = if (isFocused) NeonCyan else iconTint,
+                tint = if (isFocused) MaterialTheme.colorScheme.primary else iconTint,
                 modifier = Modifier.size(22.dp)
             )
         }
@@ -264,19 +264,19 @@ private fun SettingsItem(
             Text(
                 text = title,
                 style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
-                color = if (isFocused) NeonCyan else TextPrimary
+                color = if (isFocused) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
             )
             Spacer(modifier = Modifier.height(2.dp))
             Text(
                 text = subtitle,
                 style = MaterialTheme.typography.bodySmall,
-                color = if (isFocused) TextSecondary else TextMuted
+                color = if (isFocused) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
             )
         }
         Icon(
             imageVector = Icons.Filled.ChevronRight,
             contentDescription = null,
-            tint = if (isFocused) NeonCyan else TextMuted,
+            tint = if (isFocused) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
             modifier = Modifier.size(20.dp)
         )
     }
@@ -298,7 +298,7 @@ private fun SettingsSwitchItem(
         modifier = Modifier
             .fillMaxWidth()
             .onFocusChanged { isFocused = it.isFocused }
-            .background(if (isFocused) NeonCyan.copy(alpha = 0.16f) else Color.Transparent)
+            .background(if (isFocused) MaterialTheme.colorScheme.primary.copy(alpha = 0.16f) else Color.Transparent)
             .clickable { onCheckedChange(!checked) }
             .padding(horizontal = 16.dp, vertical = 12.dp)
             .testTag(testTag),
@@ -308,13 +308,13 @@ private fun SettingsSwitchItem(
             modifier = Modifier
                 .size(40.dp)
                 .clip(RoundedCornerShape(10.dp))
-                .background(if (isFocused) NeonCyan.copy(alpha = 0.28f) else DarkSurfaceVariant),
+                .background(if (isFocused) MaterialTheme.colorScheme.primary.copy(alpha = 0.28f) else MaterialTheme.colorScheme.surfaceVariant),
             contentAlignment = Alignment.Center
         ) {
             Icon(
                 imageVector = icon,
                 contentDescription = null,
-                tint = if (isFocused) NeonCyan else iconTint,
+                tint = if (isFocused) MaterialTheme.colorScheme.primary else iconTint,
                 modifier = Modifier.size(22.dp)
             )
         }
@@ -323,20 +323,20 @@ private fun SettingsSwitchItem(
             Text(
                 text = title,
                 style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
-                color = if (isFocused) NeonCyan else TextPrimary
+                color = if (isFocused) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
             )
             Text(
                 text = subtitle,
                 style = MaterialTheme.typography.bodySmall,
-                color = if (isFocused) TextSecondary else TextMuted
+                color = if (isFocused) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
             )
         }
         Switch(
             checked = checked,
             onCheckedChange = { onCheckedChange(it) },
             colors = SwitchDefaults.colors(
-                checkedThumbColor = Color.Black,
-                checkedTrackColor = NeonCyan
+                checkedThumbColor = MaterialTheme.colorScheme.background,
+                checkedTrackColor = MaterialTheme.colorScheme.primary
             )
         )
     }

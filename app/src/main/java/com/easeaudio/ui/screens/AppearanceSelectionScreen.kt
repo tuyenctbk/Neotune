@@ -63,7 +63,7 @@ fun AppearanceSelectionScreen(
     ) {
         Surface(
             modifier = Modifier.fillMaxSize(),
-            color = DarkBackground
+            color = MaterialTheme.colorScheme.background
         ) {
             Column(
                 modifier = Modifier
@@ -90,7 +90,7 @@ fun AppearanceSelectionScreen(
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Back",
-                            tint = if (isBackFocused) DarkBackground else previewTheme.primary
+                            tint = if (isBackFocused) MaterialTheme.colorScheme.background else previewTheme.primary
                         )
                     }
                     Spacer(modifier = Modifier.width(12.dp))
@@ -106,13 +106,13 @@ fun AppearanceSelectionScreen(
                             Text(
                                 text = stringResource(R.string.appearance),
                                 style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Black),
-                                color = TextPrimary
+                                color = MaterialTheme.colorScheme.onSurface
                             )
                         }
                         Text(
                             text = stringResource(R.string.appearance_subtitle),
                             style = MaterialTheme.typography.bodyMedium,
-                            color = TextSecondary
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                 }
@@ -200,7 +200,7 @@ fun AppearanceSelectionScreen(
                     }
                 }
 
-                HorizontalDivider(color = CardBorder, thickness = 1.dp, modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp))
+                HorizontalDivider(color = MaterialTheme.colorScheme.outline, thickness = 1.dp, modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp))
 
                 // Adaptive Grid for 8 curated themes
                 LazyVerticalGrid(
@@ -281,15 +281,15 @@ fun ThemeSelectionCard(
                 } else {
                     Brush.horizontalGradient(
                         listOf(
-                            CardBorder.copy(alpha = 0.4f),
-                            CardBorder.copy(alpha = 0.4f)
+                            MaterialTheme.colorScheme.outline.copy(alpha = 0.4f),
+                            MaterialTheme.colorScheme.outline.copy(alpha = 0.4f)
                         )
                     )
                 },
                 shape = RoundedCornerShape(18.dp)
             )
             .testTag("theme_card_${theme.id}"),
-        color = if (isFocused) DarkSurfaceVariant else if (isSelected) DarkSurfaceVariant.copy(alpha = 0.7f) else DarkSurface
+        color = if (isFocused) MaterialTheme.colorScheme.surfaceVariant else if (isSelected) MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f) else MaterialTheme.colorScheme.surface
     ) {
         Row(
             modifier = Modifier
@@ -306,7 +306,7 @@ fun ThemeSelectionCard(
                         style = MaterialTheme.typography.titleMedium.copy(
                             fontWeight = if (isSelected || isFocused) FontWeight.Black else FontWeight.Bold
                         ),
-                        color = if (isFocused) Color.White else if (isSelected) theme.primary else TextPrimary
+                        color = if (isFocused) Color.White else if (isSelected) theme.primary else MaterialTheme.colorScheme.onSurface
                     )
                     if (isSelected) {
                         Spacer(modifier = Modifier.width(8.dp))
@@ -320,7 +320,7 @@ fun ThemeSelectionCard(
                                 Icon(
                                     imageVector = Icons.Filled.Check,
                                     contentDescription = null,
-                                    tint = DarkBackground,
+                                    tint = MaterialTheme.colorScheme.background,
                                     modifier = Modifier.size(12.dp)
                                 )
                                 Spacer(modifier = Modifier.width(3.dp))
@@ -330,7 +330,7 @@ fun ThemeSelectionCard(
                                         fontWeight = FontWeight.Black,
                                         fontSize = 10.sp
                                     ),
-                                    color = DarkBackground
+                                    color = MaterialTheme.colorScheme.background
                                 )
                             }
                         }
@@ -340,7 +340,7 @@ fun ThemeSelectionCard(
                 Text(
                     text = theme.description,
                     style = MaterialTheme.typography.bodySmall,
-                    color = if (isFocused) Color.White.copy(alpha = 0.85f) else TextSecondary,
+                    color = if (isFocused) Color.White.copy(alpha = 0.85f) else MaterialTheme.colorScheme.onSurfaceVariant,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis
                 )
@@ -479,7 +479,7 @@ fun ColorPill(label: String, color: Color) {
         Text(
             text = label,
             style = MaterialTheme.typography.labelSmall.copy(fontSize = 11.sp),
-            color = TextMuted
+            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
         )
     }
 }

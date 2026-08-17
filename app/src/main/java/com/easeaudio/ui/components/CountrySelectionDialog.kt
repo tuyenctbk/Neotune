@@ -63,9 +63,9 @@ fun CountrySelectionDialog(
                 .fillMaxWidth(0.92f)
                 .heightIn(max = 580.dp)
                 .clip(RoundedCornerShape(24.dp))
-                .border(1.dp, CardBorder, RoundedCornerShape(24.dp))
+                .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(24.dp))
                 .testTag("dialog_country_selection"),
-            color = DarkSurface
+            color = MaterialTheme.colorScheme.surface
         ) {
             Column(
                 modifier = Modifier
@@ -85,7 +85,7 @@ fun CountrySelectionDialog(
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 20.sp
                             ),
-                            color = TextPrimary
+                            color = MaterialTheme.colorScheme.onSurface
                         )
                         val subtitleText = when {
                             isLoading -> stringResource(R.string.discovering_countries)
@@ -96,7 +96,7 @@ fun CountrySelectionDialog(
                             Text(
                                 text = subtitleText,
                                 style = MaterialTheme.typography.bodySmall,
-                                color = if (isLoading) NeonCyan else TextMuted
+                                color = if (isLoading) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
                             )
                         }
                     }
@@ -105,13 +105,13 @@ fun CountrySelectionDialog(
                         modifier = Modifier
                             .size(32.dp)
                             .clip(CircleShape)
-                            .background(DarkSurfaceVariant)
+                            .background(MaterialTheme.colorScheme.surfaceVariant)
                             .testTag("btn_close_country_dialog")
                     ) {
                         Icon(
                             imageVector = Icons.Filled.Close,
                             contentDescription = "Close",
-                            tint = TextMuted,
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.size(18.dp)
                         )
                     }
@@ -125,8 +125,8 @@ fun CountrySelectionDialog(
                             .fillMaxWidth()
                             .height(2.dp)
                             .clip(RoundedCornerShape(1.dp)),
-                        color = NeonCyan,
-                        trackColor = NeonCyan.copy(alpha = 0.1f)
+                        color = MaterialTheme.colorScheme.primary,
+                        trackColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
                     )
                 }
 
@@ -136,24 +136,24 @@ fun CountrySelectionDialog(
                 OutlinedTextField(
                     value = searchQuery,
                     onValueChange = { searchQuery = it },
-                    placeholder = { Text(stringResource(R.string.search_country_placeholder), color = TextMuted) },
-                    leadingIcon = { Icon(imageVector = Icons.Filled.Search, contentDescription = null, tint = TextMuted) },
+                    placeholder = { Text(stringResource(R.string.search_country_placeholder), color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)) },
+                    leadingIcon = { Icon(imageVector = Icons.Filled.Search, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)) },
                     trailingIcon = {
                         if (searchQuery.isNotEmpty()) {
                             IconButton(onClick = { searchQuery = "" }) {
-                                Icon(imageVector = Icons.Filled.Close, contentDescription = "Clear", tint = TextMuted)
+                                Icon(imageVector = Icons.Filled.Close, contentDescription = "Clear", tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f))
                             }
                         }
                     },
                     singleLine = true,
                     shape = RoundedCornerShape(14.dp),
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedContainerColor = DarkBackground,
-                        unfocusedContainerColor = DarkBackground,
-                        focusedBorderColor = NeonCyan,
+                        focusedContainerColor = MaterialTheme.colorScheme.background,
+                        unfocusedContainerColor = MaterialTheme.colorScheme.background,
+                        focusedBorderColor = MaterialTheme.colorScheme.primary,
                         unfocusedBorderColor = Color.Transparent,
-                        focusedTextColor = TextPrimary,
-                        unfocusedTextColor = TextPrimary
+                        focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                        unfocusedTextColor = MaterialTheme.colorScheme.onSurface
                     ),
                     modifier = Modifier
                         .fillMaxWidth()
@@ -173,7 +173,7 @@ fun CountrySelectionDialog(
                         Text(
                             text = stringResource(R.string.no_countries_matched, searchQuery),
                             style = MaterialTheme.typography.bodyMedium,
-                            color = TextMuted
+                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
                         )
                     }
                 } else {
@@ -198,11 +198,11 @@ fun CountrySelectionDialog(
                                     }
                                     .border(
                                         width = if (isFocused) 1.5.dp else if (isSelected) 1.dp else 0.dp,
-                                        color = if (isFocused || isSelected) NeonCyan else Color.Transparent,
+                                        color = if (isFocused || isSelected) MaterialTheme.colorScheme.primary else Color.Transparent,
                                         shape = RoundedCornerShape(12.dp)
                                     )
                                     .testTag("item_country_${country.name}"),
-                                color = if (isSelected) NeonCyan.copy(alpha = 0.15f) else DarkSurfaceVariant.copy(alpha = 0.6f)
+                                color = if (isSelected) MaterialTheme.colorScheme.primary.copy(alpha = 0.15f) else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f)
                             ) {
                                 Row(
                                     modifier = Modifier
@@ -220,7 +220,7 @@ fun CountrySelectionDialog(
                                             Icon(
                                                 imageVector = Icons.Filled.Language,
                                                 contentDescription = null,
-                                                tint = NeonCyan,
+                                                tint = MaterialTheme.colorScheme.primary,
                                                 modifier = Modifier.size(20.dp)
                                             )
                                         } else {
@@ -232,7 +232,7 @@ fun CountrySelectionDialog(
                                             style = MaterialTheme.typography.bodyLarge.copy(
                                                 fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium
                                             ),
-                                            color = if (isSelected) NeonCyan else TextPrimary,
+                                            color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
                                             maxLines = 1,
                                             overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
                                         )
@@ -244,13 +244,13 @@ fun CountrySelectionDialog(
                                         if (country.stationCountText.isNotBlank()) {
                                             Surface(
                                                 shape = RoundedCornerShape(8.dp),
-                                                color = if (isSelected) NeonCyan.copy(alpha = 0.2f) else DarkBackground.copy(alpha = 0.6f),
+                                                color = if (isSelected) MaterialTheme.colorScheme.primary.copy(alpha = 0.2f) else MaterialTheme.colorScheme.background.copy(alpha = 0.6f),
                                                 modifier = Modifier.padding(end = if (isSelected) 8.dp else 0.dp)
                                             ) {
                                                 Text(
                                                     text = country.stationCountText,
                                                     style = MaterialTheme.typography.labelSmall.copy(fontSize = 11.sp, fontWeight = FontWeight.SemiBold),
-                                                    color = if (isSelected) NeonCyan else TextMuted,
+                                                    color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
                                                     maxLines = 1,
                                                     softWrap = false,
                                                     modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
@@ -262,7 +262,7 @@ fun CountrySelectionDialog(
                                             Icon(
                                                 imageVector = Icons.Filled.Check,
                                                 contentDescription = "Selected",
-                                                tint = NeonCyan,
+                                                tint = MaterialTheme.colorScheme.primary,
                                                 modifier = Modifier.size(18.dp)
                                             )
                                         }

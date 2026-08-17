@@ -21,7 +21,6 @@
     <uses-feature android:name="android.hardware.microphone" android:required="false" />
 
     <!-- Android Auto & Android Automotive OS (AAOS) compatibility -->
-    <uses-feature android:name="android.hardware.type.automotive" android:required="false" />
     <uses-feature android:name="android.hardware.wifi" android:required="false" />
     <uses-feature android:name="android.hardware.screen.portrait" android:required="false" />
     <uses-feature android:name="android.hardware.screen.landscape" android:required="false" />

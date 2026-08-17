@@ -176,7 +176,7 @@ fun HomeScreen(
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
-        containerColor = DarkBackground,
+        containerColor = MaterialTheme.colorScheme.background,
         floatingActionButton = {
             AnimatedVisibility(
                 visible = isFabVisible,
@@ -187,15 +187,15 @@ fun HomeScreen(
                 var isFabFocused by remember { mutableStateOf(false) }
                 FloatingActionButton(
                     onClick = onOpenAddStation,
-                    containerColor = if (isFabFocused) Color.White else NeonCyan,
-                    contentColor = DarkBackground,
+                    containerColor = if (isFabFocused) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.background,
                     shape = CircleShape,
                     modifier = Modifier
                         .navigationBarsPadding()
                         .onFocusChanged { isFabFocused = it.isFocused }
                         .border(
                             width = if (isFabFocused) 3.dp else 0.dp,
-                            color = if (isFabFocused) NeonCyan else Color.Transparent,
+                            color = if (isFabFocused) MaterialTheme.colorScheme.primary else Color.Transparent,
                             shape = CircleShape
                         )
                         .testTag("fab_add_station")
@@ -262,7 +262,7 @@ fun HomeScreen(
                                         fontWeight = FontWeight.Black,
                                         letterSpacing = (-0.8).sp
                                     ),
-                                    color = TextPrimary
+                                    color = MaterialTheme.colorScheme.onSurface
                                 )
                             }
 
@@ -279,7 +279,7 @@ fun HomeScreen(
                                         Icon(
                                             imageVector = Icons.Filled.Language,
                                             contentDescription = "Global",
-                                            tint = TextPrimary,
+                                            tint = MaterialTheme.colorScheme.onSurface,
                                             modifier = Modifier.size(24.dp)
                                         )
                                     } else {
@@ -292,7 +292,7 @@ fun HomeScreen(
                         Text(
                             text = stringResource(R.string.app_description),
                             style = MaterialTheme.typography.bodyMedium,
-                            color = TextSecondary,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.padding(start = if (isExpanded) 58.dp else 46.dp)
                         )
                     }
@@ -308,15 +308,15 @@ fun HomeScreen(
                         OutlinedTextField(
                             value = uiState.searchQuery,
                             onValueChange = onSearchQueryChange,
-                            placeholder = { Text(stringResource(R.string.search_placeholder), color = TextMuted) },
-                            leadingIcon = { Icon(imageVector = Icons.Filled.Search, contentDescription = null, tint = TextMuted) },
+                            placeholder = { Text(stringResource(R.string.search_placeholder), color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)) },
+                            leadingIcon = { Icon(imageVector = Icons.Filled.Search, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)) },
                             trailingIcon = {
                                 if (uiState.searchQuery.isNotEmpty()) {
                                     IconButton(onClick = { onSearchQueryChange("") }) {
                                         Icon(
                                             imageVector = Icons.Filled.Close,
                                             contentDescription = "Clear search",
-                                            tint = TextMuted
+                                            tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
                                         )
                                     }
                                 }
@@ -333,12 +333,12 @@ fun HomeScreen(
                             ),
                             shape = RoundedCornerShape(16.dp),
                             colors = OutlinedTextFieldDefaults.colors(
-                                focusedContainerColor = DarkSurface,
-                                unfocusedContainerColor = DarkSurface,
-                                focusedBorderColor = NeonCyan,
+                                focusedContainerColor = MaterialTheme.colorScheme.surface,
+                                unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+                                focusedBorderColor = MaterialTheme.colorScheme.primary,
                                 unfocusedBorderColor = Color.Transparent,
-                                focusedTextColor = TextPrimary,
-                                unfocusedTextColor = TextPrimary
+                                focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                                unfocusedTextColor = MaterialTheme.colorScheme.onSurface
                             ),
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -371,19 +371,19 @@ fun HomeScreen(
                                     Icon(
                                         imageVector = Icons.Outlined.History,
                                         contentDescription = null,
-                                        tint = TextMuted,
+                                        tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
                                         modifier = Modifier.size(14.dp)
                                     )
                                     Text(
                                         text = stringResource(R.string.recent_searches),
                                         style = MaterialTheme.typography.labelSmall,
-                                        color = TextMuted
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
                                     )
                                 }
                                 Text(
                                     text = stringResource(R.string.clear_history),
                                     style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
-                                    color = NeonCyan,
+                                    color = MaterialTheme.colorScheme.primary,
                                     modifier = Modifier
                                         .clickable { onClearSearchHistory() }
                                         .padding(horizontal = 4.dp, vertical = 2.dp)
@@ -397,8 +397,8 @@ fun HomeScreen(
                                 items(suggestions) { query ->
                                     Surface(
                                         shape = RoundedCornerShape(20.dp),
-                                        color = DarkSurfaceVariant,
-                                        border = BorderStroke(1.dp, NeonCyan.copy(alpha = 0.3f)),
+                                        color = MaterialTheme.colorScheme.surfaceVariant,
+                                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.3f)),
                                         modifier = Modifier.clickable {
                                             onSearchQueryChange(query)
                                             onSaveSearchQuery(query)
@@ -412,20 +412,20 @@ fun HomeScreen(
                                             Icon(
                                                 imageVector = Icons.Filled.History,
                                                 contentDescription = null,
-                                                tint = NeonCyan,
+                                                tint = MaterialTheme.colorScheme.primary,
                                                 modifier = Modifier.size(14.dp)
                                             )
                                             Spacer(modifier = Modifier.width(6.dp))
                                             Text(
                                                 text = query,
                                                 style = MaterialTheme.typography.labelMedium,
-                                                color = TextPrimary
+                                                color = MaterialTheme.colorScheme.onSurface
                                             )
                                             Spacer(modifier = Modifier.width(6.dp))
                                             Icon(
                                                 imageVector = Icons.Filled.Close,
                                                 contentDescription = "Remove search suggestion",
-                                                tint = TextMuted,
+                                                tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
                                                 modifier = Modifier
                                                     .size(14.dp)
                                                     .clickable { onDeleteSearchQuery(query) }
@@ -457,13 +457,13 @@ fun HomeScreen(
                                     .onFocusChanged { isPillFocused = it.isFocused }
                                     .clip(CircleShape)
                                     .background(
-                                        if (isSelected) NeonCyan 
-                                        else if (isPillFocused) DarkSurfaceVariant 
+                                        if (isSelected) MaterialTheme.colorScheme.primary 
+                                        else if (isPillFocused) MaterialTheme.colorScheme.surfaceVariant 
                                         else Color.Transparent
                                     )
                                     .border(
                                         width = if (isPillFocused) 2.dp else if (isSelected) 0.dp else 1.dp,
-                                        color = if (isPillFocused) NeonCyan else if (isSelected) Color.Transparent else CardBorder,
+                                        color = if (isPillFocused) MaterialTheme.colorScheme.primary else if (isSelected) Color.Transparent else MaterialTheme.colorScheme.outline,
                                         shape = CircleShape
                                     )
                                     .clickable {
@@ -479,7 +479,7 @@ fun HomeScreen(
                                     style = MaterialTheme.typography.bodyMedium.copy(
                                         fontWeight = if (isSelected || isPillFocused) FontWeight.Bold else FontWeight.Medium
                                     ),
-                                    color = if (isSelected) DarkBackground else if (isPillFocused) NeonCyan else TextMuted
+                                    color = if (isSelected) MaterialTheme.colorScheme.background else if (isPillFocused) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
                                 )
                             }
                         }
@@ -493,7 +493,7 @@ fun HomeScreen(
                         Text(
                             text = stringResource(R.string.recent_streams),
                             style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
-                            color = TextPrimary,
+                            color = MaterialTheme.colorScheme.onSurface,
                             modifier = Modifier.padding(vertical = 8.dp)
                         )
                     }
@@ -545,8 +545,8 @@ fun HomeScreen(
                                     .shadow(
                                         elevation = if (isHeroFocused) 16.dp else 0.dp,
                                         shape = RoundedCornerShape(20.dp),
-                                        spotColor = NeonCyan,
-                                        ambientColor = NeonCyan.copy(alpha = 0.5f)
+                                        spotColor = MaterialTheme.colorScheme.primary,
+                                        ambientColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
                                     )
                                     .clip(RoundedCornerShape(20.dp))
                                     .combinedClickable(
@@ -558,16 +558,16 @@ fun HomeScreen(
                                         brush = if (isHeroFocused) {
                                             Brush.horizontalGradient(
                                                 listOf(
-                                                    NeonCyan,
+                                                    MaterialTheme.colorScheme.primary,
                                                     Color.White,
-                                                    NeonCyan
+                                                    MaterialTheme.colorScheme.primary
                                                 )
                                             )
                                         } else Brush.horizontalGradient(listOf(Color.Transparent, Color.Transparent)),
                                         shape = RoundedCornerShape(20.dp)
                                     )
                                     .testTag("hero_featured_card"),
-                                color = DarkSurface
+                                color = MaterialTheme.colorScheme.surface
                             ) {
                                 Box(modifier = Modifier.fillMaxWidth().height(if (isExpanded) 220.dp else 160.dp)) {
                                     AsyncImage(
@@ -582,7 +582,7 @@ fun HomeScreen(
                                             .fillMaxSize()
                                             .background(
                                                 Brush.verticalGradient(
-                                                    listOf(Color.Transparent, DarkBackground.copy(alpha = 0.95f))
+                                                    listOf(Color.Transparent, MaterialTheme.colorScheme.background.copy(alpha = 0.95f))
                                                 )
                                             )
                                     )
@@ -598,20 +598,20 @@ fun HomeScreen(
                                             Text(
                                                 text = stringResource(R.string.featured_station),
                                                 style = MaterialTheme.typography.labelMedium,
-                                                color = TextMuted,
+                                                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
                                                 fontWeight = FontWeight.Bold
                                             )
                                             Text(
                                                 text = featured.name,
                                                 style = if (isExpanded) MaterialTheme.typography.headlineMedium else MaterialTheme.typography.titleLarge,
-                                                color = TextPrimary,
+                                                color = MaterialTheme.colorScheme.onSurface,
                                                 maxLines = 1,
                                                 overflow = TextOverflow.Ellipsis
                                             )
                                             Text(
                                                 text = "${featured.genre} • ${featured.bitrate}",
                                                 style = MaterialTheme.typography.bodyMedium,
-                                                color = TextSecondary
+                                                color = MaterialTheme.colorScheme.onSurfaceVariant
                                             )
                                         }
 
@@ -626,14 +626,14 @@ fun HomeScreen(
                                             if (isFeaturedSelected && uiState.isLoading) {
                                                 CircularProgressIndicator(
                                                     modifier = Modifier.size(if (isExpanded) 32.dp else 24.dp),
-                                                    color = DarkBackground,
+                                                    color = MaterialTheme.colorScheme.background,
                                                     strokeWidth = 2.5.dp
                                                 )
                                             } else {
                                                 Icon(
                                                     imageVector = if (isFeaturedSelected && uiState.isPlaying) Icons.Filled.Pause else Icons.Filled.PlayArrow,
                                                     contentDescription = "Play Featured",
-                                                    tint = DarkBackground,
+                                                    tint = MaterialTheme.colorScheme.background,
                                                     modifier = Modifier.size(if (isExpanded) 32.dp else 24.dp)
                                                 )
                                             }
@@ -645,15 +645,15 @@ fun HomeScreen(
                             DropdownMenu(
                                 expanded = showHeroMenu,
                                 onDismissRequest = { showHeroMenu = false },
-                                modifier = Modifier.background(DarkSurfaceVariant)
+                                modifier = Modifier.background(MaterialTheme.colorScheme.surfaceVariant)
                             ) {
                                 DropdownMenuItem(
-                                    text = { Text(if (featured.isFavorite) "Remove from Favorites" else "Add to Favorites", color = TextPrimary) },
+                                    text = { Text(if (featured.isFavorite) "Remove from Favorites" else "Add to Favorites", color = MaterialTheme.colorScheme.onSurface) },
                                     leadingIcon = { 
                                         Icon(
                                             imageVector = if (featured.isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder, 
                                             contentDescription = null, 
-                                            tint = if (featured.isFavorite) FavoriteHeartColor else TextMuted
+                                            tint = if (featured.isFavorite) FavoriteHeartColor else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
                                         ) 
                                     },
                                     onClick = {
@@ -666,14 +666,14 @@ fun HomeScreen(
                                     text = { 
                                         Text(
                                             if (isFeaturedDemoted) "Move to Top (Show More)" else "Move to Bottom (Show Less)", 
-                                            color = TextPrimary
+                                            color = MaterialTheme.colorScheme.onSurface
                                         ) 
                                     },
                                     leadingIcon = { 
                                         Icon(
                                             imageVector = if (isFeaturedDemoted) Icons.Filled.ArrowUpward else Icons.Filled.ArrowDownward, 
                                             contentDescription = null, 
-                                            tint = NeonCyan
+                                            tint = MaterialTheme.colorScheme.primary
                                         ) 
                                     },
                                     onClick = {
@@ -682,7 +682,7 @@ fun HomeScreen(
                                     }
                                 )
 
-                                HorizontalDivider(color = CardBorder, thickness = 1.dp)
+                                HorizontalDivider(color = MaterialTheme.colorScheme.outline, thickness = 1.dp)
 
                                 DropdownMenuItem(
                                     text = { Text(stringResource(R.string.block_this_station), color = Color(0xFFEF5350)) },
@@ -702,7 +702,7 @@ fun HomeScreen(
                     Text(
                         text = if (uiState.selectedTab == HomeTab.Radio) stringResource(R.string.live_radio_stations) else stringResource(R.string.podcasts_and_shows),
                         style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
-                        color = TextPrimary,
+                        color = MaterialTheme.colorScheme.onSurface,
                         modifier = Modifier.padding(top = 12.dp, bottom = 4.dp)
                     )
                 }
@@ -719,7 +719,7 @@ fun HomeScreen(
                             if (uiState.isDiscoveringOnline) {
                                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                     CircularProgressIndicator(
-                                        color = NeonCyan,
+                                        color = MaterialTheme.colorScheme.primary,
                                         modifier = Modifier.size(32.dp),
                                         strokeWidth = 3.dp
                                     )
@@ -727,7 +727,7 @@ fun HomeScreen(
                                     Text(
                                         text = stringResource(R.string.loading_more_stations),
                                         style = MaterialTheme.typography.titleMedium,
-                                        color = TextSecondary
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
                                 }
                             } else if (uiState.isDiscoveryError) {
@@ -735,29 +735,29 @@ fun HomeScreen(
                                     Icon(
                                         imageVector = Icons.Filled.Warning,
                                         contentDescription = null,
-                                        tint = TextMuted,
+                                        tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
                                         modifier = Modifier.size(48.dp)
                                     )
                                     Spacer(modifier = Modifier.height(12.dp))
                                     Text(
                                         text = stringResource(R.string.network_error_title),
                                         style = MaterialTheme.typography.titleMedium,
-                                        color = TextSecondary
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
                                     Spacer(modifier = Modifier.height(8.dp))
                                     Button(
                                         onClick = onRetryDiscovery,
-                                        colors = ButtonDefaults.buttonColors(containerColor = NeonCyan),
+                                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
                                         shape = RoundedCornerShape(12.dp)
                                     ) {
-                                        Text(stringResource(R.string.retry_discovery), color = DarkBackground)
+                                        Text(stringResource(R.string.retry_discovery), color = MaterialTheme.colorScheme.background)
                                     }
                                 }
                             } else {
                                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                    Text(stringResource(R.string.no_stations_found), style = MaterialTheme.typography.titleMedium, color = TextSecondary)
+                                    Text(stringResource(R.string.no_stations_found), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                                     Spacer(modifier = Modifier.height(6.dp))
-                                    Text(stringResource(R.string.add_station_prompt), style = MaterialTheme.typography.bodyMedium, color = TextMuted)
+                                    Text(stringResource(R.string.add_station_prompt), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f))
                                 }
                             }
                         }
@@ -794,13 +794,13 @@ fun HomeScreen(
                         ) {
                             CircularProgressIndicator(
                                 modifier = Modifier.size(20.dp),
-                                color = NeonCyan,
+                                color = MaterialTheme.colorScheme.primary,
                                 strokeWidth = 2.dp
                             )
                             Spacer(modifier = Modifier.width(10.dp))
                             Text(
                                 text = stringResource(R.string.loading_more_stations),
-                                color = TextSecondary,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 style = MaterialTheme.typography.bodyMedium
                             )
                         }
@@ -839,7 +839,7 @@ fun RecentStationCard(
     var showMenu by remember { mutableStateOf(false) }
     val haptic = LocalHapticFeedback.current
     val context = LocalContext.current
-    val activeAccent = NeonCyan
+    val activeAccent = MaterialTheme.colorScheme.primary
     val focusScale by animateFloatAsState(
         targetValue = if (isFocused) 1.08f else 1.0f,
         animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessLow),
@@ -875,7 +875,7 @@ fun RecentStationCard(
                         ambientColor = activeAccent.copy(alpha = 0.5f)
                     )
                     .clip(RoundedCornerShape(18.dp))
-                    .background(DarkSurfaceVariant)
+                    .background(MaterialTheme.colorScheme.surfaceVariant)
                     .border(
                         width = if (isFocused) 3.5.dp else 0.dp,
                         brush = if (isFocused) {
@@ -918,7 +918,7 @@ fun RecentStationCard(
                 style = MaterialTheme.typography.labelSmall.copy(
                     fontWeight = if (isFocused) FontWeight.Black else FontWeight.Medium
                 ),
-                color = if (isFocused) Color.White else TextPrimary,
+                color = if (isFocused) Color.White else MaterialTheme.colorScheme.onSurface,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 textAlign = TextAlign.Center
@@ -928,15 +928,15 @@ fun RecentStationCard(
         DropdownMenu(
             expanded = showMenu,
             onDismissRequest = { showMenu = false },
-            modifier = Modifier.background(DarkSurfaceVariant)
+            modifier = Modifier.background(MaterialTheme.colorScheme.surfaceVariant)
         ) {
             DropdownMenuItem(
-                text = { Text(if (station.isFavorite) "Remove from Favorites" else "Add to Favorites", color = TextPrimary) },
+                text = { Text(if (station.isFavorite) "Remove from Favorites" else "Add to Favorites", color = MaterialTheme.colorScheme.onSurface) },
                 leadingIcon = { 
                     Icon(
                         imageVector = if (station.isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder, 
                         contentDescription = null, 
-                        tint = if (station.isFavorite) FavoriteHeartColor else TextMuted
+                        tint = if (station.isFavorite) FavoriteHeartColor else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
                     ) 
                 },
                 onClick = {
@@ -949,14 +949,14 @@ fun RecentStationCard(
                 text = { 
                     Text(
                         if (isDemoted) stringResource(R.string.move_to_top) else stringResource(R.string.move_to_bottom), 
-                        color = TextPrimary
+                        color = MaterialTheme.colorScheme.onSurface
                     ) 
                 },
                 leadingIcon = { 
                     Icon(
                         imageVector = if (isDemoted) Icons.Filled.ArrowUpward else Icons.Filled.ArrowDownward, 
                         contentDescription = null, 
-                        tint = NeonCyan
+                        tint = MaterialTheme.colorScheme.primary
                     ) 
                 },
                 onClick = {
@@ -965,11 +965,11 @@ fun RecentStationCard(
                 }
             )
 
-            HorizontalDivider(color = CardBorder, thickness = 1.dp)
+            HorizontalDivider(color = MaterialTheme.colorScheme.outline, thickness = 1.dp)
 
             DropdownMenuItem(
-                text = { Text(stringResource(R.string.share_station), color = TextPrimary) },
-                leadingIcon = { Icon(Icons.Filled.Share, contentDescription = null, tint = NeonCyan) },
+                text = { Text(stringResource(R.string.share_station), color = MaterialTheme.colorScheme.onSurface) },
+                leadingIcon = { Icon(Icons.Filled.Share, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },
                 onClick = {
                     showMenu = false
                     haptic.performHapticFeedback(HapticFeedbackType.LongPress)
@@ -1014,7 +1014,7 @@ fun StationCard(
     var showMenu by remember { mutableStateOf(false) }
     val haptic = LocalHapticFeedback.current
     val context = LocalContext.current
-    val activeAccent = NeonCyan
+    val activeAccent = MaterialTheme.colorScheme.primary
     val focusScale by animateFloatAsState(
         targetValue = if (isFocused) 1.06f else 1.0f,
         animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessLow),
@@ -1064,15 +1064,15 @@ fun StationCard(
                     } else {
                         Brush.horizontalGradient(
                             listOf(
-                                CardBorder.copy(alpha = 0.5f),
-                                CardBorder.copy(alpha = 0.5f)
+                                MaterialTheme.colorScheme.outline.copy(alpha = 0.5f),
+                                MaterialTheme.colorScheme.outline.copy(alpha = 0.5f)
                             )
                         )
                     },
                     shape = RoundedCornerShape(18.dp)
                 )
                 .testTag("station_card_${station.id}"),
-            color = if (isFocused) DarkSurfaceVariant.copy(alpha = 0.95f) else if (isSelected) DarkSurfaceVariant.copy(alpha = 0.8f) else DarkSurface
+            color = if (isFocused) MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.95f) else if (isSelected) MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.8f) else MaterialTheme.colorScheme.surface
         ) {
             Box(
                 modifier = Modifier
@@ -1101,7 +1101,7 @@ fun StationCard(
                         modifier = Modifier
                             .size(60.dp)
                             .clip(RoundedCornerShape(14.dp))
-                            .background(DarkSurfaceVariant)
+                            .background(MaterialTheme.colorScheme.surfaceVariant)
                             .border(
                                 width = if (isFocused) 2.dp else 0.dp,
                                 color = if (isFocused) activeAccent else Color.Transparent,
@@ -1118,7 +1118,7 @@ fun StationCard(
                             Box(
                                 modifier = Modifier
                                     .fillMaxSize()
-                                    .background(DarkBackground.copy(alpha = 0.55f)),
+                                    .background(MaterialTheme.colorScheme.background.copy(alpha = 0.55f)),
                                 contentAlignment = Alignment.Center
                             ) {
                                 if (isLoading) {
@@ -1154,7 +1154,7 @@ fun StationCard(
                                 fontWeight = if (isFocused || isSelected) FontWeight.Black else FontWeight.Bold,
                                 fontSize = if (isFocused) 16.sp else 15.sp
                             ),
-                            color = if (isFocused) Color.White else if (isSelected) activeAccent else TextPrimary,
+                            color = if (isFocused) Color.White else if (isSelected) activeAccent else MaterialTheme.colorScheme.onSurface,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )
@@ -1199,18 +1199,18 @@ fun StationCard(
                                     style = MaterialTheme.typography.bodySmall.copy(
                                         fontWeight = if (isFocused) FontWeight.SemiBold else FontWeight.Normal
                                     ),
-                                    color = if (isFocused) activeAccent else TextSecondary,
+                                    color = if (isFocused) activeAccent else MaterialTheme.colorScheme.onSurfaceVariant,
                                     maxLines = 1,
                                     overflow = TextOverflow.Ellipsis,
                                     modifier = Modifier.weight(1f, fill = false)
                                 )
                                 val secondary = station.country.ifBlank { station.bitrate }
                                 if (secondary.isNotBlank()) {
-                                    Text(" • ", color = TextMuted, style = MaterialTheme.typography.bodySmall)
+                                    Text(" • ", color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f), style = MaterialTheme.typography.bodySmall)
                                     Text(
                                         text = secondary,
                                         style = MaterialTheme.typography.bodySmall,
-                                        color = if (isFocused) Color.White.copy(alpha = 0.85f) else TextMuted,
+                                        color = if (isFocused) Color.White.copy(alpha = 0.85f) else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
                                         maxLines = 1,
                                         overflow = TextOverflow.Ellipsis,
                                         modifier = Modifier.weight(1f, fill = false)
@@ -1234,7 +1234,7 @@ fun StationCard(
                                 Icon(
                                     imageVector = if (isPlaying) Icons.Filled.Pause else Icons.Filled.PlayArrow,
                                     contentDescription = null,
-                                    tint = DarkBackground,
+                                    tint = MaterialTheme.colorScheme.background,
                                     modifier = Modifier.size(14.dp)
                                 )
                                 Spacer(modifier = Modifier.width(4.dp))
@@ -1244,7 +1244,7 @@ fun StationCard(
                                         fontWeight = FontWeight.Black,
                                         fontSize = 11.sp
                                     ),
-                                    color = DarkBackground
+                                    color = MaterialTheme.colorScheme.background
                                 )
                             }
                         }
@@ -1262,7 +1262,7 @@ fun StationCard(
                             Icon(
                                 imageVector = if (station.isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
                                 contentDescription = "Favorite",
-                                tint = if (station.isFavorite) FavoriteHeartColor else TextMuted,
+                                tint = if (station.isFavorite) FavoriteHeartColor else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
                                 modifier = Modifier.size(20.dp)
                             )
                         }
@@ -1274,15 +1274,15 @@ fun StationCard(
         DropdownMenu(
             expanded = showMenu,
             onDismissRequest = { showMenu = false },
-            modifier = Modifier.background(DarkSurfaceVariant)
+            modifier = Modifier.background(MaterialTheme.colorScheme.surfaceVariant)
         ) {
             DropdownMenuItem(
-                text = { Text(if (station.isFavorite) stringResource(R.string.remove_from_favorites) else stringResource(R.string.add_to_favorites), color = TextPrimary) },
+                text = { Text(if (station.isFavorite) stringResource(R.string.remove_from_favorites) else stringResource(R.string.add_to_favorites), color = MaterialTheme.colorScheme.onSurface) },
                 leadingIcon = { 
                     Icon(
                         imageVector = if (station.isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder, 
                         contentDescription = null, 
-                        tint = if (station.isFavorite) FavoriteHeartColor else TextMuted
+                        tint = if (station.isFavorite) FavoriteHeartColor else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
                     ) 
                 },
                 onClick = {
@@ -1295,14 +1295,14 @@ fun StationCard(
                 text = { 
                     Text(
                         if (isDemoted) stringResource(R.string.move_to_top) else stringResource(R.string.move_to_bottom), 
-                        color = TextPrimary
+                        color = MaterialTheme.colorScheme.onSurface
                     ) 
                 },
                 leadingIcon = { 
                     Icon(
                         imageVector = if (isDemoted) Icons.Filled.ArrowUpward else Icons.Filled.ArrowDownward, 
                         contentDescription = null, 
-                        tint = NeonCyan
+                        tint = MaterialTheme.colorScheme.primary
                     ) 
                 },
                 onClick = {
@@ -1311,11 +1311,11 @@ fun StationCard(
                 }
             )
 
-            HorizontalDivider(color = CardBorder, thickness = 1.dp)
+            HorizontalDivider(color = MaterialTheme.colorScheme.outline, thickness = 1.dp)
 
             DropdownMenuItem(
-                text = { Text(stringResource(R.string.share_station), color = TextPrimary) },
-                leadingIcon = { Icon(Icons.Filled.Share, contentDescription = null, tint = NeonCyan) },
+                text = { Text(stringResource(R.string.share_station), color = MaterialTheme.colorScheme.onSurface) },
+                leadingIcon = { Icon(Icons.Filled.Share, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },
                 onClick = {
                     showMenu = false
                     haptic.performHapticFeedback(HapticFeedbackType.LongPress)

@@ -56,8 +56,8 @@ fun TrackActionSheet(
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
-        containerColor = DarkSurface,
-        scrimColor = DarkBackground.copy(alpha = 0.7f),
+        containerColor = MaterialTheme.colorScheme.surface,
+        scrimColor = MaterialTheme.colorScheme.background.copy(alpha = 0.7f),
         shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp)
     ) {
         Column(
@@ -76,13 +76,13 @@ fun TrackActionSheet(
                         modifier = Modifier
                             .size(36.dp)
                             .clip(CircleShape)
-                            .background(if (isPodcast) NeonPurple.copy(alpha = 0.15f) else NeonCyan.copy(alpha = 0.15f)),
+                            .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
                             imageVector = if (isPodcast) Icons.Filled.MusicNote else Icons.Filled.PlayArrow,
                             contentDescription = null,
-                            tint = if (isPodcast) NeonPurple else NeonCyan,
+                            tint = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.size(20.dp)
                         )
                     }
@@ -91,12 +91,12 @@ fun TrackActionSheet(
                         Text(
                             text = stringResource(if (isPodcast) R.string.podcast_options else R.string.station_options),
                             style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-                            color = TextPrimary
+                            color = MaterialTheme.colorScheme.onSurface
                         )
                         Text(
                             text = stationName,
                             style = MaterialTheme.typography.bodySmall,
-                            color = TextMuted
+                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
                         )
                     }
                 }
@@ -106,12 +106,12 @@ fun TrackActionSheet(
                     modifier = Modifier
                         .size(32.dp)
                         .clip(CircleShape)
-                        .background(DarkSurfaceVariant)
+                        .background(MaterialTheme.colorScheme.surfaceVariant)
                 ) {
                     Icon(
                         imageVector = Icons.Filled.Close,
                         contentDescription = "Close",
-                        tint = TextMuted,
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.size(18.dp)
                     )
                 }
@@ -123,12 +123,12 @@ fun TrackActionSheet(
             Surface(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(14.dp),
-                color = DarkBackground.copy(alpha = 0.8f)
+                color = MaterialTheme.colorScheme.background.copy(alpha = 0.8f)
             ) {
                 Text(
                     text = trackTitle,
                     style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.SemiBold, fontSize = 15.sp),
-                    color = NeonCyan,
+                    color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.padding(14.dp)
                 )
             }
@@ -140,7 +140,7 @@ fun TrackActionSheet(
                 TrackActionItem(
                     icon = if (isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
                     label = stringResource(if (isFavorite) R.string.remove_from_favorites else R.string.add_to_favorites),
-                    tint = if (isFavorite) FavoriteHeartColor else TextPrimary
+                    tint = if (isFavorite) FavoriteHeartColor else MaterialTheme.colorScheme.onSurface
                 ) {
                     onDismiss()
                     onToggleFavorite()
@@ -152,7 +152,7 @@ fun TrackActionSheet(
                 TrackActionItem(
                     icon = Icons.Filled.Alarm,
                     label = stringResource(R.string.set_as_alarm_station),
-                    tint = NeonCyan
+                    tint = MaterialTheme.colorScheme.primary
                 ) {
                     onDismiss()
                     onSetAsAlarmStation()
@@ -163,7 +163,7 @@ fun TrackActionSheet(
             TrackActionItem(
                 icon = Icons.Filled.PlayArrow,
                 label = stringResource(R.string.search_on_youtube),
-                tint = NeonCyan
+                tint = MaterialTheme.colorScheme.primary
             ) {
                 onDismiss()
                 val query = URLEncoder.encode(trackTitle, "UTF-8")
@@ -177,7 +177,7 @@ fun TrackActionSheet(
             TrackActionItem(
                 icon = Icons.Filled.Share,
                 label = stringResource(R.string.share_track),
-                tint = TextPrimary
+                tint = MaterialTheme.colorScheme.onSurface
             ) {
                 onDismiss()
                 val sendIntent = Intent().apply {
@@ -218,7 +218,7 @@ private fun TrackActionItem(
             .padding(vertical = 4.dp)
             .clip(RoundedCornerShape(12.dp))
             .clickable { onClick() },
-        color = DarkSurfaceVariant.copy(alpha = 0.5f)
+        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
     ) {
         Row(
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
@@ -234,7 +234,7 @@ private fun TrackActionItem(
             Text(
                 text = label,
                 style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Medium),
-                color = TextPrimary
+                color = MaterialTheme.colorScheme.onSurface
             )
         }
     }
