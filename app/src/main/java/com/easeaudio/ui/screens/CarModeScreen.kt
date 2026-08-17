@@ -1,24 +1,26 @@
 package com.easeaudio.ui.screens
 
-import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.DirectionsCar
-import androidx.compose.material.icons.filled.Pause
-import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material.icons.filled.SkipNext
-import androidx.compose.material.icons.filled.SkipPrevious
+import androidx.compose.material.icons.automirrored.filled.List
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -26,276 +28,589 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
 import com.easeaudio.R
 import com.easeaudio.data.RadioStation
-import com.easeaudio.ui.theme.*
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.outlined.FavoriteBorder
 import com.easeaudio.ui.components.AudioVisualizerCanvas
 import com.easeaudio.ui.components.VisualizerStyle
+import com.easeaudio.ui.theme.FavoriteHeartColor
+import com.easeaudio.viewmodel.HomeUiState
+
+enum class CarTab {
+    Player, Radio, Podcast, Favorites
+}
 
 @Composable
 fun CarModeScreen(
-    currentStation: RadioStation?,
-    isPlaying: Boolean,
-    waveAmplitudes: List<Float> = List(8) { 0.2f },
-    stations: List<RadioStation>,
+    uiState: HomeUiState,
     onPlayPause: () -> Unit,
     onNextStation: () -> Unit,
     onPreviousStation: () -> Unit,
     onSelectStation: (RadioStation) -> Unit,
     onToggleFavorite: (RadioStation) -> Unit = {},
+    onTabSelect: (HomeTab) -> Unit,
+    onGenreSelect: (String) -> Unit,
+    onCountrySelect: (String) -> Unit,
+    onSearchQueryChange: (String) -> Unit,
+    onLoadMore: () -> Unit,
+    onOpenEpisodes: () -> Unit,
     onExitCarMode: () -> Unit
 ) {
-    Surface(
-        modifier = Modifier.fillMaxSize(),
-        color = MaterialTheme.colorScheme.background
+    var activeCarTab by remember { mutableStateOf(CarTab.Player) }
+    var showCountryDialog by remember { mutableStateOf(false) }
+
+    BoxWithConstraints(
+        modifier = Modifier.fillMaxSize()
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(20.dp),
-            verticalArrangement = Arrangement.SpaceBetween
+        val isWide = this.maxWidth > 600.dp
+        
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = MaterialTheme.colorScheme.background
         ) {
-            // Header Row
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        imageVector = Icons.Filled.DirectionsCar,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(28.dp)
-                    )
-                    Spacer(modifier = Modifier.width(10.dp))
-                    Text(
-                        text = stringResource(R.string.car_mode_title),
-                        style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Black, fontSize = 22.sp),
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                }
-
-                var isExitFocused by remember { mutableStateOf(false) }
-                Button(
-                    onClick = onExitCarMode,
-                    colors = ButtonDefaults.buttonColors(containerColor = if (isExitFocused) MaterialTheme.colorScheme.primary.copy(alpha = 0.3f) else MaterialTheme.colorScheme.surfaceVariant),
-                    shape = CircleShape,
-                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-                    modifier = Modifier
-                        .onFocusChanged { isExitFocused = it.isFocused }
-                        .border(
-                            width = if (isExitFocused) 2.dp else 0.dp,
-                            color = if (isExitFocused) MaterialTheme.colorScheme.primary else Color.Transparent,
-                            shape = CircleShape
+            Box(modifier = Modifier.fillMaxSize()) {
+                Row(modifier = Modifier.fillMaxSize()) {
+                    // SIDEBAR NAVIGATION - Minimalist & Safe
+                    if (isWide) {
+                        CarSideNav(
+                            selectedTab = activeCarTab,
+                            onTabSelect = { 
+                                activeCarTab = it
+                                if (it == CarTab.Radio) onTabSelect(HomeTab.Radio)
+                                if (it == CarTab.Podcast) onTabSelect(HomeTab.Podcast)
+                            },
+                            onExit = onExitCarMode
                         )
-                ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(imageVector = Icons.Filled.Close, contentDescription = null, tint = if (isExitFocused) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface, modifier = Modifier.size(16.dp))
-                        Spacer(modifier = Modifier.width(6.dp))
-                        Text(text = stringResource(R.string.exit_car_mode), style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold), color = if (isExitFocused) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface)
                     }
-                }
-            }
 
-            // Current Station Display Card
-            Surface(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(140.dp),
-                shape = RoundedCornerShape(24.dp),
-                color = MaterialTheme.colorScheme.surface
-            ) {
-                Box(modifier = Modifier.fillMaxSize()) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(16.dp),
-                        verticalArrangement = Arrangement.Center,
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Text(
-                            text = currentStation?.name ?: stringResource(R.string.no_station_selected),
-                            style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold),
-                            color = MaterialTheme.colorScheme.onSurface,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                            textAlign = TextAlign.Center
-                        )
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Text(
-                            text = currentStation?.genre ?: "Radio",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.primary,
-                            textAlign = TextAlign.Center
-                        )
-                        if (currentStation != null && isPlaying) {
-                            Spacer(modifier = Modifier.height(10.dp))
-                            AudioVisualizerCanvas(
-                                waveAmplitudes = waveAmplitudes,
-                                isPlaying = isPlaying,
-                                modifier = Modifier
-                                    .fillMaxWidth(0.5f)
-                                    .height(28.dp),
-                                style = VisualizerStyle.ROUNDED_BARS
+                    Column(modifier = Modifier.weight(1f)) {
+                        if (!isWide) {
+                            CarTopNav(
+                                selectedTab = activeCarTab,
+                                onTabSelect = { 
+                                    activeCarTab = it 
+                                    if (it == CarTab.Radio) onTabSelect(HomeTab.Radio)
+                                    if (it == CarTab.Podcast) onTabSelect(HomeTab.Podcast)
+                                },
+                                onExit = onExitCarMode
                             )
                         }
-                    }
 
+                        // Content Area
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                                .padding(horizontal = if (isWide) 24.dp else 16.dp)
+                                .padding(top = if (isWide) 24.dp else 0.dp)
+                        ) {
+                            AnimatedContent(
+                                targetState = activeCarTab,
+                                transitionSpec = { fadeIn() togetherWith fadeOut() },
+                                label = "car_tab_transition"
+                            ) { targetTab ->
+                                when (targetTab) {
+                                    CarTab.Player -> {
+                                        UnifiedHeroPlayer(
+                                            uiState = uiState,
+                                            onPlayPause = onPlayPause,
+                                            onNextStation = onNextStation,
+                                            onPreviousStation = onPreviousStation,
+                                            onToggleFavorite = onToggleFavorite,
+                                            onOpenEpisodes = onOpenEpisodes,
+                                            modifier = Modifier.fillMaxSize()
+                                        )
+                                    }
+                                    CarTab.Radio, CarTab.Podcast -> {
+                                        DiscoveryPanel(
+                                            uiState = uiState,
+                                            onGenreSelect = onGenreSelect,
+                                            onCountryPickerOpen = { showCountryDialog = true },
+                                            onSearchQueryChange = onSearchQueryChange,
+                                            onStationSelect = {
+                                                onSelectStation(it)
+                                                activeCarTab = CarTab.Player
+                                            },
+                                            onToggleFavorite = onToggleFavorite,
+                                            onLoadMore = onLoadMore,
+                                            columns = if (isWide) 3 else 1
+                                        )
+                                    }
+                                    CarTab.Favorites -> {
+                                        FavoritesPanel(
+                                            favoriteStations = uiState.favoriteStations,
+                                            onStationSelect = {
+                                                onSelectStation(it)
+                                                activeCarTab = CarTab.Player
+                                            },
+                                            onToggleFavorite = onToggleFavorite,
+                                            columns = if (isWide) 3 else 1
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // MINI PLAYER - Pinned to bottom when browsing
+                if (activeCarTab != CarTab.Player && uiState.currentStation != null) {
+                    CarMiniPlayer(
+                        station = uiState.currentStation!!,
+                        isPlaying = uiState.isPlaying,
+                        isLoading = uiState.isLoading,
+                        streamTitle = uiState.streamTitle,
+                        waveAmplitudes = uiState.waveAmplitudes,
+                        onTogglePlay = onPlayPause,
+                        onClick = { activeCarTab = CarTab.Player },
+                        modifier = Modifier
+                            .align(Alignment.BottomCenter)
+                            .padding(horizontal = 24.dp, vertical = 16.dp)
+                    )
+                }
+            }
+        }
+    }
+
+    if (showCountryDialog) {
+        com.easeaudio.ui.components.CountrySelectionDialog(
+            selectedCountry = uiState.selectedCountry,
+            countries = uiState.availableCountries,
+            onSelectCountry = { 
+                onCountrySelect(it)
+                showCountryDialog = false
+            },
+            onDismiss = { showCountryDialog = false }
+        )
+    }
+}
+
+@Composable
+private fun CarSideNav(
+    selectedTab: CarTab,
+    onTabSelect: (CarTab) -> Unit,
+    onExit: () -> Unit
+) {
+    NavigationRail(
+        containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
+        header = {
+            IconButton(onClick = onExit, modifier = Modifier.padding(vertical = 12.dp)) {
+                Icon(Icons.Filled.Close, contentDescription = "Exit", tint = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
+        },
+        modifier = Modifier.width(100.dp).fillMaxHeight()
+    ) {
+        val items = listOf(
+            Triple(CarTab.Player, Icons.Filled.PlayCircle, "Player"),
+            Triple(CarTab.Radio, Icons.Filled.Radio, "Radio"),
+            Triple(CarTab.Podcast, Icons.Filled.Mic, "Podcasts"),
+            Triple(CarTab.Favorites, Icons.Filled.Favorite, "Saved")
+        )
+
+        Column(
+            modifier = Modifier.fillMaxHeight(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            items.forEach { (tab, icon, label) ->
+                val isSelected = selectedTab == tab
+                NavigationRailItem(
+                    selected = isSelected,
+                    onClick = { onTabSelect(tab) },
+                    icon = { Icon(icon, contentDescription = label, modifier = Modifier.size(32.dp)) },
+                    label = { Text(label, style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold)) },
+                    colors = NavigationRailItemDefaults.colors(
+                        selectedIconColor = MaterialTheme.colorScheme.background,
+                        selectedTextColor = MaterialTheme.colorScheme.primary,
+                        indicatorColor = MaterialTheme.colorScheme.primary,
+                        unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                        unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant
+                    ),
+                    modifier = Modifier.padding(vertical = 8.dp)
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun CarTopNav(
+    selectedTab: CarTab,
+    onTabSelect: (CarTab) -> Unit,
+    onExit: () -> Unit
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth().padding(8.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        ScrollableTabRow(
+            selectedTabIndex = selectedTab.ordinal,
+            containerColor = Color.Transparent,
+            divider = {},
+            indicator = {},
+            edgePadding = 0.dp,
+            modifier = Modifier.weight(1f)
+        ) {
+            CarTab.entries.forEach { tab ->
+                val isSelected = selectedTab == tab
+                Tab(
+                    selected = isSelected,
+                    onClick = { onTabSelect(tab) },
+                    modifier = Modifier.padding(horizontal = 4.dp, vertical = 8.dp)
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(if (isSelected) MaterialTheme.colorScheme.primary else Color.Transparent)
+                ) {
+                    Text(
+                        text = tab.name,
+                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                        style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
+                        color = if (isSelected) MaterialTheme.colorScheme.background else MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+        }
+        IconButton(onClick = onExit) {
+            Icon(Icons.Filled.Close, contentDescription = "Exit")
+        }
+    }
+}
+
+@Composable
+private fun FavoritesPanel(
+    favoriteStations: List<RadioStation>,
+    onStationSelect: (RadioStation) -> Unit,
+    onToggleFavorite: (RadioStation) -> Unit,
+    columns: Int
+) {
+    Column(modifier = Modifier.fillMaxSize()) {
+        Text(
+            text = "Your Favorites",
+            style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Black),
+            color = MaterialTheme.colorScheme.onSurface,
+            modifier = Modifier.padding(bottom = 16.dp)
+        )
+        
+        if (favoriteStations.isEmpty()) {
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Text("No saved stations", color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
+        } else {
+            QuickSelectGrid(
+                stations = favoriteStations,
+                currentStationId = null,
+                onSelectStation = onStationSelect,
+                onToggleFavorite = onToggleFavorite,
+                columns = columns,
+                modifier = Modifier.fillMaxSize()
+            )
+        }
+    }
+}
+
+@Composable
+private fun DiscoveryPanel(
+    uiState: HomeUiState,
+    onGenreSelect: (String) -> Unit,
+    onCountryPickerOpen: () -> Unit,
+    onSearchQueryChange: (String) -> Unit,
+    onStationSelect: (RadioStation) -> Unit,
+    onToggleFavorite: (RadioStation) -> Unit,
+    onLoadMore: () -> Unit,
+    columns: Int
+) {
+    Column(modifier = Modifier.fillMaxSize()) {
+        // Search & Filter Row
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            // Minimalist Search Bar
+            OutlinedTextField(
+                value = uiState.searchQuery,
+                onValueChange = onSearchQueryChange,
+                placeholder = { Text("Search...", style = MaterialTheme.typography.bodyMedium) },
+                leadingIcon = { Icon(Icons.Filled.Search, contentDescription = null, modifier = Modifier.size(22.dp)) },
+                trailingIcon = {
+                    if (uiState.searchQuery.isNotEmpty()) {
+                        IconButton(onClick = { onSearchQueryChange("") }) {
+                            Icon(Icons.Filled.Close, contentDescription = "Clear", modifier = Modifier.size(20.dp))
+                        }
+                    }
+                },
+                singleLine = true,
+                shape = RoundedCornerShape(16.dp),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                    unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                    focusedBorderColor = MaterialTheme.colorScheme.primary,
+                    unfocusedBorderColor = Color.Transparent,
+                    focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                    unfocusedTextColor = MaterialTheme.colorScheme.onSurface
+                ),
+                modifier = Modifier.weight(1f).height(52.dp)
+            )
+
+            if (uiState.selectedTab == HomeTab.Radio) {
+                // Nation Picker
+                Button(
+                    onClick = onCountryPickerOpen,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                        contentColor = MaterialTheme.colorScheme.onSurface
+                    ),
+                    shape = RoundedCornerShape(16.dp),
+                    modifier = Modifier.height(52.dp)
+                ) {
+                    Icon(Icons.Filled.Public, contentDescription = null, modifier = Modifier.size(20.dp))
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(text = uiState.selectedCountry, style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold))
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        // Genre Filter
+        val genreList = if (uiState.selectedTab == HomeTab.Radio) uiState.availableGenres else uiState.availablePodcastTopics
+        LazyRow(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            items(genreList) { genre ->
+                val isSelected = genre.key == uiState.selectedGenre
+                Surface(
+                    onClick = { onGenreSelect(genre.key) },
+                    shape = RoundedCornerShape(12.dp),
+                    color = if (isSelected) MaterialTheme.colorScheme.primary.copy(alpha = 0.2f) else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                    border = BorderStroke(
+                        1.dp,
+                        if (isSelected) MaterialTheme.colorScheme.primary else Color.Transparent
+                    )
+                ) {
+                    Text(
+                        text = stringResource(genre.labelResId),
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                        style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
+                        color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Grid
+        QuickSelectGrid(
+            stations = uiState.stations,
+            currentStationId = uiState.currentStation?.id,
+            onSelectStation = onStationSelect,
+            onToggleFavorite = onToggleFavorite,
+            onLoadMore = onLoadMore,
+            columns = columns,
+            modifier = Modifier.fillMaxSize()
+        )
+    }
+}
+
+@Composable
+private fun UnifiedHeroPlayer(
+    uiState: HomeUiState,
+    onPlayPause: () -> Unit,
+    onNextStation: () -> Unit,
+    onPreviousStation: () -> Unit,
+    onToggleFavorite: (RadioStation) -> Unit,
+    onOpenEpisodes: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val currentStation = uiState.currentStation
+    val isPlaying = uiState.isPlaying
+    val waveAmplitudes = uiState.waveAmplitudes
+
+    BoxWithConstraints(modifier = modifier) {
+        val availableHeight = this.maxHeight
+        val isExtremelyShort = availableHeight < 320.dp
+        
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            shape = RoundedCornerShape(32.dp),
+            color = MaterialTheme.colorScheme.surface,
+            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.3f))
+        ) {
+            Row(
+                modifier = Modifier.fillMaxSize().padding(if (isExtremelyShort) 16.dp else 24.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                // Left Side: Artwork area (Reduced to give more space for info/controls)
+                Box(
+                    modifier = Modifier
+                        .fillMaxHeight(if (isExtremelyShort) 0.85f else 0.82f)
+                        .aspectRatio(1f)
+                        .clip(RoundedCornerShape(24.dp))
+                        .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    if (currentStation?.imageUrl?.isNotEmpty() == true) {
+                        AsyncImage(
+                            model = currentStation.imageUrl,
+                            contentDescription = null,
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier.fillMaxSize()
+                        )
+                    } else {
+                        Icon(
+                            imageVector = Icons.Filled.Radio,
+                            contentDescription = null,
+                            modifier = Modifier.size(if (isExtremelyShort) 64.dp else 100.dp),
+                            tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.4f)
+                        )
+                    }
+                    
                     if (currentStation != null) {
                         var isFavFocused by remember { mutableStateOf(false) }
                         IconButton(
                             onClick = { onToggleFavorite(currentStation) },
                             modifier = Modifier
                                 .align(Alignment.TopEnd)
-                                .padding(8.dp)
-                                .size(48.dp)
+                                .padding(if (isExtremelyShort) 4.dp else 12.dp)
+                                .background(Color.Black.copy(alpha = 0.4f), CircleShape)
                                 .onFocusChanged { isFavFocused = it.isFocused }
-                                .border(
-                                    width = if (isFavFocused) 2.dp else 0.dp,
-                                    color = if (isFavFocused) MaterialTheme.colorScheme.primary else Color.Transparent,
-                                    shape = CircleShape
-                                )
+                                .border(if (isFavFocused) 2.dp else 0.dp, MaterialTheme.colorScheme.primary, CircleShape)
                         ) {
                             Icon(
                                 imageVector = if (currentStation.isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
-                                contentDescription = "Favorite",
-                                tint = if (currentStation.isFavorite) FavoriteHeartColor else if (isFavFocused) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
-                                modifier = Modifier.size(28.dp)
+                                contentDescription = null,
+                                tint = if (currentStation.isFavorite) FavoriteHeartColor else Color.White,
+                                modifier = Modifier.size(if (isExtremelyShort) 24.dp else 32.dp)
                             )
                         }
                     }
                 }
-            }
 
-            // Giant Playback Controls
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                // Prev Button
-                var isPrevFocused by remember { mutableStateOf(false) }
-                Surface(
-                    modifier = Modifier
-                        .size(72.dp)
-                        .clip(CircleShape)
-                        .onFocusChanged { isPrevFocused = it.isFocused }
-                        .border(
-                            width = if (isPrevFocused) 3.dp else 0.dp,
-                            color = if (isPrevFocused) MaterialTheme.colorScheme.primary else Color.Transparent,
-                            shape = CircleShape
-                        )
-                        .clickable(onClick = onPreviousStation),
-                    color = if (isPrevFocused) MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.9f) else MaterialTheme.colorScheme.surfaceVariant
+                Spacer(modifier = Modifier.width(if (isExtremelyShort) 24.dp else 40.dp))
+
+                // Right Side: Info & Giant Controls
+                Column(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.SpaceBetween,
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Box(contentAlignment = Alignment.Center) {
-                        Icon(imageVector = Icons.Filled.SkipPrevious, contentDescription = "Previous", tint = if (isPrevFocused) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface, modifier = Modifier.size(36.dp))
-                    }
-                }
-
-                // Main Play/Pause Giant Button
-                var isPlayFocused by remember { mutableStateOf(false) }
-                Surface(
-                    modifier = Modifier
-                        .size(96.dp)
-                        .clip(CircleShape)
-                        .onFocusChanged { isPlayFocused = it.isFocused }
-                        .border(
-                            width = if (isPlayFocused) 4.dp else 0.dp,
-                            color = if (isPlayFocused) Color.White else Color.Transparent,
-                            shape = CircleShape
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(
+                            text = currentStation?.name ?: stringResource(R.string.no_station_selected),
+                            style = if (isExtremelyShort) MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Black) 
+                                    else MaterialTheme.typography.displaySmall.copy(fontWeight = FontWeight.Black),
+                            color = MaterialTheme.colorScheme.onSurface,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            textAlign = TextAlign.Center
                         )
-                        .clickable(onClick = onPlayPause),
-                    color = MaterialTheme.colorScheme.primary
-                ) {
-                    Box(contentAlignment = Alignment.Center) {
-                        Icon(
-                            imageVector = if (isPlaying) Icons.Filled.Pause else Icons.Filled.PlayArrow,
-                            contentDescription = if (isPlaying) "Pause" else "Play",
-                            tint = MaterialTheme.colorScheme.background,
-                            modifier = Modifier.size(48.dp)
-                        )
-                    }
-                }
-
-                // Next Button
-                var isNextFocused by remember { mutableStateOf(false) }
-                Surface(
-                    modifier = Modifier
-                        .size(72.dp)
-                        .clip(CircleShape)
-                        .onFocusChanged { isNextFocused = it.isFocused }
-                        .border(
-                            width = if (isNextFocused) 3.dp else 0.dp,
-                            color = if (isNextFocused) MaterialTheme.colorScheme.primary else Color.Transparent,
-                            shape = CircleShape
-                        )
-                        .clickable(onClick = onNextStation),
-                    color = if (isNextFocused) MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.9f) else MaterialTheme.colorScheme.surfaceVariant
-                ) {
-                    Box(contentAlignment = Alignment.Center) {
-                        Icon(imageVector = Icons.Filled.SkipNext, contentDescription = "Next", tint = if (isNextFocused) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface, modifier = Modifier.size(36.dp))
-                    }
-                }
-            }
-
-            // Large Touch / D-pad Station Cards Grid (Quick Pick)
-            Text(
-                text = stringResource(R.string.quick_select),
-                style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold),
-                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
-                modifier = Modifier.padding(start = 4.dp)
-            )
-
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(2),
-                horizontalArrangement = Arrangement.spacedBy(10.dp),
-                verticalArrangement = Arrangement.spacedBy(10.dp),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(160.dp)
-            ) {
-                items(stations.take(6)) { station ->
-                    val isSelected = currentStation?.id == station.id
-                    var isCardFocused by remember { mutableStateOf(false) }
-                    Surface(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(70.dp)
-                            .clip(RoundedCornerShape(16.dp))
-                            .onFocusChanged { isCardFocused = it.isFocused }
-                            .border(
-                                width = if (isCardFocused) 2.dp else if (isSelected) 1.dp else 0.dp,
-                                color = if (isCardFocused) MaterialTheme.colorScheme.primary else if (isSelected) MaterialTheme.colorScheme.primary.copy(alpha = 0.5f) else Color.Transparent,
-                                shape = RoundedCornerShape(16.dp)
-                            )
-                            .clickable { onSelectStation(station) },
-                        color = if (isCardFocused) MaterialTheme.colorScheme.primary.copy(alpha = 0.25f) else if (isSelected) MaterialTheme.colorScheme.primary.copy(alpha = 0.2f) else MaterialTheme.colorScheme.surface
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .padding(12.dp),
-                            contentAlignment = Alignment.CenterStart
-                        ) {
+                        Spacer(modifier = Modifier.height(4.dp))
+                        
+                        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
                             Text(
-                                text = station.name,
-                                style = MaterialTheme.typography.bodyLarge.copy(
-                                    fontWeight = if (isSelected || isCardFocused) FontWeight.Bold else FontWeight.Medium
-                                ),
-                                color = if (isSelected || isCardFocused) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
-                                maxLines = 2,
-                                overflow = TextOverflow.Ellipsis
+                                text = currentStation?.genre ?: "NeoTune Radio",
+                                style = if (isExtremelyShort) MaterialTheme.typography.bodyMedium 
+                                        else MaterialTheme.typography.headlineSmall,
+                                color = MaterialTheme.colorScheme.primary,
+                                textAlign = TextAlign.Center
                             )
+                            if (currentStation?.isPodcast == true) {
+                                Spacer(modifier = Modifier.width(12.dp))
+                                Button(
+                                    onClick = onOpenEpisodes,
+                                    shape = RoundedCornerShape(12.dp),
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.15f),
+                                        contentColor = MaterialTheme.colorScheme.primary
+                                    ),
+                                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp),
+                                    modifier = Modifier.height(36.dp)
+                                ) {
+                                    Icon(Icons.Filled.VideoLibrary, null, modifier = Modifier.size(16.dp))
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text("EPISODES", style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Black, letterSpacing = 1.sp))
+                                }
+                            }
+                        }
+                        
+                        if (currentStation != null && isPlaying) {
+                            Spacer(modifier = Modifier.height(if (isExtremelyShort) 8.dp else 20.dp))
+                            AudioVisualizerCanvas(
+                                waveAmplitudes = waveAmplitudes,
+                                isPlaying = isPlaying,
+                                modifier = Modifier.fillMaxWidth(0.85f).height(if (isExtremelyShort) 32.dp else 52.dp),
+                                style = VisualizerStyle.ROUNDED_BARS,
+                                primaryColor = MaterialTheme.colorScheme.primary,
+                                secondaryColor = MaterialTheme.colorScheme.secondary,
+                                accentColor = MaterialTheme.colorScheme.tertiary
+                            )
+                        } else if (currentStation == null) {
+                            Spacer(modifier = Modifier.height(if (isExtremelyShort) 8.dp else 20.dp))
+                            Text(
+                                text = "Tap icons on the left to browse",
+                                style = if (isExtremelyShort) MaterialTheme.typography.labelMedium else MaterialTheme.typography.bodyLarge,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                                textAlign = TextAlign.Center
+                            )
+                        }
+                    }
+
+                    // Massive Controls Row
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceEvenly,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        var isPrevFocused by remember { mutableStateOf(false) }
+                        IconButton(
+                            onClick = onPreviousStation,
+                            modifier = Modifier
+                                .size(if (isExtremelyShort) 60.dp else 86.dp)
+                                .onFocusChanged { isPrevFocused = it.isFocused }
+                                .background(MaterialTheme.colorScheme.surfaceVariant, CircleShape)
+                                .border(if (isPrevFocused) 3.dp else 0.dp, MaterialTheme.colorScheme.primary, CircleShape)
+                        ) {
+                            Icon(Icons.Filled.SkipPrevious, null, modifier = Modifier.size(if (isExtremelyShort) 32.dp else 42.dp), tint = MaterialTheme.colorScheme.onSurface)
+                        }
+
+                        var isPlayFocused by remember { mutableStateOf(false) }
+                        FilledIconButton(
+                            onClick = onPlayPause,
+                            modifier = Modifier
+                                .size(if (isExtremelyShort) 80.dp else 110.dp)
+                                .onFocusChanged { isPlayFocused = it.isFocused }
+                                .border(if (isPlayFocused) 4.dp else 0.dp, Color.White, CircleShape),
+                            shape = CircleShape,
+                            colors = IconButtonDefaults.filledIconButtonColors(
+                                containerColor = MaterialTheme.colorScheme.primary,
+                                contentColor = MaterialTheme.colorScheme.background
+                            )
+                        ) {
+                            Icon(
+                                imageVector = if (isPlaying) Icons.Filled.Pause else Icons.Filled.PlayArrow,
+                                contentDescription = if (isPlaying) "Pause" else "Play",
+                                modifier = Modifier.size(if (isExtremelyShort) 44.dp else 60.dp)
+                            )
+                        }
+
+                        var isNextFocused by remember { mutableStateOf(false) }
+                        IconButton(
+                            onClick = onNextStation,
+                            modifier = Modifier
+                                .size(if (isExtremelyShort) 60.dp else 86.dp)
+                                .onFocusChanged { isNextFocused = it.isFocused }
+                                .background(MaterialTheme.colorScheme.surfaceVariant, CircleShape)
+                                .border(if (isNextFocused) 3.dp else 0.dp, MaterialTheme.colorScheme.primary, CircleShape)
+                        ) {
+                            Icon(Icons.Filled.SkipNext, null, modifier = Modifier.size(if (isExtremelyShort) 32.dp else 42.dp), tint = MaterialTheme.colorScheme.onSurface)
                         }
                     }
                 }
@@ -304,3 +619,187 @@ fun CarModeScreen(
     }
 }
 
+@Composable
+private fun CarMiniPlayer(
+    station: RadioStation,
+    isPlaying: Boolean,
+    isLoading: Boolean,
+    streamTitle: String?,
+    waveAmplitudes: List<Float>,
+    onTogglePlay: () -> Unit,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Surface(
+        onClick = onClick,
+        modifier = modifier.height(76.dp).fillMaxWidth(),
+        shape = RoundedCornerShape(20.dp),
+        color = MaterialTheme.colorScheme.surface,
+        tonalElevation = 6.dp,
+        shadowElevation = 8.dp,
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.3f))
+    ) {
+        Row(
+            modifier = Modifier.fillMaxSize().padding(horizontal = 14.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            AsyncImage(
+                model = station.imageUrl,
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.size(52.dp).clip(RoundedCornerShape(10.dp))
+            )
+            
+            Spacer(modifier = Modifier.width(16.dp))
+            
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = station.name,
+                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Black),
+                    color = MaterialTheme.colorScheme.onSurface,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    if (isPlaying) {
+                        AudioVisualizerCanvas(
+                            waveAmplitudes = waveAmplitudes.take(8),
+                            isPlaying = isPlaying,
+                            modifier = Modifier.width(36.dp).height(16.dp),
+                            style = VisualizerStyle.ROUNDED_BARS,
+                            primaryColor = MaterialTheme.colorScheme.primary
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                    }
+                    Text(
+                        text = if (isLoading) "Buffering..." else (streamTitle ?: station.genre),
+                        style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
+                        color = MaterialTheme.colorScheme.primary,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+            }
+            
+            Surface(
+                onClick = onTogglePlay,
+                shape = CircleShape,
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(52.dp)
+            ) {
+                Box(contentAlignment = Alignment.Center) {
+                    if (isLoading) {
+                        CircularProgressIndicator(modifier = Modifier.size(24.dp), color = MaterialTheme.colorScheme.background, strokeWidth = 3.dp)
+                    } else {
+                        Icon(
+                            imageVector = if (isPlaying) Icons.Filled.Pause else Icons.Filled.PlayArrow,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.background,
+                            modifier = Modifier.size(32.dp)
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun QuickSelectGrid(
+    stations: List<RadioStation>,
+    currentStationId: String?,
+    onSelectStation: (RadioStation) -> Unit,
+    onToggleFavorite: (RadioStation) -> Unit = {},
+    onLoadMore: () -> Unit = {},
+    columns: Int,
+    modifier: Modifier = Modifier
+) {
+    val gridState = rememberLazyGridState()
+    val shouldLoadMore = remember(gridState) {
+        derivedStateOf {
+            val total = gridState.layoutInfo.totalItemsCount
+            val last = gridState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
+            total > 0 && last >= total - 3
+        }
+    }
+    
+    LaunchedEffect(shouldLoadMore.value) {
+        if (shouldLoadMore.value) onLoadMore()
+    }
+
+    LazyVerticalGrid(
+        columns = GridCells.Fixed(columns),
+        state = gridState,
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+        modifier = modifier
+    ) {
+        items(stations, key = { it.id }) { station ->
+            val isSelected = currentStationId == station.id
+            var isCardFocused by remember { mutableStateOf(false) }
+            Surface(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(if (columns == 1) 76.dp else 80.dp)
+                    .clip(RoundedCornerShape(16.dp))
+                    .onFocusChanged { isCardFocused = it.isFocused }
+                    .border(
+                        width = if (isCardFocused) 2.dp else if (isSelected) 1.dp else 0.dp,
+                        color = if (isCardFocused) MaterialTheme.colorScheme.primary else if (isSelected) MaterialTheme.colorScheme.primary.copy(alpha = 0.5f) else Color.Transparent,
+                        shape = RoundedCornerShape(16.dp)
+                    )
+                    .clickable { onSelectStation(station) },
+                color = if (isCardFocused) MaterialTheme.colorScheme.primary.copy(alpha = 0.25f) else if (isSelected) MaterialTheme.colorScheme.primary.copy(alpha = 0.2f) else MaterialTheme.colorScheme.surface
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 12.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    // Avatar / Artwork
+                    AsyncImage(
+                        model = station.imageUrl,
+                        contentDescription = null,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.size(if (columns == 1) 52.dp else 56.dp).clip(RoundedCornerShape(10.dp))
+                    )
+                    
+                    Spacer(modifier = Modifier.width(16.dp))
+                    
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = station.name,
+                            style = MaterialTheme.typography.bodyLarge.copy(
+                                fontWeight = if (isSelected || isCardFocused) FontWeight.Black else FontWeight.Bold,
+                                fontSize = if (columns == 1) 17.sp else 18.sp
+                            ),
+                            color = if (isSelected || isCardFocused) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                        Text(
+                            text = station.genre,
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                            maxLines = 1
+                        )
+                    }
+                    
+                    // Heart Icon (Favorite)
+                    IconButton(
+                        onClick = { onToggleFavorite(station) },
+                        modifier = Modifier.size(40.dp)
+                    ) {
+                        Icon(
+                            imageVector = if (station.isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
+                            contentDescription = "Favorite",
+                            tint = if (station.isFavorite) FavoriteHeartColor else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
+                            modifier = Modifier.size(22.dp)
+                        )
+                    }
+                }
+            }
+        }
+    }
+}

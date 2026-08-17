@@ -360,41 +360,6 @@ fun MainAppContent(
                         .fillMaxSize()
                         .padding(innerPadding)
                 ) {
-                    AnimatedVisibility(
-                        visible = !uiState.networkStatus.isConnected,
-                        enter = fadeIn() + androidx.compose.animation.expandVertically(),
-                        exit = fadeOut() + androidx.compose.animation.shrinkVertically()
-                    ) {
-                        Surface(
-                            color = Color(0xFFDC2626),
-                            contentColor = Color.White,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .testTag("no_connection_banner")
-                        ) {
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(horizontal = 16.dp, vertical = 10.dp),
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(10.dp)
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Filled.WifiOff,
-                                    contentDescription = null,
-                                    modifier = Modifier.size(20.dp),
-                                    tint = Color.White
-                                )
-                                Text(
-                                    text = stringResource(R.string.no_connection_msg),
-                                    style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Medium),
-                                    color = Color.White,
-                                    modifier = Modifier.weight(1f)
-                                )
-                            }
-                        }
-                    }
-
                     Box(modifier = Modifier.weight(1f)) {
                         NavHost(
                             navController = navController,
@@ -571,15 +536,18 @@ fun MainAppContent(
 
                         composable(NavRoute.CarMode.route) {
                             CarModeScreen(
-                                currentStation = syncedCurrentStation,
-                                isPlaying = uiState.isPlaying,
-                                waveAmplitudes = uiState.waveAmplitudes,
-                                stations = uiState.stations,
+                                uiState = uiState,
                                 onPlayPause = { viewModel.togglePlayPause() },
                                 onNextStation = { viewModel.playNextStation() },
                                 onPreviousStation = { viewModel.playPreviousStation() },
                                 onSelectStation = { viewModel.playStation(it) },
                                 onToggleFavorite = { viewModel.toggleFavorite(it) },
+                                onTabSelect = { viewModel.setSelectedTab(it) },
+                                onGenreSelect = { viewModel.setSelectedGenre(it) },
+                                onCountrySelect = { viewModel.setSelectedCountry(it) },
+                                onSearchQueryChange = { viewModel.setSearchQuery(it) },
+                                onLoadMore = { viewModel.loadMoreStations() },
+                                onOpenEpisodes = { viewModel.setShowEpisodesSheet(true) },
                                 onExitCarMode = {
                                     if (!navController.popBackStack()) {
                                         navController.navigate(NavRoute.Home.route) {
@@ -800,4 +768,3 @@ fun MainAppContent(
         }
     }
 }
-
