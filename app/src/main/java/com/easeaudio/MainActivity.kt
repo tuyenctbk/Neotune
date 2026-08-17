@@ -541,13 +541,13 @@ fun MainAppContent(
                                 onNextStation = { viewModel.playNextStation() },
                                 onPreviousStation = { viewModel.playPreviousStation() },
                                 onSelectStation = { viewModel.playStation(it) },
+                                onEpisodeSelect = { show, episode -> viewModel.playEpisode(show, episode) },
                                 onToggleFavorite = { viewModel.toggleFavorite(it) },
                                 onTabSelect = { viewModel.setSelectedTab(it) },
                                 onGenreSelect = { viewModel.setSelectedGenre(it) },
                                 onCountrySelect = { viewModel.setSelectedCountry(it) },
                                 onSearchQueryChange = { viewModel.setSearchQuery(it) },
                                 onLoadMore = { viewModel.loadMoreStations() },
-                                onOpenEpisodes = { viewModel.setShowEpisodesSheet(true) },
                                 onExitCarMode = {
                                     if (!navController.popBackStack()) {
                                         navController.navigate(NavRoute.Home.route) {

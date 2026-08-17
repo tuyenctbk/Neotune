@@ -9,6 +9,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -38,6 +39,7 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.easeaudio.R
 import com.easeaudio.data.RadioStation
+import com.easeaudio.data.PodcastEpisode
 import com.easeaudio.ui.components.AudioVisualizerCanvas
 import com.easeaudio.ui.components.VisualizerStyle
 import com.easeaudio.ui.theme.FavoriteHeartColor
@@ -54,13 +56,13 @@ fun CarModeScreen(
     onNextStation: () -> Unit,
     onPreviousStation: () -> Unit,
     onSelectStation: (RadioStation) -> Unit,
+    onEpisodeSelect: (RadioStation, PodcastEpisode) -> Unit,
     onToggleFavorite: (RadioStation) -> Unit = {},
     onTabSelect: (HomeTab) -> Unit,
     onGenreSelect: (String) -> Unit,
     onCountrySelect: (String) -> Unit,
     onSearchQueryChange: (String) -> Unit,
     onLoadMore: () -> Unit,
-    onOpenEpisodes: () -> Unit,
     onExitCarMode: () -> Unit
 ) {
     var activeCarTab by remember { mutableStateOf(CarTab.Player) }
@@ -123,7 +125,7 @@ fun CarModeScreen(
                                             onNextStation = onNextStation,
                                             onPreviousStation = onPreviousStation,
                                             onToggleFavorite = onToggleFavorite,
-                                            onOpenEpisodes = onOpenEpisodes,
+                                            onEpisodeSelect = onEpisodeSelect,
                                             modifier = Modifier.fillMaxSize()
                                         )
                                     }
@@ -427,7 +429,7 @@ private fun UnifiedHeroPlayer(
     onNextStation: () -> Unit,
     onPreviousStation: () -> Unit,
     onToggleFavorite: (RadioStation) -> Unit,
-    onOpenEpisodes: () -> Unit,
+    onEpisodeSelect: (RadioStation, PodcastEpisode) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val currentStation = uiState.currentStation
@@ -448,146 +450,108 @@ private fun UnifiedHeroPlayer(
                 modifier = Modifier.fillMaxSize().padding(if (isExtremelyShort) 16.dp else 24.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Left Side: Artwork area (Reduced to give more space for info/controls)
-                Box(
-                    modifier = Modifier
-                        .fillMaxHeight(if (isExtremelyShort) 0.85f else 0.82f)
-                        .aspectRatio(1f)
-                        .clip(RoundedCornerShape(24.dp))
-                        .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f)),
-                    contentAlignment = Alignment.Center
-                ) {
-                    if (currentStation?.imageUrl?.isNotEmpty() == true) {
-                        AsyncImage(
-                            model = currentStation.imageUrl,
-                            contentDescription = null,
-                            contentScale = ContentScale.Crop,
-                            modifier = Modifier.fillMaxSize()
-                        )
-                    } else {
-                        Icon(
-                            imageVector = Icons.Filled.Radio,
-                            contentDescription = null,
-                            modifier = Modifier.size(if (isExtremelyShort) 64.dp else 100.dp),
-                            tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.4f)
-                        )
-                    }
-                    
-                    if (currentStation != null) {
-                        var isFavFocused by remember { mutableStateOf(false) }
-                        IconButton(
-                            onClick = { onToggleFavorite(currentStation) },
-                            modifier = Modifier
-                                .align(Alignment.TopEnd)
-                                .padding(if (isExtremelyShort) 4.dp else 12.dp)
-                                .background(Color.Black.copy(alpha = 0.4f), CircleShape)
-                                .onFocusChanged { isFavFocused = it.isFocused }
-                                .border(if (isFavFocused) 2.dp else 0.dp, MaterialTheme.colorScheme.primary, CircleShape)
-                        ) {
-                            Icon(
-                                imageVector = if (currentStation.isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
-                                contentDescription = null,
-                                tint = if (currentStation.isFavorite) FavoriteHeartColor else Color.White,
-                                modifier = Modifier.size(if (isExtremelyShort) 24.dp else 32.dp)
-                            )
-                        }
-                    }
-                }
-
-                Spacer(modifier = Modifier.width(if (isExtremelyShort) 24.dp else 40.dp))
-
-                // Right Side: Info & Giant Controls
+                // Left Side: High-Density Info Area
                 Column(
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier.weight(1.1f).fillMaxHeight(),
                     verticalArrangement = Arrangement.SpaceBetween,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        // Compact Artwork
+                        Box(
+                            modifier = Modifier
+                                .size(if (isExtremelyShort) 110.dp else 160.dp)
+                                .clip(RoundedCornerShape(24.dp))
+                                .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f)),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            if (currentStation?.imageUrl?.isNotEmpty() == true) {
+                                AsyncImage(
+                                    model = currentStation.imageUrl,
+                                    contentDescription = null,
+                                    contentScale = ContentScale.Crop,
+                                    modifier = Modifier.fillMaxSize()
+                                )
+                            } else {
+                                Icon(
+                                    imageVector = Icons.Filled.Radio,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(if (isExtremelyShort) 52.dp else 80.dp),
+                                    tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.4f)
+                                )
+                            }
+                            
+                            if (currentStation != null) {
+                                var isFavFocused by remember { mutableStateOf(false) }
+                                IconButton(
+                                    onClick = { onToggleFavorite(currentStation) },
+                                    modifier = Modifier
+                                        .align(Alignment.TopEnd)
+                                        .padding(8.dp)
+                                        .background(Color.Black.copy(alpha = 0.4f), CircleShape)
+                                        .onFocusChanged { isFavFocused = it.isFocused }
+                                        .border(if (isFavFocused) 2.dp else 0.dp, MaterialTheme.colorScheme.primary, CircleShape)
+                                ) {
+                                    Icon(
+                                        imageVector = if (currentStation.isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
+                                        contentDescription = null,
+                                        tint = if (currentStation.isFavorite) FavoriteHeartColor else Color.White,
+                                        modifier = Modifier.size(if (isExtremelyShort) 20.dp else 28.dp)
+                                    )
+                                }
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(12.dp))
+                        
                         Text(
                             text = currentStation?.name ?: stringResource(R.string.no_station_selected),
                             style = if (isExtremelyShort) MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Black) 
-                                    else MaterialTheme.typography.displaySmall.copy(fontWeight = FontWeight.Black),
+                                    else MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Black),
                             color = MaterialTheme.colorScheme.onSurface,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
                             textAlign = TextAlign.Center
                         )
-                        Spacer(modifier = Modifier.height(4.dp))
-                        
-                        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
-                            Text(
-                                text = currentStation?.genre ?: "NeoTune Radio",
-                                style = if (isExtremelyShort) MaterialTheme.typography.bodyMedium 
-                                        else MaterialTheme.typography.headlineSmall,
-                                color = MaterialTheme.colorScheme.primary,
-                                textAlign = TextAlign.Center
-                            )
-                            if (currentStation?.isPodcast == true) {
-                                Spacer(modifier = Modifier.width(12.dp))
-                                Button(
-                                    onClick = onOpenEpisodes,
-                                    shape = RoundedCornerShape(12.dp),
-                                    colors = ButtonDefaults.buttonColors(
-                                        containerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.15f),
-                                        contentColor = MaterialTheme.colorScheme.primary
-                                    ),
-                                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp),
-                                    modifier = Modifier.height(36.dp)
-                                ) {
-                                    Icon(Icons.Filled.VideoLibrary, null, modifier = Modifier.size(16.dp))
-                                    Spacer(modifier = Modifier.width(8.dp))
-                                    Text("EPISODES", style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Black, letterSpacing = 1.sp))
-                                }
-                            }
-                        }
-                        
+                        Text(
+                            text = currentStation?.genre ?: "NeoTune Radio",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.primary,
+                            textAlign = TextAlign.Center
+                        )
+
                         if (currentStation != null && isPlaying) {
-                            Spacer(modifier = Modifier.height(if (isExtremelyShort) 8.dp else 20.dp))
+                            Spacer(modifier = Modifier.height(10.dp))
                             AudioVisualizerCanvas(
                                 waveAmplitudes = waveAmplitudes,
                                 isPlaying = isPlaying,
-                                modifier = Modifier.fillMaxWidth(0.85f).height(if (isExtremelyShort) 32.dp else 52.dp),
+                                modifier = Modifier.fillMaxWidth(0.9f).height(if (isExtremelyShort) 24.dp else 40.dp),
                                 style = VisualizerStyle.ROUNDED_BARS,
                                 primaryColor = MaterialTheme.colorScheme.primary,
                                 secondaryColor = MaterialTheme.colorScheme.secondary,
                                 accentColor = MaterialTheme.colorScheme.tertiary
                             )
-                        } else if (currentStation == null) {
-                            Spacer(modifier = Modifier.height(if (isExtremelyShort) 8.dp else 20.dp))
-                            Text(
-                                text = "Tap icons on the left to browse",
-                                style = if (isExtremelyShort) MaterialTheme.typography.labelMedium else MaterialTheme.typography.bodyLarge,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
-                                textAlign = TextAlign.Center
-                            )
                         }
                     }
 
-                    // Massive Controls Row
+                    // Integrated Playback Controls
                     Row(
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
                         horizontalArrangement = Arrangement.SpaceEvenly,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        var isPrevFocused by remember { mutableStateOf(false) }
                         IconButton(
                             onClick = onPreviousStation,
                             modifier = Modifier
-                                .size(if (isExtremelyShort) 60.dp else 86.dp)
-                                .onFocusChanged { isPrevFocused = it.isFocused }
+                                .size(if (isExtremelyShort) 52.dp else 64.dp)
                                 .background(MaterialTheme.colorScheme.surfaceVariant, CircleShape)
-                                .border(if (isPrevFocused) 3.dp else 0.dp, MaterialTheme.colorScheme.primary, CircleShape)
                         ) {
-                            Icon(Icons.Filled.SkipPrevious, null, modifier = Modifier.size(if (isExtremelyShort) 32.dp else 42.dp), tint = MaterialTheme.colorScheme.onSurface)
+                            Icon(Icons.Filled.SkipPrevious, null, modifier = Modifier.size(if (isExtremelyShort) 28.dp else 32.dp), tint = MaterialTheme.colorScheme.onSurface)
                         }
 
-                        var isPlayFocused by remember { mutableStateOf(false) }
                         FilledIconButton(
                             onClick = onPlayPause,
-                            modifier = Modifier
-                                .size(if (isExtremelyShort) 80.dp else 110.dp)
-                                .onFocusChanged { isPlayFocused = it.isFocused }
-                                .border(if (isPlayFocused) 4.dp else 0.dp, Color.White, CircleShape),
+                            modifier = Modifier.size(if (isExtremelyShort) 72.dp else 84.dp),
                             shape = CircleShape,
                             colors = IconButtonDefaults.filledIconButtonColors(
                                 containerColor = MaterialTheme.colorScheme.primary,
@@ -597,21 +561,101 @@ private fun UnifiedHeroPlayer(
                             Icon(
                                 imageVector = if (isPlaying) Icons.Filled.Pause else Icons.Filled.PlayArrow,
                                 contentDescription = if (isPlaying) "Pause" else "Play",
-                                modifier = Modifier.size(if (isExtremelyShort) 44.dp else 60.dp)
+                                modifier = Modifier.size(if (isExtremelyShort) 38.dp else 44.dp)
                             )
                         }
 
-                        var isNextFocused by remember { mutableStateOf(false) }
                         IconButton(
                             onClick = onNextStation,
                             modifier = Modifier
-                                .size(if (isExtremelyShort) 60.dp else 86.dp)
-                                .onFocusChanged { isNextFocused = it.isFocused }
+                                .size(if (isExtremelyShort) 52.dp else 64.dp)
                                 .background(MaterialTheme.colorScheme.surfaceVariant, CircleShape)
-                                .border(if (isNextFocused) 3.dp else 0.dp, MaterialTheme.colorScheme.primary, CircleShape)
                         ) {
-                            Icon(Icons.Filled.SkipNext, null, modifier = Modifier.size(if (isExtremelyShort) 32.dp else 42.dp), tint = MaterialTheme.colorScheme.onSurface)
+                            Icon(Icons.Filled.SkipNext, null, modifier = Modifier.size(if (isExtremelyShort) 28.dp else 32.dp), tint = MaterialTheme.colorScheme.onSurface)
                         }
+                    }
+                }
+
+                Spacer(modifier = Modifier.width(if (isExtremelyShort) 16.dp else 32.dp))
+
+                // Right Side: Secondary Content (Podcast Episodes or Suggestions)
+                Column(
+                    modifier = Modifier.weight(0.9f).fillMaxHeight()
+                ) {
+                    if (currentStation?.isPodcast == true) {
+                        Text(
+                            text = "Episodes",
+                            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Black),
+                            color = MaterialTheme.colorScheme.onSurface,
+                            modifier = Modifier.padding(bottom = 8.dp)
+                        )
+                        
+                        if (uiState.isLoadingEpisodes) {
+                            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                                CircularProgressIndicator(modifier = Modifier.size(32.dp), strokeWidth = 3.dp)
+                            }
+                        } else if (uiState.currentEpisodesList.isEmpty()) {
+                            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                                Text("No episodes found", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            }
+                        } else {
+                            LazyColumn(
+                                modifier = Modifier.fillMaxSize(),
+                                verticalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                items(uiState.currentEpisodesList) { episode ->
+                                    val isCurrent = uiState.currentEpisode?.id == episode.id
+                                    Surface(
+                                        onClick = { onEpisodeSelect(currentStation, episode) },
+                                        shape = RoundedCornerShape(12.dp),
+                                        color = if (isCurrent) MaterialTheme.colorScheme.primary.copy(alpha = 0.15f) else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f),
+                                        border = if (isCurrent) BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)) else null
+                                    ) {
+                                        Row(
+                                            modifier = Modifier.fillMaxWidth().padding(10.dp),
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            AsyncImage(
+                                                model = episode.artworkUrl.ifBlank { currentStation.imageUrl },
+                                                contentDescription = null,
+                                                contentScale = ContentScale.Crop,
+                                                modifier = Modifier.size(36.dp).clip(RoundedCornerShape(6.dp))
+                                            )
+                                            Spacer(modifier = Modifier.width(12.dp))
+                                            Column {
+                                                Text(
+                                                    text = episode.title,
+                                                    style = MaterialTheme.typography.labelMedium.copy(fontWeight = if (isCurrent) FontWeight.Black else FontWeight.Bold),
+                                                    color = if (isCurrent) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
+                                                    maxLines = 1,
+                                                    overflow = TextOverflow.Ellipsis
+                                                )
+                                                Text(
+                                                    text = episode.pubDate,
+                                                    style = MaterialTheme.typography.labelSmall,
+                                                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+                                                )
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    } else {
+                        // Radio Mode: Show Recently Played or Suggestions
+                        Text(
+                            text = "Recently Played",
+                            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Black),
+                            color = MaterialTheme.colorScheme.onSurface,
+                            modifier = Modifier.padding(bottom = 8.dp)
+                        )
+                        QuickSelectGrid(
+                            stations = uiState.recentRadioStations,
+                            currentStationId = currentStation?.id,
+                            onSelectStation = { /* Selection handled by parent */ },
+                            columns = 1,
+                            modifier = Modifier.fillMaxSize()
+                        )
                     }
                 }
             }
@@ -669,7 +713,7 @@ private fun CarMiniPlayer(
                             style = VisualizerStyle.ROUNDED_BARS,
                             primaryColor = MaterialTheme.colorScheme.primary
                         )
-                        Spacer(modifier = Modifier.width(8.dp))
+                        Spacer(modifier = Modifier.width(10.dp))
                     }
                     Text(
                         text = if (isLoading) "Buffering..." else (streamTitle ?: station.genre),
