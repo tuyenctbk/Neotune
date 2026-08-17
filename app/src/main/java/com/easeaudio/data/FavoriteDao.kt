@@ -8,6 +8,9 @@ interface FavoriteDao {
     @Query("SELECT * FROM favorite_stations ORDER BY addedTimestamp DESC")
     fun getAllFavorites(): Flow<List<FavoriteStation>>
 
+    @Query("SELECT * FROM favorite_stations ORDER BY addedTimestamp DESC")
+    suspend fun getAllFavoritesDirect(): List<FavoriteStation>
+
     @Query("SELECT EXISTS(SELECT 1 FROM favorite_stations WHERE id = :stationId)")
     fun isFavorite(stationId: String): Flow<Boolean>
 

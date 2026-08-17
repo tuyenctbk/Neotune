@@ -327,6 +327,8 @@
     <string name="viz_mirror">Mirror</string>
     <string name="viz_wave">Wave</string>
     <string name="viz_pulse">Pulse</string>
+    <string name="viz_ribbon">Ribbon</string>
+    <string name="viz_matrix">Matrix</string>
     <string name="move_to_top">Move to Top (Show More)</string>
     <string name="move_to_bottom">Move to Bottom (Show Less)</string>
 

@@ -492,7 +492,7 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
     private val _isBatterySaverEnabled = MutableStateFlow(appPrefs.getBoolean("is_battery_saver_enabled", false))
     val isBatterySaverEnabled: StateFlow<Boolean> = _isBatterySaverEnabled.asStateFlow()
 
-    private val _isAutoPlayOnStartupEnabled = MutableStateFlow(appPrefs.getBoolean("is_auto_play_on_startup_enabled", true))
+    private val _isAutoPlayOnStartupEnabled = MutableStateFlow(appPrefs.getBoolean("is_auto_play_on_startup_enabled", false))
     val isAutoPlayOnStartupEnabled: StateFlow<Boolean> = _isAutoPlayOnStartupEnabled.asStateFlow()
 
     private val _selectedLauncherIcon = MutableStateFlow(com.easeaudio.util.AppIconManager.getCurrentIconTheme(getApplication()))

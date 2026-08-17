@@ -114,16 +114,33 @@ class MainActivity : ComponentActivity() {
         return when (keyCode) {
             KeyEvent.KEYCODE_MEDIA_PLAY,
             KeyEvent.KEYCODE_MEDIA_PAUSE,
-            KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE -> {
+            KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE,
+            KeyEvent.KEYCODE_HEADSETHOOK -> {
                 viewModel.togglePlayPause()
                 true
             }
-            KeyEvent.KEYCODE_MEDIA_NEXT -> {
+            KeyEvent.KEYCODE_MEDIA_STOP -> {
+                viewModel.playerManager.stopPlayer()
+                true
+            }
+            KeyEvent.KEYCODE_MEDIA_NEXT,
+            KeyEvent.KEYCODE_CHANNEL_UP,
+            KeyEvent.KEYCODE_PAGE_UP -> {
                 viewModel.playNextStation()
                 true
             }
-            KeyEvent.KEYCODE_MEDIA_PREVIOUS -> {
+            KeyEvent.KEYCODE_MEDIA_PREVIOUS,
+            KeyEvent.KEYCODE_CHANNEL_DOWN,
+            KeyEvent.KEYCODE_PAGE_DOWN -> {
                 viewModel.playPreviousStation()
+                true
+            }
+            KeyEvent.KEYCODE_MEDIA_FAST_FORWARD -> {
+                viewModel.playerManager.skipForward(30000L)
+                true
+            }
+            KeyEvent.KEYCODE_MEDIA_REWIND -> {
+                viewModel.playerManager.skipBackward(15000L)
                 true
             }
             else -> super.onKeyDown(keyCode, event)
@@ -140,10 +157,19 @@ fun MainAppContent(
     val context = LocalContext.current
     val prefs = remember { context.getSharedPreferences("neotune_prefs", Context.MODE_PRIVATE) }
     val isOnboardingCompleted = remember { mutableStateOf(prefs.getBoolean("is_onboarding_completed", false)) }
-    
+
     val uiState by viewModel.homeUiState.collectAsState()
+
+    val isAutomotive = remember {
+        val uiModeManager = context.getSystemService(Context.UI_MODE_SERVICE) as? android.app.UiModeManager
+        uiModeManager?.currentModeType == android.content.res.Configuration.UI_MODE_TYPE_CAR
+    }
     
-    val startDestination = if (isOnboardingCompleted.value) NavRoute.Home.route else NavRoute.Onboarding.route
+    val startDestination = when {
+        !isOnboardingCompleted.value -> NavRoute.Onboarding.route
+        isAutomotive -> NavRoute.CarMode.route
+        else -> NavRoute.Home.route
+    }
 
     var hasNotificationPermission by remember {
         mutableStateOf(
@@ -554,7 +580,13 @@ fun MainAppContent(
                                 onPreviousStation = { viewModel.playPreviousStation() },
                                 onSelectStation = { viewModel.playStation(it) },
                                 onToggleFavorite = { viewModel.toggleFavorite(it) },
-                                onExitCarMode = { navController.popBackStack() }
+                                onExitCarMode = {
+                                    if (!navController.popBackStack()) {
+                                        navController.navigate(NavRoute.Home.route) {
+                                            popUpTo(NavRoute.CarMode.route) { inclusive = true }
+                                        }
+                                    }
+                                }
                             )
                         }
                     }
@@ -609,53 +641,56 @@ fun MainAppContent(
         }
         }
 
-        // Full Player Modal
-        AnimatedVisibility(
-            visible = isFullPlayerVisible,
-            enter = slideInVertically { it },
-            exit = slideOutVertically { it },
-            modifier = Modifier.fillMaxSize()
-        ) {
-            PlayerScreen(
-                station = syncedCurrentStation,
-                windowSizeClass = windowSizeClass,
-                isPlaying = uiState.isPlaying,
-                isLoading = uiState.isLoading,
-                streamTitle = uiState.streamTitle,
-                waveAmplitudes = uiState.waveAmplitudes,
-                volume = uiState.volume,
-                sleepTimerRemaining = uiState.sleepTimerRemaining,
-                activeEqPreset = uiState.activeEqPreset,
-                eqPresets = viewModel.eqPresets,
-                playbackError = uiState.playbackError,
-                hasNotificationPermission = hasNotificationPermission,
-                currentPosition = uiState.currentPlaybackPosition,
-                totalDuration = uiState.totalPlaybackDuration,
-                playbackSpeed = uiState.playbackSpeed,
-                onPlaybackSpeedChange = { speed -> viewModel.playerManager.setPlaybackSpeed(speed) },
-                onOpenEpisodes = { viewModel.setShowEpisodesSheet(true) },
-                onRequestNotificationPermission = onRequestNotificationPermission,
-                onTogglePlay = { viewModel.togglePlayPause() },
-                onToggleFavorite = { syncedCurrentStation?.let { viewModel.toggleFavorite(it) } },
-                onVolumeChange = { viewModel.playerManager.setVolume(it) },
-                onOpenSleepTimer = { viewModel.setShowSleepTimerDialog(true) },
-                onOpenEqualizer = { viewModel.setShowEqualizerDialog(true) },
-                onOpenTrackOptions = { showTrackActionSheet = true },
-                onOpenScreensaver = {
-                    isFullPlayerVisible = false
-                    navController.navigate(NavRoute.Screensaver.route)
-                },
-                onOpenCarMode = {
-                    isFullPlayerVisible = false
-                    navController.navigate(NavRoute.CarMode.route)
-                },
-                onRetryStream = { viewModel.retryCurrentStation() },
-                onPlayNextStation = { viewModel.playNextStation() },
-                onPlayPreviousStation = { viewModel.playPreviousStation() },
-                onSeekRelative = { offsetMs -> viewModel.playerManager.seekRelative(offsetMs) },
-                onSeek = { posMs -> viewModel.playerManager.seekTo(posMs) },
-                onBack = { isFullPlayerVisible = false }
-            )
+        // Full Player Modal with Window-Level Focus Isolation
+        if (isFullPlayerVisible) {
+            androidx.compose.ui.window.Dialog(
+                onDismissRequest = { isFullPlayerVisible = false },
+                properties = androidx.compose.ui.window.DialogProperties(
+                    usePlatformDefaultWidth = false,
+                    decorFitsSystemWindows = false
+                )
+            ) {
+                PlayerScreen(
+                    station = syncedCurrentStation,
+                    windowSizeClass = windowSizeClass,
+                    isPlaying = uiState.isPlaying,
+                    isLoading = uiState.isLoading,
+                    streamTitle = uiState.streamTitle,
+                    waveAmplitudes = uiState.waveAmplitudes,
+                    volume = uiState.volume,
+                    sleepTimerRemaining = uiState.sleepTimerRemaining,
+                    activeEqPreset = uiState.activeEqPreset,
+                    eqPresets = viewModel.eqPresets,
+                    playbackError = uiState.playbackError,
+                    hasNotificationPermission = hasNotificationPermission,
+                    currentPosition = uiState.currentPlaybackPosition,
+                    totalDuration = uiState.totalPlaybackDuration,
+                    playbackSpeed = uiState.playbackSpeed,
+                    onPlaybackSpeedChange = { speed -> viewModel.playerManager.setPlaybackSpeed(speed) },
+                    onOpenEpisodes = { viewModel.setShowEpisodesSheet(true) },
+                    onRequestNotificationPermission = onRequestNotificationPermission,
+                    onTogglePlay = { viewModel.togglePlayPause() },
+                    onToggleFavorite = { syncedCurrentStation?.let { viewModel.toggleFavorite(it) } },
+                    onVolumeChange = { viewModel.playerManager.setVolume(it) },
+                    onOpenSleepTimer = { viewModel.setShowSleepTimerDialog(true) },
+                    onOpenEqualizer = { viewModel.setShowEqualizerDialog(true) },
+                    onOpenTrackOptions = { showTrackActionSheet = true },
+                    onOpenScreensaver = {
+                        isFullPlayerVisible = false
+                        navController.navigate(NavRoute.Screensaver.route)
+                    },
+                    onOpenCarMode = {
+                        isFullPlayerVisible = false
+                        navController.navigate(NavRoute.CarMode.route)
+                    },
+                    onRetryStream = { viewModel.retryCurrentStation() },
+                    onPlayNextStation = { viewModel.playNextStation() },
+                    onPlayPreviousStation = { viewModel.playPreviousStation() },
+                    onSeekRelative = { offsetMs -> viewModel.playerManager.seekRelative(offsetMs) },
+                    onSeek = { posMs -> viewModel.playerManager.seekTo(posMs) },
+                    onBack = { isFullPlayerVisible = false }
+                )
+            }
         }
 
         val activePrompt by viewModel.smartEngagementManager.activePrompt.collectAsState()

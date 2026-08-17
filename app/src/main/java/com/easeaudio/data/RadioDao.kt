@@ -8,8 +8,14 @@ interface RadioDao {
     @Query("SELECT * FROM radio_stations WHERE isFavorite = 1 ORDER BY name ASC")
     fun getFavoriteStations(): Flow<List<RadioStation>>
 
+    @Query("SELECT * FROM radio_stations WHERE isFavorite = 1 ORDER BY name ASC")
+    suspend fun getFavoriteStationsDirect(): List<RadioStation>
+
     @Query("SELECT * FROM radio_stations WHERE lastListenedTimestamp > 0 ORDER BY lastListenedTimestamp DESC LIMIT 20")
     fun getRecentStations(): Flow<List<RadioStation>>
+
+    @Query("SELECT * FROM radio_stations WHERE lastListenedTimestamp > 0 ORDER BY lastListenedTimestamp DESC LIMIT 20")
+    suspend fun getRecentStationsDirect(): List<RadioStation>
 
     @Query("SELECT * FROM radio_stations WHERE isCustom = 1 ORDER BY name ASC")
     fun getCustomStations(): Flow<List<RadioStation>>

@@ -2,12 +2,15 @@ package com.easeaudio.ui.screens
 
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
-import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.*
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -124,22 +127,22 @@ fun PlayerScreen(
         label = "paletteVibrant"
     )
 
-    val translucentBackground = DarkBackground.copy(alpha = 0.85f)
+    val solidBackground = DarkBackground
     Scaffold(
         modifier = Modifier
             .fillMaxSize()
-            .background(translucentBackground)
+            .background(solidBackground)
             .background(
                 Brush.verticalGradient(
                     colors = listOf(
-                        animatedMutedColor.copy(alpha = 0.4f),
-                        translucentBackground,
-                        animatedVibrantColor.copy(alpha = 0.2f),
-                        translucentBackground
+                        animatedMutedColor.copy(alpha = 0.35f),
+                        solidBackground,
+                        animatedVibrantColor.copy(alpha = 0.15f),
+                        solidBackground
                     )
                 )
             ),
-        containerColor = Color.Transparent,
+        containerColor = solidBackground,
         topBar = {
             Row(
                 modifier = Modifier
@@ -169,7 +172,7 @@ fun PlayerScreen(
                 Text(
                     text = stringResource(if (isPodcast) R.string.on_demand_podcast else R.string.live_radio_broadcast),
                     style = MaterialTheme.typography.labelLarge,
-                    color = if (isPodcast) NeonPurple else NeonPink,
+                    color = NeonCyan,
                     fontWeight = FontWeight.Bold
                 )
 
@@ -230,26 +233,30 @@ fun PlayerScreen(
                         modifier = Modifier
                             .onFocusChanged { isSleepFocused = it.isFocused }
                             .clip(CircleShape)
-                            .background(if (isSleepFocused) NeonPurple else Color.Transparent)
+                            .background(if (isSleepFocused) NeonCyan else Color.Transparent)
                             .testTag("btn_player_sleep_timer")
                     ) {
                         Icon(
                             imageVector = Icons.Filled.Bedtime,
                             contentDescription = "Sleep Timer",
-                            tint = if (isSleepFocused) DarkBackground else (if (sleepTimerRemaining != null) NeonPurple else TextMuted)
+                            tint = if (isSleepFocused) DarkBackground else (if (sleepTimerRemaining != null) NeonCyan else TextMuted)
                         )
                     }
 
+                    var isMenuFocused by remember { mutableStateOf(false) }
                     var showPlayerMenu by remember { mutableStateOf(false) }
                     Box {
                         IconButton(
                             onClick = { showPlayerMenu = true },
-                            modifier = Modifier.clip(CircleShape)
+                            modifier = Modifier
+                                .onFocusChanged { isMenuFocused = it.isFocused }
+                                .clip(CircleShape)
+                                .background(if (isMenuFocused) NeonCyan else Color.Transparent)
                         ) {
                             Icon(
                                 imageVector = Icons.Filled.MoreVert,
                                 contentDescription = "More Options",
-                                tint = TextPrimary
+                                tint = if (isMenuFocused) DarkBackground else TextPrimary
                             )
                         }
                         
@@ -486,6 +493,15 @@ private fun PlayerContent(
     val isPodcast = station.isPodcast
     var visualizerStyle by remember { mutableStateOf(VisualizerStyle.ROUNDED_BARS) }
 
+    val playPauseFocusRequester = remember { FocusRequester() }
+
+    LaunchedEffect(Unit) {
+        kotlinx.coroutines.delay(120)
+        try {
+            playPauseFocusRequester.requestFocus()
+        } catch (_: Exception) {}
+    }
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -537,8 +553,8 @@ private fun PlayerContent(
         if (hasLiveMetadata) {
             Surface(
                 shape = RoundedCornerShape(12.dp),
-                color = NeonPurple.copy(alpha = 0.2f),
-                border = BorderStroke(1.dp, NeonPurple.copy(alpha = 0.5f)),
+                color = NeonCyan.copy(alpha = 0.15f),
+                border = BorderStroke(1.dp, NeonCyan.copy(alpha = 0.4f)),
                 modifier = Modifier.padding(vertical = 4.dp)
             ) {
                 Row(
@@ -613,7 +629,7 @@ private fun PlayerContent(
                         draggingValue = null
                     },
                     valueRange = 0f..totalDuration.toFloat(),
-                    colors = SliderDefaults.colors(thumbColor = NeonPurple, activeTrackColor = NeonPurple)
+                    colors = SliderDefaults.colors(thumbColor = NeonCyan, activeTrackColor = NeonCyan)
                 )
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                     Text(
@@ -629,7 +645,7 @@ private fun PlayerContent(
                     Text(
                         text = stringResource(R.string.resumed_at, formatDuration(currentPosition)),
                         style = MaterialTheme.typography.labelSmall,
-                        color = NeonPurple,
+                        color = NeonCyan,
                         modifier = Modifier.clickable { onSeek?.invoke(0L) }
                     )
                 }
@@ -704,6 +720,8 @@ private fun PlayerContent(
                                         VisualizerStyle.DUAL_MIRROR -> stringResource(R.string.viz_mirror)
                                         VisualizerStyle.WAVE_LINE -> stringResource(R.string.viz_wave)
                                         VisualizerStyle.CIRCULAR_RIPPLE -> stringResource(R.string.viz_pulse)
+                                        VisualizerStyle.NEON_RIBBON -> stringResource(R.string.viz_ribbon)
+                                        VisualizerStyle.DOT_MATRIX -> stringResource(R.string.viz_matrix)
                                     },
                                     modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp),
                                     style = MaterialTheme.typography.labelSmall,
@@ -773,13 +791,14 @@ private fun PlayerContent(
                         onSeekRelative(-15000L)
                     }
                 ) {
-                    Icon(Icons.Filled.Replay10, null, tint = NeonPurple)
+                    Icon(Icons.Filled.Replay10, null, tint = NeonCyan)
                 }
             }
 
             var isPlayFocused by remember { mutableStateOf(false) }
             Box(
                 modifier = Modifier
+                    .focusRequester(playPauseFocusRequester)
                     .size(72.dp)
                     .scale(if (isPlayFocused) 1.15f else 1.0f)
                     .onFocusChanged { isPlayFocused = it.isFocused }
@@ -790,6 +809,7 @@ private fun PlayerContent(
                     )
                     .clip(CircleShape)
                     .background(if (isPlayFocused) NeonCyan else PlayButtonContainer)
+                    .focusable()
                     .clickable {
                         haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                         onTogglePlay()
@@ -811,7 +831,7 @@ private fun PlayerContent(
                         onSeekRelative(30000L)
                     }
                 ) {
-                    Icon(Icons.Filled.Forward30, null, tint = NeonPurple)
+                    Icon(Icons.Filled.Forward30, null, tint = NeonCyan)
                 }
             }
 

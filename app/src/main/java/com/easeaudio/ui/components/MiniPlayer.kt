@@ -140,7 +140,7 @@ fun MiniPlayer(
                                 fontWeight = FontWeight.Bold,
                                 modifier = Modifier
                                     .clip(RoundedCornerShape(4.dp))
-                                    .background(if (isPodcast) NeonPurple else NeonPink)
+                                    .background(NeonCyan)
                                     .padding(horizontal = 4.dp, vertical = 1.dp)
                             )
                         }
@@ -155,7 +155,7 @@ fun MiniPlayer(
                                         .weight(1f)
                                         .height(3.dp)
                                         .clip(RoundedCornerShape(2.dp)),
-                                    color = NeonPurple,
+                                    color = NeonCyan,
                                     trackColor = DarkSurface
                                 )
                                 Spacer(modifier = Modifier.width(6.dp))

@@ -3,6 +3,9 @@ package com.easeaudio.ui.screens
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
@@ -79,7 +82,7 @@ fun FavoritesScreen(
             Column(
                 modifier = Modifier
                     .fillMaxHeight()
-                    .widthIn(max = 800.dp)
+                    .fillMaxWidth()
             ) {
                 // Header
                 Row(
@@ -238,9 +241,12 @@ fun FavoritesScreen(
                         }
                     }
                 } else {
-                    LazyColumn(
+                    LazyVerticalGrid(
+                        columns = GridCells.Adaptive(minSize = 300.dp),
                         modifier = Modifier.fillMaxSize(),
-                        contentPadding = PaddingValues(bottom = 80.dp)
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                        verticalArrangement = Arrangement.spacedBy(10.dp),
+                        contentPadding = PaddingValues(start = 20.dp, top = 8.dp, end = 20.dp, bottom = 80.dp)
                     ) {
                         items(filteredFavorites, key = { it.id }) { station ->
                             val isSelected = currentStation?.id == station.id

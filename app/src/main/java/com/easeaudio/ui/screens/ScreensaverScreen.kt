@@ -1,19 +1,16 @@
 package com.easeaudio.ui.screens
 
+import android.view.KeyEvent
+import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.*
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.*
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.Bedtime
@@ -24,36 +21,38 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.foundation.focusable
-import androidx.compose.ui.input.key.onKeyEvent
-import androidx.compose.ui.input.key.KeyEventType
-import androidx.compose.ui.input.key.type
-import androidx.compose.ui.draw.blur
-import com.easeaudio.ui.components.AudioVisualizerCanvas
-import com.easeaudio.ui.components.VisualizerStyle
-import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onKeyEvent
+import androidx.compose.ui.input.key.type
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
-import androidx.annotation.StringRes
-import androidx.compose.ui.res.stringResource
 import com.easeaudio.R
 import com.easeaudio.data.RadioStation
+import com.easeaudio.ui.components.AudioVisualizerCanvas
+import com.easeaudio.ui.components.VisualizerStyle
 import com.easeaudio.ui.theme.*
 import kotlinx.coroutines.delay
 import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
+import java.util.*
 import kotlin.math.sin
 
 enum class AmbientTheme(@StringRes val nameRes: Int) {
@@ -80,18 +79,35 @@ fun ScreensaverScreen(
     var currentDate by remember { mutableStateOf(getFormattedDate()) }
     var selectedTheme by remember { mutableStateOf(AmbientTheme.STATION_ART) }
     var isDimmed by remember { mutableStateOf(false) }
-    var showOverlayControls by remember { mutableStateOf(true) }
+    var showOverlayControls by remember { mutableStateOf(false) }
+    var lastInteractionTime by remember { mutableLongStateOf(System.currentTimeMillis()) }
 
-    val focusRequester = remember { FocusRequester() }
+    val containerFocusRequester = remember { FocusRequester() }
+    val playPauseFocusRequester = remember { FocusRequester() }
 
     LaunchedEffect(Unit) {
-        focusRequester.requestFocus()
+        containerFocusRequester.requestFocus()
     }
 
     LaunchedEffect(showOverlayControls) {
         if (showOverlayControls) {
-            delay(6000L)
-            showOverlayControls = false
+            delay(120)
+            try {
+                playPauseFocusRequester.requestFocus()
+            } catch (_: Exception) {}
+        } else {
+            try {
+                containerFocusRequester.requestFocus()
+            } catch (_: Exception) {}
+        }
+    }
+
+    LaunchedEffect(showOverlayControls, lastInteractionTime) {
+        if (showOverlayControls) {
+            delay(8000L)
+            if (System.currentTimeMillis() - lastInteractionTime >= 8000L) {
+                showOverlayControls = false
+            }
         }
     }
 
@@ -137,22 +153,28 @@ fun ScreensaverScreen(
         modifier = modifier
             .fillMaxSize()
             .background(DarkBackground)
-            .focusRequester(focusRequester)
+            .focusRequester(containerFocusRequester)
             .focusable()
             .onKeyEvent { keyEvent ->
-                if (!showOverlayControls) {
-                    if (keyEvent.type == KeyEventType.KeyDown) {
+                lastInteractionTime = System.currentTimeMillis()
+                if (keyEvent.type == KeyEventType.KeyDown) {
+                    if (keyEvent.key == Key.Back || keyEvent.key == Key.Escape) {
+                        if (showOverlayControls) {
+                            showOverlayControls = false
+                            return@onKeyEvent true
+                        }
+                    } else if (!showOverlayControls) {
                         showOverlayControls = true
+                        return@onKeyEvent true
                     }
-                    true
-                } else {
-                    false
                 }
+                false
             }
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null
             ) {
+                lastInteractionTime = System.currentTimeMillis()
                 showOverlayControls = !showOverlayControls
             }
     ) {
@@ -169,7 +191,7 @@ fun ScreensaverScreen(
                         contentScale = ContentScale.Crop,
                         modifier = Modifier
                             .fillMaxSize()
-                            .blur(if (isDimmed) 12.dp else 6.dp)
+                            .blur(if (isDimmed) 14.dp else 8.dp)
                     )
                 } else {
                     AuroraGradientCanvas(particlePhase)
@@ -186,7 +208,7 @@ fun ScreensaverScreen(
             }
         }
 
-        val dimAlpha = if (isDimmed) 0.85f else 0.55f
+        val dimAlpha = if (isDimmed) 0.88f else 0.58f
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -195,7 +217,7 @@ fun ScreensaverScreen(
                         colors = listOf(
                             Color.Black.copy(alpha = dimAlpha + 0.1f),
                             Color.Black.copy(alpha = dimAlpha - 0.15f),
-                            Color.Black.copy(alpha = dimAlpha + 0.25f)
+                            Color.Black.copy(alpha = dimAlpha + 0.28f)
                         )
                     )
                 )
@@ -209,7 +231,7 @@ fun ScreensaverScreen(
                 .navigationBarsPadding()
                 .padding(
                     horizontal = if (isCompactHeight) 16.dp else 24.dp,
-                    vertical = if (isCompactHeight) 12.dp else 20.dp
+                    vertical = if (isCompactHeight) 10.dp else 18.dp
                 )
                 .offset(x = driftX.dp, y = driftY.dp)
                 .verticalScroll(rememberScrollState()),
@@ -225,11 +247,24 @@ fun ScreensaverScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 if (sleepTimerRemaining != null) {
+                    var isSleepPillFocused by remember { mutableStateOf(false) }
                     Surface(
-                        color = NeonPurple.copy(alpha = 0.25f),
+                        color = NeonCyan.copy(alpha = 0.15f),
                         shape = RoundedCornerShape(20.dp),
-                        border = androidx.compose.foundation.BorderStroke(1.dp, NeonPurple.copy(alpha = 0.5f)),
-                        modifier = Modifier.clickable { onOpenSleepTimer() }
+                        border = BorderStroke(
+                            width = if (isSleepPillFocused) 2.dp else 1.dp,
+                            color = if (isSleepPillFocused) NeonCyan else NeonCyan.copy(alpha = 0.4f)
+                        ),
+                        modifier = Modifier
+                            .onFocusChanged {
+                                isSleepPillFocused = it.isFocused
+                                if (it.isFocused) lastInteractionTime = System.currentTimeMillis()
+                            }
+                            .scale(if (isSleepPillFocused) 1.08f else 1.0f)
+                            .clickable {
+                                lastInteractionTime = System.currentTimeMillis()
+                                onOpenSleepTimer()
+                            }
                     ) {
                         Row(
                             modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
@@ -238,7 +273,7 @@ fun ScreensaverScreen(
                             Icon(
                                 imageVector = Icons.Filled.Bedtime,
                                 contentDescription = null,
-                                tint = NeonPurple,
+                                tint = NeonCyan,
                                 modifier = Modifier.size(16.dp)
                             )
                             Spacer(modifier = Modifier.width(6.dp))
@@ -254,11 +289,25 @@ fun ScreensaverScreen(
                     Spacer(modifier = Modifier.width(1.dp))
                 }
 
+                var isDimFocused by remember { mutableStateOf(false) }
                 IconButton(
-                    onClick = { isDimmed = !isDimmed },
+                    onClick = {
+                        lastInteractionTime = System.currentTimeMillis()
+                        isDimmed = !isDimmed
+                    },
                     modifier = Modifier
+                        .onFocusChanged {
+                            isDimFocused = it.isFocused
+                            if (it.isFocused) lastInteractionTime = System.currentTimeMillis()
+                        }
+                        .scale(if (isDimFocused) 1.15f else 1.0f)
                         .clip(CircleShape)
-                        .background(Color.Black.copy(alpha = 0.4f))
+                        .background(if (isDimFocused) DarkSurfaceVariant else Color.Black.copy(alpha = 0.4f))
+                        .border(
+                            width = if (isDimFocused) 2.5.dp else 0.dp,
+                            color = if (isDimFocused) NeonCyan else Color.Transparent,
+                            shape = CircleShape
+                        )
                         .testTag("btn_ambient_dim")
                 ) {
                     Icon(
@@ -269,16 +318,16 @@ fun ScreensaverScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.height(if (isCompactHeight) 8.dp else 16.dp))
+            Spacer(modifier = Modifier.height(if (isCompactHeight) 6.dp else 12.dp))
 
             // Center Column: Clock & Date
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.padding(vertical = if (isCompactHeight) 8.dp else 16.dp)
+                modifier = Modifier.padding(vertical = if (isCompactHeight) 4.dp else 10.dp)
             ) {
                 Text(
                     text = currentTime,
-                    fontSize = if (isCompactHeight) 48.sp else 68.sp,
+                    fontSize = if (isCompactHeight) 46.sp else 64.sp,
                     fontWeight = FontWeight.ExtraLight,
                     color = TextPrimary.copy(alpha = if (isDimmed) 0.7f else 0.95f),
                     letterSpacing = 2.sp,
@@ -296,235 +345,364 @@ fun ScreensaverScreen(
                 )
             }
 
-            Spacer(modifier = Modifier.height(if (isCompactHeight) 8.dp else 16.dp))
+            Spacer(modifier = Modifier.height(if (isCompactHeight) 6.dp else 12.dp))
 
-            // Bottom Section: Now Playing Card
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                if (currentStation != null) {
-                    Surface(
-                        color = DarkSurface.copy(alpha = if (isDimmed) 0.5f else 0.8f),
-                        shape = RoundedCornerShape(20.dp),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .testTag("dock_now_playing_card")
-                    ) {
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 16.dp, vertical = if (isCompactHeight) 12.dp else 16.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.Center
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Filled.MusicNote,
-                                    contentDescription = null,
-                                    tint = NeonCyan,
-                                    modifier = Modifier.size(16.dp)
-                                )
-                                Spacer(modifier = Modifier.width(6.dp))
-                                Text(
-                                    text = streamTitle ?: currentStation.genre,
-                                    style = if (isCompactHeight) MaterialTheme.typography.titleMedium else MaterialTheme.typography.titleLarge,
-                                    color = TextPrimary,
-                                    fontWeight = FontWeight.Bold,
-                                    textAlign = TextAlign.Center,
-                                    maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis
-                                )
-                            }
-
-                            Spacer(modifier = Modifier.height(2.dp))
-
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(6.dp)
-                            ) {
-                                Text(
-                                    text = currentStation.name,
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = TextSecondary,
-                                    maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis
-                                )
-                                Text("•", color = TextMuted)
-                                Text(
-                                    text = currentStation.bitrate,
-                                    style = MaterialTheme.typography.labelSmall,
-                                    color = NeonPurple,
-                                    fontWeight = FontWeight.SemiBold
-                                )
-                            }
-
-                            Spacer(modifier = Modifier.height(10.dp))
-
-                            // Waveform Visualizer
-                            AudioVisualizerCanvas(
-                                waveAmplitudes = waveAmplitudes,
-                                isPlaying = isPlaying,
-                                modifier = Modifier
-                                    .height(32.dp)
-                                    .fillMaxWidth(0.5f),
-                                style = VisualizerStyle.ROUNDED_BARS,
-                                primaryColor = NeonCyan,
-                                secondaryColor = NeonPurple,
-                                accentColor = NeonPink
-                            )
-                        }
-                    }
-                } else {
-                    Surface(
-                        color = DarkSurface.copy(alpha = 0.6f),
-                        shape = RoundedCornerShape(18.dp),
-                        modifier = Modifier.padding(8.dp)
-                    ) {
-                        Text(
-                            text = stringResource(R.string.tap_tuner_pick_station),
-                            color = TextSecondary,
-                            style = MaterialTheme.typography.bodyMedium,
-                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp)
-                        )
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                AnimatedVisibility(
-                    visible = !showOverlayControls,
-                    enter = fadeIn(),
-                    exit = fadeOut()
-                ) {
-                    Text(
-                        text = stringResource(R.string.tap_for_ambient_controls),
-                        style = MaterialTheme.typography.labelSmall,
-                        color = TextMuted.copy(alpha = 0.6f),
-                        textAlign = TextAlign.Center
-                    )
-                }
-            }
-        }
-
-        // LAYER 3: Touch-to-Reveal Minimal Ambient Control Bar (Scrollable chips)
-        AnimatedVisibility(
-            visible = showOverlayControls,
-            enter = fadeIn(animationSpec = tween(300)),
-            exit = fadeOut(animationSpec = tween(300)),
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .navigationBarsPadding()
-                .padding(bottom = 12.dp, start = 12.dp, end = 12.dp)
-        ) {
-            Surface(
-                color = Color.Black.copy(alpha = 0.88f),
-                shape = RoundedCornerShape(28.dp),
-                border = androidx.compose.foundation.BorderStroke(1.dp, CardBorder),
-                shadowElevation = 12.dp,
-                modifier = Modifier.fillMaxWidth(0.95f)
+            // Bottom Area: Seamless Mutually-Exclusive View (No Overlap!)
+            // View A: Static Ambient Info Card with Waveform
+            AnimatedVisibility(
+                visible = !showOverlayControls,
+                enter = fadeIn(animationSpec = tween(250)),
+                exit = fadeOut(animationSpec = tween(200))
             ) {
                 Column(
-                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    // Scrollable Theme Selector Chips
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .horizontalScroll(rememberScrollState()),
-                        horizontalArrangement = Arrangement.spacedBy(6.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            imageVector = Icons.Outlined.Wallpaper,
-                            contentDescription = null,
-                            tint = TextMuted,
+                    if (currentStation != null) {
+                        Surface(
+                            color = DarkSurface.copy(alpha = if (isDimmed) 0.5f else 0.8f),
+                            shape = RoundedCornerShape(20.dp),
                             modifier = Modifier
-                                .size(16.dp)
-                                .padding(end = 2.dp)
-                        )
-
-                        AmbientTheme.entries.forEach { theme ->
-                            val isSelected = selectedTheme == theme
-                            FilterChip(
-                                selected = isSelected,
-                                onClick = { selectedTheme = theme },
-                                label = {
-                                    Text(
-                                        text = stringResource(theme.nameRes),
-                                        style = MaterialTheme.typography.labelSmall
+                                .fillMaxWidth()
+                                .testTag("dock_now_playing_card")
+                        ) {
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 16.dp, vertical = if (isCompactHeight) 12.dp else 16.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.Center
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Filled.MusicNote,
+                                        contentDescription = null,
+                                        tint = NeonCyan,
+                                        modifier = Modifier.size(16.dp)
                                     )
-                                },
-                                colors = FilterChipDefaults.filterChipColors(
-                                    selectedContainerColor = ActivePill,
-                                    selectedLabelColor = DarkBackground,
-                                    containerColor = DarkSurfaceVariant.copy(alpha = 0.5f),
-                                    labelColor = TextSecondary
-                                ),
-                                border = FilterChipDefaults.filterChipBorder(
-                                    enabled = true,
-                                    selected = isSelected,
-                                    borderColor = CardBorder,
-                                    selectedBorderColor = NeonCyan
+                                    Spacer(modifier = Modifier.width(6.dp))
+                                    Text(
+                                        text = streamTitle ?: currentStation.genre,
+                                        style = if (isCompactHeight) MaterialTheme.typography.titleMedium else MaterialTheme.typography.titleLarge,
+                                        color = TextPrimary,
+                                        fontWeight = FontWeight.Bold,
+                                        textAlign = TextAlign.Center,
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis
+                                    )
+                                }
+
+                                Spacer(modifier = Modifier.height(2.dp))
+
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                                ) {
+                                    Text(
+                                        text = currentStation.name,
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        color = TextSecondary,
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis
+                                    )
+                                    Text("•", color = TextMuted)
+                                    Text(
+                                        text = currentStation.bitrate,
+                                        style = MaterialTheme.typography.labelSmall,
+                                        color = NeonCyan,
+                                        fontWeight = FontWeight.SemiBold
+                                    )
+                                }
+
+                                Spacer(modifier = Modifier.height(10.dp))
+
+                                // Waveform Visualizer
+                                AudioVisualizerCanvas(
+                                    waveAmplitudes = waveAmplitudes,
+                                    isPlaying = isPlaying,
+                                    modifier = Modifier
+                                        .height(30.dp)
+                                        .fillMaxWidth(0.55f),
+                                    style = VisualizerStyle.ROUNDED_BARS,
+                                    primaryColor = NeonCyan,
+                                    secondaryColor = NeonPurple,
+                                    accentColor = NeonPink
                                 )
+                            }
+                        }
+                    } else {
+                        Surface(
+                            color = DarkSurface.copy(alpha = 0.6f),
+                            shape = RoundedCornerShape(18.dp),
+                            modifier = Modifier.padding(8.dp)
+                        ) {
+                            Text(
+                                text = stringResource(R.string.tap_tuner_pick_station),
+                                color = TextSecondary,
+                                style = MaterialTheme.typography.bodyMedium,
+                                modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp)
                             )
                         }
                     }
 
                     Spacer(modifier = Modifier.height(8.dp))
 
-                    // Minimal Transport Controls
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(16.dp),
-                        verticalAlignment = Alignment.CenterVertically
+                    Text(
+                        text = stringResource(R.string.tap_for_ambient_controls),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = TextMuted.copy(alpha = 0.7f),
+                        textAlign = TextAlign.Center
+                    )
+                }
+            }
+
+            // View B: Interactive Ambient Controls Bar with Full D-pad Focus Support
+            AnimatedVisibility(
+                visible = showOverlayControls,
+                enter = fadeIn(animationSpec = tween(250)),
+                exit = fadeOut(animationSpec = tween(200))
+            ) {
+                Surface(
+                    color = Color(0xFF101216).copy(alpha = 0.95f),
+                    shape = RoundedCornerShape(24.dp),
+                    border = BorderStroke(1.dp, CardBorder.copy(alpha = 0.8f)),
+                    shadowElevation = 16.dp,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 4.dp)
+                ) {
+                    Column(
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 14.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        IconButton(
-                            onClick = onOpenSleepTimer,
-                            modifier = Modifier
-                                .size(42.dp)
-                                .clip(CircleShape)
-                                .background(if (sleepTimerRemaining != null) ActivePill else DarkSurfaceVariant)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Outlined.Bedtime,
-                                contentDescription = stringResource(R.string.sleep_timer),
-                                tint = if (sleepTimerRemaining != null) DarkBackground else TextSecondary,
-                                modifier = Modifier.size(18.dp)
-                            )
+                        // Station Header info inside control bar
+                        if (currentStation != null) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.Center
+                            ) {
+                                Text(
+                                    text = currentStation.name,
+                                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                                    color = TextPrimary,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
+                                )
+                                Text(" • ", color = TextMuted)
+                                Text(
+                                    text = streamTitle ?: currentStation.genre,
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = NeonCyan,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
+                                )
+                            }
+                            Spacer(modifier = Modifier.height(10.dp))
                         }
 
-                        FloatingActionButton(
-                            onClick = onTogglePlay,
-                            containerColor = NeonCyan,
-                            contentColor = DarkBackground,
+                        // Theme Selector Chips Row
+                        Row(
                             modifier = Modifier
-                                .size(48.dp)
-                                .testTag("dock_play_pause")
+                                .fillMaxWidth()
+                                .horizontalScroll(rememberScrollState()),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
                             Icon(
-                                imageVector = if (isPlaying) Icons.Filled.Pause else Icons.Filled.PlayArrow,
-                                contentDescription = if (isPlaying) "Pause" else "Play",
-                                modifier = Modifier.size(24.dp)
-                            )
-                        }
-
-                        if (onToggleFavorite != null && currentStation != null) {
-                            IconButton(
-                                onClick = onToggleFavorite,
+                                imageVector = Icons.Outlined.Wallpaper,
+                                contentDescription = null,
+                                tint = TextMuted,
                                 modifier = Modifier
-                                    .size(42.dp)
+                                    .size(16.dp)
+                                    .padding(end = 2.dp)
+                            )
+
+                            AmbientTheme.entries.forEach { theme ->
+                                val isSelected = selectedTheme == theme
+                                var isChipFocused by remember { mutableStateOf(false) }
+                                val chipScale by animateFloatAsState(
+                                    targetValue = if (isChipFocused) 1.08f else 1.0f,
+                                    animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessLow),
+                                    label = "chip_focus"
+                                )
+
+                                Surface(
+                                    shape = RoundedCornerShape(20.dp),
+                                    color = if (isSelected) ActivePill else if (isChipFocused) DarkSurfaceVariant else DarkSurfaceVariant.copy(alpha = 0.45f),
+                                    border = BorderStroke(
+                                        width = if (isChipFocused) 2.5.dp else if (isSelected) 1.5.dp else 1.dp,
+                                        brush = if (isChipFocused) {
+                                            Brush.horizontalGradient(listOf(NeonCyan, Color.White, NeonCyan))
+                                        } else if (isSelected) {
+                                            Brush.horizontalGradient(listOf(NeonCyan, NeonCyan.copy(alpha = 0.6f)))
+                                        } else {
+                                            Brush.horizontalGradient(listOf(CardBorder, CardBorder))
+                                        }
+                                    ),
+                                    modifier = Modifier
+                                        .onFocusChanged {
+                                            isChipFocused = it.isFocused
+                                            if (it.isFocused) lastInteractionTime = System.currentTimeMillis()
+                                        }
+                                        .scale(chipScale)
+                                        .shadow(
+                                            elevation = if (isChipFocused) 10.dp else 0.dp,
+                                            shape = RoundedCornerShape(20.dp),
+                                            spotColor = NeonCyan
+                                        )
+                                        .clickable {
+                                            selectedTheme = theme
+                                            lastInteractionTime = System.currentTimeMillis()
+                                        }
+                                ) {
+                                    Row(
+                                        modifier = Modifier.padding(horizontal = 14.dp, vertical = 7.dp),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        if (isSelected) {
+                                            Icon(
+                                                imageVector = Icons.Filled.Check,
+                                                contentDescription = null,
+                                                tint = DarkBackground,
+                                                modifier = Modifier.size(13.dp)
+                                            )
+                                            Spacer(modifier = Modifier.width(4.dp))
+                                        }
+                                        Text(
+                                            text = stringResource(theme.nameRes),
+                                            style = MaterialTheme.typography.labelSmall.copy(
+                                                fontWeight = if (isSelected || isChipFocused) FontWeight.Black else FontWeight.Medium
+                                            ),
+                                            color = if (isSelected) DarkBackground else if (isChipFocused) Color.White else TextSecondary
+                                        )
+                                    }
+                                }
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(14.dp))
+
+                        // Transport Action Controls Row (D-pad optimized)
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(20.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            var isTimerFocused by remember { mutableStateOf(false) }
+                            IconButton(
+                                onClick = {
+                                    lastInteractionTime = System.currentTimeMillis()
+                                    onOpenSleepTimer()
+                                },
+                                modifier = Modifier
+                                    .onFocusChanged {
+                                        isTimerFocused = it.isFocused
+                                        if (it.isFocused) lastInteractionTime = System.currentTimeMillis()
+                                    }
+                                    .scale(if (isTimerFocused) 1.15f else 1.0f)
+                                    .shadow(
+                                        elevation = if (isTimerFocused) 10.dp else 0.dp,
+                                        shape = CircleShape,
+                                        spotColor = NeonCyan
+                                    )
                                     .clip(CircleShape)
-                                    .background(DarkSurfaceVariant)
+                                    .background(if (sleepTimerRemaining != null) ActivePill else if (isTimerFocused) DarkSurfaceVariant else DarkSurfaceVariant.copy(alpha = 0.6f))
+                                    .border(
+                                        width = if (isTimerFocused) 2.5.dp else 0.dp,
+                                        color = if (isTimerFocused) NeonCyan else Color.Transparent,
+                                        shape = CircleShape
+                                    )
+                                    .size(46.dp)
                             ) {
                                 Icon(
-                                    imageVector = if (currentStation.isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
-                                    contentDescription = "Favorite",
-                                    tint = if (currentStation.isFavorite) FavoriteHeartColor else TextSecondary,
-                                    modifier = Modifier.size(18.dp)
+                                    imageVector = Icons.Outlined.Bedtime,
+                                    contentDescription = stringResource(R.string.sleep_timer),
+                                    tint = if (sleepTimerRemaining != null) DarkBackground else if (isTimerFocused) Color.White else TextSecondary,
+                                    modifier = Modifier.size(20.dp)
                                 )
+                            }
+
+                            var isPlayFocused by remember { mutableStateOf(false) }
+                            val playScale by animateFloatAsState(
+                                targetValue = if (isPlayFocused) 1.18f else 1.0f,
+                                animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessLow),
+                                label = "play_focus"
+                            )
+
+                            Box(
+                                modifier = Modifier
+                                    .focusRequester(playPauseFocusRequester)
+                                    .onFocusChanged {
+                                        isPlayFocused = it.isFocused
+                                        if (it.isFocused) lastInteractionTime = System.currentTimeMillis()
+                                    }
+                                    .scale(playScale)
+                                    .shadow(
+                                        elevation = if (isPlayFocused) 16.dp else 4.dp,
+                                        shape = CircleShape,
+                                        spotColor = NeonCyan,
+                                        ambientColor = NeonCyan.copy(alpha = 0.6f)
+                                    )
+                                    .clip(CircleShape)
+                                    .background(NeonCyan)
+                                    .border(
+                                        width = if (isPlayFocused) 3.5.dp else 0.dp,
+                                        brush = if (isPlayFocused) {
+                                            Brush.horizontalGradient(listOf(Color.White, NeonCyan, Color.White))
+                                        } else Brush.horizontalGradient(listOf(Color.Transparent, Color.Transparent)),
+                                        shape = CircleShape
+                                    )
+                                    .clickable {
+                                        lastInteractionTime = System.currentTimeMillis()
+                                        onTogglePlay()
+                                    }
+                                    .size(54.dp)
+                                    .testTag("dock_play_pause"),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(
+                                    imageVector = if (isPlaying) Icons.Filled.Pause else Icons.Filled.PlayArrow,
+                                    contentDescription = if (isPlaying) "Pause" else "Play",
+                                    tint = DarkBackground,
+                                    modifier = Modifier.size(28.dp)
+                                )
+                            }
+
+                            if (onToggleFavorite != null && currentStation != null) {
+                                var isFavFocused by remember { mutableStateOf(false) }
+                                IconButton(
+                                    onClick = {
+                                        lastInteractionTime = System.currentTimeMillis()
+                                        onToggleFavorite()
+                                    },
+                                    modifier = Modifier
+                                        .onFocusChanged {
+                                            isFavFocused = it.isFocused
+                                            if (it.isFocused) lastInteractionTime = System.currentTimeMillis()
+                                        }
+                                        .scale(if (isFavFocused) 1.15f else 1.0f)
+                                        .shadow(
+                                            elevation = if (isFavFocused) 10.dp else 0.dp,
+                                            shape = CircleShape,
+                                            spotColor = NeonCyan
+                                        )
+                                        .clip(CircleShape)
+                                        .background(if (isFavFocused) DarkSurfaceVariant else DarkSurfaceVariant.copy(alpha = 0.6f))
+                                        .border(
+                                            width = if (isFavFocused) 2.5.dp else 0.dp,
+                                            color = if (isFavFocused) NeonCyan else Color.Transparent,
+                                            shape = CircleShape
+                                        )
+                                        .size(46.dp)
+                                ) {
+                                    Icon(
+                                        imageVector = if (currentStation.isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
+                                        contentDescription = "Favorite",
+                                        tint = if (currentStation.isFavorite) FavoriteHeartColor else if (isFavFocused) Color.White else TextSecondary,
+                                        modifier = Modifier.size(20.dp)
+                                    )
+                                }
                             }
                         }
                     }

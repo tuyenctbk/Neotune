@@ -8,10 +8,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
@@ -90,7 +91,7 @@ fun SettingsScreen(
                         HorizontalDivider(color = DarkSurfaceVariant, thickness = 1.dp)
                         SettingsItem(
                             icon = Icons.Filled.Bedtime,
-                            iconTint = if (sleepTimerRemaining != null) NeonPurple else TextMuted,
+                            iconTint = if (sleepTimerRemaining != null) NeonCyan else TextMuted,
                             title = stringResource(R.string.sleep_timer),
                             subtitle = sleepTimerRemaining?.let { stringResource(R.string.sleeping_in, it) } ?: "Set automatic sleep timer",
                             onClick = onOpenSleepTimer,
@@ -106,93 +107,25 @@ fun SettingsScreen(
                             testTag = "setting_radio_alarm"
                         )
                         HorizontalDivider(color = DarkSurfaceVariant, thickness = 1.dp)
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 16.dp, vertical = 12.dp)
-                                .testTag("setting_battery_saver"),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Box(
-                                modifier = Modifier
-                                    .size(40.dp)
-                                    .clip(RoundedCornerShape(10.dp))
-                                    .background(DarkSurfaceVariant),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Filled.BatterySaver,
-                                    contentDescription = null,
-                                    tint = NeonCyan,
-                                    modifier = Modifier.size(22.dp)
-                                )
-                            }
-                            Spacer(modifier = Modifier.width(14.dp))
-                            Column(modifier = Modifier.weight(1f)) {
-                                Text(
-                                    text = stringResource(R.string.battery_saver_mode),
-                                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
-                                    color = TextPrimary
-                                )
-                                Text(
-                                    text = stringResource(R.string.battery_saver_mode_desc),
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = TextMuted
-                                )
-                            }
-                            Switch(
-                                checked = isBatterySaverEnabled,
-                                onCheckedChange = { onToggleBatterySaver() },
-                                colors = SwitchDefaults.colors(
-                                    checkedThumbColor = Color.Black,
-                                    checkedTrackColor = NeonCyan
-                                )
-                            )
-                        }
+                        SettingsSwitchItem(
+                            icon = Icons.Filled.BatterySaver,
+                            iconTint = NeonCyan,
+                            title = stringResource(R.string.battery_saver_mode),
+                            subtitle = stringResource(R.string.battery_saver_mode_desc),
+                            checked = isBatterySaverEnabled,
+                            onCheckedChange = { onToggleBatterySaver() },
+                            testTag = "setting_battery_saver"
+                        )
                         HorizontalDivider(color = DarkSurfaceVariant, thickness = 1.dp)
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 16.dp, vertical = 12.dp)
-                                .testTag("setting_auto_play"),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Box(
-                                modifier = Modifier
-                                    .size(40.dp)
-                                    .clip(RoundedCornerShape(10.dp))
-                                    .background(DarkSurfaceVariant),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Filled.PlayCircle,
-                                    contentDescription = null,
-                                    tint = NeonPurple,
-                                    modifier = Modifier.size(22.dp)
-                                )
-                            }
-                            Spacer(modifier = Modifier.width(14.dp))
-                            Column(modifier = Modifier.weight(1f)) {
-                                Text(
-                                    text = "Auto-Play on Startup",
-                                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
-                                    color = TextPrimary
-                                )
-                                Text(
-                                    text = "Resume the last played station/podcast on app launch",
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = TextMuted
-                                )
-                            }
-                            Switch(
-                                checked = isAutoPlayOnStartupEnabled,
-                                onCheckedChange = { onToggleAutoPlayOnStartup() },
-                                colors = SwitchDefaults.colors(
-                                    checkedThumbColor = Color.Black,
-                                    checkedTrackColor = NeonPurple
-                                )
-                            )
-                        }
+                        SettingsSwitchItem(
+                            icon = Icons.Filled.PlayCircle,
+                            iconTint = NeonCyan,
+                            title = "Auto-Play on Startup",
+                            subtitle = "Resume the last played station/podcast on app launch",
+                            checked = isAutoPlayOnStartupEnabled,
+                            onCheckedChange = { onToggleAutoPlayOnStartup() },
+                            testTag = "setting_auto_play"
+                        )
                     }
                 }
 
@@ -205,7 +138,7 @@ fun SettingsScreen(
                     SettingsCard {
                         SettingsItem(
                             icon = Icons.Filled.Palette,
-                            iconTint = NeonPink,
+                            iconTint = NeonCyan,
                             title = stringResource(R.string.appearance),
                             subtitle = "Themes, accent colors & languages",
                             onClick = onOpenAppearance,
@@ -221,49 +154,15 @@ fun SettingsScreen(
                             testTag = "setting_onboarding"
                         )
                         HorizontalDivider(color = DarkSurfaceVariant, thickness = 1.dp)
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 16.dp, vertical = 12.dp)
-                                .testTag("setting_light_mode"),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Box(
-                                modifier = Modifier
-                                    .size(40.dp)
-                                    .clip(RoundedCornerShape(10.dp))
-                                    .background(DarkSurfaceVariant),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Filled.LightMode,
-                                    contentDescription = null,
-                                    tint = NeonPink,
-                                    modifier = Modifier.size(22.dp)
-                                )
-                            }
-                            Spacer(modifier = Modifier.width(14.dp))
-                            Column(modifier = Modifier.weight(1f)) {
-                                Text(
-                                    text = "Light Theme",
-                                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
-                                    color = TextPrimary
-                                )
-                                Text(
-                                    text = "Toggle comfortable light theme for long playback sessions",
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = TextMuted
-                                )
-                            }
-                            Switch(
-                                checked = isLightMode,
-                                onCheckedChange = { onToggleLightMode() },
-                                colors = SwitchDefaults.colors(
-                                    checkedThumbColor = Color.Black,
-                                    checkedTrackColor = NeonPink
-                                )
-                            )
-                        }
+                        SettingsSwitchItem(
+                            icon = Icons.Filled.LightMode,
+                            iconTint = NeonCyan,
+                            title = "Light Theme",
+                            subtitle = "Toggle comfortable light theme for long playback sessions",
+                            checked = isLightMode,
+                            onCheckedChange = { onToggleLightMode() },
+                            testTag = "setting_light_mode"
+                        )
                     }
                 }
 
@@ -334,9 +233,13 @@ private fun SettingsItem(
     onClick: () -> Unit,
     testTag: String
 ) {
+    var isFocused by remember { mutableStateOf(false) }
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
+            .onFocusChanged { isFocused = it.isFocused }
+            .background(if (isFocused) NeonCyan.copy(alpha = 0.16f) else Color.Transparent)
             .clickable(onClick = onClick)
             .padding(horizontal = 16.dp, vertical = 14.dp)
             .testTag(testTag),
@@ -346,13 +249,13 @@ private fun SettingsItem(
             modifier = Modifier
                 .size(40.dp)
                 .clip(RoundedCornerShape(10.dp))
-                .background(DarkSurfaceVariant),
+                .background(if (isFocused) NeonCyan.copy(alpha = 0.28f) else DarkSurfaceVariant),
             contentAlignment = Alignment.Center
         ) {
             Icon(
                 imageVector = icon,
                 contentDescription = title,
-                tint = iconTint,
+                tint = if (isFocused) NeonCyan else iconTint,
                 modifier = Modifier.size(22.dp)
             )
         }
@@ -361,20 +264,80 @@ private fun SettingsItem(
             Text(
                 text = title,
                 style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
-                color = TextPrimary
+                color = if (isFocused) NeonCyan else TextPrimary
             )
             Spacer(modifier = Modifier.height(2.dp))
             Text(
                 text = subtitle,
                 style = MaterialTheme.typography.bodySmall,
-                color = TextMuted
+                color = if (isFocused) TextSecondary else TextMuted
             )
         }
         Icon(
             imageVector = Icons.Filled.ChevronRight,
             contentDescription = null,
-            tint = TextMuted,
+            tint = if (isFocused) NeonCyan else TextMuted,
             modifier = Modifier.size(20.dp)
+        )
+    }
+}
+
+@Composable
+private fun SettingsSwitchItem(
+    icon: ImageVector,
+    iconTint: androidx.compose.ui.graphics.Color,
+    title: String,
+    subtitle: String,
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit,
+    testTag: String
+) {
+    var isFocused by remember { mutableStateOf(false) }
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .onFocusChanged { isFocused = it.isFocused }
+            .background(if (isFocused) NeonCyan.copy(alpha = 0.16f) else Color.Transparent)
+            .clickable { onCheckedChange(!checked) }
+            .padding(horizontal = 16.dp, vertical = 12.dp)
+            .testTag(testTag),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Box(
+            modifier = Modifier
+                .size(40.dp)
+                .clip(RoundedCornerShape(10.dp))
+                .background(if (isFocused) NeonCyan.copy(alpha = 0.28f) else DarkSurfaceVariant),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = if (isFocused) NeonCyan else iconTint,
+                modifier = Modifier.size(22.dp)
+            )
+        }
+        Spacer(modifier = Modifier.width(14.dp))
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
+                color = if (isFocused) NeonCyan else TextPrimary
+            )
+            Text(
+                text = subtitle,
+                style = MaterialTheme.typography.bodySmall,
+                color = if (isFocused) TextSecondary else TextMuted
+            )
+        }
+        Switch(
+            checked = checked,
+            onCheckedChange = { onCheckedChange(it) },
+            colors = SwitchDefaults.colors(
+                checkedThumbColor = Color.Black,
+                checkedTrackColor = NeonCyan
+            )
         )
     }
 }

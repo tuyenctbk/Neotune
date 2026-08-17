@@ -20,8 +20,16 @@ import androidx.media3.datasource.HttpDataSource
 import androidx.media3.exoplayer.DefaultLoadControl
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
+import androidx.media3.session.LibraryResult
+import androidx.media3.session.MediaLibraryService
+import androidx.media3.session.MediaLibraryService.MediaLibrarySession
 import androidx.media3.session.MediaSession
 import androidx.media3.session.SessionError
+import com.google.common.collect.ImmutableList
+import com.google.common.util.concurrent.Futures
+import com.google.common.util.concurrent.ListenableFuture
+import com.google.common.util.concurrent.SettableFuture
+import com.easeaudio.data.RadioDatabase
 import com.easeaudio.data.RadioStation
 import com.easeaudio.firebase.FirebaseConfigManager
 import com.easeaudio.network.NetworkQualityManager
@@ -72,7 +80,15 @@ class RadioPlayerManager(private val context: Context) {
 
     companion object {
         @Volatile
-        var sharedMediaSession: MediaSession? = null
+        var sharedMediaLibrarySession: MediaLibrarySession? = null
+
+        var sharedMediaSession: MediaSession?
+            get() = sharedMediaLibrarySession
+            set(value) {
+                if (value is MediaLibrarySession) {
+                    sharedMediaLibrarySession = value
+                }
+            }
 
         @Volatile
         private var instance: RadioPlayerManager? = null
@@ -90,9 +106,6 @@ class RadioPlayerManager(private val context: Context) {
     // failing child coroutine (e.g. a crashed wave loop) does not cancel siblings.
     @Volatile private var scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
 
-
-
-
     val networkQualityManager = NetworkQualityManager(context)
     val firebaseConfigManager = FirebaseConfigManager(context)
 
@@ -100,7 +113,14 @@ class RadioPlayerManager(private val context: Context) {
     val remoteConfig = firebaseConfigManager.configState
 
     private var exoPlayer: ExoPlayer? = null
-    private var mediaSession: MediaSession? = null
+    private var mediaLibrarySession: MediaLibrarySession? = null
+    private var mediaSession: MediaSession?
+        get() = mediaLibrarySession
+        set(value) {
+            if (value is MediaLibrarySession) {
+                mediaLibrarySession = value
+            }
+        }
     private var wifiLock: android.net.wifi.WifiManager.WifiLock? = null
 
     private val _currentStation = MutableStateFlow<RadioStation?>(null)
@@ -453,26 +473,6 @@ class RadioPlayerManager(private val context: Context) {
                     PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
                 )
 
-                val mediaSessionCallback = object : MediaSession.Callback {
-                    override fun onPlayerCommandRequest(
-                        session: MediaSession,
-                        controller: MediaSession.ControllerInfo,
-                        playerCommand: Int
-                    ): Int {
-                        if (playerCommand == Player.COMMAND_SEEK_TO_NEXT) {
-                            scope.launch(Dispatchers.Main) {
-                                playNextStation(currentStationList)
-                            }
-                        }
-                        if (playerCommand == Player.COMMAND_SEEK_TO_PREVIOUS) {
-                            scope.launch(Dispatchers.Main) {
-                                playPreviousStation(currentStationList)
-                            }
-                        }
-                        return super.onPlayerCommandRequest(session, controller, playerCommand)
-                    }
-                }
-
                 val forwardingPlayer = object : androidx.media3.common.ForwardingPlayer(player) {
                     override fun getAvailableCommands(): Player.Commands {
                         return super.getAvailableCommands().buildUpon()
@@ -502,16 +502,338 @@ class RadioPlayerManager(private val context: Context) {
                     }
                 }
 
-                mediaSession = MediaSession.Builder(context.applicationContext, forwardingPlayer)
+                val mediaLibraryCallback = object : MediaLibrarySession.Callback {
+                    override fun onGetLibraryRoot(
+                        session: MediaLibrarySession,
+                        browser: MediaSession.ControllerInfo,
+                        params: MediaLibraryService.LibraryParams?
+                    ): ListenableFuture<LibraryResult<MediaItem>> {
+                        val rootItem = createFolderItem(
+                            id = "root_neotune",
+                            title = "Neotune",
+                            mediaType = MediaMetadata.MEDIA_TYPE_FOLDER_MIXED,
+                            subtitle = "Internet Radio & Podcasts"
+                        )
+                        return Futures.immediateFuture(LibraryResult.ofItem(rootItem, params))
+                    }
+
+                    override fun onGetChildren(
+                        session: MediaLibrarySession,
+                        browser: MediaSession.ControllerInfo,
+                        parentId: String,
+                        page: Int,
+                        pageSize: Int,
+                        params: MediaLibraryService.LibraryParams?
+                    ): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
+                        val future = SettableFuture.create<LibraryResult<ImmutableList<MediaItem>>>()
+                        scope.launch(Dispatchers.IO) {
+                            try {
+                                val items = mutableListOf<MediaItem>()
+                                when (parentId) {
+                                    "root_neotune", "root", "/" -> {
+                                        items.add(createFolderItem("folder_favorites", "Favorites", MediaMetadata.MEDIA_TYPE_FOLDER_RADIO_STATIONS, "Starred stations & podcasts"))
+                                        items.add(createFolderItem("folder_top", "Top & Trending", MediaMetadata.MEDIA_TYPE_FOLDER_RADIO_STATIONS, "Featured global streams"))
+                                        items.add(createFolderItem("folder_recent", "Recently Played", MediaMetadata.MEDIA_TYPE_FOLDER_RADIO_STATIONS, "Your recent stations"))
+                                        items.add(createFolderItem("folder_genres", "Genres & Categories", MediaMetadata.MEDIA_TYPE_FOLDER_GENRES, "Browse by musical genre"))
+                                        items.add(createFolderItem("folder_podcasts", "Podcasts", MediaMetadata.MEDIA_TYPE_FOLDER_PODCASTS, "Popular podcast shows"))
+                                    }
+                                    "folder_favorites" -> {
+                                        val favs = RadioDatabase.getDatabase(context).favoriteDao().getAllFavoritesDirect()
+                                        if (favs.isNotEmpty()) {
+                                            items.addAll(favs.map { fav ->
+                                                val st = knownStations[fav.id] ?: RadioStation(
+                                                    id = fav.id,
+                                                    name = fav.name,
+                                                    streamUrl = fav.streamUrl,
+                                                    genre = fav.genre,
+                                                    country = fav.country,
+                                                    imageUrl = fav.imageUrl,
+                                                    bitrate = fav.bitrate,
+                                                    codec = fav.codec,
+                                                    isCustom = fav.isCustom,
+                                                    isFavorite = true
+                                                )
+                                                knownStations[st.id] = st
+                                                stationToMediaItem(st)
+                                            })
+                                        } else {
+                                            items.addAll(knownStations.values.filter { it.isFavorite }.map { stationToMediaItem(it) })
+                                        }
+                                    }
+                                    "folder_top" -> {
+                                        val topList = if (currentStationList.isNotEmpty()) currentStationList else knownStations.values.toList()
+                                        items.addAll(topList.take(30).map { stationToMediaItem(it) })
+                                    }
+                                    "folder_recent" -> {
+                                        val recents = RadioDatabase.getDatabase(context).radioDao().getRecentStationsDirect()
+                                        if (recents.isNotEmpty()) {
+                                            items.addAll(recents.map { stationToMediaItem(it) })
+                                        } else {
+                                            items.addAll(currentStationList.take(10).map { stationToMediaItem(it) })
+                                        }
+                                    }
+                                    "folder_genres" -> {
+                                        val genreList = listOf(
+                                            "Pop" to "genre_pop",
+                                            "Rock" to "genre_rock",
+                                            "Jazz" to "genre_jazz",
+                                            "Classical" to "genre_classical",
+                                            "News & Talk" to "genre_news",
+                                            "Electronic" to "genre_electronic",
+                                            "Country" to "genre_country",
+                                            "Dance" to "genre_dance",
+                                            "Ambient" to "genre_ambient",
+                                            "Hip Hop" to "genre_hiphop",
+                                            "Lo-Fi" to "genre_lofi",
+                                            "Metal" to "genre_metal",
+                                            "Blues" to "genre_blues"
+                                        )
+                                        items.addAll(genreList.map { (name, id) ->
+                                            createFolderItem(id, name, MediaMetadata.MEDIA_TYPE_FOLDER_RADIO_STATIONS)
+                                        })
+                                    }
+                                    "folder_podcasts" -> {
+                                        val podcasts = knownStations.values.filter { it.isPodcast }
+                                        if (podcasts.isNotEmpty()) {
+                                            items.addAll(podcasts.map { stationToMediaItem(it) })
+                                        } else {
+                                            items.addAll(currentStationList.filter { it.isPodcast }.map { stationToMediaItem(it) })
+                                        }
+                                    }
+                                    else -> {
+                                        if (parentId.startsWith("genre_")) {
+                                            val genreKeyword = parentId.removePrefix("genre_")
+                                            val matching = knownStations.values.filter {
+                                                it.genre.contains(genreKeyword, ignoreCase = true) ||
+                                                it.name.contains(genreKeyword, ignoreCase = true)
+                                            }
+                                            items.addAll(matching.take(25).map { stationToMediaItem(it) })
+                                        }
+                                    }
+                                }
+
+                                val fromIndex = (page * pageSize).coerceAtMost(items.size)
+                                val toIndex = if (pageSize > 0) ((page + 1) * pageSize).coerceAtMost(items.size) else items.size
+                                val paged = if (fromIndex < toIndex) items.subList(fromIndex, toIndex) else items
+                                future.set(LibraryResult.ofItemList(ImmutableList.copyOf(paged), params))
+                            } catch (e: Exception) {
+                                Log.e(TAG, "Error resolving children for $parentId: ${e.message}", e)
+                                future.set(LibraryResult.ofError(SessionError.ERROR_UNKNOWN))
+                            }
+                        }
+                        return future
+                    }
+
+                    override fun onGetItem(
+                        session: MediaLibrarySession,
+                        browser: MediaSession.ControllerInfo,
+                        mediaId: String
+                    ): ListenableFuture<LibraryResult<MediaItem>> {
+                        val station = knownStations[mediaId]
+                        if (station != null) {
+                            return Futures.immediateFuture(LibraryResult.ofItem(stationToMediaItem(station), null))
+                        }
+                        if (mediaId.startsWith("folder_") || mediaId.startsWith("genre_") || mediaId == "root_neotune") {
+                            val title = mediaId.removePrefix("folder_").removePrefix("genre_").replaceFirstChar { it.uppercase() }
+                            return Futures.immediateFuture(LibraryResult.ofItem(createFolderItem(mediaId, title, MediaMetadata.MEDIA_TYPE_FOLDER_MIXED), null))
+                        }
+                        val future = SettableFuture.create<LibraryResult<MediaItem>>()
+                        scope.launch(Dispatchers.IO) {
+                            try {
+                                val dbStation = RadioDatabase.getDatabase(context).radioDao().getStationById(mediaId)
+                                if (dbStation != null) {
+                                    knownStations[dbStation.id] = dbStation
+                                    future.set(LibraryResult.ofItem(stationToMediaItem(dbStation), null))
+                                } else {
+                                    future.set(LibraryResult.ofError(SessionError.ERROR_BAD_VALUE))
+                                }
+                            } catch (e: Exception) {
+                                future.set(LibraryResult.ofError(SessionError.ERROR_UNKNOWN))
+                            }
+                        }
+                        return future
+                    }
+
+                    override fun onAddMediaItems(
+                        mediaSession: MediaSession,
+                        controller: MediaSession.ControllerInfo,
+                        mediaItems: MutableList<MediaItem>
+                    ): ListenableFuture<MutableList<MediaItem>> {
+                        val updatedItems = mediaItems.map { item ->
+                            val station = knownStations[item.mediaId]
+                            if (station != null) {
+                                stationToMediaItem(station)
+                            } else {
+                                item
+                            }
+                        }.toMutableList()
+
+                        val targetItem = updatedItems.firstOrNull()
+                        if (targetItem != null) {
+                            val targetId = targetItem.mediaId
+                            val streamUriStr = targetItem.localConfiguration?.uri?.toString()
+                                ?: targetItem.requestMetadata.mediaUri?.toString()
+                                ?: targetId
+                            val st = knownStations[targetId] ?: RadioStation(
+                                id = targetId,
+                                name = targetItem.mediaMetadata.title?.toString() ?: "Station",
+                                streamUrl = streamUriStr,
+                                genre = targetItem.mediaMetadata.artist?.toString() ?: "Radio",
+                                country = "Global",
+                                imageUrl = targetItem.mediaMetadata.artworkUri?.toString() ?: ""
+                            )
+                            scope.launch(Dispatchers.Main) {
+                                playStation(st)
+                            }
+                        }
+                        return Futures.immediateFuture(updatedItems)
+                    }
+
+                    override fun onSearch(
+                        session: MediaLibrarySession,
+                        browser: MediaSession.ControllerInfo,
+                        query: String,
+                        params: MediaLibraryService.LibraryParams?
+                    ): ListenableFuture<LibraryResult<Void>> {
+                        val matching = searchStations(query)
+                        session.notifySearchResultChanged(browser, query, matching.size, params)
+                        return Futures.immediateFuture(LibraryResult.ofVoid(params))
+                    }
+
+                    override fun onGetSearchResult(
+                        session: MediaLibrarySession,
+                        browser: MediaSession.ControllerInfo,
+                        query: String,
+                        page: Int,
+                        pageSize: Int,
+                        params: MediaLibraryService.LibraryParams?
+                    ): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
+                        val matching = searchStations(query)
+                        val fromIndex = (page * pageSize).coerceAtMost(matching.size)
+                        val toIndex = if (pageSize > 0) ((page + 1) * pageSize).coerceAtMost(matching.size) else matching.size
+                        val subList = if (fromIndex < toIndex) matching.subList(fromIndex, toIndex) else matching
+                        val mediaItems = subList.map { stationToMediaItem(it) }
+                        return Futures.immediateFuture(LibraryResult.ofItemList(ImmutableList.copyOf(mediaItems), params))
+                    }
+
+                    override fun onPlaybackResumption(
+                        mediaSession: MediaSession,
+                        controller: MediaSession.ControllerInfo
+                    ): ListenableFuture<MediaSession.MediaItemsWithStartPosition> {
+                        val current = _currentStation.value
+                        if (current != null) {
+                            val item = stationToMediaItem(current)
+                            val itemsWithStart = MediaSession.MediaItemsWithStartPosition(
+                                ImmutableList.of(item),
+                                0,
+                                exoPlayer?.currentPosition ?: 0L
+                            )
+                            return Futures.immediateFuture(itemsWithStart)
+                        }
+                        val future = SettableFuture.create<MediaSession.MediaItemsWithStartPosition>()
+                        scope.launch(Dispatchers.IO) {
+                            try {
+                                val recents = RadioDatabase.getDatabase(context).radioDao().getRecentStationsDirect()
+                                val candidate = recents.firstOrNull() ?: currentStationList.firstOrNull()
+                                if (candidate != null) {
+                                    knownStations[candidate.id] = candidate
+                                    val item = stationToMediaItem(candidate)
+                                    val itemsWithStart = MediaSession.MediaItemsWithStartPosition(
+                                        ImmutableList.of(item),
+                                        0,
+                                        0L
+                                    )
+                                    withContext(Dispatchers.Main) {
+                                        setPreloadedStation(candidate)
+                                    }
+                                    future.set(itemsWithStart)
+                                } else {
+                                    future.setException(UnsupportedOperationException("No station to resume"))
+                                }
+                            } catch (e: Exception) {
+                                future.setException(e)
+                            }
+                        }
+                        return future
+                    }
+
+                    override fun onPlayerCommandRequest(
+                        session: MediaSession,
+                        controller: MediaSession.ControllerInfo,
+                        playerCommand: Int
+                    ): Int {
+                        if (playerCommand == Player.COMMAND_SEEK_TO_NEXT) {
+                            scope.launch(Dispatchers.Main) {
+                                playNextStation(currentStationList)
+                            }
+                        }
+                        if (playerCommand == Player.COMMAND_SEEK_TO_PREVIOUS) {
+                            scope.launch(Dispatchers.Main) {
+                                playPreviousStation(currentStationList)
+                            }
+                        }
+                        return super.onPlayerCommandRequest(session, controller, playerCommand)
+                    }
+                }
+
+                mediaLibrarySession = MediaLibrarySession.Builder(context.applicationContext, forwardingPlayer, mediaLibraryCallback)
                     .setSessionActivity(pendingIntent)
-                    .setCallback(mediaSessionCallback)
                     .build().also {
-                        sharedMediaSession = it
+                        sharedMediaLibrarySession = it
                     }
             } catch (e: Exception) {
-                Log.e(TAG, "Failed to create MediaSession: ${e.message}", e)
+                Log.e(TAG, "Failed to create MediaLibrarySession: ${e.message}", e)
             }
         }
+    }
+
+    fun stationToMediaItem(station: RadioStation): MediaItem {
+        val artworkUri = try {
+            if (station.imageUrl.isNotBlank()) Uri.parse(station.imageUrl) else null
+        } catch (e: Exception) {
+            null
+        }
+
+        val metadata = MediaMetadata.Builder()
+            .setTitle(station.name)
+            .setArtist(station.genre)
+            .setSubtitle(if (station.isPodcast) "Podcast" else station.country)
+            .setArtworkUri(artworkUri)
+            .setIsPlayable(true)
+            .setIsBrowsable(false)
+            .setMediaType(if (station.isPodcast) MediaMetadata.MEDIA_TYPE_PODCAST_EPISODE else MediaMetadata.MEDIA_TYPE_RADIO_STATION)
+            .build()
+
+        return MediaItem.Builder()
+            .setMediaId(station.id)
+            .setUri(station.streamUrl)
+            .setMediaMetadata(metadata)
+            .build()
+    }
+
+    private fun createFolderItem(id: String, title: String, mediaType: Int, subtitle: String? = null): MediaItem {
+        val metadata = MediaMetadata.Builder()
+            .setTitle(title)
+            .setSubtitle(subtitle)
+            .setIsPlayable(false)
+            .setIsBrowsable(true)
+            .setMediaType(mediaType)
+            .build()
+
+        return MediaItem.Builder()
+            .setMediaId(id)
+            .setMediaMetadata(metadata)
+            .build()
+    }
+
+    private fun searchStations(query: String): List<RadioStation> {
+        val q = query.trim().lowercase()
+        if (q.isBlank()) return currentStationList.take(20)
+        return knownStations.values.filter {
+            it.name.lowercase().contains(q) ||
+            it.genre.lowercase().contains(q) ||
+            it.country.lowercase().contains(q)
+        }.take(30)
     }
 
     @Volatile private var isHealingAttempt = false

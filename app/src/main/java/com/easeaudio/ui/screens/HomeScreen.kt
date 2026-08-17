@@ -48,8 +48,12 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.graphics.Brush
@@ -209,17 +213,18 @@ fun HomeScreen(
                 .padding(innerPadding)
         ) {
             LazyVerticalGrid(
-                columns = GridCells.Fixed(columns),
+                columns = GridCells.Adaptive(minSize = 300.dp),
                 state = gridState,
                 modifier = Modifier
-                    .fillMaxHeight()
-                    .widthIn(max = if (isExpanded) 1200.dp else 800.dp)
+                    .fillMaxSize()
                     .align(Alignment.TopCenter),
-                contentPadding = PaddingValues(bottom = 80.dp)
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                verticalArrangement = Arrangement.spacedBy(10.dp),
+                contentPadding = PaddingValues(start = 20.dp, top = 8.dp, end = 20.dp, bottom = 80.dp)
             ) {
                 // AdMob Banner
                 if (uiState.remoteConfig.adsEnabled) {
-                    item(span = { GridItemSpan(columns) }) {
+                    item(span = { GridItemSpan(maxLineSpan) }) {
                         AdMobBanner(
                             adUnitId = uiState.remoteConfig.bannerAdUnitId,
                             modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
@@ -228,11 +233,11 @@ fun HomeScreen(
                 }
 
                 // App Header
-                item(span = { GridItemSpan(columns) }) {
+                item(span = { GridItemSpan(maxLineSpan) }) {
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 20.dp, vertical = 12.dp)
+                            .padding(vertical = 12.dp)
                     ) {
                         Row(
                             modifier = Modifier.fillMaxWidth(),
@@ -294,11 +299,11 @@ fun HomeScreen(
                 }
 
                 // Search Bar & Suggestions
-                item(span = { GridItemSpan(columns) }) {
+                item(span = { GridItemSpan(maxLineSpan) }) {
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 20.dp)
+                            .padding(vertical = 4.dp)
                     ) {
                         OutlinedTextField(
                             value = uiState.searchQuery,
@@ -434,14 +439,14 @@ fun HomeScreen(
                 }
 
                 // Genre Filter Pills
-                item(span = { GridItemSpan(columns) }) {
+                item(span = { GridItemSpan(maxLineSpan) }) {
                     val activeGenreList = if (uiState.selectedTab == HomeTab.Podcast) uiState.availablePodcastTopics else uiState.availableGenres
                     val haptic = LocalHapticFeedback.current
                     LazyRow(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(vertical = 16.dp),
-                        contentPadding = PaddingValues(horizontal = 20.dp),
+                            .padding(vertical = 12.dp),
+                        contentPadding = PaddingValues(0.dp),
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         items(activeGenreList) { genre ->
@@ -484,18 +489,18 @@ fun HomeScreen(
                 // Recent Streams Section (Tab-filtered, Top 5)
                 val activeRecentList = displayedRecentList
                 if (activeRecentList.isNotEmpty() && uiState.searchQuery.isEmpty() && uiState.selectedGenre == "All") {
-                    item(span = { GridItemSpan(columns) }) {
+                    item(span = { GridItemSpan(maxLineSpan) }) {
                         Text(
                             text = stringResource(R.string.recent_streams),
-                            style = MaterialTheme.typography.titleLarge,
+                            style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
                             color = TextPrimary,
-                            modifier = Modifier.padding(horizontal = 20.dp, vertical = 12.dp)
+                            modifier = Modifier.padding(vertical = 8.dp)
                         )
                     }
-                    item(span = { GridItemSpan(columns) }) {
+                    item(span = { GridItemSpan(maxLineSpan) }) {
                         LazyRow(
                             modifier = Modifier.fillMaxWidth(),
-                            contentPadding = PaddingValues(horizontal = 20.dp),
+                            contentPadding = PaddingValues(0.dp),
                             horizontalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
                             items(activeRecentList.take(10)) { station ->
@@ -517,34 +522,54 @@ fun HomeScreen(
                 // Featured Station Hero Banner
                 if (uiState.stations.isNotEmpty() && uiState.searchQuery.isEmpty() && uiState.selectedGenre == "All") {
                     val featured = uiState.stations.first()
-                    item(span = { GridItemSpan(columns) }) {
+                    item(span = { GridItemSpan(maxLineSpan) }) {
                         var isHeroFocused by remember { mutableStateOf(false) }
                         var showHeroMenu by remember { mutableStateOf(false) }
                         val isFeaturedDemoted = uiState.demotedStationIds.contains(featured.id)
+                        val heroScale by animateFloatAsState(
+                            targetValue = if (isHeroFocused) 1.03f else 1.0f,
+                            animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessLow),
+                            label = "hero_focus_scale"
+                        )
                         
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(horizontal = 20.dp, vertical = 8.dp)
+                                .padding(vertical = 6.dp)
                         ) {
                             Surface(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .onFocusChanged { isHeroFocused = it.isFocused }
+                                    .scale(heroScale)
+                                    .shadow(
+                                        elevation = if (isHeroFocused) 16.dp else 0.dp,
+                                        shape = RoundedCornerShape(20.dp),
+                                        spotColor = NeonCyan,
+                                        ambientColor = NeonCyan.copy(alpha = 0.5f)
+                                    )
                                     .clip(RoundedCornerShape(20.dp))
                                     .combinedClickable(
                                         onClick = { onStationSelect(featured) },
                                         onLongClick = { showHeroMenu = true }
                                     )
                                     .border(
-                                        width = if (isHeroFocused) 2.5.dp else 0.dp,
-                                        color = if (isHeroFocused) NeonCyan else Color.Transparent,
+                                        width = if (isHeroFocused) 3.5.dp else 0.dp,
+                                        brush = if (isHeroFocused) {
+                                            Brush.horizontalGradient(
+                                                listOf(
+                                                    NeonCyan,
+                                                    Color.White,
+                                                    NeonCyan
+                                                )
+                                            )
+                                        } else Brush.horizontalGradient(listOf(Color.Transparent, Color.Transparent)),
                                         shape = RoundedCornerShape(20.dp)
                                     )
                                     .testTag("hero_featured_card"),
                                 color = DarkSurface
                             ) {
-                                Box(modifier = Modifier.fillMaxWidth().height(if (isExpanded) 240.dp else 160.dp)) {
+                                Box(modifier = Modifier.fillMaxWidth().height(if (isExpanded) 220.dp else 160.dp)) {
                                     AsyncImage(
                                         model = featured.imageUrl,
                                         contentDescription = featured.name,
@@ -673,18 +698,18 @@ fun HomeScreen(
                 }
 
                 // Section Title
-                item(span = { GridItemSpan(columns) }) {
+                item(span = { GridItemSpan(maxLineSpan) }) {
                     Text(
                         text = if (uiState.selectedTab == HomeTab.Radio) stringResource(R.string.live_radio_stations) else stringResource(R.string.podcasts_and_shows),
-                        style = MaterialTheme.typography.titleLarge,
+                        style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
                         color = TextPrimary,
-                        modifier = Modifier.padding(horizontal = 20.dp, vertical = 12.dp)
+                        modifier = Modifier.padding(top = 12.dp, bottom = 4.dp)
                     )
                 }
 
                 // Empty or Initial Loading State
                 if (uiState.stations.isEmpty()) {
-                    item(span = { GridItemSpan(columns) }) {
+                    item(span = { GridItemSpan(maxLineSpan) }) {
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -759,7 +784,7 @@ fun HomeScreen(
                 }
 
                 if (uiState.isLoadingMore) {
-                    item(span = { GridItemSpan(columns) }) {
+                    item(span = { GridItemSpan(maxLineSpan) }) {
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -814,13 +839,20 @@ fun RecentStationCard(
     var showMenu by remember { mutableStateOf(false) }
     val haptic = LocalHapticFeedback.current
     val context = LocalContext.current
+    val activeAccent = NeonCyan
+    val focusScale by animateFloatAsState(
+        targetValue = if (isFocused) 1.08f else 1.0f,
+        animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessLow),
+        label = "recent_card_focus_scale"
+    )
     
     Box {
         Column(
             modifier = Modifier
-                .width(100.dp)
+                .width(112.dp)
                 .onFocusChanged { isFocused = it.isFocused }
-                .clip(RoundedCornerShape(12.dp))
+                .scale(focusScale)
+                .clip(RoundedCornerShape(16.dp))
                 .combinedClickable(
                     onClick = {
                         haptic.performHapticFeedback(HapticFeedbackType.LongPress)
@@ -835,12 +867,27 @@ fun RecentStationCard(
         ) {
             Box(
                 modifier = Modifier
-                    .size(80.dp)
-                    .clip(RoundedCornerShape(16.dp))
+                    .size(84.dp)
+                    .shadow(
+                        elevation = if (isFocused) 14.dp else 0.dp,
+                        shape = RoundedCornerShape(18.dp),
+                        spotColor = activeAccent,
+                        ambientColor = activeAccent.copy(alpha = 0.5f)
+                    )
+                    .clip(RoundedCornerShape(18.dp))
+                    .background(DarkSurfaceVariant)
                     .border(
-                        width = if (isFocused) 2.dp else 0.dp,
-                        color = if (isFocused) NeonCyan else Color.Transparent,
-                        shape = RoundedCornerShape(16.dp)
+                        width = if (isFocused) 3.5.dp else 0.dp,
+                        brush = if (isFocused) {
+                            Brush.horizontalGradient(
+                                listOf(
+                                    activeAccent,
+                                    Color.White,
+                                    activeAccent
+                                )
+                            )
+                        } else Brush.horizontalGradient(listOf(Color.Transparent, Color.Transparent)),
+                        shape = RoundedCornerShape(18.dp)
                     )
             ) {
                 AsyncImage(
@@ -853,13 +900,13 @@ fun RecentStationCard(
                     Box(
                         modifier = Modifier
                             .fillMaxSize()
-                            .background(Color.Black.copy(alpha = 0.4f)),
+                            .background(Color.Black.copy(alpha = 0.45f)),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
                             imageVector = Icons.Filled.Pause,
                             contentDescription = null,
-                            tint = Color.White,
+                            tint = activeAccent,
                             modifier = Modifier.size(32.dp)
                         )
                     }
@@ -868,8 +915,10 @@ fun RecentStationCard(
             Spacer(modifier = Modifier.height(6.dp))
             Text(
                 text = station.name,
-                style = MaterialTheme.typography.labelSmall,
-                color = if (isFocused) NeonCyan else TextPrimary,
+                style = MaterialTheme.typography.labelSmall.copy(
+                    fontWeight = if (isFocused) FontWeight.Black else FontWeight.Medium
+                ),
+                color = if (isFocused) Color.White else TextPrimary,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 textAlign = TextAlign.Center
@@ -965,15 +1014,26 @@ fun StationCard(
     var showMenu by remember { mutableStateOf(false) }
     val haptic = LocalHapticFeedback.current
     val context = LocalContext.current
+    val activeAccent = NeonCyan
+    val focusScale by animateFloatAsState(
+        targetValue = if (isFocused) 1.06f else 1.0f,
+        animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessLow),
+        label = "station_card_focus_scale"
+    )
     
     Box(modifier = Modifier.fillMaxWidth()) {
         Surface(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 20.dp, vertical = 6.dp)
                 .onFocusChanged { isFocused = it.isFocused }
-                .scale(if (isFocused) 1.04f else 1.0f)
-                .clip(RoundedCornerShape(16.dp))
+                .scale(focusScale)
+                .shadow(
+                    elevation = if (isFocused) 16.dp else 0.dp,
+                    shape = RoundedCornerShape(18.dp),
+                    spotColor = activeAccent,
+                    ambientColor = activeAccent.copy(alpha = 0.5f)
+                )
+                .clip(RoundedCornerShape(18.dp))
                 .combinedClickable(
                     onClick = {
                         haptic.performHapticFeedback(HapticFeedbackType.LongPress)
@@ -985,141 +1045,228 @@ fun StationCard(
                     }
                 )
                 .border(
-                    width = if (isFocused) 2.5.dp else if (isSelected) 1.dp else 0.dp,
-                    color = if (isFocused) NeonCyan else if (isSelected) NeonCyan.copy(alpha = 0.5f) else Color.Transparent,
-                    shape = RoundedCornerShape(16.dp)
+                    width = if (isFocused) 3.5.dp else if (isSelected) 1.5.dp else 1.dp,
+                    brush = if (isFocused) {
+                        Brush.horizontalGradient(
+                            listOf(
+                                activeAccent,
+                                Color.White,
+                                activeAccent
+                            )
+                        )
+                    } else if (isSelected) {
+                        Brush.horizontalGradient(
+                            listOf(
+                                activeAccent.copy(alpha = 0.8f),
+                                activeAccent.copy(alpha = 0.4f)
+                            )
+                        )
+                    } else {
+                        Brush.horizontalGradient(
+                            listOf(
+                                CardBorder.copy(alpha = 0.5f),
+                                CardBorder.copy(alpha = 0.5f)
+                            )
+                        )
+                    },
+                    shape = RoundedCornerShape(18.dp)
                 )
                 .testTag("station_card_${station.id}"),
-            color = if (isFocused) DarkSurfaceVariant else if (isSelected) DarkSurfaceVariant.copy(alpha = 0.8f) else DarkSurface
+            color = if (isFocused) DarkSurfaceVariant.copy(alpha = 0.95f) else if (isSelected) DarkSurfaceVariant.copy(alpha = 0.8f) else DarkSurface
         ) {
-            Row(
+            Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(12.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                // Station Image
-                Box(
-                    modifier = Modifier
-                        .size(56.dp)
-                        .clip(RoundedCornerShape(12.dp))
-                ) {
-                    AsyncImage(
-                        model = station.imageUrl,
-                        contentDescription = station.name,
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier.fillMaxSize()
+                    .then(
+                        if (isFocused) {
+                            Modifier.background(
+                                Brush.horizontalGradient(
+                                    listOf(
+                                        activeAccent.copy(alpha = 0.22f),
+                                        Color.Transparent
+                                    )
+                                )
+                            )
+                        } else Modifier
                     )
-                    if (isSelected) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .background(DarkBackground.copy(alpha = 0.5f)),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            if (isLoading) {
-                                CircularProgressIndicator(
-                                    modifier = Modifier.size(24.dp),
-                                    color = NeonCyan,
-                                    strokeWidth = 2.5.dp
-                                )
-                            } else {
-                                Icon(
-                                    imageVector = if (isPlaying) Icons.Filled.Pause else Icons.Filled.PlayArrow,
-                                    contentDescription = null,
-                                    tint = NeonCyan
-                                )
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(14.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    // Station Image with sleek border when focused
+                    Box(
+                        modifier = Modifier
+                            .size(60.dp)
+                            .clip(RoundedCornerShape(14.dp))
+                            .background(DarkSurfaceVariant)
+                            .border(
+                                width = if (isFocused) 2.dp else 0.dp,
+                                color = if (isFocused) activeAccent else Color.Transparent,
+                                shape = RoundedCornerShape(14.dp)
+                            )
+                    ) {
+                        AsyncImage(
+                            model = station.imageUrl,
+                            contentDescription = station.name,
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier.fillMaxSize()
+                        )
+                        if (isSelected) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .background(DarkBackground.copy(alpha = 0.55f)),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                if (isLoading) {
+                                    CircularProgressIndicator(
+                                        modifier = Modifier.size(24.dp),
+                                        color = activeAccent,
+                                        strokeWidth = 2.5.dp
+                                    )
+                                } else {
+                                    Icon(
+                                        imageVector = if (isPlaying) Icons.Filled.Pause else Icons.Filled.PlayArrow,
+                                        contentDescription = null,
+                                        tint = activeAccent,
+                                        modifier = Modifier.size(28.dp)
+                                    )
+                                }
                             }
                         }
                     }
-                }
 
-                Spacer(modifier = Modifier.width(14.dp))
+                    Spacer(modifier = Modifier.width(14.dp))
 
-                // Text Info
-                Column(
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(end = 4.dp)
-                ) {
-                    Text(
-                        text = station.name,
-                        style = MaterialTheme.typography.titleMedium,
-                        color = if (isSelected) NeonCyan else TextPrimary,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                    Spacer(modifier = Modifier.height(2.dp))
-                    if (isSelected && isLoading) {
+                    // Text Info
+                    Column(
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(end = 6.dp),
+                        verticalArrangement = Arrangement.Center
+                    ) {
                         Text(
-                            text = stringResource(R.string.buffering_stream),
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = NeonCyan,
-                            fontWeight = FontWeight.Bold
+                            text = station.name,
+                            style = MaterialTheme.typography.titleMedium.copy(
+                                fontWeight = if (isFocused || isSelected) FontWeight.Black else FontWeight.Bold,
+                                fontSize = if (isFocused) 16.sp else 15.sp
+                            ),
+                            color = if (isFocused) Color.White else if (isSelected) activeAccent else TextPrimary,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
                         )
-                    } else if (isUnreachable) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Icon(
-                                imageVector = Icons.Filled.Warning,
-                                contentDescription = null,
-                                tint = Color(0xFFFFB74D),
-                                modifier = Modifier.size(13.dp)
-                            )
-                            Spacer(modifier = Modifier.width(4.dp))
+                        Spacer(modifier = Modifier.height(4.dp))
+                        if (isSelected && isLoading) {
                             Text(
-                                text = stringResource(R.string.stream_unreachable),
-                                style = MaterialTheme.typography.labelSmall,
-                                color = Color(0xFFFFB74D),
-                                fontWeight = FontWeight.Medium,
+                                text = stringResource(R.string.buffering_stream),
+                                style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Bold),
+                                color = activeAccent,
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis
                             )
+                        } else if (isUnreachable) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Filled.Warning,
+                                    contentDescription = null,
+                                    tint = Color(0xFFFFB74D),
+                                    modifier = Modifier.size(13.dp)
+                                )
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text(
+                                    text = stringResource(R.string.stream_unreachable),
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = Color(0xFFFFB74D),
+                                    fontWeight = FontWeight.Medium,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
+                                )
+                            }
+                        } else {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                val genreText = station.genre.ifBlank { "Radio" }
+                                Text(
+                                    text = genreText,
+                                    style = MaterialTheme.typography.bodySmall.copy(
+                                        fontWeight = if (isFocused) FontWeight.SemiBold else FontWeight.Normal
+                                    ),
+                                    color = if (isFocused) activeAccent else TextSecondary,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                    modifier = Modifier.weight(1f, fill = false)
+                                )
+                                val secondary = station.country.ifBlank { station.bitrate }
+                                if (secondary.isNotBlank()) {
+                                    Text(" • ", color = TextMuted, style = MaterialTheme.typography.bodySmall)
+                                    Text(
+                                        text = secondary,
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = if (isFocused) Color.White.copy(alpha = 0.85f) else TextMuted,
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis,
+                                        modifier = Modifier.weight(1f, fill = false)
+                                    )
+                                }
+                            }
+                        }
+                    }
+
+                    // Action Button on right: On TV Focus, show a vibrant PLAY / TUNE IN pill!
+                    if (isFocused) {
+                        Surface(
+                            shape = RoundedCornerShape(20.dp),
+                            color = activeAccent,
+                            modifier = Modifier.padding(start = 4.dp)
+                        ) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp)
+                            ) {
+                                Icon(
+                                    imageVector = if (isPlaying) Icons.Filled.Pause else Icons.Filled.PlayArrow,
+                                    contentDescription = null,
+                                    tint = DarkBackground,
+                                    modifier = Modifier.size(14.dp)
+                                )
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text(
+                                    text = if (isPlaying) "PLAYING" else "TUNE IN",
+                                    style = MaterialTheme.typography.labelSmall.copy(
+                                        fontWeight = FontWeight.Black,
+                                        fontSize = 11.sp
+                                    ),
+                                    color = DarkBackground
+                                )
+                            }
                         }
                     } else {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically
+                        IconButton(
+                            onClick = {
+                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                onToggleFavorite()
+                            },
+                            modifier = Modifier
+                                .size(38.dp)
+                                .focusProperties { canFocus = false }
+                                .testTag("favorite_button_${station.id}")
                         ) {
-                            Text(
-                                text = station.genre,
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = TextSecondary,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
-                                modifier = Modifier.weight(1f, fill = false)
-                            )
-                            Text(" • ", color = TextMuted)
-                            Text(
-                                text = station.country,
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = TextMuted,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
-                                modifier = Modifier.weight(1f, fill = false)
+                            Icon(
+                                imageVector = if (station.isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
+                                contentDescription = "Favorite",
+                                tint = if (station.isFavorite) FavoriteHeartColor else TextMuted,
+                                modifier = Modifier.size(20.dp)
                             )
                         }
                     }
-                }
-
-                // Favorite Button
-                IconButton(
-                    onClick = {
-                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                        onToggleFavorite()
-                    },
-                    modifier = Modifier
-                        .size(40.dp)
-                        .focusProperties { canFocus = false }
-                        .testTag("favorite_button_${station.id}")
-                ) {
-                    Icon(
-                        imageVector = if (station.isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
-                        contentDescription = "Favorite",
-                        tint = if (station.isFavorite) FavoriteHeartColor else TextMuted
-                    )
                 }
             }
         }

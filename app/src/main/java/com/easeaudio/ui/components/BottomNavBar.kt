@@ -68,7 +68,7 @@ fun BottomNavBar(
         items.forEach { item ->
             val isSelected = currentRoute == item.route || (item.route == "radio" && currentRoute == "home")
             val localizedTitle = stringResource(item.titleRes)
-            val selectedAccent = if (item.route == "podcast") NeonPurple else NeonCyan
+            val selectedAccent = NeonCyan
             var isFocused by remember { mutableStateOf(false) }
             
             NavigationBarItem(
