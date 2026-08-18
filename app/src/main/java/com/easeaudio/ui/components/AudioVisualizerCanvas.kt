@@ -13,6 +13,8 @@ import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 import kotlin.math.cos
 import kotlin.math.sin
 
@@ -50,45 +52,53 @@ fun AudioVisualizerCanvas(
         label = "idle_phase"
     )
 
-    val rawAmplitudes = remember(waveAmplitudes) {
-        if (waveAmplitudes.isEmpty()) List(16) { 0.1f } else waveAmplitudes
-    }
+    val barCount = 16
+    val animatables = remember { List(barCount) { Animatable(0.1f) } }
+    val peakAmplitudes = remember { FloatArray(barCount) { 0.1f } }
 
-    // Peak hold physics state
-    val peakAmplitudes = remember { mutableStateListOf<Float>() }
-    LaunchedEffect(rawAmplitudes.size) {
-        peakAmplitudes.clear()
-        rawAmplitudes.forEach { peakAmplitudes.add(it) }
-    }
-
-    // Animate each amplitude value smoothly with spring physics
-    val animatedAmplitudes = rawAmplitudes.mapIndexed { index, targetAmp ->
-        val effectiveTarget = if (isPlaying) {
-            targetAmp.coerceIn(0.08f, 1.0f)
+    LaunchedEffect(waveAmplitudes, isPlaying) {
+        val targets = if (waveAmplitudes.isNotEmpty()) {
+            List(barCount) { i ->
+                val sourceIndex = (i * waveAmplitudes.size / barCount).coerceIn(0, waveAmplitudes.size - 1)
+                waveAmplitudes[sourceIndex].coerceIn(0.08f, 1.0f)
+            }
         } else {
-            // Gentle breathing wave when idle/paused
-            val sineWave = (sin(idlePhase + index * 0.45f) * 0.5f + 0.5f) * 0.14f + 0.04f
-            sineWave.coerceIn(0.04f, 0.22f)
+            List(barCount) { 0.1f }
         }
 
-        // Update peak hold decay
-        if (index < peakAmplitudes.size) {
-            if (effectiveTarget > peakAmplitudes[index]) {
-                peakAmplitudes[index] = effectiveTarget
-            } else {
-                peakAmplitudes[index] = (peakAmplitudes[index] - 0.015f).coerceAtLeast(effectiveTarget)
+        if (isPlaying) {
+            kotlinx.coroutines.coroutineScope {
+                val scope = this
+                animatables.forEachIndexed { index, animatable ->
+                    val target = targets[index]
+                    if (target > peakAmplitudes[index]) {
+                        peakAmplitudes[index] = target
+                    } else {
+                        peakAmplitudes[index] = (peakAmplitudes[index] - 0.02f).coerceAtLeast(target)
+                    }
+                    scope.launch {
+                        animatable.animateTo(
+                            targetValue = target,
+                            animationSpec = spring(
+                                dampingRatio = Spring.DampingRatioLowBouncy,
+                                stiffness = Spring.StiffnessMedium
+                            )
+                        )
+                    }
+                }
             }
         }
+    }
 
-        val animatedValue by animateFloatAsState(
-            targetValue = effectiveTarget,
-            animationSpec = spring(
-                dampingRatio = Spring.DampingRatioLowBouncy,
-                stiffness = Spring.StiffnessMedium
-            ),
-            label = "amp_animation_$index"
-        )
-        animatedValue
+    val animatedAmplitudes = remember(animatables.map { it.value }, isPlaying, idlePhase) {
+        List(barCount) { index ->
+            if (isPlaying) {
+                animatables[index].value
+            } else {
+                val sineWave = (sin(idlePhase + index * 0.45f) * 0.5f + 0.5f) * 0.14f + 0.04f
+                sineWave.coerceIn(0.04f, 0.22f)
+            }
+        }
     }
 
     Canvas(

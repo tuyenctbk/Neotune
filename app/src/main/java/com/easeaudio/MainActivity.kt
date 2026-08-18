@@ -162,7 +162,8 @@ fun MainAppContent(
 
     val isAutomotive = remember {
         val uiModeManager = context.getSystemService(Context.UI_MODE_SERVICE) as? android.app.UiModeManager
-        uiModeManager?.currentModeType == android.content.res.Configuration.UI_MODE_TYPE_CAR
+        context.packageManager.hasSystemFeature(PackageManager.FEATURE_AUTOMOTIVE) ||
+            uiModeManager?.currentModeType == android.content.res.Configuration.UI_MODE_TYPE_CAR
     }
     
     val startDestination = when {
@@ -548,6 +549,13 @@ fun MainAppContent(
                                 onCountrySelect = { viewModel.setSelectedCountry(it) },
                                 onSearchQueryChange = { viewModel.setSearchQuery(it) },
                                 onLoadMore = { viewModel.loadMoreStations() },
+                                onSeekRelative = { offsetMs -> viewModel.playerManager.seekRelative(offsetMs) },
+                                onSeek = { posMs -> viewModel.playerManager.seekTo(posMs) },
+                                onPlaybackSpeedChange = { speed -> viewModel.setPlaybackSpeed(speed) },
+                                onOpenSleepTimer = { viewModel.setShowSleepTimerDialog(true) },
+                                onOpenEqualizer = { viewModel.setShowEqualizerDialog(true) },
+                                onOpenEpisodes = { viewModel.setShowEpisodesSheet(true) },
+                                eqPresets = viewModel.eqPresets,
                                 onExitCarMode = {
                                     if (!navController.popBackStack()) {
                                         navController.navigate(NavRoute.Home.route) {

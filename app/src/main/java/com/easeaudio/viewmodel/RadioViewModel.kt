@@ -88,12 +88,11 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
 
     fun playEpisode(show: RadioStation, episode: PodcastEpisode) {
         _currentEpisode.value = episode
-        val updatedStation = show.copy(
-            name = "${show.name}: ${episode.title}",
-            streamUrl = episode.audioUrl,
-            imageUrl = episode.artworkUrl.ifBlank { show.imageUrl }
-        )
-        playStation(updatedStation)
+        playerManager.playPodcastEpisode(show, episode)
+        viewModelScope.launch {
+            repository.recordStationListened(show)
+            snackbarMessage.emit("Playing '${episode.title}'")
+        }
     }
 
     private val _selectedGenre = MutableStateFlow("All")
@@ -521,6 +520,18 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
     }
 
 
+    companion object {
+        val defaultPopularStation = RadioStation(
+            id = "101_smooth_jazz",
+            name = "101 SMOOTH JAZZ",
+            genre = "Jazz & Blues",
+            country = "The United States Of America",
+            streamUrl = "https://stream.zeno.fm/f3wvbbqmdg8uv",
+            imageUrl = "https://images.unsplash.com/photo-1511192336575-5a79af67a629?auto=format&fit=crop&w=600&q=80",
+            bitrate = "128 kbps"
+        )
+    }
+
     fun autoResumeLastPlayedStation() {
         viewModelScope.launch {
             try {
@@ -535,6 +546,9 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
                         android.util.Log.i("RadioViewModel", "Preloading last played station without play: ${lastPlayed.name}")
                         playerManager.setPreloadedStation(lastPlayed)
                     }
+                } else if (lastPlayed == null && playerManager.currentStation.value == null) {
+                    android.util.Log.i("RadioViewModel", "Preloading default popular station without play: ${defaultPopularStation.name}")
+                    playerManager.setPreloadedStation(defaultPopularStation)
                 }
             } catch (e: Exception) {
                 android.util.Log.w("RadioViewModel", "Failed to auto-resume station: ${e.message}")
@@ -957,13 +971,8 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
 
                 if (targetEpisode != null) {
                     _currentEpisode.value = targetEpisode
-                    val updatedStation = station.copy(
-                        name = "${station.name}: ${targetEpisode.title}",
-                        streamUrl = targetEpisode.audioUrl,
-                        imageUrl = targetEpisode.artworkUrl.ifBlank { station.imageUrl }
-                    )
-                    playerManager.playStation(updatedStation)
-                    repository.recordStationListened(updatedStation)
+                    playerManager.playPodcastEpisode(station, targetEpisode)
+                    repository.recordStationListened(station)
                     snackbarMessage.emit("Added '${station.name}' to Recently Played")
                 } else {
                     playerManager.playStation(station)
@@ -1119,6 +1128,10 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
     fun setEqPreset(preset: String) {
         _activeEqPreset.value = preset
         playerManager.setEqPreset(preset)
+    }
+
+    fun setPlaybackSpeed(speed: Float) {
+        playerManager.setPlaybackSpeed(speed)
     }
 
     fun setSleepTimer(minutes: Int) {

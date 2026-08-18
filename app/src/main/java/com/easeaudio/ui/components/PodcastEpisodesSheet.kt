@@ -15,7 +15,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.*
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.*
@@ -779,7 +779,7 @@ fun PodcastEpisodeDetailView(
                             contentAlignment = Alignment.Center
                         ) {
                             Icon(
-                                imageVector = if (isActive && isEpisodePlaying) Icons.Filled.VolumeUp else Icons.Filled.PlayArrow,
+                                imageVector = if (isActive && isEpisodePlaying) Icons.AutoMirrored.Filled.VolumeUp else Icons.Filled.PlayArrow,
                                 contentDescription = null,
                                 tint = if (isActive) MaterialTheme.colorScheme.background else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
                                 modifier = Modifier.size(16.dp)
@@ -878,7 +878,7 @@ fun PodcastEpisodeDetailView(
                             .apply()
                         Toast.makeText(context, if (isSaved) "Saved to your library!" else "Removed from library", Toast.LENGTH_SHORT).show()
                     },
-                    Triple(Icons.Filled.PlaylistAdd, "Add to Playlist") {
+                    Triple(Icons.AutoMirrored.Filled.PlaylistAdd, "Add to Playlist") {
                         Toast.makeText(context, "Added to playlist!", Toast.LENGTH_SHORT).show()
                     },
                     Triple(Icons.Filled.Download, "Download File") {

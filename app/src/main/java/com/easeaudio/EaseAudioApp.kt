@@ -1,9 +1,13 @@
 package com.easeaudio
 
 import android.app.Application
-import android.content.Context
-import android.os.Build
+import com.easeaudio.util.NetworkSecurityHelper
 
-class EaseAudioApp : Application()
+class EaseAudioApp : Application() {
+    override fun onCreate() {
+        super.onCreate()
+        NetworkSecurityHelper.install()
+    }
+}
 
 

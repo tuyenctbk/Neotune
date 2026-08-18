@@ -20,9 +20,9 @@ android {
     defaultConfig {
         applicationId = "com.neotune.radio"
         minSdk = 24
-        targetSdk = 35
-        versionCode = 30
-        versionName = "3.1.3"
+        targetSdk = 37
+        versionCode = 38
+        versionName = "3.6.3"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }

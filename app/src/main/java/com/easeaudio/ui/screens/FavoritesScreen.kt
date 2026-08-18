@@ -157,7 +157,7 @@ fun FavoritesScreen(
                             .padding(horizontal = 20.dp, vertical = 8.dp),
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        LibraryFilter.values().forEach { filter ->
+                        LibraryFilter.entries.forEach { filter ->
                             val isSelected = selectedFilter == filter
                             var isPillFocused by remember { mutableStateOf(false) }
                             val label = when (filter) {

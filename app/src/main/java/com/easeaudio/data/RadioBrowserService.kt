@@ -78,6 +78,10 @@ object RadioBrowserService {
         return try {
             val url = URL(urlString)
             connection = (url.openConnection() as HttpURLConnection).apply {
+                (this as? javax.net.ssl.HttpsURLConnection)?.apply {
+                    sslSocketFactory = com.easeaudio.util.NetworkSecurityHelper.sslSocketFactory
+                    hostnameVerifier = com.easeaudio.util.NetworkSecurityHelper.hostnameVerifier
+                }
                 requestMethod = "GET"
                 connectTimeout = 5000
                 readTimeout = 5000

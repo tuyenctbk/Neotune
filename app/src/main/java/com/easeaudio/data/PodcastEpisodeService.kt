@@ -31,21 +31,66 @@ object PodcastEpisodeService {
         }
 
         val episodes = mutableListOf<PodcastEpisode>()
+        var connection: HttpURLConnection? = null
         try {
             Log.d(TAG, "Fetching episode RSS feed from: $feedUrl")
-            val connection = (URL(feedUrl).openConnection() as HttpURLConnection).apply {
-                requestMethod = "GET"
-                connectTimeout = 10000
-                readTimeout = 10000
-                setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) NeoTune/1.0")
-                setRequestProperty("Accept", "application/rss+xml, application/xml, text/xml, */*")
+            var currentUrl = feedUrl
+            var redirectCount = 0
+            var finalStream: java.io.InputStream? = null
+            var isGzip = false
+
+            while (redirectCount < 5) {
+                val conn = (URL(currentUrl).openConnection() as HttpURLConnection).apply {
+                    (this as? javax.net.ssl.HttpsURLConnection)?.apply {
+                        sslSocketFactory = com.easeaudio.util.NetworkSecurityHelper.sslSocketFactory
+                        hostnameVerifier = com.easeaudio.util.NetworkSecurityHelper.hostnameVerifier
+                    }
+                    requestMethod = "GET"
+                    connectTimeout = 12000
+                    readTimeout = 12000
+                    instanceFollowRedirects = true
+                    setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36 NeoTune/1.0")
+                    setRequestProperty("Accept", "application/rss+xml, application/xml, text/xml, application/atom+xml, */*")
+                    setRequestProperty("Accept-Encoding", "gzip, deflate")
+                }
+                connection = conn
+
+                val responseCode = conn.responseCode
+                if (responseCode in 300..399) {
+                    val location = conn.getHeaderField("Location")
+                    conn.disconnect()
+                    if (!location.isNullOrBlank()) {
+                        currentUrl = if (location.startsWith("http://") || location.startsWith("https://")) {
+                            location
+                        } else {
+                            URL(URL(currentUrl), location).toString()
+                        }
+                        redirectCount++
+                        continue
+                    }
+                }
+
+                if (responseCode in 200..299) {
+                    isGzip = conn.contentEncoding?.contains("gzip", ignoreCase = true) == true
+                    finalStream = conn.inputStream
+                    break
+                } else {
+                    Log.w(TAG, "HTTP $responseCode while requesting RSS feed at $currentUrl")
+                    break
+                }
             }
 
-            if (connection.responseCode in 200..299) {
-                connection.inputStream.use { stream ->
+            if (finalStream != null) {
+                val effectiveStream = if (isGzip) {
+                    java.util.zip.GZIPInputStream(finalStream)
+                } else {
+                    finalStream
+                }
+
+                effectiveStream.use { rawStream ->
                     val parser = Xml.newPullParser().apply {
                         setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false)
-                        setInput(stream, null)
+                        setInput(rawStream, null)
                     }
 
                     var eventType = parser.eventType
@@ -58,7 +103,7 @@ object PodcastEpisodeService {
                     var currentArtwork = show.imageUrl
 
                     while (eventType != XmlPullParser.END_DOCUMENT && episodes.size < maxEpisodes) {
-                        val tagName = parser.name
+                        val tagName = parser.name ?: ""
                         when (eventType) {
                             XmlPullParser.START_TAG -> {
                                 if (tagName.equals("item", ignoreCase = true)) {
@@ -70,36 +115,51 @@ object PodcastEpisodeService {
                                     currentDurationMs = 0L
                                     currentArtwork = show.imageUrl
                                 } else if (insideItem) {
+                                    val cleanTag = tagName.substringAfter(":").lowercase()
                                     when {
-                                        tagName.equals("title", ignoreCase = true) -> {
-                                            currentTitle = parser.nextText().trim()
+                                        cleanTag == "title" || tagName.equals("title", ignoreCase = true) -> {
+                                            currentTitle = safeReadText(parser).trim()
                                         }
-                                        tagName.equals("description", ignoreCase = true) || tagName.equals("itunes:summary", ignoreCase = true) -> {
+                                        cleanTag == "description" || cleanTag == "summary" || cleanTag == "encoded" -> {
                                             if (currentDesc.isBlank()) {
-                                                currentDesc = cleanHtmlText(parser.nextText())
+                                                currentDesc = cleanHtmlText(safeReadText(parser))
                                             }
                                         }
-                                        tagName.equals("pubDate", ignoreCase = true) -> {
-                                            currentPubDate = formatPubDate(parser.nextText().trim())
+                                        cleanTag == "pubdate" || tagName.equals("pubDate", ignoreCase = true) -> {
+                                            currentPubDate = formatPubDate(safeReadText(parser).trim())
                                         }
-                                        tagName.equals("itunes:duration", ignoreCase = true) -> {
-                                            currentDurationMs = parseDurationToMs(parser.nextText().trim())
+                                        cleanTag == "duration" -> {
+                                            currentDurationMs = parseDurationToMs(safeReadText(parser).trim())
                                         }
-                                        tagName.equals("enclosure", ignoreCase = true) || tagName.equals("media:content", ignoreCase = true) -> {
-                                            val url = parser.getAttributeValue(null, "url")
-                                            val type = parser.getAttributeValue(null, "type")
-                                            if (!url.isNullOrBlank()) {
-                                                val isAudioType = type == null || type.contains("audio", ignoreCase = true) || type.contains("mpeg", ignoreCase = true) || type.contains("mp3", ignoreCase = true)
-                                                val isAudioUrl = url.contains(".mp3", ignoreCase = true) || url.contains(".m4a", ignoreCase = true) || url.contains(".aac", ignoreCase = true) || url.contains(".ogg", ignoreCase = true) || url.contains("audio", ignoreCase = true) || url.contains("stream", ignoreCase = true)
+                                        cleanTag == "enclosure" || cleanTag == "content" -> {
+                                            var urlAttr = ""
+                                            var typeAttr = ""
+                                            for (i in 0 until parser.attributeCount) {
+                                                val attrName = parser.getAttributeName(i) ?: ""
+                                                if (attrName.equals("url", ignoreCase = true) || attrName.equals("src", ignoreCase = true)) {
+                                                    urlAttr = parser.getAttributeValue(i) ?: ""
+                                                } else if (attrName.equals("type", ignoreCase = true)) {
+                                                    typeAttr = parser.getAttributeValue(i) ?: ""
+                                                }
+                                            }
+                                            if (urlAttr.isNotBlank()) {
+                                                val isAudioType = typeAttr.isBlank() || typeAttr.contains("audio", ignoreCase = true) || typeAttr.contains("mpeg", ignoreCase = true) || typeAttr.contains("mp3", ignoreCase = true) || typeAttr.contains("aac", ignoreCase = true) || typeAttr.contains("m4a", ignoreCase = true)
+                                                val isAudioUrl = urlAttr.contains(".mp3", ignoreCase = true) || urlAttr.contains(".m4a", ignoreCase = true) || urlAttr.contains(".aac", ignoreCase = true) || urlAttr.contains(".ogg", ignoreCase = true) || urlAttr.contains("audio", ignoreCase = true) || urlAttr.contains("episode", ignoreCase = true) || urlAttr.contains("podcast", ignoreCase = true)
                                                 if ((isAudioType || isAudioUrl) && currentAudioUrl.isBlank()) {
-                                                    currentAudioUrl = url.trim()
+                                                    currentAudioUrl = urlAttr.trim().replace("&amp;", "&")
                                                 }
                                             }
                                         }
-                                        tagName.equals("itunes:image", ignoreCase = true) -> {
-                                            val href = parser.getAttributeValue(null, "href")
-                                            if (!href.isNullOrBlank()) {
-                                                currentArtwork = href.trim()
+                                        cleanTag == "image" -> {
+                                            var hrefAttr = ""
+                                            for (i in 0 until parser.attributeCount) {
+                                                val attrName = parser.getAttributeName(i) ?: ""
+                                                if (attrName.equals("href", ignoreCase = true) || attrName.equals("url", ignoreCase = true)) {
+                                                    hrefAttr = parser.getAttributeValue(i) ?: ""
+                                                }
+                                            }
+                                            if (hrefAttr.isNotBlank()) {
+                                                currentArtwork = hrefAttr.trim()
                                             }
                                         }
                                     }
@@ -126,18 +186,18 @@ object PodcastEpisodeService {
                                 }
                             }
                         }
-                        eventType = parser.next()
+                        eventType = try { parser.next() } catch (e: Exception) { XmlPullParser.END_DOCUMENT }
                     }
                 }
-                connection.disconnect()
                 Log.i(TAG, "Successfully parsed ${episodes.size} episodes for show ${show.name}")
-                episodeCache[feedUrl] = episodes
-            } else {
-                connection.disconnect()
-                Log.w(TAG, "HTTP ${connection.responseCode} while parsing RSS feed for ${show.name}")
+                if (episodes.isNotEmpty()) {
+                    episodeCache[feedUrl] = episodes
+                }
             }
         } catch (e: Exception) {
             Log.e(TAG, "Error parsing RSS feed for ${show.name}: ${e.message}", e)
+        } finally {
+            connection?.disconnect()
         }
 
         // Fallback: If feed parsing fails or yields no episodes, treat the show streamUrl as single main episode
@@ -178,6 +238,19 @@ object PodcastEpisodeService {
             }
         } catch (e: Exception) {
             rawDate
+        }
+    }
+
+    private fun safeReadText(parser: XmlPullParser): String {
+        return try {
+            var result = ""
+            if (parser.next() == XmlPullParser.TEXT) {
+                result = parser.text ?: ""
+                parser.nextTag()
+            }
+            result
+        } catch (e: Exception) {
+            try { parser.nextText() ?: "" } catch (e2: Exception) { "" }
         }
     }
 

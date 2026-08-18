@@ -258,7 +258,7 @@ fun OnboardingScreen(
 @Composable
 private fun SlideGlobalRadio() {
     BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
-        val isWide = this.maxWidth > 600.dp
+        val isWide = this.maxWidth > 650.dp && this.maxWidth >= this.maxHeight
         
         if (isWide) {
             Row(
@@ -311,7 +311,7 @@ private fun SlideGlobalRadio() {
 @Composable
 private fun SlidePodcasts() {
     BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
-        val isWide = this.maxWidth > 600.dp
+        val isWide = this.maxWidth > 650.dp && this.maxWidth >= this.maxHeight
         
         if (isWide) {
             Row(
@@ -367,7 +367,7 @@ private fun SlideBackgroundControls(
     onRequestPermission: () -> Unit
 ) {
     BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
-        val isWide = this.maxWidth > 600.dp
+        val isWide = this.maxWidth > 650.dp && this.maxWidth >= this.maxHeight
         
         if (isWide) {
             Row(
@@ -418,7 +418,7 @@ private fun SlideBackgroundControls(
 @Composable
 private fun SlideProAudio() {
     BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
-        val isWide = this.maxWidth > 600.dp
+        val isWide = this.maxWidth > 650.dp && this.maxWidth >= this.maxHeight
         
         if (isWide) {
             Row(
@@ -473,7 +473,7 @@ private fun SlideGenreDiscovery(
     onCountrySelected: (String) -> Unit
 ) {
     BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
-        val isWide = this.maxWidth > 600.dp
+        val isWide = this.maxWidth > 650.dp && this.maxWidth >= this.maxHeight
         
         if (isWide) {
             Row(

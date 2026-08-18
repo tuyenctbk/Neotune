@@ -757,6 +757,7 @@ class RadioPlayerManager(private val context: Context) {
                         return future
                     }
 
+                    @Suppress("DEPRECATION")
                     override fun onPlayerCommandRequest(
                         session: MediaSession,
                         controller: MediaSession.ControllerInfo,
@@ -913,6 +914,10 @@ class RadioPlayerManager(private val context: Context) {
                 val isDirectAudio = lower.endsWith(".mp3") || lower.endsWith(".m4a") || lower.endsWith(".aac") || lower.endsWith(".ogg") || lower.endsWith(".flac") || lower.endsWith(".wav")
 
                 val connection = (java.net.URL(currentUrl).openConnection() as java.net.HttpURLConnection).apply {
+                    (this as? javax.net.ssl.HttpsURLConnection)?.apply {
+                        sslSocketFactory = com.easeaudio.util.NetworkSecurityHelper.sslSocketFactory
+                        hostnameVerifier = com.easeaudio.util.NetworkSecurityHelper.hostnameVerifier
+                    }
                     connectTimeout = 8000
                     readTimeout = 8000
                     instanceFollowRedirects = true
@@ -937,10 +942,12 @@ class RadioPlayerManager(private val context: Context) {
                         return@withContext currentUrl
                     }
 
-                    // Safely read at most 64KB of header text to resolve playlists/RSS XML without reading large binary audio streams into memory
+                    // Safely read up to 256KB of text to resolve playlists/RSS XML without reading large binary audio streams into memory
                     val content = try {
-                        connection.inputStream.bufferedReader().use { reader ->
-                            val charBuffer = CharArray(65536)
+                        val isGzip = connection.contentEncoding?.contains("gzip", ignoreCase = true) == true
+                        val inputStream = if (isGzip) java.util.zip.GZIPInputStream(connection.inputStream) else connection.inputStream
+                        inputStream.bufferedReader().use { reader ->
+                            val charBuffer = CharArray(262144)
                             val readCount = reader.read(charBuffer, 0, charBuffer.size)
                             if (readCount > 0) String(charBuffer, 0, readCount) else ""
                         }
@@ -994,6 +1001,18 @@ class RadioPlayerManager(private val context: Context) {
 
     fun playStation(station: RadioStation) {
         playStationWithUrl(station, station.streamUrl, isFallback = false)
+    }
+
+    fun playPodcastEpisode(show: RadioStation, episode: com.easeaudio.data.PodcastEpisode) {
+        _currentStation.value = show
+        _streamTitle.value = episode.title
+        playStationWithUrl(
+            station = show.copy(
+                imageUrl = episode.artworkUrl.ifBlank { show.imageUrl }
+            ),
+            targetUrl = episode.audioUrl,
+            isFallback = false
+        )
     }
 
     fun setPreloadedStation(station: RadioStation) {
@@ -1614,14 +1633,36 @@ class RadioPlayerManager(private val context: Context) {
         fun tryMethod(method: String): Int? {
             var connection: java.net.HttpURLConnection? = null
             return try {
-                val url = java.net.URL(urlStr)
-                connection = url.openConnection() as java.net.HttpURLConnection
-                connection.requestMethod = method
-                connection.connectTimeout = 5000
-                // HEAD: no body; GET: read nothing (just need response code)
-                connection.readTimeout = if (method == "HEAD") 5000 else 1000
-                connection.instanceFollowRedirects = true
-                connection.responseCode
+                var currentUrl = urlStr
+                var code: Int? = null
+                for (hop in 0 until 3) {
+                    val url = java.net.URL(currentUrl)
+                    connection = (url.openConnection() as java.net.HttpURLConnection).apply {
+                        (this as? javax.net.ssl.HttpsURLConnection)?.apply {
+                            sslSocketFactory = com.easeaudio.util.NetworkSecurityHelper.sslSocketFactory
+                            hostnameVerifier = com.easeaudio.util.NetworkSecurityHelper.hostnameVerifier
+                        }
+                    }
+                    connection.requestMethod = method
+                    connection.connectTimeout = 6000
+                    connection.readTimeout = if (method == "HEAD") 6000 else 2000
+                    connection.instanceFollowRedirects = true
+                    connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 NeoTune/1.0")
+                    connection.setRequestProperty("Accept", "*/*")
+                    
+                    val responseCode = connection.responseCode
+                    if (responseCode in 300..399) {
+                        val location = connection.getHeaderField("Location")
+                        connection.disconnect()
+                        if (!location.isNullOrBlank()) {
+                            currentUrl = location
+                            continue
+                        }
+                    }
+                    code = responseCode
+                    break
+                }
+                code
             } catch (e: Exception) {
                 Log.d(TAG, "Silent check [$method] failed for $urlStr: ${e.message}")
                 null
@@ -1633,8 +1674,8 @@ class RadioPlayerManager(private val context: Context) {
         val headCode = tryMethod("HEAD")
         return@withContext when {
             headCode != null && headCode in 200..399 -> true
-            // Server rejected HEAD (400/405) — fall back to GET with minimal read
-            headCode == null || headCode == 400 || headCode == 405 -> {
+            // Server rejected HEAD (400/403/405) — fall back to GET with minimal read
+            headCode == null || headCode == 400 || headCode == 403 || headCode == 405 -> {
                 val getCode = tryMethod("GET")
                 getCode != null && getCode in 200..399
             }
