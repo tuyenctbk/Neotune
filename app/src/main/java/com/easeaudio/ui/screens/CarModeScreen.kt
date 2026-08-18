@@ -109,8 +109,9 @@ fun CarModeScreen(
                         Box(
                             modifier = Modifier
                                 .weight(1f)
-                                .padding(horizontal = if (isWide) 24.dp else 16.dp)
-                                .padding(top = if (isWide) 24.dp else 0.dp)
+                                .padding(horizontal = if (isWide) 16.dp else 12.dp)
+                                .padding(top = if (isWide) 12.dp else 0.dp)
+                                .padding(bottom = if (activeCarTab != CarTab.Player && uiState.currentStation != null) 72.dp else 0.dp)
                         ) {
                             AnimatedContent(
                                 targetState = activeCarTab,
@@ -124,6 +125,7 @@ fun CarModeScreen(
                                             onPlayPause = onPlayPause,
                                             onNextStation = onNextStation,
                                             onPreviousStation = onPreviousStation,
+                                            onSelectStation = onSelectStation,
                                             onToggleFavorite = onToggleFavorite,
                                             onEpisodeSelect = onEpisodeSelect,
                                             modifier = Modifier.fillMaxSize()
@@ -173,7 +175,7 @@ fun CarModeScreen(
                         onClick = { activeCarTab = CarTab.Player },
                         modifier = Modifier
                             .align(Alignment.BottomCenter)
-                            .padding(horizontal = 24.dp, vertical = 16.dp)
+                            .padding(horizontal = 24.dp, vertical = 12.dp)
                     )
                 }
             }
@@ -202,11 +204,11 @@ private fun CarSideNav(
     NavigationRail(
         containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
         header = {
-            IconButton(onClick = onExit, modifier = Modifier.padding(vertical = 12.dp)) {
+            IconButton(onClick = onExit, modifier = Modifier.padding(vertical = 4.dp)) {
                 Icon(Icons.Filled.Close, contentDescription = "Exit", tint = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         },
-        modifier = Modifier.width(100.dp).fillMaxHeight()
+        modifier = Modifier.width(86.dp).fillMaxHeight()
     ) {
         val items = listOf(
             Triple(CarTab.Player, Icons.Filled.PlayCircle, "Player"),
@@ -225,8 +227,8 @@ private fun CarSideNav(
                 NavigationRailItem(
                     selected = isSelected,
                     onClick = { onTabSelect(tab) },
-                    icon = { Icon(icon, contentDescription = label, modifier = Modifier.size(32.dp)) },
-                    label = { Text(label, style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold)) },
+                    icon = { Icon(icon, contentDescription = label, modifier = Modifier.size(26.dp)) },
+                    label = { Text(label, style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold)) },
                     colors = NavigationRailItemDefaults.colors(
                         selectedIconColor = MaterialTheme.colorScheme.background,
                         selectedTextColor = MaterialTheme.colorScheme.primary,
@@ -234,7 +236,7 @@ private fun CarSideNav(
                         unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
                         unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant
                     ),
-                    modifier = Modifier.padding(vertical = 8.dp)
+                    modifier = Modifier.padding(vertical = 2.dp)
                 )
             }
         }
@@ -265,14 +267,14 @@ private fun CarTopNav(
                 Tab(
                     selected = isSelected,
                     onClick = { onTabSelect(tab) },
-                    modifier = Modifier.padding(horizontal = 4.dp, vertical = 8.dp)
-                        .clip(RoundedCornerShape(12.dp))
+                    modifier = Modifier.padding(horizontal = 4.dp, vertical = 4.dp)
+                        .clip(RoundedCornerShape(8.dp))
                         .background(if (isSelected) MaterialTheme.colorScheme.primary else Color.Transparent)
                 ) {
                     Text(
                         text = tab.name,
-                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
-                        style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
+                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+                        style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold),
                         color = if (isSelected) MaterialTheme.colorScheme.background else MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
@@ -294,9 +296,9 @@ private fun FavoritesPanel(
     Column(modifier = Modifier.fillMaxSize()) {
         Text(
             text = "Your Favorites",
-            style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Black),
+            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Black),
             color = MaterialTheme.colorScheme.onSurface,
-            modifier = Modifier.padding(bottom = 16.dp)
+            modifier = Modifier.padding(bottom = 8.dp)
         )
         
         if (favoriteStations.isEmpty()) {
@@ -339,16 +341,16 @@ private fun DiscoveryPanel(
                 value = uiState.searchQuery,
                 onValueChange = onSearchQueryChange,
                 placeholder = { Text("Search...", style = MaterialTheme.typography.bodyMedium) },
-                leadingIcon = { Icon(Icons.Filled.Search, contentDescription = null, modifier = Modifier.size(22.dp)) },
+                leadingIcon = { Icon(Icons.Filled.Search, contentDescription = null, modifier = Modifier.size(20.dp)) },
                 trailingIcon = {
                     if (uiState.searchQuery.isNotEmpty()) {
                         IconButton(onClick = { onSearchQueryChange("") }) {
-                            Icon(Icons.Filled.Close, contentDescription = "Clear", modifier = Modifier.size(20.dp))
+                            Icon(Icons.Filled.Close, contentDescription = "Clear", modifier = Modifier.size(18.dp))
                         }
                     }
                 },
                 singleLine = true,
-                shape = RoundedCornerShape(16.dp),
+                shape = RoundedCornerShape(10.dp),
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
                     unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
@@ -357,7 +359,7 @@ private fun DiscoveryPanel(
                     focusedTextColor = MaterialTheme.colorScheme.onSurface,
                     unfocusedTextColor = MaterialTheme.colorScheme.onSurface
                 ),
-                modifier = Modifier.weight(1f).height(52.dp)
+                modifier = Modifier.weight(1f).height(46.dp)
             )
 
             if (uiState.selectedTab == HomeTab.Radio) {
@@ -368,29 +370,29 @@ private fun DiscoveryPanel(
                         containerColor = MaterialTheme.colorScheme.surfaceVariant,
                         contentColor = MaterialTheme.colorScheme.onSurface
                     ),
-                    shape = RoundedCornerShape(16.dp),
-                    modifier = Modifier.height(52.dp)
+                    shape = RoundedCornerShape(10.dp),
+                    modifier = Modifier.height(46.dp)
                 ) {
-                    Icon(Icons.Filled.Public, contentDescription = null, modifier = Modifier.size(20.dp))
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(text = uiState.selectedCountry, style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold))
+                    Icon(Icons.Filled.Public, contentDescription = null, modifier = Modifier.size(18.dp))
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text(text = uiState.selectedCountry, style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold))
                 }
             }
         }
 
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(8.dp))
 
         // Genre Filter
         val genreList = if (uiState.selectedTab == HomeTab.Radio) uiState.availableGenres else uiState.availablePodcastTopics
         LazyRow(
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
             modifier = Modifier.fillMaxWidth()
         ) {
             items(genreList) { genre ->
                 val isSelected = genre.key == uiState.selectedGenre
                 Surface(
                     onClick = { onGenreSelect(genre.key) },
-                    shape = RoundedCornerShape(12.dp),
+                    shape = RoundedCornerShape(8.dp),
                     color = if (isSelected) MaterialTheme.colorScheme.primary.copy(alpha = 0.2f) else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
                     border = BorderStroke(
                         1.dp,
@@ -399,15 +401,15 @@ private fun DiscoveryPanel(
                 ) {
                     Text(
                         text = stringResource(genre.labelResId),
-                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-                        style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
+                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                        style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
                         color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             }
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(10.dp))
 
         // Grid
         QuickSelectGrid(
@@ -428,6 +430,7 @@ private fun UnifiedHeroPlayer(
     onPlayPause: () -> Unit,
     onNextStation: () -> Unit,
     onPreviousStation: () -> Unit,
+    onSelectStation: (RadioStation) -> Unit,
     onToggleFavorite: (RadioStation) -> Unit,
     onEpisodeSelect: (RadioStation, PodcastEpisode) -> Unit,
     modifier: Modifier = Modifier
@@ -442,26 +445,27 @@ private fun UnifiedHeroPlayer(
         
         Surface(
             modifier = Modifier.fillMaxSize(),
-            shape = RoundedCornerShape(32.dp),
+            shape = RoundedCornerShape(24.dp),
             color = MaterialTheme.colorScheme.surface,
-            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.3f))
+            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.2f))
         ) {
             Row(
-                modifier = Modifier.fillMaxSize().padding(if (isExtremelyShort) 16.dp else 24.dp),
+                modifier = Modifier.fillMaxSize().padding(if (isExtremelyShort) 8.dp else 12.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Left Side: High-Density Info Area
+                // Left Side Area: Info & Controls - Proportional
                 Column(
-                    modifier = Modifier.weight(1.1f).fillMaxHeight(),
+                    modifier = Modifier.weight(1.3f).fillMaxHeight().padding(vertical = 4.dp),
                     verticalArrangement = Arrangement.SpaceBetween,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
+                    // Top: Artwork & Basic Meta
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        // Compact Artwork
+                        // VERY Compact Artwork for vertical reliability
                         Box(
                             modifier = Modifier
-                                .size(if (isExtremelyShort) 110.dp else 160.dp)
-                                .clip(RoundedCornerShape(24.dp))
+                                .size(if (isExtremelyShort) 80.dp else 100.dp)
+                                .clip(RoundedCornerShape(20.dp))
                                 .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f)),
                             contentAlignment = Alignment.Center
                         ) {
@@ -476,38 +480,36 @@ private fun UnifiedHeroPlayer(
                                 Icon(
                                     imageVector = Icons.Filled.Radio,
                                     contentDescription = null,
-                                    modifier = Modifier.size(if (isExtremelyShort) 52.dp else 80.dp),
+                                    modifier = Modifier.size(if (isExtremelyShort) 40.dp else 52.dp),
                                     tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.4f)
                                 )
                             }
                             
                             if (currentStation != null) {
-                                var isFavFocused by remember { mutableStateOf(false) }
                                 IconButton(
                                     onClick = { onToggleFavorite(currentStation) },
                                     modifier = Modifier
                                         .align(Alignment.TopEnd)
-                                        .padding(8.dp)
+                                        .padding(4.dp)
+                                        .size(32.dp)
                                         .background(Color.Black.copy(alpha = 0.4f), CircleShape)
-                                        .onFocusChanged { isFavFocused = it.isFocused }
-                                        .border(if (isFavFocused) 2.dp else 0.dp, MaterialTheme.colorScheme.primary, CircleShape)
                                 ) {
                                     Icon(
                                         imageVector = if (currentStation.isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
                                         contentDescription = null,
                                         tint = if (currentStation.isFavorite) FavoriteHeartColor else Color.White,
-                                        modifier = Modifier.size(if (isExtremelyShort) 20.dp else 28.dp)
+                                        modifier = Modifier.size(18.dp)
                                     )
                                 }
                             }
                         }
 
-                        Spacer(modifier = Modifier.height(12.dp))
+                        Spacer(modifier = Modifier.height(8.dp))
                         
                         Text(
                             text = currentStation?.name ?: stringResource(R.string.no_station_selected),
-                            style = if (isExtremelyShort) MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Black) 
-                                    else MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Black),
+                            style = if (isExtremelyShort) MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Black) 
+                                    else MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Black),
                             color = MaterialTheme.colorScheme.onSurface,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
@@ -515,17 +517,17 @@ private fun UnifiedHeroPlayer(
                         )
                         Text(
                             text = currentStation?.genre ?: "NeoTune Radio",
-                            style = MaterialTheme.typography.bodyMedium,
+                            style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.primary,
                             textAlign = TextAlign.Center
                         )
 
                         if (currentStation != null && isPlaying) {
-                            Spacer(modifier = Modifier.height(10.dp))
+                            Spacer(modifier = Modifier.height(4.dp))
                             AudioVisualizerCanvas(
                                 waveAmplitudes = waveAmplitudes,
                                 isPlaying = isPlaying,
-                                modifier = Modifier.fillMaxWidth(0.9f).height(if (isExtremelyShort) 24.dp else 40.dp),
+                                modifier = Modifier.fillMaxWidth(0.8f).height(20.dp),
                                 style = VisualizerStyle.ROUNDED_BARS,
                                 primaryColor = MaterialTheme.colorScheme.primary,
                                 secondaryColor = MaterialTheme.colorScheme.secondary,
@@ -534,24 +536,24 @@ private fun UnifiedHeroPlayer(
                         }
                     }
 
-                    // Integrated Playback Controls
+                    // Integrated Playback Controls - PINNED TO BOTTOM
                     Row(
-                        modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
+                        modifier = Modifier.fillMaxWidth().padding(bottom = 2.dp),
                         horizontalArrangement = Arrangement.SpaceEvenly,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         IconButton(
                             onClick = onPreviousStation,
                             modifier = Modifier
-                                .size(if (isExtremelyShort) 52.dp else 64.dp)
-                                .background(MaterialTheme.colorScheme.surfaceVariant, CircleShape)
+                                .size(52.dp)
+                                .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f), CircleShape)
                         ) {
-                            Icon(Icons.Filled.SkipPrevious, null, modifier = Modifier.size(if (isExtremelyShort) 28.dp else 32.dp), tint = MaterialTheme.colorScheme.onSurface)
+                            Icon(Icons.Filled.SkipPrevious, null, modifier = Modifier.size(24.dp), tint = MaterialTheme.colorScheme.onSurface)
                         }
 
                         FilledIconButton(
                             onClick = onPlayPause,
-                            modifier = Modifier.size(if (isExtremelyShort) 72.dp else 84.dp),
+                            modifier = Modifier.size(if (isExtremelyShort) 64.dp else 72.dp),
                             shape = CircleShape,
                             colors = IconButtonDefaults.filledIconButtonColors(
                                 containerColor = MaterialTheme.colorScheme.primary,
@@ -561,78 +563,75 @@ private fun UnifiedHeroPlayer(
                             Icon(
                                 imageVector = if (isPlaying) Icons.Filled.Pause else Icons.Filled.PlayArrow,
                                 contentDescription = if (isPlaying) "Pause" else "Play",
-                                modifier = Modifier.size(if (isExtremelyShort) 38.dp else 44.dp)
+                                modifier = Modifier.size(32.dp)
                             )
                         }
 
                         IconButton(
                             onClick = onNextStation,
                             modifier = Modifier
-                                .size(if (isExtremelyShort) 52.dp else 64.dp)
-                                .background(MaterialTheme.colorScheme.surfaceVariant, CircleShape)
+                                .size(52.dp)
+                                .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f), CircleShape)
                         ) {
-                            Icon(Icons.Filled.SkipNext, null, modifier = Modifier.size(if (isExtremelyShort) 28.dp else 32.dp), tint = MaterialTheme.colorScheme.onSurface)
+                            Icon(Icons.Filled.SkipNext, null, modifier = Modifier.size(24.dp), tint = MaterialTheme.colorScheme.onSurface)
                         }
                     }
                 }
 
-                Spacer(modifier = Modifier.width(if (isExtremelyShort) 16.dp else 32.dp))
+                Spacer(modifier = Modifier.width(if (isExtremelyShort) 8.dp else 16.dp))
 
-                // Right Side: Secondary Content (Podcast Episodes or Suggestions)
+                // Right Side Area: Detailed Selection List
                 Column(
-                    modifier = Modifier.weight(0.9f).fillMaxHeight()
+                    modifier = Modifier.weight(1f).fillMaxHeight().padding(vertical = 4.dp)
                 ) {
-                    if (currentStation?.isPodcast == true) {
-                        Text(
-                            text = "Episodes",
-                            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Black),
-                            color = MaterialTheme.colorScheme.onSurface,
-                            modifier = Modifier.padding(bottom = 8.dp)
-                        )
-                        
+                    val isPodcast = currentStation?.isPodcast == true
+                    Text(
+                        text = if (isPodcast) "Episodes" else "Recently Played",
+                        style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Black),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f),
+                        modifier = Modifier.padding(bottom = 6.dp)
+                    )
+                    
+                    if (isPodcast) {
                         if (uiState.isLoadingEpisodes) {
                             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                                CircularProgressIndicator(modifier = Modifier.size(32.dp), strokeWidth = 3.dp)
-                            }
-                        } else if (uiState.currentEpisodesList.isEmpty()) {
-                            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                                Text("No episodes found", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                CircularProgressIndicator(modifier = Modifier.size(24.dp), strokeWidth = 2.dp)
                             }
                         } else {
                             LazyColumn(
                                 modifier = Modifier.fillMaxSize(),
-                                verticalArrangement = Arrangement.spacedBy(8.dp)
+                                verticalArrangement = Arrangement.spacedBy(4.dp)
                             ) {
                                 items(uiState.currentEpisodesList) { episode ->
                                     val isCurrent = uiState.currentEpisode?.id == episode.id
                                     Surface(
-                                        onClick = { onEpisodeSelect(currentStation, episode) },
-                                        shape = RoundedCornerShape(12.dp),
-                                        color = if (isCurrent) MaterialTheme.colorScheme.primary.copy(alpha = 0.15f) else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f),
-                                        border = if (isCurrent) BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)) else null
+                                        onClick = { onEpisodeSelect(currentStation!!, episode) },
+                                        shape = RoundedCornerShape(8.dp),
+                                        color = if (isCurrent) MaterialTheme.colorScheme.primary.copy(alpha = 0.15f) else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
+                                        border = if (isCurrent) BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.4f)) else null
                                     ) {
                                         Row(
-                                            modifier = Modifier.fillMaxWidth().padding(10.dp),
+                                            modifier = Modifier.fillMaxWidth().padding(8.dp),
                                             verticalAlignment = Alignment.CenterVertically
                                         ) {
                                             AsyncImage(
-                                                model = episode.artworkUrl.ifBlank { currentStation.imageUrl },
+                                                model = episode.artworkUrl.ifBlank { currentStation!!.imageUrl },
                                                 contentDescription = null,
                                                 contentScale = ContentScale.Crop,
-                                                modifier = Modifier.size(36.dp).clip(RoundedCornerShape(6.dp))
+                                                modifier = Modifier.size(32.dp).clip(RoundedCornerShape(6.dp))
                                             )
-                                            Spacer(modifier = Modifier.width(12.dp))
+                                            Spacer(modifier = Modifier.width(10.dp))
                                             Column {
                                                 Text(
                                                     text = episode.title,
-                                                    style = MaterialTheme.typography.labelMedium.copy(fontWeight = if (isCurrent) FontWeight.Black else FontWeight.Bold),
+                                                    style = MaterialTheme.typography.labelSmall.copy(fontWeight = if (isCurrent) FontWeight.Black else FontWeight.Bold),
                                                     color = if (isCurrent) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
                                                     maxLines = 1,
                                                     overflow = TextOverflow.Ellipsis
                                                 )
                                                 Text(
                                                     text = episode.pubDate,
-                                                    style = MaterialTheme.typography.labelSmall,
+                                                    style = MaterialTheme.typography.labelSmall.copy(fontSize = 10.sp),
                                                     color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
                                                 )
                                             }
@@ -642,17 +641,12 @@ private fun UnifiedHeroPlayer(
                             }
                         }
                     } else {
-                        // Radio Mode: Show Recently Played or Suggestions
-                        Text(
-                            text = "Recently Played",
-                            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Black),
-                            color = MaterialTheme.colorScheme.onSurface,
-                            modifier = Modifier.padding(bottom = 8.dp)
-                        )
+                        // Radio: Show Recent or Curated
                         QuickSelectGrid(
                             stations = uiState.recentRadioStations,
                             currentStationId = currentStation?.id,
-                            onSelectStation = { /* Selection handled by parent */ },
+                            onSelectStation = { onSelectStation(it) },
+                            onToggleFavorite = onToggleFavorite,
                             columns = 1,
                             modifier = Modifier.fillMaxSize()
                         )
@@ -676,30 +670,30 @@ private fun CarMiniPlayer(
 ) {
     Surface(
         onClick = onClick,
-        modifier = modifier.height(76.dp).fillMaxWidth(),
-        shape = RoundedCornerShape(20.dp),
+        modifier = modifier.height(68.dp).fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
         color = MaterialTheme.colorScheme.surface,
-        tonalElevation = 6.dp,
-        shadowElevation = 8.dp,
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.3f))
+        tonalElevation = 4.dp,
+        shadowElevation = 6.dp,
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.2f))
     ) {
         Row(
-            modifier = Modifier.fillMaxSize().padding(horizontal = 14.dp),
+            modifier = Modifier.fillMaxSize().padding(horizontal = 12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             AsyncImage(
                 model = station.imageUrl,
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
-                modifier = Modifier.size(52.dp).clip(RoundedCornerShape(10.dp))
+                modifier = Modifier.size(44.dp).clip(RoundedCornerShape(8.dp))
             )
             
-            Spacer(modifier = Modifier.width(16.dp))
+            Spacer(modifier = Modifier.width(12.dp))
             
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = station.name,
-                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Black),
+                    style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Black),
                     color = MaterialTheme.colorScheme.onSurface,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
@@ -709,15 +703,15 @@ private fun CarMiniPlayer(
                         AudioVisualizerCanvas(
                             waveAmplitudes = waveAmplitudes.take(8),
                             isPlaying = isPlaying,
-                            modifier = Modifier.width(36.dp).height(16.dp),
+                            modifier = Modifier.width(28.dp).height(12.dp),
                             style = VisualizerStyle.ROUNDED_BARS,
                             primaryColor = MaterialTheme.colorScheme.primary
                         )
-                        Spacer(modifier = Modifier.width(10.dp))
+                        Spacer(modifier = Modifier.width(8.dp))
                     }
                     Text(
                         text = if (isLoading) "Buffering..." else (streamTitle ?: station.genre),
-                        style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
+                        style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
                         color = MaterialTheme.colorScheme.primary,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
@@ -729,17 +723,17 @@ private fun CarMiniPlayer(
                 onClick = onTogglePlay,
                 shape = CircleShape,
                 color = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.size(52.dp)
+                modifier = Modifier.size(44.dp)
             ) {
                 Box(contentAlignment = Alignment.Center) {
                     if (isLoading) {
-                        CircularProgressIndicator(modifier = Modifier.size(24.dp), color = MaterialTheme.colorScheme.background, strokeWidth = 3.dp)
+                        CircularProgressIndicator(modifier = Modifier.size(20.dp), color = MaterialTheme.colorScheme.background, strokeWidth = 2.dp)
                     } else {
                         Icon(
                             imageVector = if (isPlaying) Icons.Filled.Pause else Icons.Filled.PlayArrow,
                             contentDescription = null,
                             tint = MaterialTheme.colorScheme.background,
-                            modifier = Modifier.size(32.dp)
+                            modifier = Modifier.size(24.dp)
                         )
                     }
                 }
@@ -774,8 +768,8 @@ private fun QuickSelectGrid(
     LazyVerticalGrid(
         columns = GridCells.Fixed(columns),
         state = gridState,
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
         modifier = modifier
     ) {
         items(stations, key = { it.id }) { station ->
@@ -784,13 +778,13 @@ private fun QuickSelectGrid(
             Surface(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(if (columns == 1) 76.dp else 80.dp)
-                    .clip(RoundedCornerShape(16.dp))
+                    .height(if (columns == 1) 56.dp else 68.dp)
+                    .clip(RoundedCornerShape(12.dp))
                     .onFocusChanged { isCardFocused = it.isFocused }
                     .border(
                         width = if (isCardFocused) 2.dp else if (isSelected) 1.dp else 0.dp,
                         color = if (isCardFocused) MaterialTheme.colorScheme.primary else if (isSelected) MaterialTheme.colorScheme.primary.copy(alpha = 0.5f) else Color.Transparent,
-                        shape = RoundedCornerShape(16.dp)
+                        shape = RoundedCornerShape(12.dp)
                     )
                     .clickable { onSelectStation(station) },
                 color = if (isCardFocused) MaterialTheme.colorScheme.primary.copy(alpha = 0.25f) else if (isSelected) MaterialTheme.colorScheme.primary.copy(alpha = 0.2f) else MaterialTheme.colorScheme.surface
@@ -798,7 +792,7 @@ private fun QuickSelectGrid(
                 Row(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(horizontal = 12.dp),
+                        .padding(horizontal = 8.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     // Avatar / Artwork
@@ -806,17 +800,17 @@ private fun QuickSelectGrid(
                         model = station.imageUrl,
                         contentDescription = null,
                         contentScale = ContentScale.Crop,
-                        modifier = Modifier.size(if (columns == 1) 52.dp else 56.dp).clip(RoundedCornerShape(10.dp))
+                        modifier = Modifier.size(if (columns == 1) 38.dp else 48.dp).clip(RoundedCornerShape(6.dp))
                     )
                     
-                    Spacer(modifier = Modifier.width(16.dp))
+                    Spacer(modifier = Modifier.width(10.dp))
                     
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
                             text = station.name,
-                            style = MaterialTheme.typography.bodyLarge.copy(
+                            style = MaterialTheme.typography.bodySmall.copy(
                                 fontWeight = if (isSelected || isCardFocused) FontWeight.Black else FontWeight.Bold,
-                                fontSize = if (columns == 1) 17.sp else 18.sp
+                                fontSize = if (columns == 1) 14.sp else 15.sp
                             ),
                             color = if (isSelected || isCardFocused) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
                             maxLines = 1,
@@ -824,7 +818,7 @@ private fun QuickSelectGrid(
                         )
                         Text(
                             text = station.genre,
-                            style = MaterialTheme.typography.labelSmall,
+                            style = MaterialTheme.typography.labelSmall.copy(fontSize = 10.sp),
                             color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
                             maxLines = 1
                         )
@@ -833,13 +827,13 @@ private fun QuickSelectGrid(
                     // Heart Icon (Favorite)
                     IconButton(
                         onClick = { onToggleFavorite(station) },
-                        modifier = Modifier.size(40.dp)
+                        modifier = Modifier.size(32.dp)
                     ) {
                         Icon(
                             imageVector = if (station.isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
                             contentDescription = "Favorite",
                             tint = if (station.isFavorite) FavoriteHeartColor else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
-                            modifier = Modifier.size(22.dp)
+                            modifier = Modifier.size(18.dp)
                         )
                     }
                 }

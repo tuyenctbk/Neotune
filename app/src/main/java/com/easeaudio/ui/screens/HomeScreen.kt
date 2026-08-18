@@ -113,7 +113,7 @@ fun HomeScreen(
     val isExpanded = windowSizeClass.widthSizeClass == WindowWidthSizeClass.Expanded
     val isMedium = windowSizeClass.widthSizeClass == WindowWidthSizeClass.Medium
     val columns = when {
-        isExpanded -> 4 // Optimize for TV and Large Tablets
+        isExpanded -> 4 
         isMedium -> 2
         else -> 1
     }
@@ -230,13 +230,14 @@ fun HomeScreen(
                     }
                 }
 
-                // App Header
+                // App Header & Search Bar (Merged for minimal spacing)
                 item(span = { GridItemSpan(maxLineSpan) }) {
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(vertical = 12.dp)
+                            .padding(top = 12.dp, bottom = 4.dp)
                     ) {
+                        // Title Row
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceBetween,
@@ -286,16 +287,10 @@ fun HomeScreen(
                                 }
                             }
                         }
-                    }
-                }
 
-                // Search Bar & Suggestions
-                item(span = { GridItemSpan(maxLineSpan) }) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 4.dp)
-                    ) {
+                        Spacer(modifier = Modifier.height(10.dp)) // Minimal gap
+
+                        // Search Input
                         OutlinedTextField(
                             value = uiState.searchQuery,
                             onValueChange = onSearchQueryChange,
@@ -336,7 +331,7 @@ fun HomeScreen(
                                 .testTag("input_search_stations")
                         )
 
-                        // Search Suggestions from Room Database
+                        // Search Suggestions
                         val suggestions = remember(uiState.recentSearchQueries, uiState.searchQuery) {
                             val trimmed = uiState.searchQuery.trim()
                             if (trimmed.isEmpty()) {
@@ -477,7 +472,7 @@ fun HomeScreen(
                     }
                 }
 
-                // Recent Streams Section (Tab-filtered, Top 5)
+                // Recent Streams Section
                 val activeRecentList = displayedRecentList
                 if (activeRecentList.isNotEmpty() && uiState.searchQuery.isEmpty() && uiState.selectedGenre == "All") {
                     item(span = { GridItemSpan(maxLineSpan) }) {
@@ -567,7 +562,6 @@ fun HomeScreen(
                                         contentScale = ContentScale.Crop,
                                         modifier = Modifier.fillMaxSize()
                                     )
-                                    // Gradient Overlay
                                     Box(
                                         modifier = Modifier
                                             .fillMaxSize()
@@ -577,7 +571,6 @@ fun HomeScreen(
                                                 )
                                             )
                                     )
-                                    // Content
                                     Row(
                                         modifier = Modifier
                                             .fillMaxSize()
@@ -747,7 +740,7 @@ fun HomeScreen(
                             } else {
                                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                     Text(stringResource(R.string.no_stations_found), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                                    Spacer(modifier = Modifier.height(6.dp))
+                                    Spacer(modifier = Modifier.height(6.6.dp))
                                     Text(stringResource(R.string.add_station_prompt), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f))
                                 }
                             }
@@ -1087,7 +1080,6 @@ fun StationCard(
                         .padding(14.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    // Station Image with sleek border when focused
                     Box(
                         modifier = Modifier
                             .size(60.dp)
@@ -1132,7 +1124,6 @@ fun StationCard(
 
                     Spacer(modifier = Modifier.width(14.dp))
 
-                    // Text Info
                     Column(
                         modifier = Modifier
                             .weight(1f)
@@ -1211,7 +1202,6 @@ fun StationCard(
                         }
                     }
 
-                    // Action Button on right: On TV Focus, show a vibrant PLAY / TUNE IN pill!
                     if (isFocused) {
                         Surface(
                             shape = RoundedCornerShape(20.dp),
