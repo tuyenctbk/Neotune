@@ -323,7 +323,6 @@
     <string name="clear_search">נקה חיפוש</string>
     <string name="remove_search_suggestion">הסר הצעת חיפוש</string>
     <string name="play_featured">נגן תחנה מומלצת</string>
-    <string name="exit_car_mode">צא ממצב רכב</string>
     <string name="car_quick_presets">קביעות מהירות</string>
     <string name="car_preset_saved_format">נשמר בקביעה %1$d</string>
     <string name="car_long_press_preset_hint">לחץ לחיצה ארוכה לשמירת התחנה הנוכחית</string>

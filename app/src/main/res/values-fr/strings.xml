@@ -323,7 +323,6 @@
     <string name="clear_search">Effacer la recherche</string>
     <string name="remove_search_suggestion">Supprimer la suggestion</string>
     <string name="play_featured">Écouter en vedette</string>
-    <string name="exit_car_mode">Quitter le mode voiture</string>
     <string name="car_quick_presets">Préréglages rapides</string>
     <string name="car_preset_saved_format">Enregistré dans le Préréglage %1$d</string>
     <string name="car_long_press_preset_hint">Appui long pour enregistrer la station ici</string>

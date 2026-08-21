@@ -323,7 +323,6 @@
     <string name="clear_search">Borrar búsqueda</string>
     <string name="remove_search_suggestion">Eliminar sugerencia</string>
     <string name="play_featured">Reproducir destacada</string>
-    <string name="exit_car_mode">Salir del modo automotriz</string>
     <string name="car_quick_presets">Presintonías rápidas</string>
     <string name="car_preset_saved_format">Guardado en Presintonía %1$d</string>
     <string name="car_long_press_preset_hint">Mantén presionado para guardar emisora aquí</string>

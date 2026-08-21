@@ -1371,9 +1371,9 @@ private fun AutomotiveHeroPlayer(
                         horizontalArrangement = Arrangement.spacedBy(4.dp)
                     ) {
                         val sideTabs = if (isPodcast) {
-                            listOf(SideListTab.Episodes to stringResource(R.string.episodes_label), SideListTab.Favorites to stringResource(R.string.favorites), SideListTab.Recent to stringResource(R.string.recents))
+                            listOf(SideListTab.Episodes to stringResource(R.string.episodes_label), SideListTab.Favorites to stringResource(R.string.favorites), SideListTab.Recent to stringResource(R.string.recent_streams))
                         } else {
-                            listOf(SideListTab.Favorites to stringResource(R.string.favorites), SideListTab.Recent to stringResource(R.string.recents), SideListTab.Top to stringResource(R.string.browse_stations))
+                            listOf(SideListTab.Favorites to stringResource(R.string.favorites), SideListTab.Recent to stringResource(R.string.recent_streams), SideListTab.Top to stringResource(R.string.browse_stations))
                         }
 
                         sideTabs.forEach { (tab, label) ->
@@ -1982,7 +1982,7 @@ private fun AutomotiveDiscoveryPanel(
                 onValueChange = onSearchQueryChange,
                 placeholder = {
                     Text(
-                        if (isPodcastTab) stringResource(R.string.search_podcasts_shows_hint) else stringResource(R.string.search_radio_stations_hint),
+                        if (isPodcastTab) stringResource(R.string.search_results_podcasts) else stringResource(R.string.search_placeholder),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
                     )

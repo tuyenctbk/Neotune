@@ -323,7 +323,6 @@
     <string name="clear_search">Suche löschen</string>
     <string name="remove_search_suggestion">Suchvorschlag entfernen</string>
     <string name="play_featured">Empfohlenen Sender abspielen</string>
-    <string name="exit_car_mode">Fahrzeugmodus beenden</string>
     <string name="car_quick_presets">Schnellwahltasten</string>
     <string name="car_preset_saved_format">Auf Schnellwahl %1$d gespeichert</string>
     <string name="car_long_press_preset_hint">Gedrückt halten, um Sender hier zu speichern</string>

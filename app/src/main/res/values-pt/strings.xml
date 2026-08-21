@@ -323,7 +323,6 @@
     <string name="clear_search">Limpar pesquisa</string>
     <string name="remove_search_suggestion">Remover sugestão</string>
     <string name="play_featured">Tocar estação destaque</string>
-    <string name="exit_car_mode">Sair do modo automotivo</string>
     <string name="car_quick_presets">Predefinições rápidas</string>
     <string name="car_preset_saved_format">Salvo na Predefinição %1$d</string>
     <string name="car_long_press_preset_hint">Segure para salvar a estação aqui</string>

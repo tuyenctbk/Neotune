@@ -323,7 +323,6 @@
     <string name="clear_search">Xóa tìm kiếm</string>
     <string name="remove_search_suggestion">Xóa gợi ý tìm kiếm</string>
     <string name="play_featured">Phát Kênh Nổi Bật</string>
-    <string name="exit_car_mode">Thoát Chế Độ Lái Xe</string>
     <string name="car_quick_presets">Kênh Cài Sẵn Nhanh</string>
     <string name="car_preset_saved_format">Đã lưu vào Kênh Cài Sẵn %1$d</string>
     <string name="car_long_press_preset_hint">Nhấn giữ để lưu kênh hiện tại vào ô này</string>

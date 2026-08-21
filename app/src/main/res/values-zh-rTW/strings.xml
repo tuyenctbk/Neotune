@@ -323,7 +323,6 @@
     <string name="clear_search">清空搜尋</string>
     <string name="remove_search_suggestion">刪除搜尋建議</string>
     <string name="play_featured">播放精選推薦</string>
-    <string name="exit_car_mode">退出車載模式</string>
     <string name="car_quick_presets">快捷預設</string>
     <string name="car_preset_saved_format">已儲存至預設 %1$d</string>
     <string name="car_long_press_preset_hint">長按預設欄位可儲存目前電台</string>

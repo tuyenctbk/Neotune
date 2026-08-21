@@ -379,7 +379,6 @@
     <string name="clear_search">Clear search</string>
     <string name="remove_search_suggestion">Remove search suggestion</string>
     <string name="play_featured">Play Featured</string>
-    <string name="exit_car_mode">Exit Automotive Mode</string>
     <string name="car_quick_presets">Quick Presets</string>
     <string name="car_preset_saved_format">Saved to Preset %1$d</string>
     <string name="car_long_press_preset_hint">Long-press preset to save current station</string>

@@ -323,7 +323,6 @@
     <string name="clear_search">Очистить поиск</string>
     <string name="remove_search_suggestion">Удалить подсказку</string>
     <string name="play_featured">Включить рекомендуемую</string>
-    <string name="exit_car_mode">Выйти из режима авто</string>
     <string name="car_quick_presets">Быстрые пресеты</string>
     <string name="car_preset_saved_format">Сохранено в пресет %1$d</string>
     <string name="car_long_press_preset_hint">Удерживайте, чтобы сохранить станцию в слот</string>
