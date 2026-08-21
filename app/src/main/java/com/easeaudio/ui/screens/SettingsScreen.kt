@@ -15,6 +15,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import android.content.Intent
+import android.net.Uri
+import android.util.Log
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -43,6 +47,7 @@ fun SettingsScreen(
     onOpenAttribution: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val context = LocalContext.current
     Scaffold(
         modifier = modifier.fillMaxSize(),
         containerColor = MaterialTheme.colorScheme.background
@@ -189,6 +194,69 @@ fun SettingsScreen(
                             subtitle = "Data providers & API attributions",
                             onClick = onOpenAttribution,
                             testTag = "setting_attribution"
+                        )
+                    }
+                }
+
+                // Support & Community Section
+                item {
+                    SettingsSectionHeader(title = stringResource(R.string.support_development_header))
+                }
+
+                item {
+                    SettingsCard {
+                        SettingsItem(
+                            icon = Icons.Filled.LocalCafe,
+                            iconTint = Color(0xFFFF813F),
+                            title = stringResource(R.string.donate_buymeacoffee),
+                            subtitle = stringResource(R.string.donate_buymeacoffee_desc),
+                            onClick = {
+                                try {
+                                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://buymeacoffee.com/tuyenphamvn")).apply {
+                                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                                    }
+                                    context.startActivity(intent)
+                                } catch (e: Exception) {
+                                    Log.e("SettingsScreen", "Failed to open BuyMeACoffee link", e)
+                                }
+                            },
+                            testTag = "setting_donate_buymeacoffee"
+                        )
+                        HorizontalDivider(color = MaterialTheme.colorScheme.surfaceVariant, thickness = 1.dp)
+                        SettingsItem(
+                            icon = Icons.Filled.Favorite,
+                            iconTint = Color(0xFFEA4AAA),
+                            title = stringResource(R.string.donate_github_sponsors),
+                            subtitle = stringResource(R.string.donate_github_sponsors_desc),
+                            onClick = {
+                                try {
+                                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/sponsors/tuyenphamvn")).apply {
+                                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                                    }
+                                    context.startActivity(intent)
+                                } catch (e: Exception) {
+                                    Log.e("SettingsScreen", "Failed to open GitHub Sponsors link", e)
+                                }
+                            },
+                            testTag = "setting_donate_github"
+                        )
+                        HorizontalDivider(color = MaterialTheme.colorScheme.surfaceVariant, thickness = 1.dp)
+                        SettingsItem(
+                            icon = Icons.Filled.VolunteerActivism,
+                            iconTint = Color(0xFF0079C1),
+                            title = stringResource(R.string.donate_paypal),
+                            subtitle = stringResource(R.string.donate_paypal_desc),
+                            onClick = {
+                                try {
+                                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://paypal.me/tuyenphamvn")).apply {
+                                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                                    }
+                                    context.startActivity(intent)
+                                } catch (e: Exception) {
+                                    Log.e("SettingsScreen", "Failed to open PayPal donation link", e)
+                                }
+                            },
+                            testTag = "setting_donate_paypal"
                         )
                     }
                 }

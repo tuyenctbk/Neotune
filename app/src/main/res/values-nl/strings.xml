@@ -333,4 +333,13 @@
     <string name="car_volume_down">Vol -</string>
     <string name="car_volume_up">Vol +</string>
     <string name="car_curated_master_title">Master &amp; Audiophile Zenders</string>
+
+    <!-- Developer Donation -->
+    <string name="support_development_header">Steun &amp; Community</string>
+    <string name="donate_paypal">Doneren via PayPal</string>
+    <string name="donate_paypal_desc">Steun advertentievrije ontwikkeling (paypal.me/tuyenphamvn)</string>
+    <string name="donate_buymeacoffee">Buy Me a Coffee</string>
+    <string name="donate_buymeacoffee_desc">Trakteer op een koffie (Kaart, Google Pay)</string>
+    <string name="donate_github_sponsors">GitHub Sponsors</string>
+    <string name="donate_github_sponsors_desc">Sponsor ontwikkeling op GitHub (0% kosten)</string>
 </resources>

@@ -338,4 +338,13 @@
     <string name="car_volume_down">音量 -</string>
     <string name="car_volume_up">音量 +</string>
     <string name="car_curated_master_title">厳選マスター &amp; オーディオファイル</string>
+
+    <!-- Developer Donation -->
+    <string name="support_development_header">サポートとコミュニティ</string>
+    <string name="donate_paypal">PayPalで寄付</string>
+    <string name="donate_paypal_desc">広告なしアプリの開発を支援 (paypal.me/tuyenphamvn)</string>
+    <string name="donate_buymeacoffee">Buy Me a Coffee</string>
+    <string name="donate_buymeacoffee_desc">コーヒーを奢って開発を応援 (カード, Google Pay)</string>
+    <string name="donate_github_sponsors">GitHub Sponsors</string>
+    <string name="donate_github_sponsors_desc">GitHubで開発者をスポンサーする (手数料0%)</string>
 </resources>

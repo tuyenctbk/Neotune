@@ -333,4 +333,13 @@
     <string name="car_volume_down">Glasnost -</string>
     <string name="car_volume_up">Glasnost +</string>
     <string name="car_curated_master_title">Postaje Master &amp; Audiophile</string>
+
+    <!-- Developer Donation -->
+    <string name="support_development_header">Podpora in skupnost</string>
+    <string name="donate_paypal">Donirajte prek storitve PayPal</string>
+    <string name="donate_paypal_desc">Podprite razvoj brez oglasov (paypal.me/tuyenphamvn)</string>
+    <string name="donate_buymeacoffee">Buy Me a Coffee</string>
+    <string name="donate_buymeacoffee_desc">Support with a coffee (Card, Google Pay)</string>
+    <string name="donate_github_sponsors">GitHub Sponsors</string>
+    <string name="donate_github_sponsors_desc">Sponsor development on GitHub</string>
 </resources>

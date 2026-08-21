@@ -333,4 +333,13 @@
     <string name="car_volume_down">Hlasitosť -</string>
     <string name="car_volume_up">Hlasitosť +</string>
     <string name="car_curated_master_title">Stanice Master &amp; Audiophile</string>
+
+    <!-- Developer Donation -->
+    <string name="support_development_header">Podpora a komunita</string>
+    <string name="donate_paypal">Prispieť cez PayPal</string>
+    <string name="donate_paypal_desc">Podporte vývoj aplikácie bez reklám (paypal.me/tuyenphamvn)</string>
+    <string name="donate_buymeacoffee">Buy Me a Coffee</string>
+    <string name="donate_buymeacoffee_desc">Support with a coffee (Card, Google Pay)</string>
+    <string name="donate_github_sponsors">GitHub Sponsors</string>
+    <string name="donate_github_sponsors_desc">Sponsor development on GitHub</string>
 </resources>

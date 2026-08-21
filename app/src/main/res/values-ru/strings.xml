@@ -338,4 +338,13 @@
     <string name="car_volume_down">Громкость -</string>
     <string name="car_volume_up">Громкость +</string>
     <string name="car_curated_master_title">Master &amp; Audiophile Станции</string>
+
+    <!-- Developer Donation -->
+    <string name="support_development_header">Поддержка и сообщество</string>
+    <string name="donate_paypal">Поддержать через PayPal</string>
+    <string name="donate_paypal_desc">Поддержка разработки без рекламы (paypal.me/tuyenphamvn)</string>
+    <string name="donate_buymeacoffee">Buy Me a Coffee</string>
+    <string name="donate_buymeacoffee_desc">Угостить кофе (Карта, Google Pay)</string>
+    <string name="donate_github_sponsors">GitHub Sponsors</string>
+    <string name="donate_github_sponsors_desc">Спонсировать разработку на GitHub (0% комиссии)</string>
 </resources>

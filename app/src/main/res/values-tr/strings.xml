@@ -333,4 +333,13 @@
     <string name="car_volume_down">Ses -</string>
     <string name="car_volume_up">Ses +</string>
     <string name="car_curated_master_title">Master &amp; Odyofil İstasyonları</string>
+
+    <!-- Developer Donation -->
+    <string name="support_development_header">Destek &amp; Topluluk</string>
+    <string name="donate_paypal">PayPal ile Bağış Yap</string>
+    <string name="donate_paypal_desc">Reklamsız geliştirmeyi destekleyin (paypal.me/tuyenphamvn)</string>
+    <string name="donate_buymeacoffee">Bir Kahve Ismarla</string>
+    <string name="donate_buymeacoffee_desc">Geliştiriciye kahve ısmarla (Kart, Google Pay)</string>
+    <string name="donate_github_sponsors">GitHub Sponsors</string>
+    <string name="donate_github_sponsors_desc">GitHub üzerinden geliştirmeyi destekle</string>
 </resources>

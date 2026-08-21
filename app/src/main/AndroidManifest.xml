@@ -25,6 +25,9 @@
     <uses-feature android:name="android.hardware.screen.portrait" android:required="false" />
     <uses-feature android:name="android.hardware.screen.landscape" android:required="false" />
 
+    <!-- Explicitly remove Advertising ID permission to ensure 100% Ad-Free Google Play compliance -->
+    <uses-permission android:name="com.google.android.gms.permission.AD_ID" tools:node="remove" />
+
     <application
         android:name=".EaseAudioApp"
         android:banner="@drawable/tv_banner"
@@ -47,14 +50,6 @@
         <meta-data
             android:name="com.google.android.gms.car.notification.SmallIcon"
             android:resource="@drawable/ic_favicon" />
-
-        <!-- Bug #10: Provider authority must use the full package name, not a relative path.
-             A relative authority like ".mobileadsinitprovider" is ambiguous and causes
-             ProviderConflict crashes on debug builds with an applicationIdSuffix. -->
-        <provider
-            android:name="com.google.android.gms.ads.MobileAdsInitProvider"
-            android:authorities="${applicationId}.mobileadsinitprovider"
-            tools:node="remove" />
 
         <activity
             android:name=".MainActivity"
@@ -114,11 +109,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity-alias>
-
-        <!-- AdMob App ID (test ID — replace with production ID before release) -->
-        <meta-data
-            android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="ca-app-pub-3940256099942544~3347511713"/>
 
         <service
             android:name=".service.RadioPlaybackService"

@@ -333,4 +333,13 @@
     <string name="car_volume_down">Vol -</string>
     <string name="car_volume_up">Vol +</string>
     <string name="car_curated_master_title">Master &amp; Audiophile Stationer</string>
+
+    <!-- Developer Donation -->
+    <string name="support_development_header">Support og fællesskab</string>
+    <string name="donate_paypal">Donér via PayPal</string>
+    <string name="donate_paypal_desc">Støt reklamefri udvikling (paypal.me/tuyenphamvn)</string>
+    <string name="donate_buymeacoffee">Buy Me a Coffee</string>
+    <string name="donate_buymeacoffee_desc">Support with a coffee (Card, Google Pay)</string>
+    <string name="donate_github_sponsors">GitHub Sponsors</string>
+    <string name="donate_github_sponsors_desc">Sponsor development on GitHub</string>
 </resources>

@@ -333,4 +333,13 @@
     <string name="car_volume_down">Vol -</string>
     <string name="car_volume_up">Vol +</string>
     <string name="car_curated_master_title">Stasiun Master &amp; Audiophile</string>
+
+    <!-- Developer Donation -->
+    <string name="support_development_header">Dukungan &amp; Komunitas</string>
+    <string name="donate_paypal">Donasi via PayPal</string>
+    <string name="donate_paypal_desc">Dukung pengembangan bebas iklan (paypal.me/tuyenphamvn)</string>
+    <string name="donate_buymeacoffee">Belikan Kopi (Buy Me a Coffee)</string>
+    <string name="donate_buymeacoffee_desc">Dukung dengan secangkir kopi (Kartu, Google Pay)</string>
+    <string name="donate_github_sponsors">GitHub Sponsors</string>
+    <string name="donate_github_sponsors_desc">Sponsori pengembangan di GitHub (0% biaya)</string>
 </resources>

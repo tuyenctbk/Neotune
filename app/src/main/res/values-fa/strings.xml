@@ -333,4 +333,13 @@
     <string name="car_volume_down">Vol -</string>
     <string name="car_volume_up">Vol +</string>
     <string name="car_curated_master_title">Audiophile &amp; Master Presets</string>
+
+    <!-- Developer Donation -->
+    <string name="support_development_header">پشتیبانی و انجمن</string>
+    <string name="donate_paypal">حمایت مالی از طریق PayPal</string>
+    <string name="donate_paypal_desc">حمایت از توسعه بدون تبلیغات (paypal.me/tuyenphamvn)</string>
+    <string name="donate_buymeacoffee">Buy Me a Coffee</string>
+    <string name="donate_buymeacoffee_desc">Support with a coffee (Card, Google Pay)</string>
+    <string name="donate_github_sponsors">GitHub Sponsors</string>
+    <string name="donate_github_sponsors_desc">Sponsor development on GitHub</string>
 </resources>

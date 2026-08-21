@@ -338,4 +338,13 @@
     <string name="car_volume_down">音量 -</string>
     <string name="car_volume_up">音量 +</string>
     <string name="car_curated_master_title">精选母带与高保真电台</string>
+
+    <!-- Developer Donation -->
+    <string name="support_development_header">支持与社区</string>
+    <string name="donate_paypal">通过 PayPal 赞助</string>
+    <string name="donate_paypal_desc">支持无广告纯净版持续开发 (paypal.me/tuyenphamvn)</string>
+    <string name="donate_buymeacoffee">请开发者喝杯咖啡</string>
+    <string name="donate_buymeacoffee_desc">通过 Buy Me a Coffee 赞助 (信用卡, Google Pay)</string>
+    <string name="donate_github_sponsors">GitHub Sponsors</string>
+    <string name="donate_github_sponsors_desc">在 GitHub 上赞助支持开发者 (0%手续费)</string>
 </resources>

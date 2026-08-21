@@ -333,4 +333,13 @@
     <string name="car_volume_down">ลดเสียง</string>
     <string name="car_volume_up">เพิ่มเสียง</string>
     <string name="car_curated_master_title">สถานีระดับมาสเตอร์ &amp; ออดิโอไฟล์</string>
+
+    <!-- Developer Donation -->
+    <string name="support_development_header">การสนับสนุนและชุมชน</string>
+    <string name="donate_paypal">บริจาคผ่าน PayPal</string>
+    <string name="donate_paypal_desc">สนับสนุนการพัฒนาแบบไร้โฆษณา (paypal.me/tuyenphamvn)</string>
+    <string name="donate_buymeacoffee">เลี้ยงกาแฟผู้พัฒนา</string>
+    <string name="donate_buymeacoffee_desc">สนับสนุนด้วยกาแฟ (บัตร, Google Pay)</string>
+    <string name="donate_github_sponsors">GitHub Sponsors</string>
+    <string name="donate_github_sponsors_desc">สนับสนุนการพัฒนาบน GitHub</string>
 </resources>

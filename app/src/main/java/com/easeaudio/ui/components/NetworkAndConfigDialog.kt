@@ -27,7 +27,6 @@ import com.easeaudio.R
 fun NetworkAndConfigDialog(
     networkStatus: NetworkStatus,
     remoteConfig: AppRemoteConfig,
-    onToggleSimulatedAds: (Boolean) -> Unit,
     onDismiss: () -> Unit
 ) {
     AlertDialog(
@@ -110,39 +109,6 @@ fun NetworkAndConfigDialog(
                             color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
                             fontSize = 11.sp
                         )
-                        Spacer(modifier = Modifier.height(8.dp))
-                        
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Column {
-                                Text(
-                                    text = stringResource(R.string.admob_advertisements),
-                                    color = MaterialTheme.colorScheme.onSurface,
-                                    fontSize = 13.sp,
-                                    fontWeight = FontWeight.Medium
-                                )
-                                Text(
-                                    text = stringResource(R.string.always_silent_ad),
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
-                                    fontSize = 11.sp
-                                )
-                            }
-
-                            Switch(
-                                checked = remoteConfig.adsEnabled,
-                                onCheckedChange = { onToggleSimulatedAds(it) },
-                                colors = SwitchDefaults.colors(
-                                    checkedThumbColor = MaterialTheme.colorScheme.background,
-                                    checkedTrackColor = MaterialTheme.colorScheme.primary,
-                                    uncheckedThumbColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
-                                    uncheckedTrackColor = MaterialTheme.colorScheme.outline
-                                ),
-                                modifier = Modifier.testTag("switch_admob_ads")
-                            )
-                        }
                     }
                 }
             }

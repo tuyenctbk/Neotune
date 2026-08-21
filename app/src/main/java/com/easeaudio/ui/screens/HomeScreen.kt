@@ -66,7 +66,6 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import androidx.compose.ui.res.stringResource
 import com.easeaudio.R
-import com.easeaudio.ads.AdMobBanner
 import com.easeaudio.data.RadioStation
 import com.easeaudio.ui.theme.*
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -220,16 +219,6 @@ fun HomeScreen(
                 verticalArrangement = Arrangement.spacedBy(10.dp),
                 contentPadding = PaddingValues(start = 20.dp, top = 8.dp, end = 20.dp, bottom = 80.dp)
             ) {
-                // AdMob Banner
-                if (uiState.remoteConfig.adsEnabled) {
-                    item(span = { GridItemSpan(maxLineSpan) }) {
-                        AdMobBanner(
-                            adUnitId = uiState.remoteConfig.bannerAdUnitId,
-                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-                        )
-                    }
-                }
-
                 // App Header & Search Bar (Merged for minimal spacing)
                 item(span = { GridItemSpan(maxLineSpan) }) {
                     Column(

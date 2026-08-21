@@ -333,4 +333,13 @@
     <string name="car_volume_down">वॉल्यूम -</string>
     <string name="car_volume_up">वॉल्यूम +</string>
     <string name="car_curated_master_title">मास्टर और ऑडियोफाइल स्टेशन</string>
+
+    <!-- Developer Donation -->
+    <string name="support_development_header">समर्थन और समुदाय</string>
+    <string name="donate_paypal">PayPal के माध्यम से दान करें</string>
+    <string name="donate_paypal_desc">विज्ञापन-मुक्त विकास का समर्थन करें (paypal.me/tuyenphamvn)</string>
+    <string name="donate_buymeacoffee">Buy Me a Coffee</string>
+    <string name="donate_buymeacoffee_desc">एक कॉफी के साथ समर्थन करें (कार्ड, Google Pay)</string>
+    <string name="donate_github_sponsors">GitHub Sponsors</string>
+    <string name="donate_github_sponsors_desc">GitHub पर विकास को प्रायोजित करें</string>
 </resources>

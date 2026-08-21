@@ -338,4 +338,13 @@
     <string name="car_volume_down">עוצמה -</string>
     <string name="car_volume_up">עוצמה +</string>
     <string name="car_curated_master_title">תחנות Master ואיכות גבוהה</string>
+
+    <!-- Developer Donation -->
+    <string name="support_development_header">תמיכה וקהילה</string>
+    <string name="donate_paypal">תרומה דרך PayPal</string>
+    <string name="donate_paypal_desc">תמיכה בפיתוח ללא פרסומות (paypal.me/tuyenphamvn)</string>
+    <string name="donate_buymeacoffee">Buy Me a Coffee</string>
+    <string name="donate_buymeacoffee_desc">הזמן אותי לקפה (כרטיס אשראי, Google Pay)</string>
+    <string name="donate_github_sponsors">GitHub Sponsors</string>
+    <string name="donate_github_sponsors_desc">מתן חסות לפיתוח ב-GitHub (ללא עמלות)</string>
 </resources>

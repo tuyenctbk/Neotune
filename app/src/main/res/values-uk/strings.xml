@@ -333,4 +333,13 @@
     <string name="car_volume_down">Гучність -</string>
     <string name="car_volume_up">Гучність +</string>
     <string name="car_curated_master_title">Станції Master &amp; Audiophile</string>
+
+    <!-- Developer Donation -->
+    <string name="support_development_header">Підтримка та спільнота</string>
+    <string name="donate_paypal">Підтримати через PayPal</string>
+    <string name="donate_paypal_desc">Підтримайте розробку без реклами (paypal.me/tuyenphamvn)</string>
+    <string name="donate_buymeacoffee">Пригостити кавою (Buy Me a Coffee)</string>
+    <string name="donate_buymeacoffee_desc">Підтримати чашкою кави (Картка, Google Pay)</string>
+    <string name="donate_github_sponsors">GitHub Sponsors</string>
+    <string name="donate_github_sponsors_desc">Спонсорувати розробку на GitHub (0% комісії)</string>
 </resources>

@@ -333,4 +333,13 @@
     <string name="car_volume_down">Јачина -</string>
     <string name="car_volume_up">Јачина +</string>
     <string name="car_curated_master_title">Master &amp; Audiophile станице</string>
+
+    <!-- Developer Donation -->
+    <string name="support_development_header">Подршка и заједница</string>
+    <string name="donate_paypal">Донирајте преко PayPal-а</string>
+    <string name="donate_paypal_desc">Подржите развој без реклама (paypal.me/tuyenphamvn)</string>
+    <string name="donate_buymeacoffee">Buy Me a Coffee</string>
+    <string name="donate_buymeacoffee_desc">Support with a coffee (Card, Google Pay)</string>
+    <string name="donate_github_sponsors">GitHub Sponsors</string>
+    <string name="donate_github_sponsors_desc">Sponsor development on GitHub</string>
 </resources>

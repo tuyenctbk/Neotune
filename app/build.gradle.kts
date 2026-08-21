@@ -21,8 +21,8 @@ android {
         applicationId = "com.neotune.radio"
         minSdk = 24
         targetSdk = 37
-        versionCode = 39
-        versionName = "3.7.3"
+        versionCode = 40
+        versionName = "4.1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -124,9 +124,6 @@ dependencies {
 
     // AndroidX Splash Screen
     implementation(libs.androidx.core.splashscreen)
-
-    // Google Play Services Ads (AdMob)
-    implementation(libs.play.services.ads)
 
     // Firebase Remote Config, Analytics, Crashlytics & Perf
     implementation(platform(libs.firebase.bom))

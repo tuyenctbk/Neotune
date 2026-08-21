@@ -1165,10 +1165,6 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
         playerManager.playPreviousStation(currentList)
     }
 
-    fun toggleSimulatedAds(enabled: Boolean) {
-        playerManager.firebaseConfigManager.toggleSimulatedAds(enabled)
-    }
-
     fun setEqPreset(preset: String) {
         _activeEqPreset.value = preset
         playerManager.setEqPreset(preset)

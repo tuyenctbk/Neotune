@@ -14,8 +14,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 data class AppRemoteConfig(
-    val adsEnabled: Boolean = false, // Default is FALSE as requested by user
-    val bannerAdUnitId: String = "ca-app-pub-3940256099942544/6300978111", // Standard AdMob Test Banner
     val autoQualityAdaptive: Boolean = true,
     val minBufferMsCellular: Long = 20000L,
     val maxBufferMsCellular: Long = 60000L,
@@ -68,8 +66,6 @@ class FirebaseConfigManager(private val context: Context) {
 
                     // Set default map
                     val defaults: Map<String, Any> = mapOf(
-                        KEY_ADS_ENABLED to false,
-                        KEY_BANNER_AD_UNIT_ID to "ca-app-pub-3940256099942544/6300978111",
                         KEY_AUTO_QUALITY to true,
                         KEY_MIN_BUFFER to 20000L,
                         KEY_MAX_BUFFER to 60000L,
@@ -117,8 +113,6 @@ class FirebaseConfigManager(private val context: Context) {
     }
 
     private fun applyRemoteValues(config: FirebaseRemoteConfig, source: String) {
-        val adsEnabled = config.getBoolean(KEY_ADS_ENABLED)
-        val bannerId = config.getString(KEY_BANNER_AD_UNIT_ID).ifBlank { "ca-app-pub-3940256099942544/6300978111" }
         val autoQuality = config.getBoolean(KEY_AUTO_QUALITY)
         val minBuf = config.getLong(KEY_MIN_BUFFER)
         val maxBuf = config.getLong(KEY_MAX_BUFFER)
@@ -130,8 +124,6 @@ class FirebaseConfigManager(private val context: Context) {
         val notes = config.getString(KEY_UPDATE_NOTES)
 
         _configState.value = AppRemoteConfig(
-            adsEnabled = adsEnabled,
-            bannerAdUnitId = bannerId,
             autoQualityAdaptive = autoQuality,
             minBufferMsCellular = if (minBuf <= 0) 20000L else minBuf,
             maxBufferMsCellular = if (maxBuf <= 0) 60000L else maxBuf,
@@ -152,18 +144,7 @@ class FirebaseConfigManager(private val context: Context) {
         )
     }
 
-    // Allow user simulation toggle in Settings UI for testing AdMob or Remote Config
-    fun toggleSimulatedAds(enabled: Boolean) {
-        val current = _configState.value
-        _configState.value = current.copy(
-            adsEnabled = enabled,
-            configSource = if (enabled) "User Settings Override (Ads Enabled)" else "User Settings Override (Ads Disabled)"
-        )
-    }
-
     companion object {
-        const val KEY_ADS_ENABLED = "ads_enabled"
-        const val KEY_BANNER_AD_UNIT_ID = "banner_ad_unit_id"
         const val KEY_AUTO_QUALITY = "auto_quality_adaptive"
         const val KEY_MIN_BUFFER = "min_buffer_ms_cellular"
         const val KEY_MAX_BUFFER = "max_buffer_ms_cellular"

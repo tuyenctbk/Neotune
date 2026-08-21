@@ -338,4 +338,13 @@
     <string name="car_volume_down">볼륨 -</string>
     <string name="car_volume_up">볼륨 +</string>
     <string name="car_curated_master_title">엄선된 마스터 &amp; 고음질 방송</string>
+
+    <!-- Developer Donation -->
+    <string name="support_development_header">지원 및 커뮤니티</string>
+    <string name="donate_paypal">PayPal로 후원하기</string>
+    <string name="donate_paypal_desc">무광고 앱 개발 후원 (paypal.me/tuyenphamvn)</string>
+    <string name="donate_buymeacoffee">Buy Me a Coffee</string>
+    <string name="donate_buymeacoffee_desc">커피 한 잔으로 개발 후원 (카드, Google Pay)</string>
+    <string name="donate_github_sponsors">GitHub Sponsors</string>
+    <string name="donate_github_sponsors_desc">GitHub에서 개발 스폰서하기 (수수료 0%)</string>
 </resources>

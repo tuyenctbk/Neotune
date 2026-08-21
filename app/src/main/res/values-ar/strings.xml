@@ -333,4 +333,13 @@
     <string name="car_volume_down">خفض الصوت</string>
     <string name="car_volume_up">رفع الصوت</string>
     <string name="car_curated_master_title">محطات ماستر وجودة فائقة</string>
+
+    <!-- Developer Donation -->
+    <string name="support_development_header">الدعم والمجتمع</string>
+    <string name="donate_paypal">تبرع عبر PayPal</string>
+    <string name="donate_paypal_desc">ادعم التطوير بدون إعلانات (paypal.me/tuyenphamvn)</string>
+    <string name="donate_buymeacoffee">اشترِ لي قهوة (Buy Me a Coffee)</string>
+    <string name="donate_buymeacoffee_desc">ادعم بقهوة (بطاقة، Google Pay)</string>
+    <string name="donate_github_sponsors">GitHub Sponsors</string>
+    <string name="donate_github_sponsors_desc">رعاية التطوير على GitHub (بدون رسوم)</string>
 </resources>
