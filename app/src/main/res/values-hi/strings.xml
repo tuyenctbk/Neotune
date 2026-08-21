@@ -291,4 +291,46 @@
     <string name="audio_frequency_visualizer">ऑडियो विज़ुअलाइज़र</string>
     <string name="sponsor_ad_area">प्रायोजित क्षेत्र (मौन)</string>
     <string name="no_connection_msg">कनेक्शन नहीं है। नेटवर्क जाँचें।</string>
+
+    <!-- Synchronized strings -->
+    <string name="lyrics_label">गीत के बोल</string>
+    <string name="lyrics_title">लाइव बोल</string>
+    <string name="fetching_lyrics">लाइव बोल खोजे जा रहे हैं…</string>
+    <string name="no_lyrics_available">कोई बोल नहीं मिला</string>
+    <string name="lyrics_instrumental_hint">यह प्रसारण कोई वाद्य ट्रैक, टॉक शो या लाइव डीजे मिक्स हो सकता है।</string>
+    <string name="curated_section_title">मास्टर क्वालिटी और लो-फाई चयन</string>
+    <string name="curated_section_subtitle">चयनित 320k FLAC/AAC और विज्ञापन-मुक्त SomaFM स्ट्रीम</string>
+    <string name="no_episodes_loaded">कोई एपिसोड लोड नहीं हुआ</string>
+    <string name="view_episodes">एपिसोड देखें</string>
+    <string name="browse_stations">स्टेशन ब्राउज़ करें</string>
+    <string name="no_recent_stations">कोई हालिया स्टेशन नहीं</string>
+    <string name="no_saved_favorites_car">अभी तक कोई पसंदीदा सहेजा नहीं गया</string>
+    <string name="saved_favorites">सहेजे गए पसंदीदा</string>
+    <string name="car_no_favorites_desc">कोई स्टेशन सहेजा नहीं गया। ड्राइविंग के दौरान त्वरित पहुँच के लिए किसी भी स्टेशन पर दिल के आइकन पर टैप करें।</string>
+    <string name="custom_duration_minutes">कस्टम अवधि: %1$d मिनट</string>
+    <string name="starts_at">%1$s पर शुरू होता है</string>
+    <string name="chapter_count">%1$d अध्याय</string>
+    <string name="back_to_list">सूची पर वापस जाएं</string>
+    <string name="save_episode">एपिसोड सहेजें</string>
+    <string name="download_episode">एपिसोड डाउनलोड करें</string>
+    <string name="badge_flac_aac">320k FLAC / AAC</string>
+    <string name="badge_flac_master">FLAC Master</string>
+    <string name="badge_somafm">SomaFM</string>
+    <string name="clear_search">खोज साफ़ करें</string>
+    <string name="remove_search_suggestion">सुझाव हटाएं</string>
+    <string name="play_featured">विशेष रुप से प्रदर्शित चलाएं</string>
+    <string name="car_quick_presets">त्वरित प्रीसेट</string>
+    <string name="car_preset_saved_format">प्रीसेट %1$d में सहेजा गया</string>
+    <string name="car_long_press_preset_hint">वर्तमान स्टेशन को यहाँ सहेजने के लिए दबाकर रखें</string>
+    <string name="car_anti_glare_night">एंटी-ग्लेयर नाइट मोड</string>
+    <string name="car_anti_glare_on">एंटी-ग्लेयर: चालू</string>
+    <string name="car_anti_glare_off">एंटी-ग्लेयर: बंद</string>
+    <string name="car_cockpit_live_on_air">लाइव प्रसारण</string>
+    <string name="car_cockpit_stream_ready">स्ट्रीम तैयार है</string>
+    <string name="car_cockpit_buffering">स्ट्रीम से कनेक्ट हो रहा है…</string>
+    <string name="car_volume_control">कार वॉल्यूम</string>
+    <string name="car_volume_mute">म्यूट करें</string>
+    <string name="car_volume_down">वॉल्यूम -</string>
+    <string name="car_volume_up">वॉल्यूम +</string>
+    <string name="car_curated_master_title">मास्टर और ऑडियोफाइल स्टेशन</string>
 </resources>

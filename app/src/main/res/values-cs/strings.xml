@@ -291,4 +291,46 @@
     <string name="audio_frequency_visualizer">Vizualizér zvukové frekvence</string>
     <string name="sponsor_ad_area">Sponzorovaná oblast (ztlumeno)</string>
     <string name="no_connection_msg">Žádné připojení. Zkontrolujte prosím síť.</string>
+
+    <!-- Synchronized strings -->
+    <string name="lyrics_label">Text písně</string>
+    <string name="lyrics_title">Živý text písně</string>
+    <string name="fetching_lyrics">Hledání živého textu…</string>
+    <string name="no_lyrics_available">Text nebyl nalezen</string>
+    <string name="lyrics_instrumental_hint">Toto vysílání může být instrumentální skladba, talk show nebo živý DJ mix.</string>
+    <string name="curated_section_title">Výběr Master Quality &amp; Lo-Fi</string>
+    <string name="curated_section_subtitle">Vybrané streamy 320k FLAC/AAC a SomaFM bez reklam</string>
+    <string name="no_episodes_loaded">Žádné načtené epizody</string>
+    <string name="view_episodes">Zobrazit epizody</string>
+    <string name="browse_stations">Procházet stanice</string>
+    <string name="no_recent_stations">Žádné nedávné stanice</string>
+    <string name="no_saved_favorites_car">Zatím žádné uložené oblíbené</string>
+    <string name="saved_favorites">Uložené oblíbené</string>
+    <string name="car_no_favorites_desc">Žádné uložené stanice. Klepnutím na ikonu srdce u jakékoli stanice ji uložíte sem pro rychlý přístup při řízení.</string>
+    <string name="custom_duration_minutes">Vlastní délka: %1$d minut</string>
+    <string name="starts_at">Začíná v %1$s</string>
+    <string name="chapter_count">%1$d Kapitol</string>
+    <string name="back_to_list">Zpět na seznam</string>
+    <string name="save_episode">Uložit epizodu</string>
+    <string name="download_episode">Stáhnout epizodu</string>
+    <string name="badge_flac_aac">320k FLAC / AAC</string>
+    <string name="badge_flac_master">FLAC Master</string>
+    <string name="badge_somafm">SomaFM</string>
+    <string name="clear_search">Vymazat hledání</string>
+    <string name="remove_search_suggestion">Odebrat návrh hledání</string>
+    <string name="play_featured">Přehrát doporučené</string>
+    <string name="car_quick_presets">Rychlé předvolby</string>
+    <string name="car_preset_saved_format">Uloženo do předvolby %1$d</string>
+    <string name="car_long_press_preset_hint">Dlouhým stisknutím uložíte aktuální stanici do této pozice</string>
+    <string name="car_anti_glare_night">Noční antireflexní režim</string>
+    <string name="car_anti_glare_on">Antireflex: ZAP</string>
+    <string name="car_anti_glare_off">Antireflex: VYP</string>
+    <string name="car_cockpit_live_on_air">ŽIVĚ VE VYSÍLÁNÍ</string>
+    <string name="car_cockpit_stream_ready">STREAM PŘIPRAVEN</string>
+    <string name="car_cockpit_buffering">PŘIPOJOVÁNÍ STREAMU…</string>
+    <string name="car_volume_control">Hlasitost v autě</string>
+    <string name="car_volume_mute">Ztlumit</string>
+    <string name="car_volume_down">Hlasitost -</string>
+    <string name="car_volume_up">Hlasitost +</string>
+    <string name="car_curated_master_title">Stanice Master &amp; Audiophile</string>
 </resources>

@@ -324,4 +324,18 @@
     <string name="remove_search_suggestion">Xóa gợi ý tìm kiếm</string>
     <string name="play_featured">Phát Kênh Nổi Bật</string>
     <string name="exit_car_mode">Thoát Chế Độ Lái Xe</string>
+    <string name="car_quick_presets">Kênh Cài Sẵn Nhanh</string>
+    <string name="car_preset_saved_format">Đã lưu vào Kênh Cài Sẵn %1$d</string>
+    <string name="car_long_press_preset_hint">Nhấn giữ để lưu kênh hiện tại vào ô này</string>
+    <string name="car_anti_glare_night">Chế Độ Chống Chói Ban Đêm</string>
+    <string name="car_anti_glare_on">Chống chói: BẬT</string>
+    <string name="car_anti_glare_off">Chống chói: TẮT</string>
+    <string name="car_cockpit_live_on_air">ĐANG PHÁT SÓNG</string>
+    <string name="car_cockpit_stream_ready">SẴN SÀNG PHÁT</string>
+    <string name="car_cockpit_buffering">ĐANG KẾT NỐI LUỒNG…</string>
+    <string name="car_volume_control">Âm Lượng Xe</string>
+    <string name="car_volume_mute">Tắt tiếng</string>
+    <string name="car_volume_down">Giảm âm</string>
+    <string name="car_volume_up">Tăng âm</string>
+    <string name="car_curated_master_title">Kênh Master &amp; Audiophile Tuyển Chọn</string>
 </resources>

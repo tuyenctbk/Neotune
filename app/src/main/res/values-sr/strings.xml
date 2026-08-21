@@ -291,4 +291,46 @@
     <string name="audio_frequency_visualizer">Визуелизатор аудио фреквенције</string>
     <string name="sponsor_ad_area">Спонзорисана зона (без звука)</string>
     <string name="no_connection_msg">Нема везе. Проверите мрежу.</string>
+
+    <!-- Synchronized strings -->
+    <string name="lyrics_label">Текст песме</string>
+    <string name="lyrics_title">Текст уживо</string>
+    <string name="fetching_lyrics">Тражење текста уживо…</string>
+    <string name="no_lyrics_available">Текст није пронађен</string>
+    <string name="lyrics_instrumental_hint">Ово емитовање може бити инструментал, ток-шоу или ДЈ микс уживо.</string>
+    <string name="curated_section_title">Master квалитет &amp; Lo-Fi избор</string>
+    <string name="curated_section_subtitle">Одабрани 320k FLAC/AAC и SomaFM стримови без реклама</string>
+    <string name="no_episodes_loaded">Нема учитаних епизода</string>
+    <string name="view_episodes">Прикажи епизоде</string>
+    <string name="browse_stations">Прегледај станице</string>
+    <string name="no_recent_stations">Нема недавних станица</string>
+    <string name="no_saved_favorites_car">Још нема сачуваних омиљених</string>
+    <string name="saved_favorites">Сачуване омиљене</string>
+    <string name="car_no_favorites_desc">Нема сачуваних станица. Додирните икону срца на било којој станици за брзи приступ током вожње.</string>
+    <string name="custom_duration_minutes">Прилагођено трајање: %1$d мин</string>
+    <string name="starts_at">Почиње у %1$s</string>
+    <string name="chapter_count">%1$d Поглавља</string>
+    <string name="back_to_list">Назад на листу</string>
+    <string name="save_episode">Сачувај епизоду</string>
+    <string name="download_episode">Преузми епизоду</string>
+    <string name="badge_flac_aac">320k FLAC / AAC</string>
+    <string name="badge_flac_master">FLAC Master</string>
+    <string name="badge_somafm">SomaFM</string>
+    <string name="clear_search">Обриши претрагу</string>
+    <string name="remove_search_suggestion">Уклони предлог</string>
+    <string name="play_featured">Пусти препоручено</string>
+    <string name="car_quick_presets">Брзе меморије</string>
+    <string name="car_preset_saved_format">Сачувано на меморији %1$d</string>
+    <string name="car_long_press_preset_hint">Задржите да бисте сачували тренутну станицу овде</string>
+    <string name="car_anti_glare_night">Антирефлексни ноћни режим</string>
+    <string name="car_anti_glare_on">Антирефлекс: УКЉ</string>
+    <string name="car_anti_glare_off">Антирефлекс: ИСКЉ</string>
+    <string name="car_cockpit_live_on_air">УЖИВО У ЕТРУ</string>
+    <string name="car_cockpit_stream_ready">СТРИМ СПРЕМАН</string>
+    <string name="car_cockpit_buffering">ПОВЕЗИВАЊЕ НА СТРИМ…</string>
+    <string name="car_volume_control">Јачина звука у ауту</string>
+    <string name="car_volume_mute">Утишај</string>
+    <string name="car_volume_down">Јачина -</string>
+    <string name="car_volume_up">Јачина +</string>
+    <string name="car_curated_master_title">Master &amp; Audiophile станице</string>
 </resources>

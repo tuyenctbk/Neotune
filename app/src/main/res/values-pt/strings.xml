@@ -324,4 +324,18 @@
     <string name="remove_search_suggestion">Remover sugestão</string>
     <string name="play_featured">Tocar estação destaque</string>
     <string name="exit_car_mode">Sair do modo automotivo</string>
+    <string name="car_quick_presets">Predefinições rápidas</string>
+    <string name="car_preset_saved_format">Salvo na Predefinição %1$d</string>
+    <string name="car_long_press_preset_hint">Segure para salvar a estação aqui</string>
+    <string name="car_anti_glare_night">Modo noturno antirreflexo</string>
+    <string name="car_anti_glare_on">Antirreflexo: ATIVADO</string>
+    <string name="car_anti_glare_off">Antirreflexo: DESATIVADO</string>
+    <string name="car_cockpit_live_on_air">NO AR</string>
+    <string name="car_cockpit_stream_ready">STREAM PRONTO</string>
+    <string name="car_cockpit_buffering">CONECTANDO AO STREAM…</string>
+    <string name="car_volume_control">Volume automotivo</string>
+    <string name="car_volume_mute">Mudo</string>
+    <string name="car_volume_down">Vol -</string>
+    <string name="car_volume_up">Vol +</string>
+    <string name="car_curated_master_title">Estações Master &amp; Audiophile</string>
 </resources>

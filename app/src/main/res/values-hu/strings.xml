@@ -291,4 +291,46 @@
     <string name="audio_frequency_visualizer">Frekvencia vizualizáló</string>
     <string name="sponsor_ad_area">Szponzorált tartalom (néma)</string>
     <string name="no_connection_msg">Nincs kapcsolat. Kérjük, ellenőrizze a hálózatot.</string>
+
+    <!-- Synchronized strings -->
+    <string name="lyrics_label">Dalszöveg</string>
+    <string name="lyrics_title">Élő dalszöveg</string>
+    <string name="fetching_lyrics">Élő dalszöveg keresése…</string>
+    <string name="no_lyrics_available">Nincs elérhető dalszöveg</string>
+    <string name="lyrics_instrumental_hint">Ez az adás lehet hangszeres szám, beszélgetős műsor vagy élő DJ-mix.</string>
+    <string name="curated_section_title">Válogatott Master minőség &amp; Lo-Fi</string>
+    <string name="curated_section_subtitle">Válogatott 320k FLAC/AAC és reklámmentes SomaFM adások</string>
+    <string name="no_episodes_loaded">Nincsenek betöltött epizódok</string>
+    <string name="view_episodes">Epizódok megtekintése</string>
+    <string name="browse_stations">Állomások böngészése</string>
+    <string name="no_recent_stations">Nincsenek legutóbbi állomások</string>
+    <string name="no_saved_favorites_car">Még nincsenek elmentett kedvencek</string>
+    <string name="saved_favorites">Elmentett kedvencek</string>
+    <string name="car_no_favorites_desc">Nincsenek elmentett állomások. Érintse meg a szív ikont bármelyik állomáson a gyors eléréshez vezetés közben.</string>
+    <string name="custom_duration_minutes">Egyéni időtartam: %1$d perc</string>
+    <string name="starts_at">Kezdés: %1$s</string>
+    <string name="chapter_count">%1$d Fejezet</string>
+    <string name="back_to_list">Vissza a listához</string>
+    <string name="save_episode">Epizód mentése</string>
+    <string name="download_episode">Epizód letöltése</string>
+    <string name="badge_flac_aac">320k FLAC / AAC</string>
+    <string name="badge_flac_master">FLAC Master</string>
+    <string name="badge_somafm">SomaFM</string>
+    <string name="clear_search">Keresés törlése</string>
+    <string name="remove_search_suggestion">Keresési javaslat eltávolítása</string>
+    <string name="play_featured">Kiemelt lejátszása</string>
+    <string name="car_quick_presets">Gyorsbeállítások</string>
+    <string name="car_preset_saved_format">Elmentve a(z) %1$d. gombra</string>
+    <string name="car_long_press_preset_hint">Tartsa lenyomva az aktuális állomás ide mentéséhez</string>
+    <string name="car_anti_glare_night">Tükröződésmentes éjszakai mód</string>
+    <string name="car_anti_glare_on">Tükröződésmentes: BE</string>
+    <string name="car_anti_glare_off">Tükröződésmentes: KI</string>
+    <string name="car_cockpit_live_on_air">ÉLŐ ADÁS</string>
+    <string name="car_cockpit_stream_ready">ADÁS KÉSZEN ÁLL</string>
+    <string name="car_cockpit_buffering">CSATLAKOZÁS AZ ADÁSHOZ…</string>
+    <string name="car_volume_control">Autó hangerő</string>
+    <string name="car_volume_mute">Némítás</string>
+    <string name="car_volume_down">Hangerő -</string>
+    <string name="car_volume_up">Hangerő +</string>
+    <string name="car_curated_master_title">Master &amp; Audiofil Állomások</string>
 </resources>

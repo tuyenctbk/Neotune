@@ -291,4 +291,46 @@
     <string name="audio_frequency_visualizer">Vizualizator frecvență audio</string>
     <string name="sponsor_ad_area">Zonă sponsorizată (fără sunet)</string>
     <string name="no_connection_msg">Lipsă conexiune. Verificați rețeaua.</string>
+
+    <!-- Synchronized strings -->
+    <string name="lyrics_label">Versuri</string>
+    <string name="lyrics_title">Versuri în timp real</string>
+    <string name="fetching_lyrics">Se caută versuri în timp real…</string>
+    <string name="no_lyrics_available">Nu s-au găsit versuri</string>
+    <string name="lyrics_instrumental_hint">Această transmisiune ar putea fi o piesă instrumentală, o emisiune radio sau un mix DJ live.</string>
+    <string name="curated_section_title">Selecție Master Quality &amp; Lo-Fi</string>
+    <string name="curated_section_subtitle">Fluxuri 320k FLAC/AAC și SomaFM fără reclame alese manual</string>
+    <string name="no_episodes_loaded">Niciun episod încărcat</string>
+    <string name="view_episodes">Vizualizare episoade</string>
+    <string name="browse_stations">Răsfoiește posturi</string>
+    <string name="no_recent_stations">Niciun post recent</string>
+    <string name="no_saved_favorites_car">Niciun favorit salvat încă</string>
+    <string name="saved_favorites">Favorite salvate</string>
+    <string name="car_no_favorites_desc">Niciun post salvat. Atingeți pictograma inimă de pe orice post pentru a-l salva aici pentru acces rapid la volan.</string>
+    <string name="custom_duration_minutes">Durată personalizată: %1$d minute</string>
+    <string name="starts_at">Începe la %1$s</string>
+    <string name="chapter_count">%1$d Capitole</string>
+    <string name="back_to_list">Înapoi la listă</string>
+    <string name="save_episode">Salvează episodul</string>
+    <string name="download_episode">Descarcă episodul</string>
+    <string name="badge_flac_aac">320k FLAC / AAC</string>
+    <string name="badge_flac_master">FLAC Master</string>
+    <string name="badge_somafm">SomaFM</string>
+    <string name="clear_search">Șterge căutarea</string>
+    <string name="remove_search_suggestion">Elimină sugestia</string>
+    <string name="play_featured">Redă recomandate</string>
+    <string name="car_quick_presets">Presetări rapide</string>
+    <string name="car_preset_saved_format">Salvat în Presetarea %1$d</string>
+    <string name="car_long_press_preset_hint">Țineți apăsat pentru a salva postul curent în acest slot</string>
+    <string name="car_anti_glare_night">Mod de noapte anti-orbire</string>
+    <string name="car_anti_glare_on">Anti-orbire: PORNIT</string>
+    <string name="car_anti_glare_off">Anti-orbire: OPRIT</string>
+    <string name="car_cockpit_live_on_air">ÎN DIRECT</string>
+    <string name="car_cockpit_stream_ready">FLUX PREGĂTIT</string>
+    <string name="car_cockpit_buffering">CONECTARE LA FLUX…</string>
+    <string name="car_volume_control">Volum mașină</string>
+    <string name="car_volume_mute">Fără sunet</string>
+    <string name="car_volume_down">Vol -</string>
+    <string name="car_volume_up">Vol +</string>
+    <string name="car_curated_master_title">Posturi Master &amp; Audiophile</string>
 </resources>

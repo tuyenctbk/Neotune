@@ -291,4 +291,51 @@
     <string name="audio_frequency_visualizer">ויזואליזציית תדר שמע</string>
     <string name="sponsor_ad_area">אזור חסויות (מושתק)</string>
     <string name="no_connection_msg">אין חיבור. אנא בדוק את הרשת שלך.</string>
+
+    <!-- Phase 2: Live Lyrics -->
+    <string name="lyrics_label">מילים</string>
+    <string name="lyrics_title">מילים בזמן אמת</string>
+    <string name="fetching_lyrics">מחפש מילים בזמן אמת…</string>
+    <string name="no_lyrics_available">לא נמצאו מילים</string>
+    <string name="lyrics_instrumental_hint">שידור זה עשוי להיות קטע כלי, תוכנית דיבור או מיקס DJ חי.</string>
+
+    <!-- Phase 3: Curated Audiophile & Lo-Fi -->
+    <string name="curated_section_title">תחנות איכות מאסטר ו-Lo-Fi</string>
+    <string name="curated_section_subtitle">שידורי 320k FLAC/AAC ו-SomaFM ללא פרסומות</string>
+
+    <!-- Car Mode & Player UI -->
+    <string name="no_episodes_loaded">לא נטענו פרקים</string>
+    <string name="view_episodes">הצג פרקים</string>
+    <string name="browse_stations">עיין בתחנות</string>
+    <string name="no_recent_stations">אין תחנות אחרונות</string>
+    <string name="no_saved_favorites_car">אין עדיין מועדפים שמורים</string>
+    <string name="saved_favorites">מועדפים שמורים</string>
+    <string name="car_no_favorites_desc">אין תחנות שמורות. הקש על סמל הלב בכל תחנה כדי לשמור אותה כאן לגישה מהירה בזמן נהיגה.</string>
+    <string name="custom_duration_minutes">משך מותאם אישית: %1$d דקות</string>
+    <string name="starts_at">מתחיל ב-%1$s</string>
+    <string name="chapter_count">%1$d פרקים</string>
+    <string name="back_to_list">חזרה לרשימה</string>
+    <string name="save_episode">שמור פרק</string>
+    <string name="download_episode">הורד פרק</string>
+    <string name="badge_flac_aac">320k FLAC / AAC</string>
+    <string name="badge_flac_master">FLAC Master</string>
+    <string name="badge_somafm">SomaFM</string>
+    <string name="clear_search">נקה חיפוש</string>
+    <string name="remove_search_suggestion">הסר הצעת חיפוש</string>
+    <string name="play_featured">נגן תחנה מומלצת</string>
+    <string name="exit_car_mode">צא ממצב רכב</string>
+    <string name="car_quick_presets">קביעות מהירות</string>
+    <string name="car_preset_saved_format">נשמר בקביעה %1$d</string>
+    <string name="car_long_press_preset_hint">לחץ לחיצה ארוכה לשמירת התחנה הנוכחית</string>
+    <string name="car_anti_glare_night">מצב לילה נגד סנוור</string>
+    <string name="car_anti_glare_on">נגד סנוור: פועל</string>
+    <string name="car_anti_glare_off">נגד סנוור: כבוי</string>
+    <string name="car_cockpit_live_on_air">בשידור חי</string>
+    <string name="car_cockpit_stream_ready">שידור מוכן</string>
+    <string name="car_cockpit_buffering">מתחבר לשידור…</string>
+    <string name="car_volume_control">עוצמת שמע ברכב</string>
+    <string name="car_volume_mute">השתק</string>
+    <string name="car_volume_down">עוצמה -</string>
+    <string name="car_volume_up">עוצמה +</string>
+    <string name="car_curated_master_title">תחנות Master ואיכות גבוהה</string>
 </resources>

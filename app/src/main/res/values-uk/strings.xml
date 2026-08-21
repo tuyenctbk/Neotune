@@ -291,4 +291,46 @@
     <string name="audio_frequency_visualizer">Візуалізатор частот</string>
     <string name="sponsor_ad_area">Рекламна зона (без звуку)</string>
     <string name="no_connection_msg">Немає зв\'язку. Перевірте підключення до мережі.</string>
+
+    <!-- Synchronized strings -->
+    <string name="lyrics_label">Текст пісні</string>
+    <string name="lyrics_title">Текст у реальному часі</string>
+    <string name="fetching_lyrics">Пошук тексту пісні…</string>
+    <string name="no_lyrics_available">Текст пісні не знайдено</string>
+    <string name="lyrics_instrumental_hint">Ця трансляція може бути інструментальним треком, розмовним шоу або живим DJ-міксом.</string>
+    <string name="curated_section_title">Добірка Master Quality &amp; Lo-Fi</string>
+    <string name="curated_section_subtitle">Потоки 320k FLAC/AAC та SomaFM без реклами у високій якості</string>
+    <string name="no_episodes_loaded">Епізоди не завантажено</string>
+    <string name="view_episodes">Переглянути епізоди</string>
+    <string name="browse_stations">Огляд станцій</string>
+    <string name="no_recent_stations">Немає нещодавніх станцій</string>
+    <string name="no_saved_favorites_car">Улюблені станції ще не збережено</string>
+    <string name="saved_favorites">Збережені станції</string>
+    <string name="car_no_favorites_desc">Немає збережених станцій. Натисніть на серце біля будь-якої станції, щоб зберегти її тут для швидкого доступу під час водіння.</string>
+    <string name="custom_duration_minutes">Власна тривалість: %1$d хв</string>
+    <string name="starts_at">Початок о %1$s</string>
+    <string name="chapter_count">%1$d Глав</string>
+    <string name="back_to_list">Назад до списку</string>
+    <string name="save_episode">Зберегти епізод</string>
+    <string name="download_episode">Завантажити епізод</string>
+    <string name="badge_flac_aac">320k FLAC / AAC</string>
+    <string name="badge_flac_master">FLAC Master</string>
+    <string name="badge_somafm">SomaFM</string>
+    <string name="clear_search">Очистити пошук</string>
+    <string name="remove_search_suggestion">Видалити підказку</string>
+    <string name="play_featured">Увімкнути рекомендовану</string>
+    <string name="car_quick_presets">Швидкі пресети</string>
+    <string name="car_preset_saved_format">Збережено у пресет %1$d</string>
+    <string name="car_long_press_preset_hint">Утримуйте, щоб зберегти поточну станцію в цей слот</string>
+    <string name="car_anti_glare_night">Антибліковий нічний режим</string>
+    <string name="car_anti_glare_on">Антиблік: УВІМК</string>
+    <string name="car_anti_glare_off">Антиблік: ВИМК</string>
+    <string name="car_cockpit_live_on_air">У ПРЯМОМУ ЕФІРІ</string>
+    <string name="car_cockpit_stream_ready">ПОТІК ГОТОВИЙ</string>
+    <string name="car_cockpit_buffering">ПІДКЛЮЧЕННЯ ПОТОКУ…</string>
+    <string name="car_volume_control">Гучність в авто</string>
+    <string name="car_volume_mute">Без звуку</string>
+    <string name="car_volume_down">Гучність -</string>
+    <string name="car_volume_up">Гучність +</string>
+    <string name="car_curated_master_title">Станції Master &amp; Audiophile</string>
 </resources>

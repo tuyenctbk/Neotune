@@ -291,4 +291,46 @@
     <string name="audio_frequency_visualizer">Οπτικοποίηση συχνότητας ήχου</string>
     <string name="sponsor_ad_area">Περιοχή χορηγών (σίγαση)</string>
     <string name="no_connection_msg">Χωρίς σύνδεση. Ελέγξτε το δίκτυό σας.</string>
+
+    <!-- Synchronized strings -->
+    <string name="lyrics_label">Στίχοι</string>
+    <string name="lyrics_title">Ζωντανοί στίχοι</string>
+    <string name="fetching_lyrics">Εύρεση ζωντανών στίχων…</string>
+    <string name="no_lyrics_available">Δεν βρέθηκαν στίχοι</string>
+    <string name="lyrics_instrumental_hint">Αυτή η εκπομπή μπορεί να είναι ορχηστρικό κομμάτι, εκπομπή λόγου ή ζωντανό DJ mix.</string>
+    <string name="curated_section_title">Επιλεγμένα Master Quality &amp; Lo-Fi</string>
+    <string name="curated_section_subtitle">Επιλεγμένες ροές 320k FLAC/AAC και SomaFM χωρίς διαφημίσεις</string>
+    <string name="no_episodes_loaded">Δεν φορτώθηκαν επεισόδια</string>
+    <string name="view_episodes">Προβολή επεισοδίων</string>
+    <string name="browse_stations">Περιήγηση σταθμών</string>
+    <string name="no_recent_stations">Κανένας πρόσφατος σταθμός</string>
+    <string name="no_saved_favorites_car">Δεν υπάρχουν αποθηκευμένα αγαπημένα</string>
+    <string name="saved_favorites">Αποθηκευμένα αγαπημένα</string>
+    <string name="car_no_favorites_desc">Δεν υπάρχουν αποθηκευμένοι σταθμοί. Πατήστε το εικονίδιο καρδιάς σε οποιονδήποτε σταθμό για γρήγορη πρόσβαση κατά την οδήγηση.</string>
+    <string name="custom_duration_minutes">Προσαρμοσμένη διάρκεια: %1$d λεπτά</string>
+    <string name="starts_at">Ξεκινά στις %1$s</string>
+    <string name="chapter_count">%1$d Κεφάλαια</string>
+    <string name="back_to_list">Επιστροφή στη λίστα</string>
+    <string name="save_episode">Αποθήκευση επεισοδίου</string>
+    <string name="download_episode">Λήψη επεισοδίου</string>
+    <string name="badge_flac_aac">320k FLAC / AAC</string>
+    <string name="badge_flac_master">FLAC Master</string>
+    <string name="badge_somafm">SomaFM</string>
+    <string name="clear_search">Εκκαθάριση αναζήτησης</string>
+    <string name="remove_search_suggestion">Κατάργηση πρότασης</string>
+    <string name="play_featured">Αναπαραγωγή προτεινόμενου</string>
+    <string name="car_quick_presets">Γρήγορες προεπιλογές</string>
+    <string name="car_preset_saved_format">Αποθηκεύτηκε στην Προεπιλογή %1$d</string>
+    <string name="car_long_press_preset_hint">Πατήστε παρατεταμένα για αποθήκευση του τρέχοντος σταθμού</string>
+    <string name="car_anti_glare_night">Νυχτερινή λειτουργία κατά της αντανάκλασης</string>
+    <string name="car_anti_glare_on">Κατά της αντανάκλασης: ΕΝΕΡΓΟ</string>
+    <string name="car_anti_glare_off">Κατά της αντανάκλασης: ΑΝΕΝΕΡΓΟ</string>
+    <string name="car_cockpit_live_on_air">ΖΩΝΤΑΝΑ ΣΤΟΝ ΑΕΡΑ</string>
+    <string name="car_cockpit_stream_ready">ΡΟΗ ΕΤΟΙΜΗ</string>
+    <string name="car_cockpit_buffering">ΣΥΝΔΕΣΗ ΣΤΗ ΡΟΗ…</string>
+    <string name="car_volume_control">Ένταση ήχου αυτοκινήτου</string>
+    <string name="car_volume_mute">Σίγαση</string>
+    <string name="car_volume_down">Ένταση -</string>
+    <string name="car_volume_up">Ένταση +</string>
+    <string name="car_curated_master_title">Σταθμοί Master &amp; Audiophile</string>
 </resources>

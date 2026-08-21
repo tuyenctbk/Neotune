@@ -324,4 +324,18 @@
     <string name="remove_search_suggestion">추천 검색어 삭제</string>
     <string name="play_featured">추천 방송국 재생</string>
     <string name="exit_car_mode">차량 모드 종료</string>
+    <string name="car_quick_presets">빠른 프리셋</string>
+    <string name="car_preset_saved_format">프리셋 %1$d에 저장됨</string>
+    <string name="car_long_press_preset_hint">길게 눌러 현재 방송국을 슬롯에 저장</string>
+    <string name="car_anti_glare_night">야간 눈부심 방지 모드</string>
+    <string name="car_anti_glare_on">눈부심 방지: 켜짐</string>
+    <string name="car_anti_glare_off">눈부심 방지: 꺼짐</string>
+    <string name="car_cockpit_live_on_air">생방송 중</string>
+    <string name="car_cockpit_stream_ready">재생 준비 완료</string>
+    <string name="car_cockpit_buffering">스트림 연결 중…</string>
+    <string name="car_volume_control">차량 볼륨</string>
+    <string name="car_volume_mute">음소거</string>
+    <string name="car_volume_down">볼륨 -</string>
+    <string name="car_volume_up">볼륨 +</string>
+    <string name="car_curated_master_title">엄선된 마스터 &amp; 고음질 방송</string>
 </resources>

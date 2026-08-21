@@ -324,4 +324,18 @@
     <string name="remove_search_suggestion">Suchvorschlag entfernen</string>
     <string name="play_featured">Empfohlenen Sender abspielen</string>
     <string name="exit_car_mode">Fahrzeugmodus beenden</string>
+    <string name="car_quick_presets">Schnellwahltasten</string>
+    <string name="car_preset_saved_format">Auf Schnellwahl %1$d gespeichert</string>
+    <string name="car_long_press_preset_hint">Gedrückt halten, um Sender hier zu speichern</string>
+    <string name="car_anti_glare_night">Blendfreier Nachtmodus</string>
+    <string name="car_anti_glare_on">Blendfrei: EIN</string>
+    <string name="car_anti_glare_off">Blendfrei: AUS</string>
+    <string name="car_cockpit_live_on_air">LIVE AUF SENDUNG</string>
+    <string name="car_cockpit_stream_ready">STREAM BEREIT</string>
+    <string name="car_cockpit_buffering">VERBINDE STREAM…</string>
+    <string name="car_volume_control">Fahrzeuglautstärke</string>
+    <string name="car_volume_mute">Stumm</string>
+    <string name="car_volume_down">Vol -</string>
+    <string name="car_volume_up">Vol +</string>
+    <string name="car_curated_master_title">Master &amp; Audiophile Sender</string>
 </resources>

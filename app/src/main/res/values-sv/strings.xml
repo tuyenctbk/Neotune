@@ -291,4 +291,46 @@
     <string name="audio_frequency_visualizer">Ljudfrekvens visualizer</string>
     <string name="sponsor_ad_area">Sponsorområde (tyst)</string>
     <string name="no_connection_msg">Ingen anslutning. Kontrollera ditt nätverk.</string>
+
+    <!-- Synchronized strings -->
+    <string name="lyrics_label">Låttext</string>
+    <string name="lyrics_title">Live låttext</string>
+    <string name="fetching_lyrics">Söker efter live låttext…</string>
+    <string name="no_lyrics_available">Ingen låttext hittades</string>
+    <string name="lyrics_instrumental_hint">Denna sändning kan vara ett instrumentalt spår, ett samtalsprogram eller en live DJ-mix.</string>
+    <string name="curated_section_title">Kurerad Master Quality &amp; Lo-Fi</string>
+    <string name="curated_section_subtitle">Handplockade 320k FLAC/AAC och reklamfria SomaFM-strömmar</string>
+    <string name="no_episodes_loaded">Inga avsnitt laddade</string>
+    <string name="view_episodes">Visa avsnitt</string>
+    <string name="browse_stations">Bläddra bland stationer</string>
+    <string name="no_recent_stations">Inga senaste stationer</string>
+    <string name="no_saved_favorites_car">Inga sparade favoriter ännu</string>
+    <string name="saved_favorites">Sparade favoriter</string>
+    <string name="car_no_favorites_desc">Inga sparade stationer. Tryck på hjärtikonen på valfri station för att spara den här för snabb åtkomst under körning.</string>
+    <string name="custom_duration_minutes">Anpassad längd: %1$d minuter</string>
+    <string name="starts_at">Börjar kl. %1$s</string>
+    <string name="chapter_count">%1$d Kapitel</string>
+    <string name="back_to_list">Tillbaka till listan</string>
+    <string name="save_episode">Spara avsnitt</string>
+    <string name="download_episode">Ladda ner avsnitt</string>
+    <string name="badge_flac_aac">320k FLAC / AAC</string>
+    <string name="badge_flac_master">FLAC Master</string>
+    <string name="badge_somafm">SomaFM</string>
+    <string name="clear_search">Rensa sökning</string>
+    <string name="remove_search_suggestion">Ta bort sökförslag</string>
+    <string name="play_featured">Spela utvald</string>
+    <string name="car_quick_presets">Snabbval</string>
+    <string name="car_preset_saved_format">Sparad till snabbval %1$d</string>
+    <string name="car_long_press_preset_hint">Håll nedtryckt för att spara aktuell station här</string>
+    <string name="car_anti_glare_night">Bländfritt nattläge</string>
+    <string name="car_anti_glare_on">Bländskydd: PÅ</string>
+    <string name="car_anti_glare_off">Bländskydd: AV</string>
+    <string name="car_cockpit_live_on_air">DIREKTSÄNDNING</string>
+    <string name="car_cockpit_stream_ready">STRÖM REDO</string>
+    <string name="car_cockpit_buffering">ANSLUTER STRÖM…</string>
+    <string name="car_volume_control">Bilvolym</string>
+    <string name="car_volume_mute">Ljud av</string>
+    <string name="car_volume_down">Vol -</string>
+    <string name="car_volume_up">Vol +</string>
+    <string name="car_curated_master_title">Master &amp; Audiophile Stationer</string>
 </resources>

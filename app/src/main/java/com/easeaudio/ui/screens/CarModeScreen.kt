@@ -1,5 +1,8 @@
 package com.easeaudio.ui.screens
 
+import android.content.Context
+import android.media.AudioManager
+import android.widget.Toast
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
@@ -23,12 +26,12 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.automirrored.filled.QueueMusic
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -48,6 +51,7 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.easeaudio.R
+import com.easeaudio.data.CuratedStationsService
 import com.easeaudio.data.PodcastEpisode
 import com.easeaudio.data.RadioStation
 import com.easeaudio.ui.components.AudioVisualizerCanvas
@@ -55,6 +59,10 @@ import com.easeaudio.ui.components.VisualizerStyle
 import com.easeaudio.ui.theme.FavoriteHeartColor
 import com.easeaudio.viewmodel.EqPresetDisplay
 import com.easeaudio.viewmodel.HomeUiState
+import kotlinx.coroutines.delay
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 enum class CarTab {
     Player, Radio, Podcast, Favorites
@@ -62,6 +70,58 @@ enum class CarTab {
 
 enum class SideListTab {
     Favorites, Recent, Episodes, Top
+}
+
+object CarPresetsStore {
+    private const val PREFS_NAME = "neotune_car_presets"
+    private const val KEY_PRESET_PREFIX = "preset_slot_"
+
+    fun loadPresets(context: Context, favorites: List<RadioStation>): List<RadioStation> {
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        val defaultList = (favorites + CuratedStationsService.defaultCuratedStations).distinctBy { it.id }.take(6)
+        val result = mutableListOf<RadioStation>()
+        for (i in 0 until 6) {
+            val json = prefs.getString("$KEY_PRESET_PREFIX$i", null)
+            val station = if (json != null) {
+                try {
+                    val obj = org.json.JSONObject(json)
+                    RadioStation(
+                        id = obj.getString("id"),
+                        name = obj.getString("name"),
+                        genre = obj.optString("genre"),
+                        country = obj.optString("country"),
+                        streamUrl = obj.getString("streamUrl"),
+                        imageUrl = obj.optString("imageUrl"),
+                        bitrate = obj.optString("bitrate"),
+                        codec = obj.optString("codec")
+                    )
+                } catch (e: Exception) {
+                    defaultList.getOrNull(i)
+                }
+            } else {
+                defaultList.getOrNull(i)
+            }
+            if (station != null) {
+                result.add(station)
+            }
+        }
+        return result
+    }
+
+    fun savePreset(context: Context, slotIndex: Int, station: RadioStation) {
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        val obj = org.json.JSONObject().apply {
+            put("id", station.id)
+            put("name", station.name)
+            put("genre", station.genre)
+            put("country", station.country)
+            put("streamUrl", station.streamUrl)
+            put("imageUrl", station.imageUrl)
+            put("bitrate", station.bitrate)
+            put("codec", station.codec)
+        }
+        prefs.edit().putString("$KEY_PRESET_PREFIX$slotIndex", obj.toString()).apply()
+    }
 }
 
 @Composable
@@ -87,11 +147,28 @@ fun CarModeScreen(
     eqPresets: List<EqPresetDisplay> = emptyList(),
     onExitCarMode: () -> Unit
 ) {
+    val context = LocalContext.current
     val hasLastPlayed = remember {
         uiState.isPlaying || (uiState.currentStation != null && uiState.currentStation.lastListenedTimestamp > 0)
     }
     var activeCarTab by remember { mutableStateOf(if (hasLastPlayed) CarTab.Player else CarTab.Radio) }
     var showCountryDialog by remember { mutableStateOf(false) }
+    var isAntiGlare by rememberSaveable { mutableStateOf(false) }
+
+    // Live In-Car Digital Cockpit Clock
+    var currentClockTime by remember { mutableStateOf("") }
+    var currentClockDate by remember { mutableStateOf("") }
+
+    LaunchedEffect(Unit) {
+        val timeFormat = SimpleDateFormat("hh:mm a", Locale.getDefault())
+        val dateFormat = SimpleDateFormat("EEE, MMM d", Locale.getDefault())
+        while (true) {
+            val now = Date()
+            currentClockTime = timeFormat.format(now)
+            currentClockDate = dateFormat.format(now)
+            delay(10000L)
+        }
+    }
 
     LaunchedEffect(Unit) {
         if (activeCarTab == CarTab.Radio) {
@@ -99,20 +176,34 @@ fun CarModeScreen(
         }
     }
 
+    // Car Presets state
+    var carPresets by remember {
+        mutableStateOf(CarPresetsStore.loadPresets(context, uiState.favoriteStations))
+    }
+
+    // Update presets when favorites change if empty
+    LaunchedEffect(uiState.favoriteStations) {
+        if (carPresets.isEmpty()) {
+            carPresets = CarPresetsStore.loadPresets(context, uiState.favoriteStations)
+        }
+    }
+
+    val backgroundColor = if (isAntiGlare) Color(0xFF000000) else MaterialTheme.colorScheme.background
+
     BoxWithConstraints(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
+            .background(backgroundColor)
             .statusBarsPadding()
             .navigationBarsPadding()
-            .padding(top = 10.dp, bottom = 4.dp, end = 6.dp)
+            .padding(top = 8.dp, bottom = 4.dp, end = 6.dp)
     ) {
         val isWide = this.maxWidth > 640.dp
         val availableHeight = this.maxHeight
 
         Surface(
             modifier = Modifier.fillMaxSize(),
-            color = MaterialTheme.colorScheme.background
+            color = backgroundColor
         ) {
             Box(modifier = Modifier.fillMaxSize()) {
                 Row(modifier = Modifier.fillMaxSize()) {
@@ -127,6 +218,8 @@ fun CarModeScreen(
                             },
                             onCountryClick = { showCountryDialog = true },
                             selectedCountry = uiState.selectedCountry,
+                            isAntiGlare = isAntiGlare,
+                            onToggleAntiGlare = { isAntiGlare = !isAntiGlare },
                             onExit = onExitCarMode
                         )
                     }
@@ -136,7 +229,7 @@ fun CarModeScreen(
                             .weight(1f)
                             .fillMaxHeight()
                     ) {
-                        // TOP NAVIGATION for Portrait or Compact Displays
+                        // TOP NAVIGATION / COCKPIT HEADER
                         if (!isWide) {
                             CarTopNav(
                                 selectedTab = activeCarTab,
@@ -147,7 +240,21 @@ fun CarModeScreen(
                                 },
                                 onCountryClick = { showCountryDialog = true },
                                 selectedCountry = uiState.selectedCountry,
+                                isAntiGlare = isAntiGlare,
+                                onToggleAntiGlare = { isAntiGlare = !isAntiGlare },
+                                clockTime = currentClockTime,
                                 onExit = onExitCarMode
+                            )
+                        } else {
+                            // Widescreen In-Car Cockpit Top Status Bar
+                            CarWidescreenHeader(
+                                clockTime = currentClockTime,
+                                clockDate = currentClockDate,
+                                isAntiGlare = isAntiGlare,
+                                onToggleAntiGlare = { isAntiGlare = !isAntiGlare },
+                                currentStation = uiState.currentStation,
+                                isPlaying = uiState.isPlaying,
+                                isLoading = uiState.isLoading
                             )
                         }
 
@@ -184,8 +291,22 @@ fun CarModeScreen(
                                             onOpenEqualizer = onOpenEqualizer,
                                             onOpenEpisodes = onOpenEpisodes,
                                             eqPresets = eqPresets,
+                                            carPresets = carPresets,
+                                            onSelectPreset = { station ->
+                                                onSelectStation(station)
+                                            },
+                                            onSavePreset = { slotIndex, station ->
+                                                CarPresetsStore.savePreset(context, slotIndex, station)
+                                                carPresets = CarPresetsStore.loadPresets(context, uiState.favoriteStations)
+                                                Toast.makeText(
+                                                    context,
+                                                    context.getString(R.string.car_preset_saved_format, slotIndex + 1),
+                                                    Toast.LENGTH_SHORT
+                                                ).show()
+                                            },
                                             isWide = isWide,
                                             availableHeight = availableHeight,
+                                            isAntiGlare = isAntiGlare,
                                             modifier = Modifier.fillMaxSize()
                                         )
                                     }
@@ -201,7 +322,8 @@ fun CarModeScreen(
                                             },
                                             onToggleFavorite = onToggleFavorite,
                                             onLoadMore = onLoadMore,
-                                            columns = if (isWide) 2 else 1
+                                            columns = if (isWide) 2 else 1,
+                                            isAntiGlare = isAntiGlare
                                         )
                                     }
                                     CarTab.Favorites -> {
@@ -213,7 +335,8 @@ fun CarModeScreen(
                                                 activeCarTab = CarTab.Player
                                             },
                                             onToggleFavorite = onToggleFavorite,
-                                            columns = if (isWide) 2 else 1
+                                            columns = if (isWide) 2 else 1,
+                                            isAntiGlare = isAntiGlare
                                         )
                                     }
                                 }
@@ -235,6 +358,7 @@ fun CarModeScreen(
                         onTogglePlay = onPlayPause,
                         onNext = onNextStation,
                         onClick = { activeCarTab = CarTab.Player },
+                        isAntiGlare = isAntiGlare,
                         modifier = Modifier
                             .align(Alignment.BottomCenter)
                             .fillMaxWidth()
@@ -259,15 +383,130 @@ fun CarModeScreen(
 }
 
 @Composable
+private fun CarWidescreenHeader(
+    clockTime: String,
+    clockDate: String,
+    isAntiGlare: Boolean,
+    onToggleAntiGlare: () -> Unit,
+    currentStation: RadioStation?,
+    isPlaying: Boolean,
+    isLoading: Boolean
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 6.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        // Cockpit Live Clock
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Surface(
+                shape = RoundedCornerShape(8.dp),
+                color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.AccessTime,
+                        contentDescription = null,
+                        modifier = Modifier.size(15.dp),
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                    Text(
+                        text = clockTime.ifBlank { "--:--" },
+                        style = MaterialTheme.typography.titleMedium.copy(
+                            fontWeight = FontWeight.Black,
+                            fontSize = 15.sp,
+                            letterSpacing = 0.5.sp
+                        ),
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    if (clockDate.isNotBlank()) {
+                        Text(
+                            text = "• $clockDate",
+                            style = MaterialTheme.typography.labelSmall.copy(fontSize = 12.sp),
+                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
+                        )
+                    }
+                }
+            }
+
+            // Live On Air Status Pill
+            Surface(
+                shape = RoundedCornerShape(8.dp),
+                color = if (isPlaying) MaterialTheme.colorScheme.primary.copy(alpha = 0.18f)
+                else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f)
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                    horizontalArrangement = Arrangement.spacedBy(5.dp)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(6.dp)
+                            .background(
+                                if (isPlaying) MaterialTheme.colorScheme.primary
+                                else if (isLoading) Color(0xFFFFB300)
+                                else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
+                                CircleShape
+                            )
+                    )
+                    Text(
+                        text = if (isLoading) stringResource(R.string.car_cockpit_buffering)
+                               else if (isPlaying) stringResource(R.string.car_cockpit_live_on_air)
+                               else stringResource(R.string.car_cockpit_stream_ready),
+                        style = MaterialTheme.typography.labelSmall.copy(
+                            fontWeight = FontWeight.Black,
+                            fontSize = 10.sp,
+                            letterSpacing = 0.8.sp
+                        ),
+                        color = if (isPlaying) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+        }
+
+        // Night Anti-Glare Dimmer Toggle
+        IconButton(
+            onClick = onToggleAntiGlare,
+            modifier = Modifier
+                .size(38.dp)
+                .clip(CircleShape)
+                .background(
+                    if (isAntiGlare) MaterialTheme.colorScheme.primary.copy(alpha = 0.25f)
+                    else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f)
+                )
+        ) {
+            Icon(
+                imageVector = if (isAntiGlare) Icons.Filled.DarkMode else Icons.Filled.LightMode,
+                contentDescription = stringResource(R.string.car_anti_glare_night),
+                tint = if (isAntiGlare) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.size(18.dp)
+            )
+        }
+    }
+}
+
+@Composable
 private fun CarSideNav(
     selectedTab: CarTab,
     onTabSelect: (CarTab) -> Unit,
     onCountryClick: () -> Unit,
     selectedCountry: String,
+    isAntiGlare: Boolean,
+    onToggleAntiGlare: () -> Unit,
     onExit: () -> Unit
 ) {
     NavigationRail(
-        containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f),
+        containerColor = if (isAntiGlare) Color(0xFF080C10) else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f),
         header = {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -294,10 +533,10 @@ private fun CarSideNav(
             .fillMaxHeight()
     ) {
         val items = listOf(
-            Triple(CarTab.Player, Icons.Filled.PlayCircle, "Player"),
-            Triple(CarTab.Radio, Icons.Filled.Radio, "Radio"),
-            Triple(CarTab.Podcast, Icons.Filled.Mic, "Podcasts"),
-            Triple(CarTab.Favorites, Icons.Filled.Favorite, "Saved")
+            Triple(CarTab.Player, Icons.Filled.PlayCircle, stringResource(R.string.now_playing)),
+            Triple(CarTab.Radio, Icons.Filled.Radio, stringResource(R.string.nav_radio)),
+            Triple(CarTab.Podcast, Icons.Filled.Mic, stringResource(R.string.nav_podcast)),
+            Triple(CarTab.Favorites, Icons.Filled.Favorite, stringResource(R.string.favorites))
         )
 
         Column(
@@ -325,7 +564,9 @@ private fun CarSideNav(
                         label = {
                             Text(
                                 label,
-                                style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold)
+                                style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
                             )
                         },
                         colors = NavigationRailItemDefaults.colors(
@@ -340,21 +581,44 @@ private fun CarSideNav(
                 }
             }
 
-            // Bottom Country Shortcut
-            IconButton(
-                onClick = onCountryClick,
-                modifier = Modifier
-                    .padding(bottom = 12.dp)
-                    .size(44.dp)
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
+            // Bottom Actions: Anti-Glare and Country Shortcut
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.padding(bottom = 12.dp)
             ) {
-                Icon(
-                    imageVector = Icons.Filled.Language,
-                    contentDescription = "Select Country ($selectedCountry)",
-                    tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(22.dp)
-                )
+                IconButton(
+                    onClick = onToggleAntiGlare,
+                    modifier = Modifier
+                        .size(40.dp)
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(
+                            if (isAntiGlare) MaterialTheme.colorScheme.primary.copy(alpha = 0.25f)
+                            else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+                        )
+                ) {
+                    Icon(
+                        imageVector = if (isAntiGlare) Icons.Filled.DarkMode else Icons.Filled.LightMode,
+                        contentDescription = stringResource(R.string.car_anti_glare_night),
+                        tint = if (isAntiGlare) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
+
+                IconButton(
+                    onClick = onCountryClick,
+                    modifier = Modifier
+                        .size(44.dp)
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Language,
+                        contentDescription = "Select Country ($selectedCountry)",
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(22.dp)
+                    )
+                }
             }
         }
     }
@@ -366,6 +630,9 @@ private fun CarTopNav(
     onTabSelect: (CarTab) -> Unit,
     onCountryClick: () -> Unit,
     selectedCountry: String,
+    isAntiGlare: Boolean,
+    onToggleAntiGlare: () -> Unit,
+    clockTime: String,
     onExit: () -> Unit
 ) {
     Row(
@@ -375,6 +642,22 @@ private fun CarTopNav(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
+        // Digital Clock Pill in Top Bar for portrait
+        if (clockTime.isNotBlank()) {
+            Surface(
+                shape = RoundedCornerShape(8.dp),
+                color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f),
+                modifier = Modifier.padding(end = 6.dp)
+            ) {
+                Text(
+                    text = clockTime,
+                    style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Black, fontSize = 12.sp),
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp)
+                )
+            }
+        }
+
         ScrollableTabRow(
             selectedTabIndex = selectedTab.ordinal,
             containerColor = Color.Transparent,
@@ -386,16 +669,16 @@ private fun CarTopNav(
             CarTab.entries.forEach { tab ->
                 val isSelected = selectedTab == tab
                 val label = when (tab) {
-                    CarTab.Player -> "Now Playing"
-                    CarTab.Radio -> "Live Radio"
-                    CarTab.Podcast -> "Podcasts"
-                    CarTab.Favorites -> "Favorites"
+                    CarTab.Player -> stringResource(R.string.now_playing)
+                    CarTab.Radio -> stringResource(R.string.live_radio_stations)
+                    CarTab.Podcast -> stringResource(R.string.nav_podcast)
+                    CarTab.Favorites -> stringResource(R.string.favorites)
                 }
                 Tab(
                     selected = isSelected,
                     onClick = { onTabSelect(tab) },
                     modifier = Modifier
-                        .padding(horizontal = 4.dp, vertical = 2.dp)
+                        .padding(horizontal = 3.dp, vertical = 2.dp)
                         .clip(RoundedCornerShape(12.dp))
                         .background(
                             if (isSelected) MaterialTheme.colorScheme.primary
@@ -404,7 +687,7 @@ private fun CarTopNav(
                 ) {
                     Text(
                         text = label,
-                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 8.dp),
                         style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
                         color = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -412,12 +695,33 @@ private fun CarTopNav(
             }
         }
 
-        Spacer(modifier = Modifier.width(8.dp))
+        Spacer(modifier = Modifier.width(6.dp))
+
+        // Anti-Glare HUD Mode Toggle
+        IconButton(
+            onClick = onToggleAntiGlare,
+            modifier = Modifier
+                .size(38.dp)
+                .clip(CircleShape)
+                .background(
+                    if (isAntiGlare) MaterialTheme.colorScheme.primary.copy(alpha = 0.25f)
+                    else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f)
+                )
+        ) {
+            Icon(
+                imageVector = if (isAntiGlare) Icons.Filled.DarkMode else Icons.Filled.LightMode,
+                contentDescription = stringResource(R.string.car_anti_glare_night),
+                tint = if (isAntiGlare) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.size(18.dp)
+            )
+        }
+
+        Spacer(modifier = Modifier.width(4.dp))
 
         IconButton(
             onClick = onCountryClick,
             modifier = Modifier
-                .size(40.dp)
+                .size(38.dp)
                 .clip(CircleShape)
                 .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f))
         ) {
@@ -425,7 +729,7 @@ private fun CarTopNav(
                 imageVector = Icons.Filled.Language,
                 contentDescription = "Country",
                 tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.size(20.dp)
+                modifier = Modifier.size(18.dp)
             )
         }
 
@@ -434,15 +738,15 @@ private fun CarTopNav(
         IconButton(
             onClick = onExit,
             modifier = Modifier
-                .size(40.dp)
+                .size(38.dp)
                 .clip(CircleShape)
                 .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f))
         ) {
             Icon(
                 imageVector = Icons.Filled.Close,
-                contentDescription = "Exit",
+                contentDescription = stringResource(R.string.exit_car_mode),
                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.size(20.dp)
+                modifier = Modifier.size(18.dp)
             )
         }
     }
@@ -468,8 +772,12 @@ private fun AutomotiveHeroPlayer(
     onOpenEqualizer: (() -> Unit)?,
     onOpenEpisodes: (() -> Unit)?,
     eqPresets: List<EqPresetDisplay>,
+    carPresets: List<RadioStation>,
+    onSelectPreset: (RadioStation) -> Unit,
+    onSavePreset: (Int, RadioStation) -> Unit,
     isWide: Boolean,
     availableHeight: androidx.compose.ui.unit.Dp,
+    isAntiGlare: Boolean,
     modifier: Modifier = Modifier
 ) {
     val currentStation = uiState.currentStation
@@ -477,6 +785,11 @@ private fun AutomotiveHeroPlayer(
     val isLoading = uiState.isLoading
     val isPodcast = currentStation?.isPodcast == true
     val haptic = LocalHapticFeedback.current
+    val context = LocalContext.current
+
+    val audioManager = remember {
+        context.getSystemService(Context.AUDIO_SERVICE) as? AudioManager
+    }
 
     var activeSideTab by remember { mutableStateOf(if (isPodcast) SideListTab.Episodes else SideListTab.Favorites) }
     var carVisualizerStyle by remember { mutableStateOf(VisualizerStyle.DUAL_MIRROR) }
@@ -488,11 +801,14 @@ private fun AutomotiveHeroPlayer(
         }
     }
 
+    val cardBackground = if (isAntiGlare) Color(0xFF090D12) else MaterialTheme.colorScheme.surface
+    val cardBorderColor = if (isAntiGlare) Color(0xFF1E3A4D) else MaterialTheme.colorScheme.outline.copy(alpha = 0.15f)
+
     Surface(
         modifier = modifier,
         shape = RoundedCornerShape(20.dp),
-        color = MaterialTheme.colorScheme.surface,
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.15f))
+        color = cardBackground,
+        border = BorderStroke(1.dp, cardBorderColor)
     ) {
         if (isWide) {
             // Widescreen Automotive Layout: Left (Controls/Hero) & Right (Supporting Quick List)
@@ -518,7 +834,7 @@ private fun AutomotiveHeroPlayer(
                         horizontalArrangement = Arrangement.spacedBy(14.dp)
                     ) {
                         // Artwork with glowing border and 1-tap heart
-                        val artSize = if (availableHeight < 400.dp) 92.dp else 108.dp
+                        val artSize = if (availableHeight < 400.dp) 88.dp else 104.dp
                         val carContext = LocalContext.current
                         val effectiveArtworkUrl = uiState.trackArtworkUrl?.ifBlank { null } ?: currentStation?.imageUrl
                         val carImageRequest = remember(effectiveArtworkUrl) {
@@ -586,7 +902,7 @@ private fun AutomotiveHeroPlayer(
                                 ) {
                                     Icon(
                                         imageVector = if (currentStation.isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
-                                        contentDescription = "Favorite",
+                                        contentDescription = stringResource(R.string.favorites),
                                         tint = if (currentStation.isFavorite) FavoriteHeartColor else Color.White,
                                         modifier = Modifier.size(16.dp)
                                     )
@@ -623,7 +939,7 @@ private fun AutomotiveHeroPlayer(
                                             Spacer(modifier = Modifier.width(5.dp))
                                         }
                                         Text(
-                                            text = if (isPodcast) "PODCAST" else (currentStation?.genre?.uppercase() ?: "LIVE RADIO"),
+                                            text = if (isPodcast) stringResource(R.string.badge_podcast) else (currentStation?.genre?.uppercase() ?: stringResource(R.string.live_radio_stations)),
                                             style = MaterialTheme.typography.labelSmall.copy(
                                                 fontWeight = FontWeight.Black,
                                                 fontSize = 10.sp
@@ -658,7 +974,7 @@ private fun AutomotiveHeroPlayer(
                             val secondaryText = if (isPodcast) {
                                 uiState.currentEpisode?.title ?: currentStation?.genre ?: ""
                             } else {
-                                if (isLoading) "Buffering stream..." else (uiState.streamTitle ?: currentStation?.country ?: "")
+                                if (isLoading) stringResource(R.string.buffering_stream) else (uiState.streamTitle ?: currentStation?.country ?: "")
                             }
 
                             if (secondaryText.isNotBlank()) {
@@ -718,7 +1034,7 @@ private fun AutomotiveHeroPlayer(
                         Surface(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(if (availableHeight < 400.dp) 70.dp else 88.dp)
+                                .height(if (availableHeight < 400.dp) 64.dp else 78.dp)
                                 .clickable {
                                     haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                                     carVisualizerStyle = when (carVisualizerStyle) {
@@ -740,10 +1056,10 @@ private fun AutomotiveHeroPlayer(
                             Column(
                                 modifier = Modifier
                                     .fillMaxSize()
-                                    .padding(horizontal = 14.dp, vertical = 8.dp),
+                                    .padding(horizontal = 14.dp, vertical = 6.dp),
                                 verticalArrangement = Arrangement.SpaceBetween
                             ) {
-                                // Top status bar inside spectrum card
+                                // Status header inside spectrum
                                 Row(
                                     modifier = Modifier.fillMaxWidth(),
                                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -755,7 +1071,7 @@ private fun AutomotiveHeroPlayer(
                                     ) {
                                         Box(
                                             modifier = Modifier
-                                                .size(7.dp)
+                                                .size(6.dp)
                                                 .background(
                                                     if (isPlaying) MaterialTheme.colorScheme.primary
                                                     else if (isLoading) Color(0xFFFFB300)
@@ -764,7 +1080,9 @@ private fun AutomotiveHeroPlayer(
                                                 )
                                         )
                                         Text(
-                                            text = if (isLoading) "CONNECTING STREAM..." else if (isPlaying) "AUDIO SPECTRUM" else "STREAM READY",
+                                            text = if (isLoading) stringResource(R.string.car_cockpit_buffering)
+                                                   else if (isPlaying) stringResource(R.string.audio_frequency_visualizer)
+                                                   else stringResource(R.string.car_cockpit_stream_ready),
                                             style = MaterialTheme.typography.labelSmall.copy(
                                                 fontWeight = FontWeight.Black,
                                                 fontSize = 10.sp,
@@ -774,52 +1092,12 @@ private fun AutomotiveHeroPlayer(
                                         )
                                     }
 
-                                    // Right pill showing format specs & active style
-                                    Row(
-                                        verticalAlignment = Alignment.CenterVertically,
-                                        horizontalArrangement = Arrangement.spacedBy(6.dp)
-                                    ) {
-                                        if (currentStation != null) {
-                                            Text(
-                                                text = "${currentStation.codec} • ${currentStation.bitrate}",
-                                                style = MaterialTheme.typography.labelSmall.copy(fontSize = 10.sp),
-                                                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.65f)
-                                            )
-                                        }
-
-                                        Surface(
-                                            shape = RoundedCornerShape(6.dp),
-                                            color = MaterialTheme.colorScheme.primary.copy(alpha = 0.18f)
-                                        ) {
-                                            Row(
-                                                modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
-                                                verticalAlignment = Alignment.CenterVertically,
-                                                horizontalArrangement = Arrangement.spacedBy(3.dp)
-                                            ) {
-                                                Icon(
-                                                    imageVector = Icons.Filled.GraphicEq,
-                                                    contentDescription = null,
-                                                    modifier = Modifier.size(11.dp),
-                                                    tint = MaterialTheme.colorScheme.primary
-                                                )
-                                                val styleLabel = when (carVisualizerStyle) {
-                                                    VisualizerStyle.ROUNDED_BARS -> "Bars"
-                                                    VisualizerStyle.DUAL_MIRROR -> "Mirror"
-                                                    VisualizerStyle.NEON_RIBBON -> "Neon"
-                                                    VisualizerStyle.WAVE_LINE -> "Wave"
-                                                    VisualizerStyle.DOT_MATRIX -> "LED"
-                                                    else -> "EQ"
-                                                }
-                                                Text(
-                                                    text = styleLabel,
-                                                    style = MaterialTheme.typography.labelSmall.copy(
-                                                        fontWeight = FontWeight.Bold,
-                                                        fontSize = 10.sp
-                                                    ),
-                                                    color = MaterialTheme.colorScheme.primary
-                                                )
-                                            }
-                                        }
+                                    if (currentStation != null) {
+                                        Text(
+                                            text = "${currentStation.codec} • ${currentStation.bitrate}",
+                                            style = MaterialTheme.typography.labelSmall.copy(fontSize = 10.sp),
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.65f)
+                                        )
                                     }
                                 }
 
@@ -845,11 +1123,21 @@ private fun AutomotiveHeroPlayer(
                         }
                     }
 
+                    // 1-Tap In-Car Quick Radio Presets Bar (P1 - P6)
+                    AutomotivePresetsRow(
+                        presets = carPresets,
+                        currentStationId = currentStation?.id,
+                        onSelectPreset = onSelectPreset,
+                        onSavePreset = { slotIdx ->
+                            currentStation?.let { onSavePreset(slotIdx, it) }
+                        }
+                    )
+
                     // Transport Controls Row (Large & High Contrast for Driving)
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(vertical = 4.dp),
+                            .padding(vertical = 2.dp),
                         horizontalArrangement = Arrangement.SpaceEvenly,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
@@ -859,7 +1147,7 @@ private fun AutomotiveHeroPlayer(
                                 onPreviousStation()
                             },
                             modifier = Modifier
-                                .size(52.dp)
+                                .size(54.dp)
                                 .clip(CircleShape)
                                 .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f))
                         ) {
@@ -867,7 +1155,7 @@ private fun AutomotiveHeroPlayer(
                                 imageVector = Icons.Filled.SkipPrevious,
                                 contentDescription = "Previous",
                                 tint = MaterialTheme.colorScheme.onSurface,
-                                modifier = Modifier.size(28.dp)
+                                modifier = Modifier.size(30.dp)
                             )
                         }
 
@@ -878,7 +1166,7 @@ private fun AutomotiveHeroPlayer(
                                     onSeekRelative(-10000L)
                                 },
                                 modifier = Modifier
-                                    .size(48.dp)
+                                    .size(50.dp)
                                     .clip(CircleShape)
                                     .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.45f))
                             ) {
@@ -886,7 +1174,7 @@ private fun AutomotiveHeroPlayer(
                                     imageVector = Icons.Filled.Replay10,
                                     contentDescription = "Rewind 10s",
                                     tint = MaterialTheme.colorScheme.primary,
-                                    modifier = Modifier.size(24.dp)
+                                    modifier = Modifier.size(26.dp)
                                 )
                             }
                         }
@@ -898,7 +1186,7 @@ private fun AutomotiveHeroPlayer(
                                 onPlayPause()
                             },
                             modifier = Modifier
-                                .size(68.dp)
+                                .size(70.dp)
                                 .border(
                                     width = if (isPlaying) 2.5.dp else 0.dp,
                                     color = if (isPlaying) MaterialTheme.colorScheme.primary.copy(alpha = 0.6f) else Color.Transparent,
@@ -912,7 +1200,7 @@ private fun AutomotiveHeroPlayer(
                         ) {
                             if (isLoading) {
                                 CircularProgressIndicator(
-                                    modifier = Modifier.size(30.dp),
+                                    modifier = Modifier.size(32.dp),
                                     color = MaterialTheme.colorScheme.onPrimary,
                                     strokeWidth = 3.dp
                                 )
@@ -920,7 +1208,7 @@ private fun AutomotiveHeroPlayer(
                                 Icon(
                                     imageVector = if (isPlaying) Icons.Filled.Pause else Icons.Filled.PlayArrow,
                                     contentDescription = if (isPlaying) "Pause" else "Play",
-                                    modifier = Modifier.size(38.dp)
+                                    modifier = Modifier.size(40.dp)
                                 )
                             }
                         }
@@ -932,7 +1220,7 @@ private fun AutomotiveHeroPlayer(
                                     onSeekRelative(30000L)
                                 },
                                 modifier = Modifier
-                                    .size(48.dp)
+                                    .size(50.dp)
                                     .clip(CircleShape)
                                     .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.45f))
                             ) {
@@ -940,7 +1228,7 @@ private fun AutomotiveHeroPlayer(
                                     imageVector = Icons.Filled.Forward30,
                                     contentDescription = "Forward 30s",
                                     tint = MaterialTheme.colorScheme.primary,
-                                    modifier = Modifier.size(24.dp)
+                                    modifier = Modifier.size(26.dp)
                                 )
                             }
                         }
@@ -951,7 +1239,7 @@ private fun AutomotiveHeroPlayer(
                                 onNextStation()
                             },
                             modifier = Modifier
-                                .size(52.dp)
+                                .size(54.dp)
                                 .clip(CircleShape)
                                 .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f))
                         ) {
@@ -959,12 +1247,12 @@ private fun AutomotiveHeroPlayer(
                                 imageVector = Icons.Filled.SkipNext,
                                 contentDescription = "Next",
                                 tint = MaterialTheme.colorScheme.onSurface,
-                                modifier = Modifier.size(28.dp)
+                                modifier = Modifier.size(30.dp)
                             )
                         }
                     }
 
-                    // Bottom Quick Action Chips Row
+                    // Bottom Driver Quick Action Chips Row
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -972,6 +1260,48 @@ private fun AutomotiveHeroPlayer(
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
+                        // Driver Volume Controls (Mute / Down / Up)
+                        if (audioManager != null) {
+                            Surface(
+                                shape = RoundedCornerShape(8.dp),
+                                color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                                modifier = Modifier.height(34.dp)
+                            ) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    modifier = Modifier.padding(horizontal = 4.dp)
+                                ) {
+                                    IconButton(
+                                        onClick = {
+                                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                            audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_LOWER, AudioManager.FLAG_SHOW_UI)
+                                        },
+                                        modifier = Modifier.size(30.dp)
+                                    ) {
+                                        Icon(Icons.Filled.VolumeDown, contentDescription = stringResource(R.string.car_volume_down), modifier = Modifier.size(16.dp))
+                                    }
+                                    IconButton(
+                                        onClick = {
+                                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                            audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_TOGGLE_MUTE, AudioManager.FLAG_SHOW_UI)
+                                        },
+                                        modifier = Modifier.size(30.dp)
+                                    ) {
+                                        Icon(Icons.Filled.VolumeMute, contentDescription = stringResource(R.string.car_volume_mute), modifier = Modifier.size(16.dp), tint = MaterialTheme.colorScheme.primary)
+                                    }
+                                    IconButton(
+                                        onClick = {
+                                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                            audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_RAISE, AudioManager.FLAG_SHOW_UI)
+                                        },
+                                        modifier = Modifier.size(30.dp)
+                                    ) {
+                                        Icon(Icons.Filled.VolumeUp, contentDescription = stringResource(R.string.car_volume_up), modifier = Modifier.size(16.dp))
+                                    }
+                                }
+                            }
+                        }
+
                         if (isPodcast && onPlaybackSpeedChange != null) {
                             AssistChip(
                                 onClick = {
@@ -991,7 +1321,7 @@ private fun AutomotiveHeroPlayer(
                         if (isPodcast && onOpenEpisodes != null) {
                             AssistChip(
                                 onClick = onOpenEpisodes,
-                                label = { Text("Episodes") },
+                                label = { Text(stringResource(R.string.episodes_label)) },
                                 leadingIcon = { Icon(Icons.AutoMirrored.Filled.QueueMusic, null, modifier = Modifier.size(16.dp), tint = MaterialTheme.colorScheme.primary) }
                             )
                         }
@@ -1009,7 +1339,7 @@ private fun AutomotiveHeroPlayer(
                             val isTimerActive = uiState.sleepTimerRemaining != null
                             AssistChip(
                                 onClick = onOpenSleepTimer,
-                                label = { Text(if (isTimerActive) "${uiState.sleepTimerRemaining}m" else "Sleep Timer") },
+                                label = { Text(if (isTimerActive) "${uiState.sleepTimerRemaining}m" else stringResource(R.string.timer_label)) },
                                 leadingIcon = {
                                     Icon(
                                         Icons.Filled.Bedtime,
@@ -1041,9 +1371,9 @@ private fun AutomotiveHeroPlayer(
                         horizontalArrangement = Arrangement.spacedBy(4.dp)
                     ) {
                         val sideTabs = if (isPodcast) {
-                            listOf(SideListTab.Episodes to "Episodes", SideListTab.Favorites to "Saved", SideListTab.Recent to "Recents")
+                            listOf(SideListTab.Episodes to stringResource(R.string.episodes_label), SideListTab.Favorites to stringResource(R.string.favorites), SideListTab.Recent to stringResource(R.string.recents))
                         } else {
-                            listOf(SideListTab.Favorites to "Favorites", SideListTab.Recent to "Recents", SideListTab.Top to "Explore")
+                            listOf(SideListTab.Favorites to stringResource(R.string.favorites), SideListTab.Recent to stringResource(R.string.recents), SideListTab.Top to stringResource(R.string.browse_stations))
                         }
 
                         sideTabs.forEach { (tab, label) ->
@@ -1059,6 +1389,8 @@ private fun AutomotiveHeroPlayer(
                                     style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
                                     color = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant,
                                     textAlign = TextAlign.Center,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
                                     modifier = Modifier.padding(vertical = 6.dp)
                                 )
                             }
@@ -1226,7 +1558,7 @@ private fun AutomotiveHeroPlayer(
                                                 containerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.8f)
                                             ),
                                             contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp)
-                                         ) {
+                                        ) {
                                             Text(
                                                 text = stringResource(R.string.browse_stations),
                                                 style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold)
@@ -1264,9 +1596,17 @@ private fun AutomotiveHeroPlayer(
                     .padding(16.dp)
                     .verticalScroll(rememberScrollState()),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(14.dp)
+                verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 // Large Artwork
+                val effectiveArtworkUrl = uiState.trackArtworkUrl?.ifBlank { null } ?: currentStation?.imageUrl
+                val carContext = LocalContext.current
+                val carImageRequest = remember(effectiveArtworkUrl) {
+                    ImageRequest.Builder(carContext)
+                        .data(effectiveArtworkUrl)
+                        .crossfade(true)
+                        .build()
+                }
                 Box(
                     modifier = Modifier
                         .size(130.dp)
@@ -1316,7 +1656,7 @@ private fun AutomotiveHeroPlayer(
                         ) {
                             Icon(
                                 imageVector = if (currentStation.isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
-                                contentDescription = "Favorite",
+                                contentDescription = stringResource(R.string.favorites),
                                 tint = if (currentStation.isFavorite) FavoriteHeartColor else Color.White,
                                 modifier = Modifier.size(18.dp)
                             )
@@ -1348,7 +1688,7 @@ private fun AutomotiveHeroPlayer(
                 if (!isPodcast) {
                     Surface(
                         modifier = Modifier
-                            .fillMaxWidth(0.9f)
+                            .fillMaxWidth(0.92f)
                             .height(56.dp)
                             .clickable {
                                 haptic.performHapticFeedback(HapticFeedbackType.LongPress)
@@ -1387,6 +1727,16 @@ private fun AutomotiveHeroPlayer(
                     }
                 }
 
+                // 1-Tap Quick Radio Presets Bar (P1 - P6)
+                AutomotivePresetsRow(
+                    presets = carPresets,
+                    currentStationId = currentStation?.id,
+                    onSelectPreset = onSelectPreset,
+                    onSavePreset = { slotIdx ->
+                        currentStation?.let { onSavePreset(slotIdx, it) }
+                    }
+                )
+
                 // Podcast Slider
                 if (isPodcast) {
                     Column(modifier = Modifier.fillMaxWidth()) {
@@ -1415,45 +1765,116 @@ private fun AutomotiveHeroPlayer(
                     IconButton(
                         onClick = onPreviousStation,
                         modifier = Modifier
-                            .size(52.dp)
+                            .size(54.dp)
                             .clip(CircleShape)
                             .background(MaterialTheme.colorScheme.surfaceVariant)
                     ) {
-                        Icon(Icons.Filled.SkipPrevious, null, modifier = Modifier.size(28.dp))
+                        Icon(Icons.Filled.SkipPrevious, null, modifier = Modifier.size(30.dp))
                     }
 
                     if (isPodcast && onSeekRelative != null) {
-                        IconButton(onClick = { onSeekRelative(-10000L) }, modifier = Modifier.size(48.dp)) {
-                            Icon(Icons.Filled.Replay10, null, tint = MaterialTheme.colorScheme.primary)
+                        IconButton(onClick = { onSeekRelative(-10000L) }, modifier = Modifier.size(50.dp)) {
+                            Icon(Icons.Filled.Replay10, null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(26.dp))
                         }
                     }
 
                     FilledIconButton(
                         onClick = onPlayPause,
-                        modifier = Modifier.size(68.dp),
+                        modifier = Modifier.size(70.dp),
                         shape = CircleShape
                     ) {
                         Icon(
                             imageVector = if (isPlaying) Icons.Filled.Pause else Icons.Filled.PlayArrow,
                             contentDescription = if (isPlaying) "Pause" else "Play",
-                            modifier = Modifier.size(36.dp)
+                            modifier = Modifier.size(38.dp)
                         )
                     }
 
                     if (isPodcast && onSeekRelative != null) {
-                        IconButton(onClick = { onSeekRelative(30000L) }, modifier = Modifier.size(48.dp)) {
-                            Icon(Icons.Filled.Forward30, null, tint = MaterialTheme.colorScheme.primary)
+                        IconButton(onClick = { onSeekRelative(30000L) }, modifier = Modifier.size(50.dp)) {
+                            Icon(Icons.Filled.Forward30, null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(26.dp))
                         }
                     }
 
                     IconButton(
                         onClick = onNextStation,
                         modifier = Modifier
-                            .size(52.dp)
+                            .size(54.dp)
                             .clip(CircleShape)
                             .background(MaterialTheme.colorScheme.surfaceVariant)
                     ) {
-                        Icon(Icons.Filled.SkipNext, null, modifier = Modifier.size(28.dp))
+                        Icon(Icons.Filled.SkipNext, null, modifier = Modifier.size(30.dp))
+                    }
+                }
+            }
+        }
+    }
+}
+
+/**
+ * 1-Tap In-Car Radio Presets Bar (P1 - P6)
+ * Real automotive radio behavior:
+ * - 1 tap: tune to preset immediately
+ * - Long press: save current playing station to that slot
+ */
+@Composable
+private fun AutomotivePresetsRow(
+    presets: List<RadioStation>,
+    currentStationId: String?,
+    onSelectPreset: (RadioStation) -> Unit,
+    onSavePreset: (Int) -> Unit
+) {
+    val haptic = LocalHapticFeedback.current
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        for (i in 0 until 6) {
+            val station = presets.getOrNull(i)
+            val isCurrent = station != null && station.id == currentStationId
+
+            Surface(
+                onClick = {
+                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                    if (station != null) onSelectPreset(station)
+                    else onSavePreset(i)
+                },
+                modifier = Modifier
+                    .weight(1f)
+                    .height(38.dp),
+                shape = RoundedCornerShape(8.dp),
+                color = if (isCurrent) MaterialTheme.colorScheme.primary.copy(alpha = 0.22f)
+                else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.45f),
+                border = if (isCurrent) BorderStroke(1.5.dp, MaterialTheme.colorScheme.primary)
+                else BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.12f))
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 4.dp),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "P${i + 1}",
+                        style = MaterialTheme.typography.labelSmall.copy(
+                            fontWeight = FontWeight.Black,
+                            fontSize = 11.sp
+                        ),
+                        color = if (isCurrent) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    if (station != null) {
+                        Spacer(modifier = Modifier.width(3.dp))
+                        Text(
+                            text = station.name,
+                            style = MaterialTheme.typography.labelSmall.copy(fontSize = 10.sp),
+                            color = if (isCurrent) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
                     }
                 }
             }
@@ -1522,7 +1943,7 @@ private fun AutomotiveStationList(
                     ) {
                         Icon(
                             imageVector = if (station.isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
-                            contentDescription = "Favorite",
+                            contentDescription = stringResource(R.string.favorites),
                             tint = if (station.isFavorite) FavoriteHeartColor else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
                             modifier = Modifier.size(18.dp)
                         )
@@ -1542,7 +1963,8 @@ private fun AutomotiveDiscoveryPanel(
     onStationSelect: (RadioStation) -> Unit,
     onToggleFavorite: (RadioStation) -> Unit,
     onLoadMore: () -> Unit,
-    columns: Int
+    columns: Int,
+    isAntiGlare: Boolean
 ) {
     val isPodcastTab = uiState.selectedTab == HomeTab.Podcast
     Column(modifier = Modifier.fillMaxSize()) {
@@ -1560,7 +1982,7 @@ private fun AutomotiveDiscoveryPanel(
                 onValueChange = onSearchQueryChange,
                 placeholder = {
                     Text(
-                        if (isPodcastTab) "Search podcasts & shows..." else "Search radio stations...",
+                        if (isPodcastTab) stringResource(R.string.search_podcasts_shows_hint) else stringResource(R.string.search_radio_stations_hint),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
                     )
@@ -1576,7 +1998,7 @@ private fun AutomotiveDiscoveryPanel(
                 trailingIcon = {
                     if (uiState.searchQuery.isNotEmpty()) {
                         IconButton(onClick = { onSearchQueryChange("") }) {
-                            Icon(Icons.Filled.Close, contentDescription = "Clear", modifier = Modifier.size(20.dp))
+                            Icon(Icons.Filled.Close, contentDescription = stringResource(R.string.clear_search), modifier = Modifier.size(20.dp))
                         }
                     }
                 },
@@ -1585,8 +2007,8 @@ private fun AutomotiveDiscoveryPanel(
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = MaterialTheme.colorScheme.primary,
                     unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.25f),
-                    focusedContainerColor = MaterialTheme.colorScheme.surface,
-                    unfocusedContainerColor = MaterialTheme.colorScheme.surface
+                    focusedContainerColor = if (isAntiGlare) Color(0xFF090D12) else MaterialTheme.colorScheme.surface,
+                    unfocusedContainerColor = if (isAntiGlare) Color(0xFF090D12) else MaterialTheme.colorScheme.surface
                 ),
                 modifier = Modifier
                     .weight(1f)
@@ -1612,6 +2034,15 @@ private fun AutomotiveDiscoveryPanel(
                     maxLines = 1
                 )
             }
+        }
+
+        // Curated Audiophile Feeds (Radio Paradise & SomaFM) in Live Radio mode
+        if (!isPodcastTab && uiState.searchQuery.isEmpty()) {
+            CuratedAudiophileCarRow(
+                onStationSelect = onStationSelect,
+                onToggleFavorite = onToggleFavorite
+            )
+            Spacer(modifier = Modifier.height(6.dp))
         }
 
         // Category/Genre Chips Horizontal Row
@@ -1655,8 +2086,91 @@ private fun AutomotiveDiscoveryPanel(
             onToggleFavorite = onToggleFavorite,
             onLoadMore = onLoadMore,
             columns = columns,
+            isAntiGlare = isAntiGlare,
             modifier = Modifier.fillMaxSize()
         )
+    }
+}
+
+@Composable
+private fun CuratedAudiophileCarRow(
+    onStationSelect: (RadioStation) -> Unit,
+    onToggleFavorite: (RadioStation) -> Unit
+) {
+    val curatedStations = remember { CuratedStationsService.defaultCuratedStations }
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 4.dp, vertical = 2.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = stringResource(R.string.car_curated_master_title),
+                style = MaterialTheme.typography.labelMedium.copy(
+                    fontWeight = FontWeight.Black,
+                    fontSize = 12.sp
+                ),
+                color = MaterialTheme.colorScheme.primary
+            )
+            Text(
+                text = stringResource(R.string.badge_flac_aac),
+                style = MaterialTheme.typography.labelSmall.copy(fontSize = 10.sp),
+                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
+            )
+        }
+
+        LazyRow(
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
+            contentPadding = PaddingValues(vertical = 4.dp),
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            items(curatedStations) { station ->
+                Surface(
+                    onClick = { onStationSelect(station) },
+                    shape = RoundedCornerShape(12.dp),
+                    color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f),
+                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.25f)),
+                    modifier = Modifier.width(180.dp).height(54.dp)
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(horizontal = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        AsyncImage(
+                            model = station.imageUrl,
+                            contentDescription = null,
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier
+                                .size(38.dp)
+                                .clip(RoundedCornerShape(8.dp))
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = station.name,
+                                style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
+                                color = MaterialTheme.colorScheme.onSurface,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                            Text(
+                                text = if (station.id.startsWith("curated_rp")) stringResource(R.string.badge_flac_master) else stringResource(R.string.badge_somafm),
+                                style = MaterialTheme.typography.labelSmall.copy(
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 10.sp
+                                ),
+                                color = MaterialTheme.colorScheme.primary,
+                                maxLines = 1
+                            )
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -1666,7 +2180,8 @@ private fun AutomotiveFavoritesPanel(
     currentStationId: String?,
     onStationSelect: (RadioStation) -> Unit,
     onToggleFavorite: (RadioStation) -> Unit,
-    columns: Int
+    columns: Int,
+    isAntiGlare: Boolean
 ) {
     Column(modifier = Modifier.fillMaxSize()) {
         Text(
@@ -1705,6 +2220,7 @@ private fun AutomotiveFavoritesPanel(
                 onSelectStation = onStationSelect,
                 onToggleFavorite = onToggleFavorite,
                 columns = columns,
+                isAntiGlare = isAntiGlare,
                 modifier = Modifier.fillMaxSize()
             )
         }
@@ -1720,6 +2236,7 @@ private fun AutomotiveGrid(
     onToggleFavorite: (RadioStation) -> Unit,
     onLoadMore: () -> Unit = {},
     columns: Int,
+    isAntiGlare: Boolean,
     modifier: Modifier = Modifier
 ) {
     val gridState = rememberLazyGridState()
@@ -1762,6 +2279,7 @@ private fun AutomotiveGrid(
                     .clickable { onSelectStation(station) },
                 color = if (isCardFocused) MaterialTheme.colorScheme.primary.copy(alpha = 0.25f)
                         else if (isSelected) MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)
+                        else if (isAntiGlare) Color(0xFF0D1117)
                         else MaterialTheme.colorScheme.surface,
                 tonalElevation = if (isSelected) 4.dp else 1.dp
             ) {
@@ -1856,7 +2374,7 @@ private fun AutomotiveGrid(
                     ) {
                         Icon(
                             imageVector = if (station.isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
-                            contentDescription = "Favorite",
+                            contentDescription = stringResource(R.string.favorites),
                             tint = if (station.isFavorite) FavoriteHeartColor else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
                             modifier = Modifier.size(22.dp)
                         )
@@ -1879,6 +2397,7 @@ private fun CarMiniPlayer(
     onTogglePlay: () -> Unit,
     onNext: () -> Unit,
     onClick: () -> Unit,
+    isAntiGlare: Boolean,
     modifier: Modifier = Modifier
 ) {
     val haptic = LocalHapticFeedback.current
@@ -1886,7 +2405,7 @@ private fun CarMiniPlayer(
         onClick = onClick,
         modifier = modifier.height(64.dp),
         shape = RoundedCornerShape(16.dp),
-        color = MaterialTheme.colorScheme.surface,
+        color = if (isAntiGlare) Color(0xFF0D1117) else MaterialTheme.colorScheme.surface,
         tonalElevation = 6.dp,
         shadowElevation = 6.dp,
         border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.3f))
@@ -1930,7 +2449,7 @@ private fun CarMiniPlayer(
                         Spacer(modifier = Modifier.width(6.dp))
                     }
                     Text(
-                        text = if (isLoading) "Buffering..." else (streamTitle ?: station.genre),
+                        text = if (isLoading) stringResource(R.string.buffering_stream) else (streamTitle ?: station.genre),
                         style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
                         color = MaterialTheme.colorScheme.primary,
                         maxLines = 1,
@@ -1996,8 +2515,8 @@ private fun formatDuration(ms: Long): String {
     val hours = minutes / 60
     return if (hours > 0) {
         val remMinutes = minutes % 60
-        String.format(java.util.Locale.US, "%d:%02d:%02d", hours, remMinutes, seconds)
+        String.format(Locale.US, "%d:%02d:%02d", hours, remMinutes, seconds)
     } else {
-        String.format(java.util.Locale.US, "%02d:%02d", minutes, seconds)
+        String.format(Locale.US, "%02d:%02d", minutes, seconds)
     }
 }

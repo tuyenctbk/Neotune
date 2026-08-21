@@ -291,4 +291,46 @@
     <string name="audio_frequency_visualizer">Lydfrekvens visualizer</string>
     <string name="sponsor_ad_area">Sponsorområde (lydløs)</string>
     <string name="no_connection_msg">Ingen forbindelse. Tjek dit netværk.</string>
+
+    <!-- Synchronized strings -->
+    <string name="lyrics_label">Sangtekst</string>
+    <string name="lyrics_title">Live sangtekst</string>
+    <string name="fetching_lyrics">Finder live sangtekst…</string>
+    <string name="no_lyrics_available">Ingen sangtekst fundet</string>
+    <string name="lyrics_instrumental_hint">Denne udsendelse kan være et instrumentalt nummer, et talkshow eller et live DJ-mix.</string>
+    <string name="curated_section_title">Udvalgt Master Quality &amp; Lo-Fi</string>
+    <string name="curated_section_subtitle">Håndplukkede 320k FLAC/AAC og reklamefri SomaFM-streams</string>
+    <string name="no_episodes_loaded">Ingen episoder indlæst</string>
+    <string name="view_episodes">Vis episoder</string>
+    <string name="browse_stations">Gennemse stationer</string>
+    <string name="no_recent_stations">Ingen seneste stationer</string>
+    <string name="no_saved_favorites_car">Ingen gemte favoritter endnu</string>
+    <string name="saved_favorites">Gemte favoritter</string>
+    <string name="car_no_favorites_desc">Ingen gemte stationer. Tryk på hjerteikonet på en station for at gemme den her for hurtig adgang under kørslen.</string>
+    <string name="custom_duration_minutes">Brugerdefineret varighed: %1$d minutter</string>
+    <string name="starts_at">Starter kl. %1$s</string>
+    <string name="chapter_count">%1$d Kapitler</string>
+    <string name="back_to_list">Tilbage til listen</string>
+    <string name="save_episode">Gem episode</string>
+    <string name="download_episode">Download episode</string>
+    <string name="badge_flac_aac">320k FLAC / AAC</string>
+    <string name="badge_flac_master">FLAC Master</string>
+    <string name="badge_somafm">SomaFM</string>
+    <string name="clear_search">Ryd søgning</string>
+    <string name="remove_search_suggestion">Fjern søgeforslag</string>
+    <string name="play_featured">Afspil fremhævet</string>
+    <string name="car_quick_presets">Hurtige forvalg</string>
+    <string name="car_preset_saved_format">Gemt på forvalg %1$d</string>
+    <string name="car_long_press_preset_hint">Hold nede for at gemme den aktuelle station her</string>
+    <string name="car_anti_glare_night">Blændfri nattilstand</string>
+    <string name="car_anti_glare_on">Blændfri: TIL</string>
+    <string name="car_anti_glare_off">Blændfri: FRA</string>
+    <string name="car_cockpit_live_on_air">I ÆTEREN</string>
+    <string name="car_cockpit_stream_ready">STREAM KLAR</string>
+    <string name="car_cockpit_buffering">FORBINDER TIL STREAM…</string>
+    <string name="car_volume_control">Billydstyrke</string>
+    <string name="car_volume_mute">Lydløs</string>
+    <string name="car_volume_down">Vol -</string>
+    <string name="car_volume_up">Vol +</string>
+    <string name="car_curated_master_title">Master &amp; Audiophile Stationer</string>
 </resources>

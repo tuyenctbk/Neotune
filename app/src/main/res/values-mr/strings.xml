@@ -291,4 +291,46 @@
     <string name="audio_frequency_visualizer">ऑडिओ व्हिज्युअलायझर</string>
     <string name="sponsor_ad_area">प्रायोजित क्षेत्र (मौन)</string>
     <string name="no_connection_msg">कनेक्शन नाही. कृपया तुमचे नेटवर्क तपासा.</string>
+
+    <!-- Synchronized strings -->
+    <string name="lyrics_label">Lyrics</string>
+    <string name="lyrics_title">Live Lyrics</string>
+    <string name="fetching_lyrics">Finding live lyrics…</string>
+    <string name="no_lyrics_available">No Lyrics Found</string>
+    <string name="lyrics_instrumental_hint">This broadcast might be an instrumental track, talk show, or live DJ mix.</string>
+    <string name="curated_section_title">Curated Master Quality &amp; Lo-Fi</string>
+    <string name="curated_section_subtitle">Handpicked 320k FLAC/AAC &amp; SomaFM commercial-free streams</string>
+    <string name="no_episodes_loaded">No episodes loaded</string>
+    <string name="view_episodes">View Episodes</string>
+    <string name="browse_stations">Browse Stations</string>
+    <string name="no_recent_stations">No recent stations</string>
+    <string name="no_saved_favorites_car">No saved favorites yet</string>
+    <string name="saved_favorites">Saved Favorites</string>
+    <string name="car_no_favorites_desc">No saved stations. Tap the heart icon on any station to save it here for fast access while driving.</string>
+    <string name="custom_duration_minutes">Custom Duration: %1$d minutes</string>
+    <string name="starts_at">Starts at %1$s</string>
+    <string name="chapter_count">%1$d Chapters</string>
+    <string name="back_to_list">Back to List</string>
+    <string name="save_episode">Save Episode</string>
+    <string name="download_episode">Download Episode</string>
+    <string name="badge_flac_aac">320k FLAC / AAC</string>
+    <string name="badge_flac_master">FLAC Master</string>
+    <string name="badge_somafm">SomaFM</string>
+    <string name="clear_search">Clear search</string>
+    <string name="remove_search_suggestion">Remove search suggestion</string>
+    <string name="play_featured">Play Featured</string>
+    <string name="car_quick_presets">Quick Presets</string>
+    <string name="car_preset_saved_format">Saved to Preset %1$d</string>
+    <string name="car_long_press_preset_hint">Long-press preset to save current station</string>
+    <string name="car_anti_glare_night">Anti-Glare Night Mode</string>
+    <string name="car_anti_glare_on">Anti-Glare HUD: ON</string>
+    <string name="car_anti_glare_off">Anti-Glare HUD: OFF</string>
+    <string name="car_cockpit_live_on_air">LIVE ON AIR</string>
+    <string name="car_cockpit_stream_ready">STREAM READY</string>
+    <string name="car_cockpit_buffering">CONNECTING STREAM…</string>
+    <string name="car_volume_control">In-Car Volume</string>
+    <string name="car_volume_mute">Mute</string>
+    <string name="car_volume_down">Vol -</string>
+    <string name="car_volume_up">Vol +</string>
+    <string name="car_curated_master_title">Audiophile &amp; Master Presets</string>
 </resources>

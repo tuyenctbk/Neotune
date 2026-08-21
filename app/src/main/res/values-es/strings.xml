@@ -324,4 +324,18 @@
     <string name="remove_search_suggestion">Eliminar sugerencia</string>
     <string name="play_featured">Reproducir destacada</string>
     <string name="exit_car_mode">Salir del modo automotriz</string>
+    <string name="car_quick_presets">Presintonías rápidas</string>
+    <string name="car_preset_saved_format">Guardado en Presintonía %1$d</string>
+    <string name="car_long_press_preset_hint">Mantén presionado para guardar emisora aquí</string>
+    <string name="car_anti_glare_night">Modo nocturno antirreflejos</string>
+    <string name="car_anti_glare_on">Antirreflejos: ACTIVADO</string>
+    <string name="car_anti_glare_off">Antirreflejos: DESACTIVADO</string>
+    <string name="car_cockpit_live_on_air">EN EL AIRE</string>
+    <string name="car_cockpit_stream_ready">EMISIÓN LISTA</string>
+    <string name="car_cockpit_buffering">CONECTANDO EMISIÓN…</string>
+    <string name="car_volume_control">Volumen del coche</string>
+    <string name="car_volume_mute">Silenciar</string>
+    <string name="car_volume_down">Vol -</string>
+    <string name="car_volume_up">Vol +</string>
+    <string name="car_curated_master_title">Emisoras Master &amp; Audiophile</string>
 </resources>

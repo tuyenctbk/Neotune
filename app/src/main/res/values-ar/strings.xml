@@ -291,4 +291,46 @@
     <string name="audio_frequency_visualizer">متصور تردد الصوت</string>
     <string name="sponsor_ad_area">منطقة إعلانات الراعي (مكتومة)</string>
     <string name="no_connection_msg">لا يوجد اتصال. يرجى التحقق من اتصال الشبكة لاستئناف الراديو.</string>
+
+    <!-- Synchronized strings -->
+    <string name="lyrics_label">كلمات الأغاني</string>
+    <string name="lyrics_title">كلمات الأغاني المباشرة</string>
+    <string name="fetching_lyrics">جارٍ البحث عن الكلمات المباشرة…</string>
+    <string name="no_lyrics_available">لم يتم العثور على كلمات</string>
+    <string name="lyrics_instrumental_hint">قد يكون هذا البث مقطوعة موسيقية أو برنامجاً حوارياً أو مزيج دي جي مباشر.</string>
+    <string name="curated_section_title">بثوث الماستر عالية الجودة و Lo-Fi</string>
+    <string name="curated_section_subtitle">بثوث 320k FLAC/AAC و SomaFM مختارة بدون إعلانات</string>
+    <string name="no_episodes_loaded">لم يتم تحميل أي حلقات</string>
+    <string name="view_episodes">عرض الحلقات</string>
+    <string name="browse_stations">تصفح المحطات</string>
+    <string name="no_recent_stations">لا توجد محطات حديثة</string>
+    <string name="no_saved_favorites_car">لا توجد محطات مفضلة بعد</string>
+    <string name="saved_favorites">المحطات المفضلة</string>
+    <string name="car_no_favorites_desc">لا توجد محطات محفوظة. اضغط على رمز القلب في أي محطة لحفظها هنا للوصول السريع أثناء القيادة.</string>
+    <string name="custom_duration_minutes">مدة مخصصة: %1$d دقيقة</string>
+    <string name="starts_at">يبدأ عند %1$s</string>
+    <string name="chapter_count">%1$d فصول</string>
+    <string name="back_to_list">العودة للقائمة</string>
+    <string name="save_episode">حفظ الحلقة</string>
+    <string name="download_episode">تنزيل الحلقة</string>
+    <string name="badge_flac_aac">320k FLAC / AAC</string>
+    <string name="badge_flac_master">FLAC Master</string>
+    <string name="badge_somafm">SomaFM</string>
+    <string name="clear_search">مسح البحث</string>
+    <string name="remove_search_suggestion">إزالة اقتراح البحث</string>
+    <string name="play_featured">تشغيل المميز</string>
+    <string name="car_quick_presets">محطات محددة مسبقاً</string>
+    <string name="car_preset_saved_format">تم الحفظ في المحطة %1$d</string>
+    <string name="car_long_press_preset_hint">اضغط مطولاً لحفظ المحطة الحالية في هذا الزر</string>
+    <string name="car_anti_glare_night">وضع الحماية من التوهج الليلي</string>
+    <string name="car_anti_glare_on">مانع التوهج: مفعل</string>
+    <string name="car_anti_glare_off">مانع التوهج: معطل</string>
+    <string name="car_cockpit_live_on_air">على الهواء مباشرة</string>
+    <string name="car_cockpit_stream_ready">البث جاهز</string>
+    <string name="car_cockpit_buffering">جارٍ الاتصال بالبث…</string>
+    <string name="car_volume_control">مستوى صوت السيارة</string>
+    <string name="car_volume_mute">كتم</string>
+    <string name="car_volume_down">خفض الصوت</string>
+    <string name="car_volume_up">رفع الصوت</string>
+    <string name="car_curated_master_title">محطات ماستر وجودة فائقة</string>
 </resources>

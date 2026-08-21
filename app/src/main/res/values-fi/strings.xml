@@ -291,4 +291,46 @@
     <string name="audio_frequency_visualizer">Äänitaajuuden visualisointi</string>
     <string name="sponsor_ad_area">Sponsorialue (äänetön)</string>
     <string name="no_connection_msg">Ei yhteyttä. Tarkista verkkoyhteytesi.</string>
+
+    <!-- Synchronized strings -->
+    <string name="lyrics_label">Sanoitukset</string>
+    <string name="lyrics_title">Reaaliaikaiset sanoitukset</string>
+    <string name="fetching_lyrics">Etsitään reaaliaikaisia sanoituksia…</string>
+    <string name="no_lyrics_available">Sanoituksia ei löytynyt</string>
+    <string name="lyrics_instrumental_hint">Tämä lähetys saattaa olla instrumentaalikappale, puheohjelma tai live-DJ-miksaus.</string>
+    <string name="curated_section_title">Valikoitu Master Quality &amp; Lo-Fi</string>
+    <string name="curated_section_subtitle">Käsin poimitut 320k FLAC/AAC ja mainoksettomat SomaFM-striimit</string>
+    <string name="no_episodes_loaded">Jaksoja ei ole ladattu</string>
+    <string name="view_episodes">Näytä jaksot</string>
+    <string name="browse_stations">Selaa asemia</string>
+    <string name="no_recent_stations">Ei viimeaikaisia asemia</string>
+    <string name="no_saved_favorites_car">Ei vielä tallennettuja suosikkeja</string>
+    <string name="saved_favorites">Tallennetut suosikit</string>
+    <string name="car_no_favorites_desc">Ei tallennettuja asemia. Napauta sydänkuvaketta minkä tahansa aseman kohdalla tallentaaksesi sen tähän nopeaa käyttöä varten ajon aikana.</string>
+    <string name="custom_duration_minutes">Mukautettu kesto: %1$d minuuttia</string>
+    <string name="starts_at">Alkaa klo %1$s</string>
+    <string name="chapter_count">%1$d Lukua</string>
+    <string name="back_to_list">Takaisin luetteloon</string>
+    <string name="save_episode">Tallenna jakso</string>
+    <string name="download_episode">Lataa jakso</string>
+    <string name="badge_flac_aac">320k FLAC / AAC</string>
+    <string name="badge_flac_master">FLAC Master</string>
+    <string name="badge_somafm">SomaFM</string>
+    <string name="clear_search">Tyhjennä haku</string>
+    <string name="remove_search_suggestion">Poista hakuehdotus</string>
+    <string name="play_featured">Toista suositeltu</string>
+    <string name="car_quick_presets">Pikavalinnat</string>
+    <string name="car_preset_saved_format">Tallennettu pikavalintaan %1$d</string>
+    <string name="car_long_press_preset_hint">Paina pitkään tallentaaksesi nykyisen aseman tähän</string>
+    <string name="car_anti_glare_night">Häikäisemätön yötila</string>
+    <string name="car_anti_glare_on">Häikäisysuoja: PÄÄLLÄ</string>
+    <string name="car_anti_glare_off">Häikäisysuoja: POIS</string>
+    <string name="car_cockpit_live_on_air">SUORASSA LÄHETYKSESSÄ</string>
+    <string name="car_cockpit_stream_ready">STRIIMI VALMIS</string>
+    <string name="car_cockpit_buffering">YHDISTETÄÄN STRIIMIIN…</string>
+    <string name="car_volume_control">Auton äänenvoimakkuus</string>
+    <string name="car_volume_mute">Mykistä</string>
+    <string name="car_volume_down">Vol -</string>
+    <string name="car_volume_up">Vol +</string>
+    <string name="car_curated_master_title">Master- &amp; Hifi-asemat</string>
 </resources>

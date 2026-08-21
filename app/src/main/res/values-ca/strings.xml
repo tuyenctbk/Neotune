@@ -291,4 +291,46 @@
     <string name="audio_frequency_visualizer">Visualitzador de freqüència</string>
     <string name="sponsor_ad_area">Àrea patrocinada (silenci)</string>
     <string name="no_connection_msg">Sense connexió. Comprova la xarxa.</string>
+
+    <!-- Synchronized strings -->
+    <string name="lyrics_label">Lletres</string>
+    <string name="lyrics_title">Lletres en directe</string>
+    <string name="fetching_lyrics">Cercant lletres en directe…</string>
+    <string name="no_lyrics_available">No s\'han trobat lletres</string>
+    <string name="lyrics_instrumental_hint">Aquesta emissió pot ser una pista instrumental, un programa de tertúlia o una sessió de DJ en directe.</string>
+    <string name="curated_section_title">Qualitat Master &amp; Lo-Fi</string>
+    <string name="curated_section_subtitle">Emissions seleccionades 320k FLAC/AAC i SomaFM sense anuncis</string>
+    <string name="no_episodes_loaded">No s\'han carregat episodis</string>
+    <string name="view_episodes">Veure episodis</string>
+    <string name="browse_stations">Explorar emissores</string>
+    <string name="no_recent_stations">Cap emissora recent</string>
+    <string name="no_saved_favorites_car">Encara no hi ha preferits guardats</string>
+    <string name="saved_favorites">Preferits guardats</string>
+    <string name="car_no_favorites_desc">No hi ha emissores guardades. Toca el cor a qualsevol emissora per desar-la aquí i accedir-hi ràpidament conduint.</string>
+    <string name="custom_duration_minutes">Durada personalitzada: %1$d minuts</string>
+    <string name="starts_at">Comença a les %1$s</string>
+    <string name="chapter_count">%1$d Capítols</string>
+    <string name="back_to_list">Tornar a la llista</string>
+    <string name="save_episode">Desar episodi</string>
+    <string name="download_episode">Descarregar episodi</string>
+    <string name="badge_flac_aac">320k FLAC / AAC</string>
+    <string name="badge_flac_master">FLAC Master</string>
+    <string name="badge_somafm">SomaFM</string>
+    <string name="clear_search">Netejar cerca</string>
+    <string name="remove_search_suggestion">Eliminar suggeriment</string>
+    <string name="play_featured">Reproduir destacat</string>
+    <string name="car_quick_presets">Presintonies ràpides</string>
+    <string name="car_preset_saved_format">Desat a la presintonia %1$d</string>
+    <string name="car_long_press_preset_hint">Mantingues premut per desar l\'emissora aquí</string>
+    <string name="car_anti_glare_night">Mode nocturn antireflexos</string>
+    <string name="car_anti_glare_on">Antireflex: ACTIVAT</string>
+    <string name="car_anti_glare_off">Antireflex: DESACTIVAT</string>
+    <string name="car_cockpit_live_on_air">EN DIRECTE</string>
+    <string name="car_cockpit_stream_ready">EMISSIÓ A PUNT</string>
+    <string name="car_cockpit_buffering">CONNECTANT AMB L\'EMISSIÓ…</string>
+    <string name="car_volume_control">Volum del cotxe</string>
+    <string name="car_volume_mute">Silenci</string>
+    <string name="car_volume_down">Vol -</string>
+    <string name="car_volume_up">Vol +</string>
+    <string name="car_curated_master_title">Emissores Master &amp; Audiòfil</string>
 </resources>

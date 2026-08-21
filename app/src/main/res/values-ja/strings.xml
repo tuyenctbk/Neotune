@@ -324,4 +324,18 @@
     <string name="remove_search_suggestion">検索候補を削除</string>
     <string name="play_featured">おすすめステーションを再生</string>
     <string name="exit_car_mode">車内モードを終了</string>
+    <string name="car_quick_presets">クイックプリセット</string>
+    <string name="car_preset_saved_format">プリセット %1$d に保存しました</string>
+    <string name="car_long_press_preset_hint">長押しで現在のステーションを保存</string>
+    <string name="car_anti_glare_night">夜間アンチグレアモード</string>
+    <string name="car_anti_glare_on">アンチグレア: ON</string>
+    <string name="car_anti_glare_off">アンチグレア: OFF</string>
+    <string name="car_cockpit_live_on_air">オンエア中</string>
+    <string name="car_cockpit_stream_ready">再生準備完了</string>
+    <string name="car_cockpit_buffering">ストリーム接続中…</string>
+    <string name="car_volume_control">車内音量</string>
+    <string name="car_volume_mute">消音</string>
+    <string name="car_volume_down">音量 -</string>
+    <string name="car_volume_up">音量 +</string>
+    <string name="car_curated_master_title">厳選マスター &amp; オーディオファイル</string>
 </resources>

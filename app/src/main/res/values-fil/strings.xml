@@ -291,4 +291,46 @@
     <string name="audio_frequency_visualizer">Audio Frequency Visualizer</string>
     <string name="sponsor_ad_area">Area ng Sponsor Ad (Naka-mute)</string>
     <string name="no_connection_msg">Walang Koneksyon. Pakisuri ang iyong network.</string>
+
+    <!-- Synchronized strings -->
+    <string name="lyrics_label">Titik ng Kanta</string>
+    <string name="lyrics_title">Live na Titik</string>
+    <string name="fetching_lyrics">Naghahanap ng live na titik…</string>
+    <string name="no_lyrics_available">Walang Nahanap na Titik</string>
+    <string name="lyrics_instrumental_hint">Ang broadcast na ito ay maaaring instrumental, talk show, o live DJ mix.</string>
+    <string name="curated_section_title">Piniling Master Quality &amp; Lo-Fi</string>
+    <string name="curated_section_subtitle">Napiling 320k FLAC/AAC at walang ad na SomaFM streams</string>
+    <string name="no_episodes_loaded">Walang na-load na mga episode</string>
+    <string name="view_episodes">Tingnan ang mga Episode</string>
+    <string name="browse_stations">Mag-browse ng mga Istasyon</string>
+    <string name="no_recent_stations">Walang kamakailang istasyon</string>
+    <string name="no_saved_favorites_car">Wala pang naka-save na paborito</string>
+    <string name="saved_favorites">Naka-save na Paborito</string>
+    <string name="car_no_favorites_desc">Walang naka-save na istasyon. I-tap ang puso sa anumang istasyon upang i-save para sa mabilis na pag-access habang nagmamaneho.</string>
+    <string name="custom_duration_minutes">Custom na Tagal: %1$d minuto</string>
+    <string name="starts_at">Nagsisimula sa %1$s</string>
+    <string name="chapter_count">%1$d Kabanata</string>
+    <string name="back_to_list">Bumalik sa Listahan</string>
+    <string name="save_episode">I-save ang Episode</string>
+    <string name="download_episode">I-download ang Episode</string>
+    <string name="badge_flac_aac">320k FLAC / AAC</string>
+    <string name="badge_flac_master">FLAC Master</string>
+    <string name="badge_somafm">SomaFM</string>
+    <string name="clear_search">I-clear ang paghahanap</string>
+    <string name="remove_search_suggestion">Alisin ang mungkahi</string>
+    <string name="play_featured">I-play ang Tampok</string>
+    <string name="car_quick_presets">Mabilisang Preset</string>
+    <string name="car_preset_saved_format">Naka-save sa Preset %1$d</string>
+    <string name="car_long_press_preset_hint">Pindutin nang matagal upang i-save ang kasalukuyang istasyon</string>
+    <string name="car_anti_glare_night">Anti-Glare Night Mode</string>
+    <string name="car_anti_glare_on">Anti-Glare: NAKA-ON</string>
+    <string name="car_anti_glare_off">Anti-Glare: NAKA-OFF</string>
+    <string name="car_cockpit_live_on_air">LIVE NA ERE</string>
+    <string name="car_cockpit_stream_ready">HANDA NA ANG STREAM</string>
+    <string name="car_cockpit_buffering">KUMUKONEKTA SA STREAM…</string>
+    <string name="car_volume_control">Volume sa Sasakyan</string>
+    <string name="car_volume_mute">I-mute</string>
+    <string name="car_volume_down">Hinaan</string>
+    <string name="car_volume_up">Lakasan</string>
+    <string name="car_curated_master_title">Mga Istasyong Master at Audiophile</string>
 </resources>

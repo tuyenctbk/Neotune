@@ -324,4 +324,18 @@
     <string name="remove_search_suggestion">Supprimer la suggestion</string>
     <string name="play_featured">Écouter en vedette</string>
     <string name="exit_car_mode">Quitter le mode voiture</string>
+    <string name="car_quick_presets">Préréglages rapides</string>
+    <string name="car_preset_saved_format">Enregistré dans le Préréglage %1$d</string>
+    <string name="car_long_press_preset_hint">Appui long pour enregistrer la station ici</string>
+    <string name="car_anti_glare_night">Mode nuit anti-éblouissement</string>
+    <string name="car_anti_glare_on">Anti-éblouissement : ACTIVÉ</string>
+    <string name="car_anti_glare_off">Anti-éblouissement : DÉSACTIVÉ</string>
+    <string name="car_cockpit_live_on_air">EN DIRECT</string>
+    <string name="car_cockpit_stream_ready">FLUX PRÊT</string>
+    <string name="car_cockpit_buffering">CONNEXION AU FLUX…</string>
+    <string name="car_volume_control">Volume voiture</string>
+    <string name="car_volume_mute">Muet</string>
+    <string name="car_volume_down">Vol -</string>
+    <string name="car_volume_up">Vol +</string>
+    <string name="car_curated_master_title">Stations Master &amp; Audiophile</string>
 </resources>

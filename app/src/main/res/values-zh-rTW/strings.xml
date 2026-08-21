@@ -324,4 +324,18 @@
     <string name="remove_search_suggestion">刪除搜尋建議</string>
     <string name="play_featured">播放精選推薦</string>
     <string name="exit_car_mode">退出車載模式</string>
+    <string name="car_quick_presets">快捷預設</string>
+    <string name="car_preset_saved_format">已儲存至預設 %1$d</string>
+    <string name="car_long_press_preset_hint">長按預設欄位可儲存目前電台</string>
+    <string name="car_anti_glare_night">夜間防眩光模式</string>
+    <string name="car_anti_glare_on">防眩光: 開啟</string>
+    <string name="car_anti_glare_off">防眩光: 關閉</string>
+    <string name="car_cockpit_live_on_air">正在直播</string>
+    <string name="car_cockpit_stream_ready">準備就緒</string>
+    <string name="car_cockpit_buffering">正在連線廣播…</string>
+    <string name="car_volume_control">車載音量</string>
+    <string name="car_volume_mute">靜音</string>
+    <string name="car_volume_down">音量 -</string>
+    <string name="car_volume_up">音量 +</string>
+    <string name="car_curated_master_title">精選母帶與高保真電台</string>
 </resources>

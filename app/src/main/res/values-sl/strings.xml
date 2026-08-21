@@ -291,4 +291,46 @@
     <string name="audio_frequency_visualizer">Vizualizator zvočnih frekvenc</string>
     <string name="sponsor_ad_area">Sponzorsko območje (nemo)</string>
     <string name="no_connection_msg">Ni povezave. Preverite omrežje.</string>
+
+    <!-- Synchronized strings -->
+    <string name="lyrics_label">Besedilo</string>
+    <string name="lyrics_title">Besedilo v živo</string>
+    <string name="fetching_lyrics">Iskanje besedila v živo…</string>
+    <string name="no_lyrics_available">Besedilo ni bilo najdeno</string>
+    <string name="lyrics_instrumental_hint">To predvajanje je lahko instrumentalna skladba, pogovorna oddaja ali DJ miks v živo.</string>
+    <string name="curated_section_title">Izbor Master Quality &amp; Lo-Fi</string>
+    <string name="curated_section_subtitle">Izbrani tokovi 320k FLAC/AAC in SomaFM brez oglasov</string>
+    <string name="no_episodes_loaded">Ni naloženih epizod</string>
+    <string name="view_episodes">Ogled epizod</string>
+    <string name="browse_stations">Brskanje po postajah</string>
+    <string name="no_recent_stations">Ni nedavnih postaj</string>
+    <string name="no_saved_favorites_car">Ni še shranjenih priljubljenih</string>
+    <string name="saved_favorites">Shranjene priljubljene</string>
+    <string name="car_no_favorites_desc">Ni shranjenih postaj. Dotaknite se ikone srca na kateri koli postaji za hiter dostop med vožnjo.</string>
+    <string name="custom_duration_minutes">Trajanje po meri: %1$d minut</string>
+    <string name="starts_at">Začne se ob %1$s</string>
+    <string name="chapter_count">%1$d Poglavij</string>
+    <string name="back_to_list">Nazaj na seznam</string>
+    <string name="save_episode">Shrani epizodo</string>
+    <string name="download_episode">Prenesi epizodo</string>
+    <string name="badge_flac_aac">320k FLAC / AAC</string>
+    <string name="badge_flac_master">FLAC Master</string>
+    <string name="badge_somafm">SomaFM</string>
+    <string name="clear_search">Počisti iskanje</string>
+    <string name="remove_search_suggestion">Odstrani predlog</string>
+    <string name="play_featured">Predvajaj priporočeno</string>
+    <string name="car_quick_presets">Hitre prednastavitve</string>
+    <string name="car_preset_saved_format">Shranjeno na prednastavitev %1$d</string>
+    <string name="car_long_press_preset_hint">Pridržite za shranjevanje trenutne postaje</string>
+    <string name="car_anti_glare_night">Nočni način proti bleščanju</string>
+    <string name="car_anti_glare_on">Proti bleščanju: VKLOP</string>
+    <string name="car_anti_glare_off">Proti bleščanju: IZKLOP</string>
+    <string name="car_cockpit_live_on_air">V ŽIVO V ETRU</string>
+    <string name="car_cockpit_stream_ready">TOK PRIPRAVLJEN</string>
+    <string name="car_cockpit_buffering">POVEZOVANJE S TOKOM…</string>
+    <string name="car_volume_control">Glasnost v avtu</string>
+    <string name="car_volume_mute">Izklopi zvok</string>
+    <string name="car_volume_down">Glasnost -</string>
+    <string name="car_volume_up">Glasnost +</string>
+    <string name="car_curated_master_title">Postaje Master &amp; Audiophile</string>
 </resources>

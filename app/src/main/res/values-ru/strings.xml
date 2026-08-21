@@ -324,4 +324,18 @@
     <string name="remove_search_suggestion">Удалить подсказку</string>
     <string name="play_featured">Включить рекомендуемую</string>
     <string name="exit_car_mode">Выйти из режима авто</string>
+    <string name="car_quick_presets">Быстрые пресеты</string>
+    <string name="car_preset_saved_format">Сохранено в пресет %1$d</string>
+    <string name="car_long_press_preset_hint">Удерживайте, чтобы сохранить станцию в слот</string>
+    <string name="car_anti_glare_night">Антибликовый ночной режим</string>
+    <string name="car_anti_glare_on">Антиблик: ВКЛ</string>
+    <string name="car_anti_glare_off">Антиблик: ВЫКЛ</string>
+    <string name="car_cockpit_live_on_air">В ПРЯМОМ ЭФИРЕ</string>
+    <string name="car_cockpit_stream_ready">ПОТОК ГОТОВ</string>
+    <string name="car_cockpit_buffering">ПОДКЛЮЧЕНИЕ ПОТОКА…</string>
+    <string name="car_volume_control">Громкость в авто</string>
+    <string name="car_volume_mute">Без звука</string>
+    <string name="car_volume_down">Громкость -</string>
+    <string name="car_volume_up">Громкость +</string>
+    <string name="car_curated_master_title">Master &amp; Audiophile Станции</string>
 </resources>

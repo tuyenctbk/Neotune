@@ -380,4 +380,18 @@
     <string name="remove_search_suggestion">Remove search suggestion</string>
     <string name="play_featured">Play Featured</string>
     <string name="exit_car_mode">Exit Automotive Mode</string>
+    <string name="car_quick_presets">Quick Presets</string>
+    <string name="car_preset_saved_format">Saved to Preset %1$d</string>
+    <string name="car_long_press_preset_hint">Long-press preset to save current station</string>
+    <string name="car_anti_glare_night">Anti-Glare Night Mode</string>
+    <string name="car_anti_glare_on">Anti-Glare HUD: ON</string>
+    <string name="car_anti_glare_off">Anti-Glare HUD: OFF</string>
+    <string name="car_cockpit_live_on_air">LIVE ON AIR</string>
+    <string name="car_cockpit_stream_ready">STREAM READY</string>
+    <string name="car_cockpit_buffering">CONNECTING STREAM…</string>
+    <string name="car_volume_control">In-Car Volume</string>
+    <string name="car_volume_mute">Mute</string>
+    <string name="car_volume_down">Vol -</string>
+    <string name="car_volume_up">Vol +</string>
+    <string name="car_curated_master_title">Audiophile &amp; Master Presets</string>
 </resources>

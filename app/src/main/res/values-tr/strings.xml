@@ -291,4 +291,46 @@
     <string name="audio_frequency_visualizer">Ses frekansı görselleştirici</string>
     <string name="sponsor_ad_area">Sponsor alanı (sessiz)</string>
     <string name="no_connection_msg">Bağlantı yok. Lütfen ağınızı kontrol edin.</string>
+
+    <!-- Synchronized strings -->
+    <string name="lyrics_label">Şarkı Sözleri</string>
+    <string name="lyrics_title">Canlı Şarkı Sözleri</string>
+    <string name="fetching_lyrics">Canlı şarkı sözleri aranıyor…</string>
+    <string name="no_lyrics_available">Şarkı Sözü Bulunamadı</string>
+    <string name="lyrics_instrumental_hint">Bu yayın enstrümantal bir parça, söyleşi veya canlı DJ miksi olabilir.</string>
+    <string name="curated_section_title">Özel Master Kalite &amp; Lo-Fi</string>
+    <string name="curated_section_subtitle">Özenle seçilmiş 320k FLAC/AAC ve reklamsız SomaFM yayınları</string>
+    <string name="no_episodes_loaded">Yüklü bölüm yok</string>
+    <string name="view_episodes">Bölümleri Görüntüle</string>
+    <string name="browse_stations">İstasyonlara Göz At</string>
+    <string name="no_recent_stations">Son çalınan istasyon yok</string>
+    <string name="no_saved_favorites_car">Henüz kayıtlı favori yok</string>
+    <string name="saved_favorites">Kayıtlı Favoriler</string>
+    <string name="car_no_favorites_desc">Kayıtlı istasyon yok. Sürüş sırasında hızlı erişim için herhangi bir istasyondaki kalp simgesine dokunun.</string>
+    <string name="custom_duration_minutes">Özel Süre: %1$d dakika</string>
+    <string name="starts_at">%1$s zamanında başlar</string>
+    <string name="chapter_count">%1$d Bölüm</string>
+    <string name="back_to_list">Listeye Geri Dön</string>
+    <string name="save_episode">Bölümü Kaydet</string>
+    <string name="download_episode">Bölümü İndir</string>
+    <string name="badge_flac_aac">320k FLAC / AAC</string>
+    <string name="badge_flac_master">FLAC Master</string>
+    <string name="badge_somafm">SomaFM</string>
+    <string name="clear_search">Aramayı temizle</string>
+    <string name="remove_search_suggestion">Arama önerisini kaldır</string>
+    <string name="play_featured">Öne Çıkanı Çal</string>
+    <string name="car_quick_presets">Hızlı Önayarlar</string>
+    <string name="car_preset_saved_format">Önayar %1$d konumuna kaydedildi</string>
+    <string name="car_long_press_preset_hint">Mevcut istasyonu buraya kaydetmek için basılı tutun</string>
+    <string name="car_anti_glare_night">Parlama Önleyici Gece Modu</string>
+    <string name="car_anti_glare_on">Parlama Önleyici: AÇIK</string>
+    <string name="car_anti_glare_off">Parlama Önleyici: KAPALI</string>
+    <string name="car_cockpit_live_on_air">CANLI YAYINDA</string>
+    <string name="car_cockpit_stream_ready">YAYIN HAZIR</string>
+    <string name="car_cockpit_buffering">YAYINA BAĞLANIYOR…</string>
+    <string name="car_volume_control">Araç Ses Seviyesi</string>
+    <string name="car_volume_mute">Sessiz</string>
+    <string name="car_volume_down">Ses -</string>
+    <string name="car_volume_up">Ses +</string>
+    <string name="car_curated_master_title">Master &amp; Odyofil İstasyonları</string>
 </resources>

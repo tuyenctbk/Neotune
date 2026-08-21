@@ -291,4 +291,46 @@
     <string name="audio_frequency_visualizer">Visualisator frekuensi</string>
     <string name="sponsor_ad_area">Area iklan sponsor (Bisu)</string>
     <string name="no_connection_msg">Tidak ada koneksi. Cek jaringan Anda.</string>
+
+    <!-- Synchronized strings -->
+    <string name="lyrics_label">Lirik</string>
+    <string name="lyrics_title">Lirik Langsung</string>
+    <string name="fetching_lyrics">Mencari lirik langsung…</string>
+    <string name="no_lyrics_available">Lirik Tidak Ditemukan</string>
+    <string name="lyrics_instrumental_hint">Siaran ini mungkin berupa trek instrumental, bincang-bincang, atau live DJ mix.</string>
+    <string name="curated_section_title">Koleksi Kualitas Master &amp; Lo-Fi</string>
+    <string name="curated_section_subtitle">Siaran pilihan 320k FLAC/AAC &amp; SomaFM bebas iklan</string>
+    <string name="no_episodes_loaded">Belum ada episode dimuat</string>
+    <string name="view_episodes">Lihat Episode</string>
+    <string name="browse_stations">Jelajahi Stasiun</string>
+    <string name="no_recent_stations">Tidak ada stasiun terkini</string>
+    <string name="no_saved_favorites_car">Belum ada favorit tersimpan</string>
+    <string name="saved_favorites">Favorit Tersimpan</string>
+    <string name="car_no_favorites_desc">Belum ada stasiun tersimpan. Ketuk ikon hati pada stasiun mana saja untuk akses cepat saat mengemudi.</string>
+    <string name="custom_duration_minutes">Durasi Kustom: %1$d menit</string>
+    <string name="starts_at">Mulai pada %1$s</string>
+    <string name="chapter_count">%1$d Bab</string>
+    <string name="back_to_list">Kembali ke Daftar</string>
+    <string name="save_episode">Simpan Episode</string>
+    <string name="download_episode">Unduh Episode</string>
+    <string name="badge_flac_aac">320k FLAC / AAC</string>
+    <string name="badge_flac_master">FLAC Master</string>
+    <string name="badge_somafm">SomaFM</string>
+    <string name="clear_search">Hapus pencarian</string>
+    <string name="remove_search_suggestion">Hapus saran pencarian</string>
+    <string name="play_featured">Putar Pilihan</string>
+    <string name="car_quick_presets">Preset Cepat</string>
+    <string name="car_preset_saved_format">Disimpan ke Preset %1$d</string>
+    <string name="car_long_press_preset_hint">Tekan lama untuk menyimpan stasiun saat ini</string>
+    <string name="car_anti_glare_night">Mode Malam Anti-Silau</string>
+    <string name="car_anti_glare_on">Anti-Silau: AKTIF</string>
+    <string name="car_anti_glare_off">Anti-Silau: NONAKTIF</string>
+    <string name="car_cockpit_live_on_air">SIARAN LANGSUNG</string>
+    <string name="car_cockpit_stream_ready">SIARAN SIAP</string>
+    <string name="car_cockpit_buffering">MENGHUBUNGKAN SIARAN…</string>
+    <string name="car_volume_control">Volume Mobil</string>
+    <string name="car_volume_mute">Bisu</string>
+    <string name="car_volume_down">Vol -</string>
+    <string name="car_volume_up">Vol +</string>
+    <string name="car_curated_master_title">Stasiun Master &amp; Audiophile</string>
 </resources>

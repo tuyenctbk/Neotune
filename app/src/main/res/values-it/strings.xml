@@ -291,4 +291,46 @@
     <string name="audio_frequency_visualizer">Visualizzatore di frequenza</string>
     <string name="sponsor_ad_area">Area sponsor (muto)</string>
     <string name="no_connection_msg">Nessuna connessione. Controlla la rete.</string>
+
+    <!-- Synchronized strings -->
+    <string name="lyrics_label">Testo</string>
+    <string name="lyrics_title">Testo in tempo reale</string>
+    <string name="fetching_lyrics">Ricerca testo in tempo reale…</string>
+    <string name="no_lyrics_available">Nessun testo trovato</string>
+    <string name="lyrics_instrumental_hint">Questa trasmissione potrebbe essere un brano strumentale, un talk show o un DJ set live.</string>
+    <string name="curated_section_title">Qualità Master &amp; Lo-Fi</string>
+    <string name="curated_section_subtitle">Streaming 320k FLAC/AAC e SomaFM senza pubblicità selezionati</string>
+    <string name="no_episodes_loaded">Nessun episodio caricato</string>
+    <string name="view_episodes">Visualizza episodi</string>
+    <string name="browse_stations">Sfoglia stazioni</string>
+    <string name="no_recent_stations">Nessuna stazione recente</string>
+    <string name="no_saved_favorites_car">Nessun preferito salvato</string>
+    <string name="saved_favorites">Preferiti salvati</string>
+    <string name="car_no_favorites_desc">Nessuna stazione salvata. Tocca il cuore su qualsiasi stazione per salvarla qui e accedervi rapidamente alla guida.</string>
+    <string name="custom_duration_minutes">Durata personalizzata: %1$d minuti</string>
+    <string name="starts_at">Inizia alle %1$s</string>
+    <string name="chapter_count">%1$d Capitoli</string>
+    <string name="back_to_list">Torna all\'elenco</string>
+    <string name="save_episode">Salva episodio</string>
+    <string name="download_episode">Scarica episodio</string>
+    <string name="badge_flac_aac">320k FLAC / AAC</string>
+    <string name="badge_flac_master">FLAC Master</string>
+    <string name="badge_somafm">SomaFM</string>
+    <string name="clear_search">Cancella ricerca</string>
+    <string name="remove_search_suggestion">Rimuovi suggerimento</string>
+    <string name="play_featured">Riproduci in evidenza</string>
+    <string name="car_quick_presets">Preimpostazioni rapide</string>
+    <string name="car_preset_saved_format">Salvato nella Preimpostazione %1$d</string>
+    <string name="car_long_press_preset_hint">Tieni premuto per salvare la stazione corrente qui</string>
+    <string name="car_anti_glare_night">Modalità antiriflesso notturna</string>
+    <string name="car_anti_glare_on">Antiriflesso: ATTIVO</string>
+    <string name="car_anti_glare_off">Antiriflesso: DISATTIVO</string>
+    <string name="car_cockpit_live_on_air">IN ONDA</string>
+    <string name="car_cockpit_stream_ready">STREAM PRONTO</string>
+    <string name="car_cockpit_buffering">CONNESSIONE ALLO STREAM…</string>
+    <string name="car_volume_control">Volume auto</string>
+    <string name="car_volume_mute">Muto</string>
+    <string name="car_volume_down">Vol -</string>
+    <string name="car_volume_up">Vol +</string>
+    <string name="car_curated_master_title">Stazioni Master &amp; Audiophile</string>
 </resources>

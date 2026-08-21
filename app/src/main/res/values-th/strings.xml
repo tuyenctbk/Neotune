@@ -291,4 +291,46 @@
     <string name="audio_frequency_visualizer">ตัวสร้างภาพความถี่เสียง</string>
     <string name="sponsor_ad_area">พื้นที่โฆษณา (ปิดเสียง)</string>
     <string name="no_connection_msg">ไม่มีการเชื่อมต่อ โปรดตรวจสอบเครือข่ายของคุณ</string>
+
+    <!-- Synchronized strings -->
+    <string name="lyrics_label">เนื้อเพลง</string>
+    <string name="lyrics_title">เนื้อเพลงสด</string>
+    <string name="fetching_lyrics">กำลังค้นหาเนื้อเพลงสด…</string>
+    <string name="no_lyrics_available">ไม่พบเนื้อเพลง</string>
+    <string name="lyrics_instrumental_hint">การออกอากาศนี้อาจเป็นเพลงบรรเลง รายการทอล์กโชว์ หรือมิกซ์ดีเจสด</string>
+    <string name="curated_section_title">สถานีคุณภาพระดับมาสเตอร์ &amp; Lo-Fi</string>
+    <string name="curated_section_subtitle">สตรีม 320k FLAC/AAC และ SomaFM ไร้โฆษณาที่คัดสรรแล้ว</string>
+    <string name="no_episodes_loaded">ยังไม่ได้โหลดตอนใดๆ</string>
+    <string name="view_episodes">ดูตอนทั้งหมด</string>
+    <string name="browse_stations">เรียกดูสถานี</string>
+    <string name="no_recent_stations">ไม่มีสถานีล่าสุด</string>
+    <string name="no_saved_favorites_car">ยังไม่มีรายการโปรดที่บันทึกไว้</string>
+    <string name="saved_favorites">รายการโปรดที่บันทึกไว้</string>
+    <string name="car_no_favorites_desc">ยังไม่มีสถานีที่บันทึกไว้ แตะไอคอนหัวใจที่สถานีใดก็ได้เพื่อบันทึกไว้ที่นี่สำหรับเข้าถึงขณะขับรถ</string>
+    <string name="custom_duration_minutes">ระยะเวลากำหนดเอง: %1$d นาที</string>
+    <string name="starts_at">เริ่มเวลา %1$s</string>
+    <string name="chapter_count">%1$d ตอนย่อย</string>
+    <string name="back_to_list">กลับไปยังรายการ</string>
+    <string name="save_episode">บันทึกตอน</string>
+    <string name="download_episode">ดาวน์โหลดตอน</string>
+    <string name="badge_flac_aac">320k FLAC / AAC</string>
+    <string name="badge_flac_master">FLAC Master</string>
+    <string name="badge_somafm">SomaFM</string>
+    <string name="clear_search">ล้างการค้นหา</string>
+    <string name="remove_search_suggestion">ลบคำแนะนำการค้นหา</string>
+    <string name="play_featured">เล่นสถานีแนะนำ</string>
+    <string name="car_quick_presets">ปุ่มตั้งค่าสถานีด่วน</string>
+    <string name="car_preset_saved_format">บันทึกลงในพรีเซ็ต %1$d แล้ว</string>
+    <string name="car_long_press_preset_hint">กดค้างเพื่อบันทึกสถานีปัจจุบันลงในช่องนี้</string>
+    <string name="car_anti_glare_night">โหมดลดแสงสะท้อนกลางคืน</string>
+    <string name="car_anti_glare_on">ลดแสงสะท้อน: เปิด</string>
+    <string name="car_anti_glare_off">ลดแสงสะท้อน: ปิด</string>
+    <string name="car_cockpit_live_on_air">กำลังออกอากาศสด</string>
+    <string name="car_cockpit_stream_ready">สตรีมพร้อมแล้ว</string>
+    <string name="car_cockpit_buffering">กำลังเชื่อมต่อสตรีม…</string>
+    <string name="car_volume_control">ระดับเสียงในรถ</string>
+    <string name="car_volume_mute">ปิดเสียง</string>
+    <string name="car_volume_down">ลดเสียง</string>
+    <string name="car_volume_up">เพิ่มเสียง</string>
+    <string name="car_curated_master_title">สถานีระดับมาสเตอร์ &amp; ออดิโอไฟล์</string>
 </resources>
