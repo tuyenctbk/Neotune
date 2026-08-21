@@ -291,4 +291,37 @@
     <string name="audio_frequency_visualizer">Trình trực quan hóa tần số</string>
     <string name="sponsor_ad_area">Khu vực quảng cáo (Tắt tiếng)</string>
     <string name="no_connection_msg">Không có kết nối. Vui lòng kiểm tra mạng.</string>
+
+    <!-- Phase 2: Live Lyrics -->
+    <string name="lyrics_label">Lời Bài Hát</string>
+    <string name="lyrics_title">Lời Bài Hát Trực Tiếp</string>
+    <string name="fetching_lyrics">Đang tìm lời bài hát…</string>
+    <string name="no_lyrics_available">Không Tìm Thấy Lời</string>
+    <string name="lyrics_instrumental_hint">Bản phát này có thể là nhạc không lời, chương trình trò chuyện hoặc DJ mix trực tiếp.</string>
+
+    <!-- Phase 3: Curated Audiophile & Lo-Fi -->
+    <string name="curated_section_title">Kênh Tuyển Chọn Chất Lượng Cao &amp; Lo-Fi</string>
+    <string name="curated_section_subtitle">Kênh 320k FLAC/AAC &amp; SomaFM không quảng cáo tuyển chọn</string>
+
+    <!-- Car Mode & Player UI -->
+    <string name="no_episodes_loaded">Chưa tải tập nào</string>
+    <string name="view_episodes">Xem Các Tập</string>
+    <string name="browse_stations">Khám Phá Kênh</string>
+    <string name="no_recent_stations">Không có kênh gần đây</string>
+    <string name="no_saved_favorites_car">Chưa có kênh yêu thích</string>
+    <string name="saved_favorites">Kênh Đã Lưu</string>
+    <string name="car_no_favorites_desc">Chưa lưu kênh nào. Nhấn biểu tượng trái tim để lưu kênh tại đây giúp truy cập nhanh khi lái xe.</string>
+    <string name="custom_duration_minutes">Thời lượng tùy chỉnh: %1$d phút</string>
+    <string name="starts_at">Bắt đầu lúc %1$s</string>
+    <string name="chapter_count">%1$d Chương</string>
+    <string name="back_to_list">Quay lại danh sách</string>
+    <string name="save_episode">Lưu tập</string>
+    <string name="download_episode">Tải tập</string>
+    <string name="badge_flac_aac">320k FLAC / AAC</string>
+    <string name="badge_flac_master">FLAC Master</string>
+    <string name="badge_somafm">SomaFM</string>
+    <string name="clear_search">Xóa tìm kiếm</string>
+    <string name="remove_search_suggestion">Xóa gợi ý tìm kiếm</string>
+    <string name="play_featured">Phát Kênh Nổi Bật</string>
+    <string name="exit_car_mode">Thoát Chế Độ Lái Xe</string>
 </resources>

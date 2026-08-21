@@ -347,4 +347,37 @@
     <string name="audio_frequency_visualizer">Audio Frequency Visualizer</string>
     <string name="sponsor_ad_area">Sponsor Ad Area (Muted - Non-Intrusive)</string>
     <string name="no_connection_msg">No Connection. Please check your network connection to resume radio streaming.</string>
+
+    <!-- Phase 2: Live Lyrics -->
+    <string name="lyrics_label">Lyrics</string>
+    <string name="lyrics_title">Live Lyrics</string>
+    <string name="fetching_lyrics">Finding live lyrics…</string>
+    <string name="no_lyrics_available">No Lyrics Found</string>
+    <string name="lyrics_instrumental_hint">This broadcast might be an instrumental track, talk show, or live DJ mix.</string>
+
+    <!-- Phase 3: Curated Audiophile & Lo-Fi -->
+    <string name="curated_section_title">Curated Master Quality &amp; Lo-Fi</string>
+    <string name="curated_section_subtitle">Handpicked 320k FLAC/AAC &amp; SomaFM commercial-free streams</string>
+
+    <!-- Car Mode & Player UI -->
+    <string name="no_episodes_loaded">No episodes loaded</string>
+    <string name="view_episodes">View Episodes</string>
+    <string name="browse_stations">Browse Stations</string>
+    <string name="no_recent_stations">No recent stations</string>
+    <string name="no_saved_favorites_car">No saved favorites yet</string>
+    <string name="saved_favorites">Saved Favorites</string>
+    <string name="car_no_favorites_desc">No saved stations. Tap the heart icon on any station to save it here for fast access while driving.</string>
+    <string name="custom_duration_minutes">Custom Duration: %1$d minutes</string>
+    <string name="starts_at">Starts at %1$s</string>
+    <string name="chapter_count">%1$d Chapters</string>
+    <string name="back_to_list">Back to List</string>
+    <string name="save_episode">Save Episode</string>
+    <string name="download_episode">Download Episode</string>
+    <string name="badge_flac_aac">320k FLAC / AAC</string>
+    <string name="badge_flac_master">FLAC Master</string>
+    <string name="badge_somafm">SomaFM</string>
+    <string name="clear_search">Clear search</string>
+    <string name="remove_search_suggestion">Remove search suggestion</string>
+    <string name="play_featured">Play Featured</string>
+    <string name="exit_car_mode">Exit Automotive Mode</string>
 </resources>

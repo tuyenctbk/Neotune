@@ -291,4 +291,37 @@
     <string name="audio_frequency_visualizer">Визуализатор частот</string>
     <string name="sponsor_ad_area">Рекламная зона (без звука)</string>
     <string name="no_connection_msg">Нет связи. Проверьте интернет-соединение.</string>
+
+    <!-- Phase 2: Live Lyrics -->
+    <string name="lyrics_label">Текст песни</string>
+    <string name="lyrics_title">Текст в реальном времени</string>
+    <string name="fetching_lyrics">Поиск текста песни…</string>
+    <string name="no_lyrics_available">Текст песни не найден</string>
+    <string name="lyrics_instrumental_hint">Эта трансляция может быть инструментальным треком, разговорным шоу или DJ-миксом.</string>
+
+    <!-- Phase 3: Curated Audiophile & Lo-Fi -->
+    <string name="curated_section_title">Избранное Master Quality &amp; Lo-Fi</string>
+    <string name="curated_section_subtitle">Потоки 320k FLAC/AAC и SomaFM без рекламы в высоком качестве</string>
+
+    <!-- Car Mode & Player UI -->
+    <string name="no_episodes_loaded">Эпизоды не загружены</string>
+    <string name="view_episodes">Посмотреть эпизоды</string>
+    <string name="browse_stations">Обзор станций</string>
+    <string name="no_recent_stations">Нет недавних станций</string>
+    <string name="no_saved_favorites_car">Избранные станции еще не сохранены</string>
+    <string name="saved_favorites">Сохраненные станции</string>
+    <string name="car_no_favorites_desc">Нет сохраненных станций. Нажмите на сердечко у любой станции, чтобы быстро включать ее за рулем.</string>
+    <string name="custom_duration_minutes">Своя длительность: %1$d мин</string>
+    <string name="starts_at">Начало в %1$s</string>
+    <string name="chapter_count">%1$d Глав</string>
+    <string name="back_to_list">Назад к списку</string>
+    <string name="save_episode">Сохранить эпизод</string>
+    <string name="download_episode">Скачать эпизод</string>
+    <string name="badge_flac_aac">320k FLAC / AAC</string>
+    <string name="badge_flac_master">FLAC Master</string>
+    <string name="badge_somafm">SomaFM</string>
+    <string name="clear_search">Очистить поиск</string>
+    <string name="remove_search_suggestion">Удалить подсказку</string>
+    <string name="play_featured">Включить рекомендуемую</string>
+    <string name="exit_car_mode">Выйти из режима авто</string>
 </resources>

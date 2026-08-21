@@ -31,6 +31,9 @@ import com.google.common.util.concurrent.ListenableFuture
 import com.google.common.util.concurrent.SettableFuture
 import com.easeaudio.data.RadioDatabase
 import com.easeaudio.data.RadioStation
+import com.easeaudio.data.TrackArtworkService
+import com.easeaudio.data.LyricsService
+import com.easeaudio.data.SongLyrics
 import com.easeaudio.firebase.FirebaseConfigManager
 import com.easeaudio.network.NetworkQualityManager
 import com.easeaudio.network.NetworkStatus
@@ -157,6 +160,31 @@ class RadioPlayerManager(private val context: Context) {
 
     private val _streamTitle = MutableStateFlow<String?>("Live Audio Stream")
     val streamTitle: StateFlow<String?> = _streamTitle.asStateFlow()
+
+    private val _trackArtworkUrl = MutableStateFlow<String?>(null)
+    val trackArtworkUrl: StateFlow<String?> = _trackArtworkUrl.asStateFlow()
+
+    private val _currentLyrics = MutableStateFlow<SongLyrics?>(null)
+    val currentLyrics: StateFlow<SongLyrics?> = _currentLyrics.asStateFlow()
+
+    private val _isLoadingLyrics = MutableStateFlow(false)
+    val isLoadingLyrics: StateFlow<Boolean> = _isLoadingLyrics.asStateFlow()
+
+    fun fetchLyricsForCurrentTrack() {
+        val title = _streamTitle.value ?: return
+        val current = _currentStation.value
+        scope.launch {
+            _isLoadingLyrics.value = true
+            try {
+                val lyrics = LyricsService.fetchLyrics(title, current?.name ?: "")
+                _currentLyrics.value = lyrics
+            } catch (e: Exception) {
+                Log.w(TAG, "Error fetching lyrics: ${e.message}")
+            } finally {
+                _isLoadingLyrics.value = false
+            }
+        }
+    }
 
     // Visualizer simulated wave amplitudes (8 bars)
     private val _waveAmplitudes = MutableStateFlow(List(8) { 0.2f })
@@ -352,11 +380,24 @@ class RadioPlayerManager(private val context: Context) {
 
                         Log.d(TAG, "MediaMetadata updated -> Station: ${_currentStation.value?.name}, Title: $title, Artist: $artist, Album: $albumTitle, Genre: $genre")
 
-                        _streamTitle.value = when {
-                            !title.isNull_Blank() && !artist.isNull_Blank() -> "$artist - $title"
-                            !title.isNull_Blank() -> title
-                            !artist.isNull_Blank() -> artist
+                        val newStreamTitle = when {
+                            !title.isNullOrBlank() && !artist.isNullOrBlank() -> "$artist - $title"
+                            !title.isNullOrBlank() -> title
+                            !artist.isNullOrBlank() -> artist
                             else -> _currentStation.value?.name ?: context.getString(R.string.live_audio_stream)
+                        }
+                        _streamTitle.value = newStreamTitle
+                        _currentLyrics.value = null
+
+                        // Asynchronously fetch live track album artwork from iTunes Search API
+                        val current = _currentStation.value
+                        if (current != null && !current.isPodcast) {
+                            scope.launch {
+                                val art = TrackArtworkService.fetchTrackArtwork(newStreamTitle, current.name)
+                                if (art != null) {
+                                    _trackArtworkUrl.value = art
+                                }
+                            }
                         }
                     }
 
@@ -941,7 +982,7 @@ class RadioPlayerManager(private val context: Context) {
                 if (responseCode in 300..399) {
                     val location = connection.getHeaderField("Location")
                     connection.disconnect()
-                    if (!location.isNull_Blank()) {
+                    if (!location.isNullOrBlank()) {
                         currentUrl = location.trim()
                         redirectCount++
                         continue
@@ -1044,6 +1085,8 @@ class RadioPlayerManager(private val context: Context) {
         _playbackError.value = null
         _isLoading.value = true
         _streamTitle.value = station.name
+        _trackArtworkUrl.value = null
+        _currentLyrics.value = null
         isFallbackAttempt = isFallback
 
         // Immediately stop previous playback so old podcast/stream stops playing instantly while resolving new URL
@@ -1216,10 +1259,10 @@ class RadioPlayerManager(private val context: Context) {
             exoPlayer?.mediaMetadata?.let { mediaMetadata ->
                 val title = mediaMetadata.title?.toString()
                 val artist = mediaMetadata.artist?.toString()
-                if (!title.isNull_Blank() || !artist.isNull_Blank()) {
+                if (!title.isNullOrBlank() || !artist.isNullOrBlank()) {
                     _streamTitle.value = when {
-                        !title.isNull_Blank() && !artist.isNull_Blank() -> "$artist - $title"
-                        !title.isNull_Blank() -> title
+                        !title.isNullOrBlank() && !artist.isNullOrBlank() -> "$artist - $title"
+                        !title.isNullOrBlank() -> title
                         else -> artist ?: ""
                     }
                 }
@@ -1701,6 +1744,4 @@ class RadioPlayerManager(private val context: Context) {
             else -> false
         }
     }
-
-    private fun CharSequence?.isNull_Blank(): Boolean = this == null || this.isBlank()
 }

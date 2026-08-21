@@ -8,6 +8,8 @@ import com.easeaudio.data.RadioRepository
 import com.easeaudio.data.RadioStation
 import com.easeaudio.data.PodcastEpisode
 import com.easeaudio.data.PodcastEpisodeService
+import com.easeaudio.data.CuratedStationsService
+import com.easeaudio.data.SongLyrics
 import com.easeaudio.service.RadioPlayerManager
 import com.easeaudio.R
 import kotlinx.coroutines.FlowPreview
@@ -39,8 +41,16 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
     val totalPlaybackDuration: StateFlow<Long> = playerManager.totalDuration
     val playbackSpeed: StateFlow<Float> = playerManager.playbackSpeed
     val networkStatus: StateFlow<com.easeaudio.network.NetworkStatus> = playerManager.networkStatus
-    val remoteConfig: StateFlow<com.easeaudio.firebase.AppRemoteConfig> = playerManager.remoteConfig
-    val failedStationIds: StateFlow<Set<String>> = playerManager.failedStationIds
+    val trackArtworkUrl: StateFlow<String?> = playerManager.trackArtworkUrl
+    val currentLyrics: StateFlow<SongLyrics?> = playerManager.currentLyrics
+    val isLoadingLyrics: StateFlow<Boolean> = playerManager.isLoadingLyrics
+
+    private val _curatedAudiophileStations = MutableStateFlow<List<RadioStation>>(CuratedStationsService.defaultCuratedStations)
+    val curatedAudiophileStations: StateFlow<List<RadioStation>> = _curatedAudiophileStations.asStateFlow()
+
+    fun fetchLyricsForCurrentTrack() {
+        playerManager.fetchLyricsForCurrentTrack()
+    }
 
     val snackbarMessage = MutableSharedFlow<String>(extraBufferCapacity = 5)
 
@@ -441,6 +451,18 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
         // Initial load of recent stations
         refreshRecentStations()
 
+        // Fetch dynamic SomaFM & Radio Paradise feeds
+        viewModelScope.launch {
+            try {
+                val curated = CuratedStationsService.getCuratedStations()
+                if (curated.isNotEmpty()) {
+                    _curatedAudiophileStations.value = curated
+                }
+            } catch (e: Exception) {
+                // Default curated stations are already set as fallback
+            }
+        }
+
         viewModelScope.launch {
             stations.collect { list ->
                 playerManager.updateStationList(list)
@@ -597,13 +619,31 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
         val isPlaying: Boolean,
         val isLoading: Boolean,
         val streamTitle: String?,
-        val playbackError: String?
+        val playbackError: String?,
+        val trackArtworkUrl: String?,
+        val currentLyrics: SongLyrics?,
+        val isLoadingLyrics: Boolean
     )
 
     private val playerSnapshot: Flow<PlayerSnapshot> = combine(
-        currentStation, isPlaying, isLoading, streamTitle, playbackError
-    ) { station, playing, loading, title, error ->
-        PlayerSnapshot(station, playing, loading, title, error)
+        combine(currentStation, isPlaying, isLoading, streamTitle, playbackError) { st, play, load, title, err ->
+            listOf<Any?>(st, play, load, title, err)
+        },
+        combine(trackArtworkUrl, currentLyrics, isLoadingLyrics) { art, lyr, loadLyr ->
+            listOf<Any?>(art, lyr, loadLyr)
+        }
+    ) { basic, extra ->
+        @Suppress("UNCHECKED_CAST")
+        PlayerSnapshot(
+            currentStation = basic[0] as RadioStation?,
+            isPlaying = basic[1] as Boolean,
+            isLoading = basic[2] as Boolean,
+            streamTitle = basic[3] as String?,
+            playbackError = basic[4] as String?,
+            trackArtworkUrl = extra[0] as String?,
+            currentLyrics = extra[1] as SongLyrics?,
+            isLoadingLyrics = extra[2] as Boolean
+        )
     }
 
     /** Groups playback detail state. */
@@ -746,6 +786,10 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
             isLoading               = ps.isLoading,
             streamTitle             = ps.streamTitle,
             playbackError           = ps.playbackError,
+            trackArtworkUrl         = ps.trackArtworkUrl,
+            currentLyrics           = ps.currentLyrics,
+            isLoadingLyrics         = ps.isLoadingLyrics,
+            curatedAudiophileStations = _curatedAudiophileStations.value,
             // Playback detail (from typed PlaybackDetail)
             waveAmplitudes          = pd.waveAmplitudes,
             volume                  = pd.volume,

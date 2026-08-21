@@ -732,7 +732,7 @@ fun PodcastEpisodeDetailView(
                         .padding(horizontal = 8.dp, vertical = 2.dp)
                 ) {
                     Text(
-                        text = "${chapters.size} Chapters",
+                        text = stringResource(R.string.chapter_count, chapters.size),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.primary,
                         fontWeight = FontWeight.Bold
@@ -800,7 +800,7 @@ fun PodcastEpisodeDetailView(
                             )
                             Spacer(modifier = Modifier.height(2.dp))
                             Text(
-                                text = "Starts at ${formatDurationMs(chapter.startTimeMs)}",
+                                text = stringResource(R.string.starts_at, formatDurationMs(chapter.startTimeMs)),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
                             )

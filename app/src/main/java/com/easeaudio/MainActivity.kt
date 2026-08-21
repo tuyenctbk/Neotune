@@ -259,6 +259,7 @@ fun MainAppContent(
     }
 
     var showTrackActionSheet by remember { mutableStateOf(false) }
+    var showGlobalLyricsSheet by remember { mutableStateOf(false) }
     val snackbarHostState = remember { SnackbarHostState() }
 
     // Collect UI notifications/snackbars (e.g., Favorites, Recently Played)
@@ -529,6 +530,7 @@ fun MainAppContent(
                                 streamTitle = uiState.streamTitle,
                                 waveAmplitudes = uiState.waveAmplitudes,
                                 sleepTimerRemaining = uiState.sleepTimerRemaining,
+                                trackArtworkUrl = uiState.trackArtworkUrl,
                                 onTogglePlay = { viewModel.togglePlayPause() },
                                 onOpenSleepTimer = { viewModel.setShowSleepTimerDialog(true) },
                                 onToggleFavorite = { syncedCurrentStation?.let { viewModel.toggleFavorite(it) } }
@@ -586,6 +588,7 @@ fun MainAppContent(
                                 waveAmplitudes = uiState.waveAmplitudes,
                                 currentPosition = uiState.currentPlaybackPosition,
                                 totalDuration = uiState.totalPlaybackDuration,
+                                trackArtworkUrl = uiState.trackArtworkUrl,
                                 onTogglePlay = { viewModel.togglePlayPause() },
                                 onToggleFavorite = { syncedCurrentStation?.let { viewModel.toggleFavorite(it) } },
                                 onOpenFullPlayer = { isFullPlayerVisible = true },
@@ -609,7 +612,21 @@ fun MainAppContent(
                                 }
                             },
                             onBlockStation = { syncedCurrentStation?.let { viewModel.blockStation(it.id) } },
+                            onOpenLyrics = {
+                                viewModel.fetchLyricsForCurrentTrack()
+                                showGlobalLyricsSheet = true
+                            },
                             onDismiss = { showTrackActionSheet = false }
+                        )
+                    }
+
+                    if (showGlobalLyricsSheet) {
+                        com.easeaudio.ui.components.LyricsBottomSheet(
+                            lyrics = uiState.currentLyrics,
+                            isLoading = uiState.isLoadingLyrics,
+                            streamTitle = uiState.streamTitle,
+                            currentPositionMs = uiState.currentPlaybackPosition,
+                            onDismiss = { showGlobalLyricsSheet = false }
                         )
                     }
                 }
@@ -638,7 +655,11 @@ fun MainAppContent(
                     activeEqPreset = uiState.activeEqPreset,
                     eqPresets = viewModel.eqPresets,
                     playbackError = uiState.playbackError,
+                    trackArtworkUrl = uiState.trackArtworkUrl,
+                    currentLyrics = uiState.currentLyrics,
+                    isLoadingLyrics = uiState.isLoadingLyrics,
                     hasNotificationPermission = hasNotificationPermission,
+                    onFetchLyrics = { viewModel.fetchLyricsForCurrentTrack() },
                     currentPosition = uiState.currentPlaybackPosition,
                     totalDuration = uiState.totalPlaybackDuration,
                     playbackSpeed = uiState.playbackSpeed,

@@ -282,7 +282,7 @@ private fun CarSideNav(
                 ) {
                     Icon(
                         imageVector = Icons.Filled.Close,
-                        contentDescription = "Exit Automotive Mode",
+                        contentDescription = stringResource(R.string.exit_car_mode),
                         tint = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.size(22.dp)
                     )
@@ -520,9 +520,10 @@ private fun AutomotiveHeroPlayer(
                         // Artwork with glowing border and 1-tap heart
                         val artSize = if (availableHeight < 400.dp) 92.dp else 108.dp
                         val carContext = LocalContext.current
-                        val carImageRequest = remember(currentStation?.imageUrl) {
+                        val effectiveArtworkUrl = uiState.trackArtworkUrl?.ifBlank { null } ?: currentStation?.imageUrl
+                        val carImageRequest = remember(effectiveArtworkUrl) {
                             ImageRequest.Builder(carContext)
-                                .data(currentStation?.imageUrl)
+                                .data(effectiveArtworkUrl)
                                 .crossfade(true)
                                 .build()
                         }
@@ -539,10 +540,10 @@ private fun AutomotiveHeroPlayer(
                                 ),
                             contentAlignment = Alignment.Center
                         ) {
-                            if (currentStation?.imageUrl?.isNotEmpty() == true) {
+                            if (effectiveArtworkUrl?.isNotEmpty() == true) {
                                 AsyncImage(
                                     model = carImageRequest,
-                                    contentDescription = currentStation.name,
+                                    contentDescription = currentStation?.name,
                                     contentScale = ContentScale.Crop,
                                     modifier = Modifier.fillMaxSize()
                                 )
@@ -1089,7 +1090,7 @@ private fun AutomotiveHeroPlayer(
                                             modifier = Modifier.size(32.dp)
                                         )
                                         Text(
-                                            text = "No episodes loaded",
+                                            text = stringResource(R.string.no_episodes_loaded),
                                             style = MaterialTheme.typography.bodySmall,
                                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                                             textAlign = TextAlign.Center
@@ -1163,7 +1164,7 @@ private fun AutomotiveHeroPlayer(
                                             modifier = Modifier.size(32.dp)
                                         )
                                         Text(
-                                            text = "No saved favorites yet",
+                                            text = stringResource(R.string.no_saved_favorites_car),
                                             style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Bold),
                                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                                             textAlign = TextAlign.Center
@@ -1177,7 +1178,7 @@ private fun AutomotiveHeroPlayer(
                                             contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp)
                                         ) {
                                             Text(
-                                                text = if (isPodcast) "View Episodes" else "Browse Stations",
+                                                text = if (isPodcast) stringResource(R.string.view_episodes) else stringResource(R.string.browse_stations),
                                                 style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold)
                                             )
                                         }
@@ -1213,7 +1214,7 @@ private fun AutomotiveHeroPlayer(
                                             modifier = Modifier.size(32.dp)
                                         )
                                         Text(
-                                            text = "No recent stations",
+                                            text = stringResource(R.string.no_recent_stations),
                                             style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Bold),
                                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                                             textAlign = TextAlign.Center
@@ -1225,9 +1226,9 @@ private fun AutomotiveHeroPlayer(
                                                 containerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.8f)
                                             ),
                                             contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp)
-                                        ) {
+                                         ) {
                                             Text(
-                                                text = "Browse Stations",
+                                                text = stringResource(R.string.browse_stations),
                                                 style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold)
                                             )
                                         }
@@ -1270,17 +1271,39 @@ private fun AutomotiveHeroPlayer(
                     modifier = Modifier
                         .size(130.dp)
                         .clip(RoundedCornerShape(20.dp))
-                        .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f)),
+                        .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.75f))
+                        .border(
+                            1.5.dp,
+                            if (isPlaying) MaterialTheme.colorScheme.primary.copy(alpha = 0.65f)
+                            else MaterialTheme.colorScheme.outline.copy(alpha = 0.3f),
+                            RoundedCornerShape(20.dp)
+                        ),
                     contentAlignment = Alignment.Center
                 ) {
-                    AsyncImage(
-                        model = currentStation?.imageUrl,
-                        contentDescription = currentStation?.name,
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier.fillMaxSize()
-                    )
+                    if (effectiveArtworkUrl?.isNotEmpty() == true) {
+                        AsyncImage(
+                            model = carImageRequest,
+                            contentDescription = currentStation?.name,
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier.fillMaxSize()
+                        )
+                    } else {
+                        Icon(
+                            imageVector = if (isPodcast) Icons.Filled.Mic else Icons.Filled.Radio,
+                            contentDescription = null,
+                            modifier = Modifier.size(54.dp),
+                            tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
+                        )
+                    }
                     if (isLoading) {
-                        CircularProgressIndicator(color = MaterialTheme.colorScheme.primary, strokeWidth = 3.dp)
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .background(MaterialTheme.colorScheme.background.copy(alpha = 0.5f)),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator(color = MaterialTheme.colorScheme.primary, strokeWidth = 3.dp)
+                        }
                     }
                     if (currentStation != null) {
                         IconButton(
@@ -1647,7 +1670,7 @@ private fun AutomotiveFavoritesPanel(
 ) {
     Column(modifier = Modifier.fillMaxSize()) {
         Text(
-            text = "Saved Favorites",
+            text = stringResource(R.string.saved_favorites),
             style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Black),
             color = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier.padding(bottom = 8.dp)
@@ -1667,7 +1690,7 @@ private fun AutomotiveFavoritesPanel(
                         modifier = Modifier.size(48.dp)
                     )
                     Text(
-                        text = "No saved stations. Tap the heart icon on any station to save it here for fast access while driving.",
+                        text = stringResource(R.string.car_no_favorites_desc),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         textAlign = TextAlign.Center

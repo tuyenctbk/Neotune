@@ -66,7 +66,7 @@ fun SleepTimerDialog(
                 }
 
                 Text(
-                    text = "Custom Duration: ${customMinutes.toInt()} minutes",
+                    text = stringResource(R.string.custom_duration_minutes, customMinutes.toInt()),
                     color = MaterialTheme.colorScheme.onSurface,
                     style = MaterialTheme.typography.bodyMedium
                 )

@@ -291,4 +291,37 @@
     <string name="audio_frequency_visualizer">Visualizador de frecuencia</string>
     <string name="sponsor_ad_area">Patrocinado (sin sonido)</string>
     <string name="no_connection_msg">Sin conexión. Verifica tu red.</string>
+
+    <!-- Phase 2: Live Lyrics -->
+    <string name="lyrics_label">Letras</string>
+    <string name="lyrics_title">Letras en vivo</string>
+    <string name="fetching_lyrics">Buscando letras en vivo…</string>
+    <string name="no_lyrics_available">No se encontraron letras</string>
+    <string name="lyrics_instrumental_hint">Esta emisión puede ser una pista instrumental, programa de entrevistas o mezcla de DJ.</string>
+
+    <!-- Phase 3: Curated Audiophile & Lo-Fi -->
+    <string name="curated_section_title">Selección Master Quality &amp; Lo-Fi</string>
+    <string name="curated_section_subtitle">Emisiones 320k FLAC/AAC y SomaFM sin publicidad seleccionadas</string>
+
+    <!-- Car Mode & Player UI -->
+    <string name="no_episodes_loaded">No hay episodios cargados</string>
+    <string name="view_episodes">Ver episodios</string>
+    <string name="browse_stations">Explorar emisoras</string>
+    <string name="no_recent_stations">Sin emisoras recientes</string>
+    <string name="no_saved_favorites_car">Sin favoritos guardados aún</string>
+    <string name="saved_favorites">Favoritos guardados</string>
+    <string name="car_no_favorites_desc">No hay emisoras guardadas. Toca el corazón en cualquier emisora para guardarla aquí y acceder rápido mientras conduces.</string>
+    <string name="custom_duration_minutes">Duración personalizada: %1$d minutos</string>
+    <string name="starts_at">Inicia a las %1$s</string>
+    <string name="chapter_count">%1$d Capítulos</string>
+    <string name="back_to_list">Volver a la lista</string>
+    <string name="save_episode">Guardar episodio</string>
+    <string name="download_episode">Descargar episodio</string>
+    <string name="badge_flac_aac">320k FLAC / AAC</string>
+    <string name="badge_flac_master">FLAC Master</string>
+    <string name="badge_somafm">SomaFM</string>
+    <string name="clear_search">Borrar búsqueda</string>
+    <string name="remove_search_suggestion">Eliminar sugerencia</string>
+    <string name="play_featured">Reproducir destacada</string>
+    <string name="exit_car_mode">Salir del modo automotriz</string>
 </resources>

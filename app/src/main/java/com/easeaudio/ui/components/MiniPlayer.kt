@@ -56,6 +56,7 @@ fun MiniPlayer(
     waveAmplitudes: List<Float>,
     currentPosition: Long = 0L,
     totalDuration: Long = 0L,
+    trackArtworkUrl: String? = null,
     onTogglePlay: () -> Unit,
     onToggleFavorite: () -> Unit,
     onOpenFullPlayer: () -> Unit,
@@ -71,6 +72,7 @@ fun MiniPlayer(
         if (station != null) {
             var isFocused by remember { mutableStateOf(false) }
             val showFocus = isFocused
+            val effectiveArtworkUrl = trackArtworkUrl?.ifBlank { null } ?: station.imageUrl
             Surface(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -108,7 +110,7 @@ fun MiniPlayer(
                             )
                     ) {
                         AsyncImage(
-                            model = station.imageUrl,
+                            model = effectiveArtworkUrl,
                             contentDescription = station.name,
                             contentScale = ContentScale.Crop,
                             modifier = Modifier.fillMaxSize()

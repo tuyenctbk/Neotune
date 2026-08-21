@@ -505,6 +505,58 @@ fun HomeScreen(
                     }
                 }
 
+                // Curated Master Quality & Lo-Fi Section
+                if (uiState.curatedAudiophileStations.isNotEmpty() && uiState.searchQuery.isEmpty() && uiState.selectedGenre == "All" && uiState.selectedTab == HomeTab.Radio) {
+                    item(span = { GridItemSpan(maxLineSpan) }) {
+                        Column(modifier = Modifier.padding(top = 16.dp, bottom = 8.dp)) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    text = stringResource(R.string.curated_section_title),
+                                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
+                                    color = MaterialTheme.colorScheme.onSurface
+                                )
+                                Surface(
+                                    shape = RoundedCornerShape(12.dp),
+                                    color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f)
+                                ) {
+                                    Text(
+                                        text = stringResource(R.string.badge_flac_aac),
+                                        style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
+                                        color = MaterialTheme.colorScheme.primary,
+                                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                                    )
+                                }
+                            }
+                            Text(
+                                text = stringResource(R.string.curated_section_subtitle),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                                modifier = Modifier.padding(top = 2.dp)
+                            )
+                        }
+                    }
+                    item(span = { GridItemSpan(maxLineSpan) }) {
+                        LazyRow(
+                            modifier = Modifier.fillMaxWidth(),
+                            contentPadding = PaddingValues(0.dp),
+                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            items(uiState.curatedAudiophileStations) { station ->
+                                CuratedStationCard(
+                                    station = station,
+                                    isPlaying = uiState.currentStation?.id == station.id && uiState.isPlaying,
+                                    onClick = { onStationSelect(station) },
+                                    onToggleFavorite = { onToggleFavorite(station) }
+                                )
+                            }
+                        }
+                    }
+                }
+
                 // Featured Station Hero Banner
                 if (uiState.stations.isNotEmpty() && uiState.searchQuery.isEmpty() && uiState.selectedGenre == "All") {
                     val featured = uiState.stations.first()
@@ -804,6 +856,161 @@ fun HomeScreen(
             },
             onDismiss = { showCountryDialog = false }
         )
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun CuratedStationCard(
+    station: RadioStation,
+    isPlaying: Boolean,
+    onClick: () -> Unit,
+    onToggleFavorite: () -> Unit = {}
+) {
+    var isFocused by remember { mutableStateOf(false) }
+    var showMenu by remember { mutableStateOf(false) }
+    val haptic = LocalHapticFeedback.current
+    val activeAccent = MaterialTheme.colorScheme.primary
+    val focusScale by animateFloatAsState(
+        targetValue = if (isFocused) 1.06f else 1.0f,
+        animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessLow),
+        label = "curated_card_focus_scale"
+    )
+
+    Box {
+        Column(
+            modifier = Modifier
+                .width(140.dp)
+                .onFocusChanged { isFocused = it.isFocused }
+                .scale(focusScale)
+                .clip(RoundedCornerShape(18.dp))
+                .combinedClickable(
+                    onClick = {
+                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                        onClick()
+                    },
+                    onLongClick = {
+                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                        showMenu = true
+                    }
+                ),
+            horizontalAlignment = Alignment.Start
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(140.dp, 100.dp)
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(MaterialTheme.colorScheme.surfaceVariant)
+                    .border(
+                        width = if (isFocused) 2.dp else if (isPlaying) 1.5.dp else 1.dp,
+                        color = if (isFocused || isPlaying) activeAccent else Color.White.copy(alpha = 0.08f),
+                        shape = RoundedCornerShape(16.dp)
+                    )
+            ) {
+                AsyncImage(
+                    model = station.imageUrl,
+                    contentDescription = station.name,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize()
+                )
+                // Gradient Overlay
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(
+                            Brush.verticalGradient(
+                                colors = listOf(
+                                    Color.Transparent,
+                                    Color.Black.copy(alpha = 0.65f)
+                                )
+                            )
+                        )
+                )
+                // Badge
+                Surface(
+                    modifier = Modifier
+                        .align(Alignment.TopStart)
+                        .padding(6.dp),
+                    shape = RoundedCornerShape(6.dp),
+                    color = Color.Black.copy(alpha = 0.6f)
+                ) {
+                    Text(
+                        text = if (station.id.startsWith("curated_rp_")) stringResource(R.string.badge_flac_master) else stringResource(R.string.badge_somafm),
+                        style = MaterialTheme.typography.labelSmall.copy(
+                            fontSize = 9.sp,
+                            fontWeight = FontWeight.Bold
+                        ),
+                        color = if (station.id.startsWith("curated_rp_")) MaterialTheme.colorScheme.primary else Color(0xFFFFB74D),
+                        modifier = Modifier.padding(horizontal = 5.dp, vertical = 2.dp)
+                    )
+                }
+
+                if (isPlaying) {
+                    Box(
+                        modifier = Modifier
+                            .align(Alignment.BottomEnd)
+                            .padding(6.dp)
+                            .size(24.dp)
+                            .clip(CircleShape)
+                            .background(activeAccent),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Pause,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.background,
+                            modifier = Modifier.size(14.dp)
+                        )
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(6.dp))
+
+            Text(
+                text = station.name.replace("SomaFM: ", ""),
+                style = MaterialTheme.typography.bodyMedium.copy(
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 13.sp
+                ),
+                color = MaterialTheme.colorScheme.onSurface,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+            Text(
+                text = station.genre,
+                style = MaterialTheme.typography.labelSmall.copy(fontSize = 11.sp),
+                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.65f),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+        }
+
+        DropdownMenu(
+            expanded = showMenu,
+            onDismissRequest = { showMenu = false },
+            modifier = Modifier.background(MaterialTheme.colorScheme.surfaceVariant)
+        ) {
+            DropdownMenuItem(
+                text = {
+                    Text(
+                        text = if (station.isFavorite) stringResource(R.string.remove_from_favorites) else stringResource(R.string.add_to_favorites),
+                        color = if (station.isFavorite) FavoriteHeartColor else MaterialTheme.colorScheme.onSurface
+                    )
+                },
+                leadingIcon = {
+                    Icon(
+                        imageVector = if (station.isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
+                        contentDescription = null,
+                        tint = if (station.isFavorite) FavoriteHeartColor else MaterialTheme.colorScheme.onSurface
+                    )
+                },
+                onClick = {
+                    onToggleFavorite()
+                    showMenu = false
+                }
+            )
+        }
     }
 }
 

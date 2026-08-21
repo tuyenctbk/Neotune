@@ -291,4 +291,37 @@
     <string name="audio_frequency_visualizer">Visualiseur de fréquence</string>
     <string name="sponsor_ad_area">Zone sponsorisée (muet)</string>
     <string name="no_connection_msg">Pas de connexion. Vérifiez votre réseau.</string>
+
+    <!-- Phase 2: Live Lyrics -->
+    <string name="lyrics_label">Paroles</string>
+    <string name="lyrics_title">Paroles en direct</string>
+    <string name="fetching_lyrics">Recherche des paroles en direct…</string>
+    <string name="no_lyrics_available">Aucune parole trouvée</string>
+    <string name="lyrics_instrumental_hint">Cette diffusion peut être un morceau instrumental, une émission ou un mix DJ.</string>
+
+    <!-- Phase 3: Curated Audiophile & Lo-Fi -->
+    <string name="curated_section_title">Sélection Haute Qualité &amp; Lo-Fi</string>
+    <string name="curated_section_subtitle">Flux 320k FLAC/AAC et SomaFM sans publicité sélectionnés</string>
+
+    <!-- Car Mode & Player UI -->
+    <string name="no_episodes_loaded">Aucun épisode chargé</string>
+    <string name="view_episodes">Voir les épisodes</string>
+    <string name="browse_stations">Parcourir les stations</string>
+    <string name="no_recent_stations">Aucune station récente</string>
+    <string name="no_saved_favorites_car">Aucun favori enregistré</string>
+    <string name="saved_favorites">Favoris enregistrés</string>
+    <string name="car_no_favorites_desc">Aucune station enregistrée. Touchez le cœur pour l\'enregistrer ici et y accéder rapidement au volant.</string>
+    <string name="custom_duration_minutes">Durée personnalisée : %1$d minutes</string>
+    <string name="starts_at">Commence à %1$s</string>
+    <string name="chapter_count">%1$d Chapitres</string>
+    <string name="back_to_list">Retour à la liste</string>
+    <string name="save_episode">Enregistrer l\'épisode</string>
+    <string name="download_episode">Télécharger l\'épisode</string>
+    <string name="badge_flac_aac">320k FLAC / AAC</string>
+    <string name="badge_flac_master">FLAC Master</string>
+    <string name="badge_somafm">SomaFM</string>
+    <string name="clear_search">Effacer la recherche</string>
+    <string name="remove_search_suggestion">Supprimer la suggestion</string>
+    <string name="play_featured">Écouter en vedette</string>
+    <string name="exit_car_mode">Quitter le mode voiture</string>
 </resources>

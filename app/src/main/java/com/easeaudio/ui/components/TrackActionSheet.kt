@@ -13,6 +13,7 @@ import androidx.compose.material.icons.filled.Alarm
 import androidx.compose.material.icons.filled.Block
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.MusicNote
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Share
@@ -42,6 +43,7 @@ fun TrackActionSheet(
     onToggleFavorite: (() -> Unit)? = null,
     onSetAsAlarmStation: (() -> Unit)? = null,
     onBlockStation: (() -> Unit)? = null,
+    onOpenLyrics: (() -> Unit)? = null,
     onDismiss: () -> Unit
 ) {
     val context = LocalContext.current
@@ -156,6 +158,18 @@ fun TrackActionSheet(
                 ) {
                     onDismiss()
                     onSetAsAlarmStation()
+                }
+            }
+
+            // Action Item: View Live Lyrics
+            if (onOpenLyrics != null) {
+                TrackActionItem(
+                    icon = Icons.Filled.Mic,
+                    label = stringResource(R.string.lyrics_title),
+                    tint = MaterialTheme.colorScheme.primary
+                ) {
+                    onDismiss()
+                    onOpenLyrics()
                 }
             }
 

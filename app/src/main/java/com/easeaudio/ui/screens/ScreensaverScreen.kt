@@ -70,6 +70,7 @@ fun ScreensaverScreen(
     streamTitle: String?,
     waveAmplitudes: List<Float>,
     sleepTimerRemaining: Int?,
+    trackArtworkUrl: String? = null,
     onTogglePlay: () -> Unit,
     onOpenSleepTimer: () -> Unit,
     onToggleFavorite: (() -> Unit)? = null,
@@ -184,9 +185,10 @@ fun ScreensaverScreen(
         // LAYER 1: Full Screen Background Image / Ambient Theme
         when (selectedTheme) {
             AmbientTheme.STATION_ART -> {
-                if (currentStation != null && currentStation.imageUrl.isNotEmpty()) {
+                val effectiveArt = trackArtworkUrl?.ifBlank { null } ?: currentStation?.imageUrl
+                if (effectiveArt?.isNotEmpty() == true) {
                     AsyncImage(
-                        model = currentStation.imageUrl,
+                        model = effectiveArt,
                         contentDescription = "Background Cover Art",
                         contentScale = ContentScale.Crop,
                         modifier = Modifier

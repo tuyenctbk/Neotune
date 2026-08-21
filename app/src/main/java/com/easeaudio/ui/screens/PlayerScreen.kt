@@ -47,6 +47,8 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.testTag
 import com.easeaudio.R
 import com.easeaudio.data.RadioStation
+import com.easeaudio.data.SongLyrics
+import com.easeaudio.ui.components.LyricsBottomSheet
 import com.easeaudio.ui.theme.*
 import com.easeaudio.viewmodel.EqPresetDisplay
 import androidx.compose.ui.text.font.FontWeight
@@ -73,6 +75,9 @@ fun PlayerScreen(
     activeEqPreset: String,
     eqPresets: List<EqPresetDisplay> = emptyList(),
     playbackError: String? = null,
+    trackArtworkUrl: String? = null,
+    currentLyrics: SongLyrics? = null,
+    isLoadingLyrics: Boolean = false,
     hasNotificationPermission: Boolean = true,
     onRequestNotificationPermission: () -> Unit = {},
     onTogglePlay: () -> Unit,
@@ -80,6 +85,7 @@ fun PlayerScreen(
     onVolumeChange: (Float) -> Unit,
     onOpenSleepTimer: () -> Unit,
     onOpenEqualizer: () -> Unit,
+    onFetchLyrics: () -> Unit = {},
     onOpenTrackOptions: () -> Unit = {},
     onOpenScreensaver: () -> Unit = {},
     onOpenCarMode: () -> Unit = {},
@@ -107,6 +113,7 @@ fun PlayerScreen(
         return
     }
 
+    val effectiveImageUrl = trackArtworkUrl?.ifBlank { null } ?: station.imageUrl
     val infiniteTransition = rememberInfiniteTransition(label = "pulse")
     val artScale by infiniteTransition.animateFloat(
         initialValue = 1.0f,
@@ -118,7 +125,7 @@ fun PlayerScreen(
         label = "artPulse"
     )
 
-    val artworkPalette = rememberArtworkPalette(station.imageUrl)
+    val artworkPalette = rememberArtworkPalette(effectiveImageUrl)
     val animatedMutedColor by animateColorAsState(
         targetValue = artworkPalette.darkMutedColor.copy(alpha = 0.5f),
         animationSpec = tween(1000),
@@ -129,6 +136,18 @@ fun PlayerScreen(
         animationSpec = tween(1000),
         label = "paletteVibrant"
     )
+
+    var showLyricsSheet by remember { mutableStateOf(false) }
+
+    if (showLyricsSheet) {
+        LyricsBottomSheet(
+            lyrics = currentLyrics,
+            isLoading = isLoadingLyrics,
+            streamTitle = streamTitle,
+            currentPositionMs = currentPosition,
+            onDismiss = { showLyricsSheet = false }
+        )
+    }
 
     val solidBackground = MaterialTheme.colorScheme.background
     Scaffold(
@@ -287,6 +306,16 @@ fun PlayerScreen(
                             )
                             HorizontalDivider(color = MaterialTheme.colorScheme.outline, thickness = 1.dp)
                             DropdownMenuItem(
+                                text = { Text(stringResource(R.string.lyrics_title), color = MaterialTheme.colorScheme.onSurface) },
+                                leadingIcon = { Icon(Icons.Filled.Mic, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },
+                                onClick = {
+                                    showPlayerMenu = false
+                                    onFetchLyrics()
+                                    showLyricsSheet = true
+                                }
+                            )
+                            HorizontalDivider(color = MaterialTheme.colorScheme.outline, thickness = 1.dp)
+                            DropdownMenuItem(
                                 text = { Text(stringResource(R.string.track_options), color = MaterialTheme.colorScheme.onSurface) },
                                 leadingIcon = { Icon(Icons.Filled.Settings, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant) },
                                 onClick = {
@@ -327,6 +356,7 @@ fun PlayerScreen(
                     ) {
                         StationArtworkCard(
                             station = station,
+                            trackArtworkUrl = trackArtworkUrl,
                             isLoading = isLoading,
                             artScale = artScale,
                             cornerRadius = 32.dp,
@@ -367,6 +397,10 @@ fun PlayerScreen(
                                 onOpenEpisodes = onOpenEpisodes,
                                 onOpenSleepTimer = onOpenSleepTimer,
                                 onOpenEqualizer = onOpenEqualizer,
+                                onOpenLyrics = {
+                                    onFetchLyrics()
+                                    showLyricsSheet = true
+                                },
                                 isHorizontal = true
                             )
                         }
@@ -397,6 +431,7 @@ fun PlayerScreen(
 
                         StationArtworkCard(
                             station = station,
+                            trackArtworkUrl = trackArtworkUrl,
                             isLoading = isLoading,
                             artScale = artScale,
                             cornerRadius = 24.dp,
@@ -431,6 +466,10 @@ fun PlayerScreen(
                             onOpenEpisodes = onOpenEpisodes,
                             onOpenSleepTimer = onOpenSleepTimer,
                             onOpenEqualizer = onOpenEqualizer,
+                            onOpenLyrics = {
+                                onFetchLyrics()
+                                showLyricsSheet = true
+                            },
                             isHorizontal = false
                         )
                     }
@@ -466,6 +505,7 @@ private fun PlayerContent(
     onOpenEpisodes: (() -> Unit)?,
     onOpenSleepTimer: () -> Unit,
     onOpenEqualizer: () -> Unit,
+    onOpenLyrics: () -> Unit = {},
     isHorizontal: Boolean
 ) {
     val isPodcast = station.isPodcast
@@ -890,6 +930,11 @@ private fun PlayerContent(
                 leadingIcon = { Icon(Icons.Filled.Bedtime, null, modifier = Modifier.size(16.dp), tint = if (sleepTimerRemaining != null) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.primary) },
                 colors = if (sleepTimerRemaining != null) AssistChipDefaults.assistChipColors(containerColor = MaterialTheme.colorScheme.primaryContainer) else AssistChipDefaults.assistChipColors()
             )
+            AssistChip(
+                onClick = onOpenLyrics,
+                label = { Text(stringResource(R.string.lyrics_label)) },
+                leadingIcon = { Icon(Icons.Filled.Mic, null, modifier = Modifier.size(16.dp), tint = MaterialTheme.colorScheme.primary) }
+            )
         }
     }
 }
@@ -911,6 +956,7 @@ private fun formatDuration(ms: Long): String {
 @Composable
 private fun StationArtworkCard(
     station: RadioStation,
+    trackArtworkUrl: String? = null,
     isLoading: Boolean,
     artScale: Float,
     cornerRadius: androidx.compose.ui.unit.Dp,
@@ -918,9 +964,10 @@ private fun StationArtworkCard(
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
-    val imageRequest = remember(station.imageUrl) {
+    val effectiveUrl = trackArtworkUrl?.ifBlank { null } ?: station.imageUrl
+    val imageRequest = remember(effectiveUrl) {
         ImageRequest.Builder(context)
-            .data(station.imageUrl)
+            .data(effectiveUrl)
             .crossfade(true)
             .build()
     }

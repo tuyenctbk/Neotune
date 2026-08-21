@@ -291,4 +291,37 @@
     <string name="audio_frequency_visualizer">音訊頻譜可視化</string>
     <string name="sponsor_ad_area">贊助區域（靜音且無干擾）</string>
     <string name="no_connection_msg">無連接。請檢查網路以恢復電台直播。</string>
+
+    <!-- Phase 2: Live Lyrics -->
+    <string name="lyrics_label">歌詞</string>
+    <string name="lyrics_title">即時歌詞</string>
+    <string name="fetching_lyrics">正在搜尋即時歌詞…</string>
+    <string name="no_lyrics_available">未找到歌詞</string>
+    <string name="lyrics_instrumental_hint">目前廣播可能為純音樂、訪談節目或DJ現場混音。</string>
+
+    <!-- Phase 3: Curated Audiophile & Lo-Fi -->
+    <string name="curated_section_title">精選無損母帶 &amp; Lo-Fi</string>
+    <string name="curated_section_subtitle">精選 320k FLAC/AAC 及 SomaFM 無廣告高品質廣播</string>
+
+    <!-- Car Mode & Player UI -->
+    <string name="no_episodes_loaded">未載入任何單集</string>
+    <string name="view_episodes">查看單集</string>
+    <string name="browse_stations">瀏覽電台</string>
+    <string name="no_recent_stations">暫無最近播放電台</string>
+    <string name="no_saved_favorites_car">暫無已收藏電台</string>
+    <string name="saved_favorites">已收藏電台</string>
+    <string name="car_no_favorites_desc">暫無收藏。在任意電台點擊愛心圖示即可收藏至此處，方便行車中快速播放。</string>
+    <string name="custom_duration_minutes">自訂時長: %1$d 分鐘</string>
+    <string name="starts_at">起始於 %1$s</string>
+    <string name="chapter_count">%1$d 章節</string>
+    <string name="back_to_list">返回列表</string>
+    <string name="save_episode">收藏單集</string>
+    <string name="download_episode">下載單集</string>
+    <string name="badge_flac_aac">320k FLAC / AAC</string>
+    <string name="badge_flac_master">FLAC Master</string>
+    <string name="badge_somafm">SomaFM</string>
+    <string name="clear_search">清空搜尋</string>
+    <string name="remove_search_suggestion">刪除搜尋建議</string>
+    <string name="play_featured">播放精選推薦</string>
+    <string name="exit_car_mode">退出車載模式</string>
 </resources>

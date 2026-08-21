@@ -291,4 +291,37 @@
     <string name="audio_frequency_visualizer">オーディオビジュアライザー</string>
     <string name="sponsor_ad_area">スポンサーエリア（ミュート）</string>
     <string name="no_connection_msg">接続なし。ネットワークを確認してください。</string>
+
+    <!-- Phase 2: Live Lyrics -->
+    <string name="lyrics_label">歌詞</string>
+    <string name="lyrics_title">リアルタイム歌詞</string>
+    <string name="fetching_lyrics">リアルタイム歌詞を検索中…</string>
+    <string name="no_lyrics_available">歌詞が見つかりません</string>
+    <string name="lyrics_instrumental_hint">この放送はインストゥルメンタル曲、トーク番組、またはDJミックスの可能性があります。</string>
+
+    <!-- Phase 3: Curated Audiophile & Lo-Fi -->
+    <string name="curated_section_title">厳選マスタークオリティ &amp; Lo-Fi</string>
+    <string name="curated_section_subtitle">厳選された320k FLAC/AACおよびSomaFM広告なし配信</string>
+
+    <!-- Car Mode & Player UI -->
+    <string name="no_episodes_loaded">エピソードが読み込まれていません</string>
+    <string name="view_episodes">エピソードを見る</string>
+    <string name="browse_stations">ステーションを探す</string>
+    <string name="no_recent_stations">最近再生したステーションはありません</string>
+    <string name="no_saved_favorites_car">お気に入りがまだ登録されていません</string>
+    <string name="saved_favorites">保存済みのお気に入り</string>
+    <string name="car_no_favorites_desc">ステーションが保存されていません。ハートアイコンをタップすると、運転中にすぐアクセスできるようにここに保存されます。</string>
+    <string name="custom_duration_minutes">カスタム時間: %1$d分</string>
+    <string name="starts_at">%1$sから開始</string>
+    <string name="chapter_count">%1$d チャプター</string>
+    <string name="back_to_list">一覧に戻る</string>
+    <string name="save_episode">エピソードを保存</string>
+    <string name="download_episode">エピソードをダウンロード</string>
+    <string name="badge_flac_aac">320k FLAC / AAC</string>
+    <string name="badge_flac_master">FLAC Master</string>
+    <string name="badge_somafm">SomaFM</string>
+    <string name="clear_search">検索をクリア</string>
+    <string name="remove_search_suggestion">検索候補を削除</string>
+    <string name="play_featured">おすすめステーションを再生</string>
+    <string name="exit_car_mode">車内モードを終了</string>
 </resources>
