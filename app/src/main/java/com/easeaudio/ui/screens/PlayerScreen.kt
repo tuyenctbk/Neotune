@@ -30,8 +30,11 @@ import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
+import coil.request.ImageRequest
 import com.easeaudio.ui.components.AudioVisualizerCanvas
 import com.easeaudio.ui.components.VisualizerStyle
 import androidx.compose.ui.graphics.Brush
@@ -322,25 +325,16 @@ fun PlayerScreen(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(40.dp)
                     ) {
-                        Box(
+                        StationArtworkCard(
+                            station = station,
+                            isLoading = isLoading,
+                            artScale = artScale,
+                            cornerRadius = 32.dp,
+                            paletteVibrant = artworkPalette.vibrantColor,
                             modifier = Modifier
                                 .weight(1f)
                                 .aspectRatio(1f)
-                                .scale(artScale)
-                                .clip(RoundedCornerShape(32.dp))
-                                .border(1.dp, Color(0x12FFFFFF), RoundedCornerShape(32.dp)),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            AsyncImage(
-                                model = station.imageUrl,
-                                contentDescription = station.name,
-                                contentScale = ContentScale.Crop,
-                                modifier = Modifier.fillMaxSize()
-                            )
-                            if (isLoading) {
-                                CircularProgressIndicator(color = MaterialTheme.colorScheme.primary, strokeWidth = 4.dp)
-                            }
-                        }
+                        )
 
                         Column(
                             modifier = Modifier
@@ -401,30 +395,14 @@ fun PlayerScreen(
                             )
                         }
 
-                        Box(
-                            modifier = Modifier
-                                .size(artSize)
-                                .scale(artScale)
-                                .clip(RoundedCornerShape(24.dp))
-                                .border(1.dp, Color(0x12FFFFFF), RoundedCornerShape(24.dp))
-                        ) {
-                            AsyncImage(
-                                model = station.imageUrl,
-                                contentDescription = station.name,
-                                contentScale = ContentScale.Crop,
-                                modifier = Modifier.fillMaxSize()
-                            )
-                            if (isLoading) {
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .background(MaterialTheme.colorScheme.background.copy(alpha = 0.6f)),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    CircularProgressIndicator(color = MaterialTheme.colorScheme.primary, strokeWidth = 3.dp)
-                                }
-                            }
-                        }
+                        StationArtworkCard(
+                            station = station,
+                            isLoading = isLoading,
+                            artScale = artScale,
+                            cornerRadius = 24.dp,
+                            paletteVibrant = artworkPalette.vibrantColor,
+                            modifier = Modifier.size(artSize)
+                        )
 
                         Spacer(modifier = Modifier.height(24.dp))
 
@@ -927,5 +905,133 @@ private fun formatDuration(ms: Long): String {
         String.format(java.util.Locale.US, "%d:%02d:%02d", hours, remMinutes, seconds)
     } else {
         String.format(java.util.Locale.US, "%02d:%02d", minutes, seconds)
+    }
+}
+
+@Composable
+private fun StationArtworkCard(
+    station: RadioStation,
+    isLoading: Boolean,
+    artScale: Float,
+    cornerRadius: androidx.compose.ui.unit.Dp,
+    paletteVibrant: Color,
+    modifier: Modifier = Modifier
+) {
+    val context = LocalContext.current
+    val imageRequest = remember(station.imageUrl) {
+        ImageRequest.Builder(context)
+            .data(station.imageUrl)
+            .crossfade(true)
+            .build()
+    }
+
+    Box(
+        modifier = modifier
+            .scale(artScale)
+            .clip(RoundedCornerShape(cornerRadius))
+            .border(
+                1.dp,
+                Brush.linearGradient(
+                    listOf(
+                        Color.White.copy(alpha = 0.22f),
+                        Color.White.copy(alpha = 0.05f),
+                        paletteVibrant.copy(alpha = 0.25f)
+                    )
+                ),
+                RoundedCornerShape(cornerRadius)
+            )
+            .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)),
+        contentAlignment = Alignment.Center
+    ) {
+        // Layer 1: Ambient Blurred Glow Background from the Station Artwork
+        AsyncImage(
+            model = imageRequest,
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier
+                .fillMaxSize()
+                .blur(radius = 24.dp)
+                .alpha(0.42f)
+        )
+
+        // Radial depth vignette overlay
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(
+                    Brush.radialGradient(
+                        colors = listOf(
+                            Color.Transparent,
+                            MaterialTheme.colorScheme.surface.copy(alpha = 0.45f),
+                            MaterialTheme.colorScheme.background.copy(alpha = 0.82f)
+                        )
+                    )
+                )
+        )
+
+        // Layer 2: Clean Inner Artwork Frame (prevents pixelation of low-res favicons)
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(14.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Surface(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .clip(RoundedCornerShape(cornerRadius - 8.dp))
+                    .border(
+                        0.5.dp,
+                        Color.White.copy(alpha = 0.15f),
+                        RoundedCornerShape(cornerRadius - 8.dp)
+                    ),
+                color = Color.Black.copy(alpha = 0.25f),
+                tonalElevation = 4.dp,
+                shadowElevation = 8.dp
+            ) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    AsyncImage(
+                        model = imageRequest,
+                        contentDescription = station.name,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
+            }
+        }
+
+        // Layer 3: Glass top gloss reflection
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(
+                    Brush.verticalGradient(
+                        colors = listOf(
+                            Color.White.copy(alpha = 0.10f),
+                            Color.Transparent,
+                            Color.Black.copy(alpha = 0.20f)
+                        )
+                    )
+                )
+        )
+
+        // Layer 4: Buffering / Loading Indicator
+        if (isLoading) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(MaterialTheme.colorScheme.background.copy(alpha = 0.55f)),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator(
+                    color = MaterialTheme.colorScheme.primary,
+                    strokeWidth = 3.5.dp,
+                    modifier = Modifier.size(40.dp)
+                )
+            }
+        }
     }
 }

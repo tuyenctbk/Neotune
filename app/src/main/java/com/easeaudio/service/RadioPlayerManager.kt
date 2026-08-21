@@ -500,6 +500,19 @@ class RadioPlayerManager(private val context: Context) {
                         val currentStation = _currentStation.value
                         return currentStation?.isPodcast == true
                     }
+
+                    override fun play() {
+                        val currentStation = _currentStation.value
+                        if (currentStation != null && (player.playbackState == Player.STATE_IDLE ||
+                                    player.playbackState == Player.STATE_ENDED ||
+                                    player.mediaItemCount == 0 ||
+                                    player.currentMediaItem == null ||
+                                    _playbackError.value != null)) {
+                            playStation(currentStation)
+                        } else {
+                            super.play()
+                        }
+                    }
                 }
 
                 val mediaLibraryCallback = object : MediaLibrarySession.Callback {
@@ -1085,11 +1098,17 @@ class RadioPlayerManager(private val context: Context) {
             if (player.isPlaying) {
                 player.pause()
             } else {
-                // Bug #6: mediaItemCount is always >= 1 after the first playStation() call
-                // because ExoPlayer retains the last item. The correct sentinel for
-                // "nothing has ever been played" is _currentStation.value == null.
-                if (_currentStation.value == null || player.playbackState == Player.STATE_ENDED || _playbackError.value != null) {
-                    _currentStation.value?.let { playStation(it) }
+                val current = _currentStation.value
+                if (current != null && (player.playbackState == Player.STATE_IDLE ||
+                            player.playbackState == Player.STATE_ENDED ||
+                            player.mediaItemCount == 0 ||
+                            player.currentMediaItem == null ||
+                            _playbackError.value != null)
+                ) {
+                    playStation(current)
+                } else if (current == null) {
+                    val fallback = currentStationList.firstOrNull() ?: knownStations.values.firstOrNull()
+                    fallback?.let { playStation(it) }
                 } else {
                     try {
                         val intent = Intent(context, RadioPlaybackService::class.java)

@@ -87,7 +87,12 @@ object iTunesPodcastService {
                         val primaryGenre = item.optString("primaryGenreName", "Podcast").trim()
                         val feedUrl = item.optString("feedUrl", "").trim()
                         val collectionViewUrl = item.optString("collectionViewUrl", "").trim()
-                        val artworkUrl = item.optString("artworkUrl600", item.optString("artworkUrl100", "")).trim()
+                        val rawArtworkUrl = item.optString("artworkUrl600", item.optString("artworkUrl100", item.optString("artworkUrl60", ""))).trim()
+                        val artworkUrl = if (rawArtworkUrl.contains("mzstatic.com")) {
+                            rawArtworkUrl.replace(Regex("/\\d+x\\d+bb"), "/600x600bb")
+                        } else {
+                            rawArtworkUrl
+                        }
                         val itemCountry = item.optString("country", "USA").trim()
 
                         val streamUrl = when {

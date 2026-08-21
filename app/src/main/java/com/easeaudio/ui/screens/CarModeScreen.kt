@@ -37,6 +37,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -45,6 +46,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.easeaudio.R
 import com.easeaudio.data.PodcastEpisode
 import com.easeaudio.data.RadioStation
@@ -517,22 +519,29 @@ private fun AutomotiveHeroPlayer(
                     ) {
                         // Artwork with glowing border and 1-tap heart
                         val artSize = if (availableHeight < 400.dp) 92.dp else 108.dp
+                        val carContext = LocalContext.current
+                        val carImageRequest = remember(currentStation?.imageUrl) {
+                            ImageRequest.Builder(carContext)
+                                .data(currentStation?.imageUrl)
+                                .crossfade(true)
+                                .build()
+                        }
                         Box(
                             modifier = Modifier
                                 .size(artSize)
                                 .clip(RoundedCornerShape(16.dp))
-                                .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f))
+                                .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.75f))
                                 .border(
-                                    1.dp,
-                                    if (isPlaying) MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
-                                    else MaterialTheme.colorScheme.outline.copy(alpha = 0.2f),
+                                    1.5.dp,
+                                    if (isPlaying) MaterialTheme.colorScheme.primary.copy(alpha = 0.65f)
+                                    else MaterialTheme.colorScheme.outline.copy(alpha = 0.3f),
                                     RoundedCornerShape(16.dp)
                                 ),
                             contentAlignment = Alignment.Center
                         ) {
                             if (currentStation?.imageUrl?.isNotEmpty() == true) {
                                 AsyncImage(
-                                    model = currentStation.imageUrl,
+                                    model = carImageRequest,
                                     contentDescription = currentStation.name,
                                     contentScale = ContentScale.Crop,
                                     modifier = Modifier.fillMaxSize()
@@ -542,16 +551,23 @@ private fun AutomotiveHeroPlayer(
                                     imageVector = if (isPodcast) Icons.Filled.Mic else Icons.Filled.Radio,
                                     contentDescription = null,
                                     modifier = Modifier.size(44.dp),
-                                    tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
+                                    tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
                                 )
                             }
 
                             if (isLoading) {
-                                CircularProgressIndicator(
-                                    modifier = Modifier.size(34.dp),
-                                    color = MaterialTheme.colorScheme.primary,
-                                    strokeWidth = 3.dp
-                                )
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .background(MaterialTheme.colorScheme.background.copy(alpha = 0.5f)),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    CircularProgressIndicator(
+                                        modifier = Modifier.size(34.dp),
+                                        color = MaterialTheme.colorScheme.primary,
+                                        strokeWidth = 3.dp
+                                    )
+                                }
                             }
 
                             // 1-tap Favorite Heart on Artwork
