@@ -245,8 +245,8 @@
     <string name="loading_podcast_episodes">Loading podcast episodes…</string>
     <string name="no_episodes_available">No episodes available for this show.</string>
     <string name="onboarding_podcast_title">Podcasts &amp; Shows</string>
-    <string name="onboarding_podcast_subtitle">Entdecken Sie eine riesige Sammlung von On-Demand-Podcasts zu verschiedenen Themen und Genres.</string>
-    <string name="onboarding_podcast_badge1">1M+ Folgen</string>
+    <string name="onboarding_podcast_subtitle">Entdecken Sie eine riesige Sammlung von über 2,5 Mio. Podcasts und On-Demand-Sendungen weltweit.</string>
+    <string name="onboarding_podcast_badge1">2,5M+ Podcasts</string>
     <string name="onboarding_podcast_badge2">Intelligente Entdeckung</string>
     <string name="onboarding_audio_title">Pro Audio &amp; EQ</string>
     <string name="onboarding_audio_subtitle">Passen Sie Ihren Sound mit erweitertem Equalizer, DSP-Profilen und Sleep-Timer an.</string>

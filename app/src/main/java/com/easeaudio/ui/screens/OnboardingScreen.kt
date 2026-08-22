@@ -708,14 +708,15 @@ private fun CountryPickerGrid(selectedCountry: String, onCountrySelected: (Strin
     val allCountriesList = remember {
         listOf(
             com.easeaudio.viewmodel.CountryDisplay("Global", "🌐", ""),
-            com.easeaudio.viewmodel.CountryDisplay("Vietnam", "🇻🇳", "VN"),
             com.easeaudio.viewmodel.CountryDisplay("United States", "🇺🇸", "US"),
             com.easeaudio.viewmodel.CountryDisplay("United Kingdom", "🇬🇧", "GB"),
+            com.easeaudio.viewmodel.CountryDisplay("Germany", "🇩🇪", "DE"),
+            com.easeaudio.viewmodel.CountryDisplay("France", "🇫🇷", "FR"),
             com.easeaudio.viewmodel.CountryDisplay("Canada", "🇨🇦", "CA"),
             com.easeaudio.viewmodel.CountryDisplay("Australia", "🇦🇺", "AU"),
-            com.easeaudio.viewmodel.CountryDisplay("Germany", "🇩🇪", "DE"),
             com.easeaudio.viewmodel.CountryDisplay("Japan", "🇯🇵", "JP"),
-            com.easeaudio.viewmodel.CountryDisplay("Brazil", "🇧🇷", "BR")
+            com.easeaudio.viewmodel.CountryDisplay("Brazil", "🇧🇷", "BR"),
+            com.easeaudio.viewmodel.CountryDisplay("Vietnam", "🇻🇳", "VN")
         )
     }
 

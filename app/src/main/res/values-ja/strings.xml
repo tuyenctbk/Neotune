@@ -245,8 +245,8 @@
     <string name="loading_podcast_episodes">Loading podcast episodes…</string>
     <string name="no_episodes_available">No episodes available for this show.</string>
     <string name="onboarding_podcast_title">ポッドキャスト &amp; 番組</string>
-    <string name="onboarding_podcast_subtitle">様々なトピックやジャンルのオンデマンド・ポッドキャストの膨大なコレクションを探索しましょう。</string>
-    <string name="onboarding_podcast_badge1">100万以上のエピソード</string>
+    <string name="onboarding_podcast_subtitle">世界中の250万以上のポッドキャストやオンデマンド番組を探索。</string>
+    <string name="onboarding_podcast_badge1">250万+ ポッドキャスト</string>
     <string name="onboarding_podcast_badge2">スマート・ディスカバリー</string>
     <string name="onboarding_audio_title">プロ・オーディオ &amp; EQ</string>
     <string name="onboarding_audio_subtitle">高度なイコライザー、DSPプロファイル、スリープタイマーでサウンドをカスタマイズ。</string>

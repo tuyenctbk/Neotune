@@ -245,8 +245,8 @@
     <string name="loading_podcast_episodes">Loading podcast episodes…</string>
     <string name="no_episodes_available">No episodes available for this show.</string>
     <string name="onboarding_podcast_title">Podcasts &amp; Émissions</string>
-    <string name="onboarding_podcast_subtitle">Explorez une vaste collection de podcasts à la demande sur divers sujets et genres.</string>
-    <string name="onboarding_podcast_badge1">1M+ Épisodes</string>
+    <string name="onboarding_podcast_subtitle">Explorez une vaste collection de plus de 2,5 millions de podcasts et d\'émissions à la demande dans le monde entier.</string>
+    <string name="onboarding_podcast_badge1">2,5M+ Podcasts</string>
     <string name="onboarding_podcast_badge2">Découverte intelligente</string>
     <string name="onboarding_audio_title">Audio Pro &amp; EQ</string>
     <string name="onboarding_audio_subtitle">Personnalisez votre son avec l\'égaliseur avancé, les profils DSP et la minuterie de mise en veille.</string>

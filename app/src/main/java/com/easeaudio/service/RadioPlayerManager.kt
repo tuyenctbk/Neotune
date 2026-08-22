@@ -587,6 +587,27 @@ class RadioPlayerManager(private val context: Context) {
                         return currentStation?.isPodcast == true
                     }
 
+                    override fun getPlayerError(): PlaybackException? {
+                        // Prevent AAOS Car Media Center from entering FATAL_ERROR (blank black screen) on offline network drops
+                        return null
+                    }
+
+                    override fun getPlaybackState(): Int {
+                        val state = super.getPlaybackState()
+                        return if (state == Player.STATE_IDLE && _currentStation.value != null) {
+                            if (_isLoading.value) Player.STATE_BUFFERING else Player.STATE_READY
+                        } else {
+                            state
+                        }
+                    }
+
+                    override fun getCurrentMediaItem(): MediaItem? {
+                        val superItem = super.getCurrentMediaItem()
+                        if (superItem != null) return superItem
+                        val st = _currentStation.value
+                        return if (st != null) stationToMediaItem(st) else null
+                    }
+
                     override fun play() {
                         val currentStation = _currentStation.value
                         if (currentStation != null && (player.playbackState == Player.STATE_IDLE ||

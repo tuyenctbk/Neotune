@@ -245,8 +245,8 @@
     <string name="loading_podcast_episodes">Loading podcast episodes…</string>
     <string name="no_episodes_available">No episodes available for this show.</string>
     <string name="onboarding_podcast_title">팟캐스트 &amp; 쇼</string>
-    <string name="onboarding_podcast_subtitle">다양한 주제와 장르에 걸친 방대한 온데마드 팟캐스트 컬렉션을 탐색해 보세요.</string>
-    <string name="onboarding_podcast_badge1">100만 개 이상의 에피소드</string>
+    <string name="onboarding_podcast_subtitle">전 세계 250만 개 이상의 팟캐스트와 주문형 프로그램을 탐색하세요.</string>
+    <string name="onboarding_podcast_badge1">250만+ 팟캐스트</string>
     <string name="onboarding_podcast_badge2">스마트 디스커버리</string>
     <string name="onboarding_audio_title">프로 오디오 &amp; EQ</string>
     <string name="onboarding_audio_subtitle">고급 이퀄라이저, DSP 프로필 및 취침 타이머로 사운드를 맞춤 설정하세요.</string>

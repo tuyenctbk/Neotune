@@ -245,8 +245,8 @@
     <string name="loading_podcast_episodes">Loading podcast episodes…</string>
     <string name="no_episodes_available">No episodes available for this show.</string>
     <string name="onboarding_podcast_title">播客与节目</string>
-    <string name="onboarding_podcast_subtitle">探索涵盖各种主题和流派的海量点播播客资源。</string>
-    <string name="onboarding_podcast_badge1">100万+ 集节目</string>
+    <string name="onboarding_podcast_subtitle">探索全球超过250万个精彩播客与点播节目。</string>
+    <string name="onboarding_podcast_badge1">250万+ 播客节目</string>
     <string name="onboarding_podcast_badge2">智能发现</string>
     <string name="onboarding_audio_title">专业音频与均衡器</string>
     <string name="onboarding_audio_subtitle">通过高级均衡器、DSP 配置和睡眠定时器自定义您的音效。</string>

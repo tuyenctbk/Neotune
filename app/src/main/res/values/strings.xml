@@ -147,8 +147,8 @@
 
     <!-- New Slide: Podcasts & Shows -->
     <string name="onboarding_podcast_title">Podcasts &amp; Shows</string>
-    <string name="onboarding_podcast_subtitle">Explore a vast collection of on-demand podcasts across various topics and genres.</string>
-    <string name="onboarding_podcast_badge1">1M+ Episodes</string>
+    <string name="onboarding_podcast_subtitle">Explore a vast collection of 2.5M+ podcasts and on-demand shows worldwide.</string>
+    <string name="onboarding_podcast_badge1">2.5M+ Podcasts</string>
     <string name="onboarding_podcast_badge2">Smart Discovery</string>
 
     <!-- Slide 2: Background Playback Controls -->

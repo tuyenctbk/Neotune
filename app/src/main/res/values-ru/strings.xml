@@ -245,8 +245,8 @@
     <string name="loading_podcast_episodes">Loading podcast episodes…</string>
     <string name="no_episodes_available">No episodes available for this show.</string>
     <string name="onboarding_podcast_title">Подкасты и шоу</string>
-    <string name="onboarding_podcast_subtitle">Исследуйте огромную коллекцию подкастов по запросу на различные темы и жанры.</string>
-    <string name="onboarding_podcast_badge1">1М+ Эпизодов</string>
+    <string name="onboarding_podcast_subtitle">Исследуйте огромную коллекцию из более чем 2,5 млн подкастов и программ со всего мира.</string>
+    <string name="onboarding_podcast_badge1">2.5M+ Подкастов</string>
     <string name="onboarding_podcast_badge2">Умный поиск</string>
     <string name="onboarding_audio_title">Про-аудио и EQ</string>
     <string name="onboarding_audio_subtitle">Настройте звук с помощью продвинутого эквалайзера, DSP-профилей и таймера сна.</string>
