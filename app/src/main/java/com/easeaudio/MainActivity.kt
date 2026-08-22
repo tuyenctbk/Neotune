@@ -160,17 +160,8 @@ fun MainAppContent(
 
     val uiState by viewModel.homeUiState.collectAsState()
 
-    val isAutomotive = remember {
-        val uiModeManager = context.getSystemService(Context.UI_MODE_SERVICE) as? android.app.UiModeManager
-        context.packageManager.hasSystemFeature(PackageManager.FEATURE_AUTOMOTIVE) ||
-            uiModeManager?.currentModeType == android.content.res.Configuration.UI_MODE_TYPE_CAR
-    }
-    
-    val startDestination = when {
-        !isOnboardingCompleted.value -> NavRoute.Onboarding.route
-        isAutomotive -> NavRoute.Settings.route
-        else -> NavRoute.Home.route
-    }
+    val startDestination = if (!isOnboardingCompleted.value) NavRoute.Onboarding.route else NavRoute.Home.route
+
 
     var hasNotificationPermission by remember {
         mutableStateOf(
@@ -219,8 +210,7 @@ fun MainAppContent(
     val completeOnboarding = {
         prefs.edit().putBoolean("is_onboarding_completed", true).apply()
         isOnboardingCompleted.value = true
-        val targetRoute = if (isAutomotive) NavRoute.Settings.route else NavRoute.Home.route
-        navController.navigate(targetRoute) {
+        navController.navigate(NavRoute.Home.route) {
             popUpTo(NavRoute.Onboarding.route) { inclusive = true }
         }
     }
@@ -284,8 +274,8 @@ fun MainAppContent(
         }
     }
 
-    val showBottomBar = !isAutomotive && windowSizeClass.widthSizeClass == WindowWidthSizeClass.Compact && currentRoute != NavRoute.Onboarding.route && currentRoute != NavRoute.CarMode.route && currentRoute != NavRoute.Screensaver.route && !isFullPlayerVisible
-    val showNavigationRail = !isAutomotive && windowSizeClass.widthSizeClass != WindowWidthSizeClass.Compact && currentRoute != NavRoute.Onboarding.route && currentRoute != NavRoute.CarMode.route && currentRoute != NavRoute.Screensaver.route && !isFullPlayerVisible
+    val showBottomBar = windowSizeClass.widthSizeClass == WindowWidthSizeClass.Compact && currentRoute != NavRoute.Onboarding.route && currentRoute != NavRoute.CarMode.route && currentRoute != NavRoute.Screensaver.route && !isFullPlayerVisible
+    val showNavigationRail = windowSizeClass.widthSizeClass != WindowWidthSizeClass.Compact && currentRoute != NavRoute.Onboarding.route && currentRoute != NavRoute.CarMode.route && currentRoute != NavRoute.Screensaver.route && !isFullPlayerVisible
 
     Box(
         modifier = Modifier
@@ -513,8 +503,7 @@ fun MainAppContent(
                                 onOpenAppearance = { viewModel.setShowAppearanceDialog(true) },
                                 onOpenOnboarding = { navController.navigate(NavRoute.Onboarding.route) },
                                 onOpenBlockedDialog = { viewModel.setShowBlockedDialog(true) },
-                                onOpenAttribution = { viewModel.setShowAttributionDialog(true) },
-                                isAutomotive = isAutomotive
+                                onOpenAttribution = { viewModel.setShowAttributionDialog(true) }
                             )
 
                             if (showAlarmDialog) {

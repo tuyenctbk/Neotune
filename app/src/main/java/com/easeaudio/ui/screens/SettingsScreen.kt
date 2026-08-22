@@ -332,24 +332,7 @@ fun SettingsScreen(
                             },
                             testTag = "setting_donate_buymeacoffee"
                         )
-                        HorizontalDivider(color = MaterialTheme.colorScheme.surfaceVariant, thickness = 1.dp)
-                        SettingsItem(
-                            icon = Icons.Filled.Favorite,
-                            iconTint = Color(0xFFEA4AAA),
-                            title = stringResource(R.string.donate_github_sponsors),
-                            subtitle = stringResource(R.string.donate_github_sponsors_desc),
-                            onClick = {
-                                try {
-                                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/sponsors/tuyenphamvn")).apply {
-                                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                                    }
-                                    context.startActivity(intent)
-                                } catch (e: Exception) {
-                                    Log.e("SettingsScreen", "Failed to open GitHub Sponsors link", e)
-                                }
-                            },
-                            testTag = "setting_donate_github"
-                        )
+
                         HorizontalDivider(color = MaterialTheme.colorScheme.surfaceVariant, thickness = 1.dp)
                         SettingsItem(
                             icon = Icons.Filled.VolunteerActivism,
