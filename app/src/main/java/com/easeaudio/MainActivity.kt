@@ -168,7 +168,7 @@ fun MainAppContent(
     
     val startDestination = when {
         !isOnboardingCompleted.value -> NavRoute.Onboarding.route
-        isAutomotive -> NavRoute.CarMode.route
+        isAutomotive -> NavRoute.Settings.route
         else -> NavRoute.Home.route
     }
 
@@ -219,7 +219,8 @@ fun MainAppContent(
     val completeOnboarding = {
         prefs.edit().putBoolean("is_onboarding_completed", true).apply()
         isOnboardingCompleted.value = true
-        navController.navigate(NavRoute.Home.route) {
+        val targetRoute = if (isAutomotive) NavRoute.Settings.route else NavRoute.Home.route
+        navController.navigate(targetRoute) {
             popUpTo(NavRoute.Onboarding.route) { inclusive = true }
         }
     }
@@ -283,8 +284,8 @@ fun MainAppContent(
         }
     }
 
-    val showBottomBar = windowSizeClass.widthSizeClass == WindowWidthSizeClass.Compact && currentRoute != NavRoute.Onboarding.route && currentRoute != NavRoute.CarMode.route && currentRoute != NavRoute.Screensaver.route && !isFullPlayerVisible
-    val showNavigationRail = windowSizeClass.widthSizeClass != WindowWidthSizeClass.Compact && currentRoute != NavRoute.Onboarding.route && currentRoute != NavRoute.CarMode.route && currentRoute != NavRoute.Screensaver.route && !isFullPlayerVisible
+    val showBottomBar = !isAutomotive && windowSizeClass.widthSizeClass == WindowWidthSizeClass.Compact && currentRoute != NavRoute.Onboarding.route && currentRoute != NavRoute.CarMode.route && currentRoute != NavRoute.Screensaver.route && !isFullPlayerVisible
+    val showNavigationRail = !isAutomotive && windowSizeClass.widthSizeClass != WindowWidthSizeClass.Compact && currentRoute != NavRoute.Onboarding.route && currentRoute != NavRoute.CarMode.route && currentRoute != NavRoute.Screensaver.route && !isFullPlayerVisible
 
     Box(
         modifier = Modifier
@@ -512,7 +513,8 @@ fun MainAppContent(
                                 onOpenAppearance = { viewModel.setShowAppearanceDialog(true) },
                                 onOpenOnboarding = { navController.navigate(NavRoute.Onboarding.route) },
                                 onOpenBlockedDialog = { viewModel.setShowBlockedDialog(true) },
-                                onOpenAttribution = { viewModel.setShowAttributionDialog(true) }
+                                onOpenAttribution = { viewModel.setShowAttributionDialog(true) },
+                                isAutomotive = isAutomotive
                             )
 
                             if (showAlarmDialog) {

@@ -45,6 +45,7 @@ fun SettingsScreen(
     onOpenOnboarding: () -> Unit = {},
     onOpenBlockedDialog: () -> Unit,
     onOpenAttribution: () -> Unit,
+    isAutomotive: Boolean = false,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
@@ -65,6 +66,45 @@ fun SettingsScreen(
                 contentPadding = PaddingValues(horizontal = 20.dp, vertical = 16.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
+                // Automotive OS Info Banner
+                if (isAutomotive) {
+                    item {
+                        Card(
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(16.dp),
+                            colors = CardDefaults.cardColors(
+                                containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f)
+                            )
+                        ) {
+                            Row(
+                                modifier = Modifier.padding(16.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Filled.DirectionsCar,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier.size(32.dp)
+                                )
+                                Spacer(modifier = Modifier.width(16.dp))
+                                Column {
+                                    Text(
+                                        text = "Android Automotive OS",
+                                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                                        color = MaterialTheme.colorScheme.onPrimaryContainer
+                                    )
+                                    Spacer(modifier = Modifier.height(4.dp))
+                                    Text(
+                                        text = "Station browsing and live playback are integrated directly into your car's Media Center dashboard.",
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.85f)
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+
                 // Header
                 item {
                     Text(
@@ -194,6 +234,33 @@ fun SettingsScreen(
                             subtitle = "Data providers & API attributions",
                             onClick = onOpenAttribution,
                             testTag = "setting_attribution"
+                        )
+                    }
+                }
+
+                // Web & Cross-Platform Section
+                item {
+                    SettingsSectionHeader(title = "Web & Cross-Platform")
+                }
+
+                item {
+                    SettingsCard {
+                        SettingsItem(
+                            icon = Icons.Filled.Language,
+                            iconTint = MaterialTheme.colorScheme.primary,
+                            title = "NeoTune Web (PWA)",
+                            subtitle = "neotune.ai.studio — Listen on browser, iOS & desktop",
+                            onClick = {
+                                try {
+                                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://neotune.ai.studio/")).apply {
+                                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                                    }
+                                    context.startActivity(intent)
+                                } catch (e: Exception) {
+                                    Log.e("SettingsScreen", "Failed to open NeoTune PWA link", e)
+                                }
+                            },
+                            testTag = "setting_neotune_pwa"
                         )
                     }
                 }
