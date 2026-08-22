@@ -23,6 +23,9 @@ interface RadioDao {
     @Query("SELECT * FROM radio_stations ORDER BY isCustom DESC, name ASC")
     fun getAllStations(): Flow<List<RadioStation>>
 
+    @Query("SELECT * FROM radio_stations ORDER BY isCustom DESC, name ASC")
+    suspend fun getAllStationsDirect(): List<RadioStation>
+
     @Query("SELECT * FROM radio_stations WHERE id = :id LIMIT 1")
     suspend fun getStationById(id: String): RadioStation?
 

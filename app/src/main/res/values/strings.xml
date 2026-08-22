@@ -22,6 +22,7 @@
     <string name="save">Save</string>
     <string name="add">Add</string>
     <string name="delete">Delete</string>
+    <string name="back">Back</string>
     <string name="equalizer">Audio Equalizer</string>
     <string name="sleep_timer">Sleep Timer</string>
     <string name="sleeping_in">Sleeping in %1$d min</string>
@@ -402,4 +403,27 @@
     <string name="donate_github_sponsors_desc">Sponsor development on GitHub</string>
     <string name="donate_paypal">Donate via PayPal</string>
     <string name="donate_paypal_desc">Support ad-free development (paypal.me/tuyenphamvn)</string>
+
+    <!-- Settings Screen, AAOS & PWA Resources -->
+    <string name="aaos_title">Android Automotive OS</string>
+    <string name="aaos_desc">Station browsing and live playback are integrated directly into your car\'s Media Center dashboard.</string>
+    <string name="aaos_open_media_center">Open Car Media Center (Browse &amp; Play)</string>
+    <string name="settings_section_audio_playback">Audio &amp; Playback</string>
+    <string name="settings_equalizer_desc">Customize bass, treble &amp; audio presets</string>
+    <string name="settings_sleep_timer_desc">Set automatic sleep timer</string>
+    <string name="settings_radio_alarm_desc">Wake up to your favorite live stream</string>
+    <string name="settings_auto_play">Auto-Play on Startup</string>
+    <string name="settings_auto_play_desc">Resume the last played station/podcast on app launch</string>
+    <string name="settings_section_appearance_tour">Appearance &amp; Tour</string>
+    <string name="settings_appearance_desc">Themes, accent colors &amp; languages</string>
+    <string name="settings_onboarding_desc">Replay onboarding walkthrough &amp; setup</string>
+    <string name="settings_light_theme">Light Theme</string>
+    <string name="settings_light_theme_desc">Toggle comfortable light theme for long playback sessions</string>
+    <string name="settings_section_content_privacy">Content &amp; Privacy</string>
+    <string name="settings_content_filters_desc">Manage hidden stations &amp; safety filters</string>
+    <string name="settings_attribution_desc">Data providers &amp; API attributions</string>
+    <string name="settings_section_web_pwa">Web &amp; Cross-Platform</string>
+    <string name="settings_pwa_title">NeoTune Web (PWA)</string>
+    <string name="settings_pwa_desc">neotune.ai.studio — Listen on browser, iOS &amp; desktop</string>
+    <string name="open_pwa_btn">Open Web App (PWA): neotune.ai.studio</string>
 </resources>

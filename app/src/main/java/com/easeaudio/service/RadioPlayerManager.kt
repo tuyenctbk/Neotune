@@ -31,6 +31,9 @@ import com.google.common.util.concurrent.ListenableFuture
 import com.google.common.util.concurrent.SettableFuture
 import com.easeaudio.data.RadioDatabase
 import com.easeaudio.data.RadioStation
+import com.easeaudio.data.CuratedStationsService
+import com.easeaudio.data.RadioBrowserService
+import com.easeaudio.data.iTunesPodcastService
 import com.easeaudio.data.TrackArtworkService
 import com.easeaudio.data.LyricsService
 import com.easeaudio.data.SongLyrics
@@ -238,9 +241,26 @@ class RadioPlayerManager(private val context: Context) {
     private var positionPollingJob: Job? = null
 
     init {
+        // Pre-seed known stations from curated list immediately so MediaBrowser is never empty
+        CuratedStationsService.defaultCuratedStations.forEach { st ->
+            knownStations[st.id] = st
+        }
         setupPlayer()
         observeNetworkChanges()
         startSilentChecking()
+        // Async background pre-warm of stations from database and curated service
+        scope.launch(Dispatchers.IO) {
+            try {
+                val dbStations = RadioDatabase.getDatabase(context).radioDao().getAllStationsDirect()
+                dbStations.forEach { st -> knownStations[st.id] = st }
+                if (currentStationList.isEmpty()) {
+                    val list = if (dbStations.isNotEmpty()) dbStations else CuratedStationsService.defaultCuratedStations
+                    currentStationList = list
+                }
+            } catch (e: Exception) {
+                Log.w(TAG, "Background pre-warm error: ${e.message}")
+            }
+        }
     }
 
     // BUG-4 fix: both flags are read/written from multiple threads (Main listener + IO coroutine);
@@ -479,7 +499,6 @@ class RadioPlayerManager(private val context: Context) {
 
                         try {
                             exoPlayer?.stop()
-                            exoPlayer?.clearMediaItems()
                         } catch (e: Exception) {
                             Log.w(TAG, "Error stopping player on failure: ${e.message}")
                         }
@@ -517,12 +536,22 @@ class RadioPlayerManager(private val context: Context) {
                 val forwardingPlayer = object : androidx.media3.common.ForwardingPlayer(player) {
                     override fun getAvailableCommands(): Player.Commands {
                         return super.getAvailableCommands().buildUpon()
+                            .add(Player.COMMAND_SEEK_TO_NEXT)
+                            .add(Player.COMMAND_SEEK_TO_PREVIOUS)
+                            .add(Player.COMMAND_SEEK_TO_NEXT_MEDIA_ITEM)
+                            .add(Player.COMMAND_SEEK_TO_PREVIOUS_MEDIA_ITEM)
                             .remove(Player.COMMAND_SEEK_BACK)
                             .remove(Player.COMMAND_SEEK_FORWARD)
                             .build()
                     }
 
                     override fun isCommandAvailable(command: Int): Boolean {
+                        if (command == Player.COMMAND_SEEK_TO_NEXT ||
+                            command == Player.COMMAND_SEEK_TO_PREVIOUS ||
+                            command == Player.COMMAND_SEEK_TO_NEXT_MEDIA_ITEM ||
+                            command == Player.COMMAND_SEEK_TO_PREVIOUS_MEDIA_ITEM) {
+                            return true
+                        }
                         val currentStation = _currentStation.value
                         val isPodcast = currentStation?.isPodcast == true
                         return if (!isPodcast && (command == Player.COMMAND_SEEK_BACK || command == Player.COMMAND_SEEK_FORWARD)) {
@@ -530,6 +559,22 @@ class RadioPlayerManager(private val context: Context) {
                         } else {
                             super.isCommandAvailable(command)
                         }
+                    }
+
+                    override fun seekToNext() {
+                        playNextStation(currentStationList)
+                    }
+
+                    override fun seekToNextMediaItem() {
+                        playNextStation(currentStationList)
+                    }
+
+                    override fun seekToPrevious() {
+                        playPreviousStation(currentStationList)
+                    }
+
+                    override fun seekToPreviousMediaItem() {
+                        playPreviousStation(currentStationList)
                     }
 
                     override fun isCurrentMediaItemLive(): Boolean {
@@ -611,19 +656,35 @@ class RadioPlayerManager(private val context: Context) {
                                                 stationToMediaItem(st)
                                             })
                                         } else {
-                                            items.addAll(knownStations.values.filter { it.isFavorite }.map { stationToMediaItem(it) })
+                                            val favList = knownStations.values.filter { it.isFavorite }
+                                            if (favList.isNotEmpty()) {
+                                                items.addAll(favList.map { stationToMediaItem(it) })
+                                            } else {
+                                                // If user has no starred favorites yet, show top curated stations
+                                                items.addAll(CuratedStationsService.defaultCuratedStations.take(10).map { stationToMediaItem(it) })
+                                            }
                                         }
                                     }
                                     "folder_top" -> {
-                                        val topList = if (currentStationList.isNotEmpty()) currentStationList else knownStations.values.toList()
-                                        items.addAll(topList.take(30).map { stationToMediaItem(it) })
+                                        val topList = when {
+                                            currentStationList.isNotEmpty() -> currentStationList
+                                            else -> {
+                                                val dbStations = RadioDatabase.getDatabase(context).radioDao().getAllStationsDirect()
+                                                val list = if (dbStations.isNotEmpty()) dbStations else CuratedStationsService.defaultCuratedStations
+                                                currentStationList = list
+                                                list.forEach { knownStations[it.id] = it }
+                                                list
+                                            }
+                                        }
+                                        items.addAll(topList.take(40).map { stationToMediaItem(it) })
                                     }
                                     "folder_recent" -> {
                                         val recents = RadioDatabase.getDatabase(context).radioDao().getRecentStationsDirect()
                                         if (recents.isNotEmpty()) {
+                                            recents.forEach { knownStations[it.id] = it }
                                             items.addAll(recents.map { stationToMediaItem(it) })
                                         } else {
-                                            items.addAll(currentStationList.take(10).map { stationToMediaItem(it) })
+                                            items.addAll(CuratedStationsService.defaultCuratedStations.take(10).map { stationToMediaItem(it) })
                                         }
                                     }
                                     "folder_genres" -> {
@@ -647,12 +708,10 @@ class RadioPlayerManager(private val context: Context) {
                                         })
                                     }
                                     "folder_podcasts" -> {
-                                        val podcasts = knownStations.values.filter { it.isPodcast }
-                                        if (podcasts.isNotEmpty()) {
-                                            items.addAll(podcasts.map { stationToMediaItem(it) })
-                                        } else {
-                                            items.addAll(currentStationList.filter { it.isPodcast }.map { stationToMediaItem(it) })
+                                        val podcasts = knownStations.values.filter { it.isPodcast }.ifEmpty {
+                                            CuratedStationsService.defaultCuratedStations.filter { it.isPodcast }
                                         }
+                                        items.addAll(podcasts.map { stationToMediaItem(it) })
                                     }
                                     else -> {
                                         if (parentId.startsWith("genre_")) {
@@ -660,8 +719,19 @@ class RadioPlayerManager(private val context: Context) {
                                             val matching = knownStations.values.filter {
                                                 it.genre.contains(genreKeyword, ignoreCase = true) ||
                                                 it.name.contains(genreKeyword, ignoreCase = true)
+                                            }.toMutableList()
+
+                                            if (matching.isEmpty()) {
+                                                val curatedMatches = CuratedStationsService.defaultCuratedStations.filter {
+                                                    it.genre.contains(genreKeyword, ignoreCase = true) ||
+                                                    it.name.contains(genreKeyword, ignoreCase = true)
+                                                }
+                                                matching.addAll(curatedMatches)
                                             }
-                                            items.addAll(matching.take(25).map { stationToMediaItem(it) })
+                                            if (matching.isEmpty()) {
+                                                matching.addAll(CuratedStationsService.defaultCuratedStations.take(10))
+                                            }
+                                            items.addAll(matching.distinctBy { it.id }.take(30).map { stationToMediaItem(it) })
                                         }
                                     }
                                 }
@@ -749,9 +819,13 @@ class RadioPlayerManager(private val context: Context) {
                         query: String,
                         params: MediaLibraryService.LibraryParams?
                     ): ListenableFuture<LibraryResult<Void>> {
-                        val matching = searchStations(query)
-                        session.notifySearchResultChanged(browser, query, matching.size, params)
-                        return Futures.immediateFuture(LibraryResult.ofVoid(params))
+                        val future = SettableFuture.create<LibraryResult<Void>>()
+                        scope.launch(Dispatchers.IO) {
+                            val matching = searchStationsAsync(query)
+                            session.notifySearchResultChanged(browser, query, matching.size, params)
+                            future.set(LibraryResult.ofVoid(params))
+                        }
+                        return future
                     }
 
                     override fun onGetSearchResult(
@@ -762,12 +836,16 @@ class RadioPlayerManager(private val context: Context) {
                         pageSize: Int,
                         params: MediaLibraryService.LibraryParams?
                     ): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
-                        val matching = searchStations(query)
-                        val fromIndex = (page * pageSize).coerceAtMost(matching.size)
-                        val toIndex = if (pageSize > 0) ((page + 1) * pageSize).coerceAtMost(matching.size) else matching.size
-                        val subList = if (fromIndex < toIndex) matching.subList(fromIndex, toIndex) else matching
-                        val mediaItems = subList.map { stationToMediaItem(it) }
-                        return Futures.immediateFuture(LibraryResult.ofItemList(ImmutableList.copyOf(mediaItems), params))
+                        val future = SettableFuture.create<LibraryResult<ImmutableList<MediaItem>>>()
+                        scope.launch(Dispatchers.IO) {
+                            val matching = searchStationsAsync(query)
+                            val fromIndex = (page * pageSize).coerceAtMost(matching.size)
+                            val toIndex = if (pageSize > 0) ((page + 1) * pageSize).coerceAtMost(matching.size) else matching.size
+                            val subList = if (fromIndex < toIndex) matching.subList(fromIndex, toIndex) else matching
+                            val mediaItems = subList.map { stationToMediaItem(it) }
+                            future.set(LibraryResult.ofItemList(ImmutableList.copyOf(mediaItems), params))
+                        }
+                        return future
                     }
 
                     override fun onPlaybackResumption(
@@ -881,14 +959,25 @@ class RadioPlayerManager(private val context: Context) {
             .build()
     }
 
-    private fun searchStations(query: String): List<RadioStation> {
+    private suspend fun searchStationsAsync(query: String): List<RadioStation> = withContext(Dispatchers.IO) {
         val q = query.trim().lowercase()
-        if (q.isBlank()) return currentStationList.take(20)
-        return knownStations.values.filter {
+        if (q.isBlank()) return@withContext (if (currentStationList.isNotEmpty()) currentStationList else CuratedStationsService.defaultCuratedStations).take(20)
+        val localMatches = knownStations.values.filter {
             it.name.lowercase().contains(q) ||
             it.genre.lowercase().contains(q) ||
             it.country.lowercase().contains(q)
-        }.take(30)
+        }.toMutableList()
+
+        if (localMatches.size < 10) {
+            try {
+                val onlineMatches = com.easeaudio.data.RadioBrowserService.fetchTopStations(limit = 30, searchQuery = q)
+                onlineMatches.forEach { knownStations[it.id] = it }
+                localMatches.addAll(onlineMatches)
+            } catch (e: Exception) {
+                Log.w(TAG, "Online search error for '$query': ${e.message}")
+            }
+        }
+        return@withContext localMatches.distinctBy { it.id }.take(30)
     }
 
     @Volatile private var isHealingAttempt = false
@@ -1098,7 +1187,32 @@ class RadioPlayerManager(private val context: Context) {
                 Log.w(TAG, "Error stopping previous player: ${e.message}")
             }
         }
-        _isPlaying.value = false
+        // Pre-populate player metadata immediately so Automotive Now Playing screen shows station info right away
+        exoPlayer?.let { player ->
+            try {
+                val artworkUri = if (station.imageUrl.isNotBlank()) {
+                    try { Uri.parse(station.imageUrl) } catch (_: Exception) { null }
+                } else null
+
+                val immediateMetadata = MediaMetadata.Builder()
+                    .setTitle(station.name)
+                    .setArtist(station.genre)
+                    .setSubtitle(if (station.isPodcast) "Podcast" else station.country)
+                    .setArtworkUri(artworkUri)
+                    .setIsPlayable(true)
+                    .build()
+
+                val immediateItem = MediaItem.Builder()
+                    .setMediaId(station.id)
+                    .setUri(targetUrl)
+                    .setMediaMetadata(immediateMetadata)
+                    .build()
+
+                player.setMediaItem(immediateItem)
+            } catch (e: Exception) {
+                Log.w(TAG, "Error setting initial media item: ${e.message}")
+            }
+        }
 
         try {
             val intent = Intent(context, RadioPlaybackService::class.java)
@@ -1110,13 +1224,20 @@ class RadioPlayerManager(private val context: Context) {
         playbackJob = scope.launch {
             val resolvedUrl = resolveDirectStreamUrl(targetUrl)
             exoPlayer?.let { player ->
+                val artworkUri = if (station.imageUrl.isNotBlank()) {
+                    try { Uri.parse(station.imageUrl) } catch (_: Exception) { null }
+                } else null
+
                 val mediaMetadata = MediaMetadata.Builder()
                     .setTitle(station.name)
                     .setArtist(station.genre)
-                    .setArtworkUri(Uri.parse(station.imageUrl))
+                    .setSubtitle(if (station.isPodcast) "Podcast" else station.country)
+                    .setArtworkUri(artworkUri)
+                    .setIsPlayable(true)
                     .build()
 
                 val mediaItem = MediaItem.Builder()
+                    .setMediaId(station.id)
                     .setUri(resolvedUrl)
                     .setMediaMetadata(mediaMetadata)
                     .build()
@@ -1182,20 +1303,32 @@ class RadioPlayerManager(private val context: Context) {
         _currentStation.value?.let { playStation(it) }
     }
 
-    fun playNextStation(stationList: List<RadioStation>) {
-        if (stationList.isEmpty()) return
-        val current = _currentStation.value ?: return playStation(stationList.first())
-        val currentIndex = stationList.indexOfFirst { it.id == current.id }
-        val nextIndex = if (currentIndex >= 0 && currentIndex < stationList.size - 1) currentIndex + 1 else 0
-        playStation(stationList[nextIndex])
+    fun playNextStation(stationList: List<RadioStation> = emptyList()) {
+        val list = when {
+            stationList.isNotEmpty() -> stationList
+            currentStationList.isNotEmpty() -> currentStationList
+            knownStations.isNotEmpty() -> knownStations.values.toList()
+            else -> CuratedStationsService.defaultCuratedStations
+        }
+        if (list.isEmpty()) return
+        val current = _currentStation.value ?: return playStation(list.first())
+        val currentIndex = list.indexOfFirst { it.id == current.id }
+        val nextIndex = if (currentIndex >= 0 && currentIndex < list.size - 1) currentIndex + 1 else 0
+        playStation(list[nextIndex])
     }
 
-    fun playPreviousStation(stationList: List<RadioStation>) {
-        if (stationList.isEmpty()) return
-        val current = _currentStation.value ?: return playStation(stationList.last())
-        val currentIndex = stationList.indexOfFirst { it.id == current.id }
-        val prevIndex = if (currentIndex > 0) currentIndex - 1 else stationList.size - 1
-        playStation(stationList[prevIndex])
+    fun playPreviousStation(stationList: List<RadioStation> = emptyList()) {
+        val list = when {
+            stationList.isNotEmpty() -> stationList
+            currentStationList.isNotEmpty() -> currentStationList
+            knownStations.isNotEmpty() -> knownStations.values.toList()
+            else -> CuratedStationsService.defaultCuratedStations
+        }
+        if (list.isEmpty()) return
+        val current = _currentStation.value ?: return playStation(list.last())
+        val currentIndex = list.indexOfFirst { it.id == current.id }
+        val prevIndex = if (currentIndex > 0) currentIndex - 1 else list.size - 1
+        playStation(list[prevIndex])
     }
 
     fun seekRelative(offsetMs: Long) {

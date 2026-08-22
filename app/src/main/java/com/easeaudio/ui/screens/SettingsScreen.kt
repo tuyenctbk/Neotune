@@ -76,28 +76,71 @@ fun SettingsScreen(
                                 containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f)
                             )
                         ) {
-                            Row(
-                                modifier = Modifier.padding(16.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Filled.DirectionsCar,
-                                    contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.primary,
-                                    modifier = Modifier.size(32.dp)
-                                )
-                                Spacer(modifier = Modifier.width(16.dp))
-                                Column {
-                                    Text(
-                                        text = "Android Automotive OS",
-                                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-                                        color = MaterialTheme.colorScheme.onPrimaryContainer
+                            Column(modifier = Modifier.padding(16.dp)) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Filled.DirectionsCar,
+                                        contentDescription = null,
+                                        tint = MaterialTheme.colorScheme.primary,
+                                        modifier = Modifier.size(32.dp)
                                     )
-                                    Spacer(modifier = Modifier.height(4.dp))
+                                    Spacer(modifier = Modifier.width(16.dp))
+                                    Column {
+                                        Text(
+                                            text = stringResource(R.string.aaos_title),
+                                            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                                            color = MaterialTheme.colorScheme.onPrimaryContainer
+                                        )
+                                        Spacer(modifier = Modifier.height(4.dp))
+                                        Text(
+                                            text = stringResource(R.string.aaos_desc),
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.85f)
+                                        )
+                                    }
+                                }
+                                Spacer(modifier = Modifier.height(12.dp))
+                                Button(
+                                    onClick = {
+                                        try {
+                                            val carMediaIntent = Intent("android.car.intent.action.MEDIA_TEMPLATE").apply {
+                                                putExtra(
+                                                    "android.car.intent.extra.MEDIA_COMPONENT",
+                                                    android.content.ComponentName("com.neotune.radio", "com.easeaudio.service.RadioPlaybackService").flattenToString()
+                                                )
+                                                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                                            }
+                                            context.startActivity(carMediaIntent)
+                                        } catch (e: Exception) {
+                                            try {
+                                                val fallbackIntent = Intent(Intent.ACTION_MAIN).apply {
+                                                    addCategory(Intent.CATEGORY_APP_MUSIC)
+                                                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                                                }
+                                                context.startActivity(fallbackIntent)
+                                            } catch (ex: Exception) {
+                                                Log.e("SettingsScreen", "Failed to launch Car Media Center", ex)
+                                            }
+                                        }
+                                    },
+                                    shape = RoundedCornerShape(12.dp),
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = MaterialTheme.colorScheme.primary,
+                                        contentColor = MaterialTheme.colorScheme.onPrimary
+                                    ),
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Filled.PlayArrow,
+                                        contentDescription = null,
+                                        modifier = Modifier.size(20.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(8.dp))
                                     Text(
-                                        text = "Station browsing and live playback are integrated directly into your car's Media Center dashboard.",
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.85f)
+                                        text = stringResource(R.string.aaos_open_media_center),
+                                        style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold)
                                     )
                                 }
                             }
@@ -120,7 +163,7 @@ fun SettingsScreen(
 
                 // Audio & Playback Section
                 item {
-                    SettingsSectionHeader(title = "Audio & Playback")
+                    SettingsSectionHeader(title = stringResource(R.string.settings_section_audio_playback))
                 }
 
                 item {
@@ -129,7 +172,7 @@ fun SettingsScreen(
                             icon = Icons.Filled.Equalizer,
                             iconTint = MaterialTheme.colorScheme.primary,
                             title = stringResource(R.string.equalizer),
-                            subtitle = "Customize bass, treble & audio presets",
+                            subtitle = stringResource(R.string.settings_equalizer_desc),
                             onClick = onOpenEqualizer,
                             testTag = "setting_equalizer"
                         )
@@ -138,7 +181,7 @@ fun SettingsScreen(
                             icon = Icons.Filled.Bedtime,
                             iconTint = if (sleepTimerRemaining != null) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
                             title = stringResource(R.string.sleep_timer),
-                            subtitle = sleepTimerRemaining?.let { stringResource(R.string.sleeping_in, it) } ?: "Set automatic sleep timer",
+                            subtitle = sleepTimerRemaining?.let { stringResource(R.string.sleeping_in, it) } ?: stringResource(R.string.settings_sleep_timer_desc),
                             onClick = onOpenSleepTimer,
                             testTag = "setting_sleep_timer"
                         )
@@ -147,7 +190,7 @@ fun SettingsScreen(
                             icon = Icons.Filled.Alarm,
                             iconTint = MaterialTheme.colorScheme.primary,
                             title = stringResource(R.string.radio_alarm),
-                            subtitle = "Wake up to your favorite live stream",
+                            subtitle = stringResource(R.string.settings_radio_alarm_desc),
                             onClick = onOpenRadioAlarm,
                             testTag = "setting_radio_alarm"
                         )
@@ -165,8 +208,8 @@ fun SettingsScreen(
                         SettingsSwitchItem(
                             icon = Icons.Filled.PlayCircle,
                             iconTint = MaterialTheme.colorScheme.primary,
-                            title = "Auto-Play on Startup",
-                            subtitle = "Resume the last played station/podcast on app launch",
+                            title = stringResource(R.string.settings_auto_play),
+                            subtitle = stringResource(R.string.settings_auto_play_desc),
                             checked = isAutoPlayOnStartupEnabled,
                             onCheckedChange = { onToggleAutoPlayOnStartup() },
                             testTag = "setting_auto_play"
@@ -176,7 +219,7 @@ fun SettingsScreen(
 
                 // Appearance & App Tour Section
                 item {
-                    SettingsSectionHeader(title = "Appearance & Tour")
+                    SettingsSectionHeader(title = stringResource(R.string.settings_section_appearance_tour))
                 }
 
                 item {
@@ -185,7 +228,7 @@ fun SettingsScreen(
                             icon = Icons.Filled.Palette,
                             iconTint = MaterialTheme.colorScheme.primary,
                             title = stringResource(R.string.appearance),
-                            subtitle = "Themes, accent colors & languages",
+                            subtitle = stringResource(R.string.settings_appearance_desc),
                             onClick = onOpenAppearance,
                             testTag = "setting_appearance"
                         )
@@ -194,7 +237,7 @@ fun SettingsScreen(
                             icon = Icons.Filled.Explore,
                             iconTint = MaterialTheme.colorScheme.primary,
                             title = stringResource(R.string.onboarding_app_tour),
-                            subtitle = "Replay onboarding walkthrough & setup",
+                            subtitle = stringResource(R.string.settings_onboarding_desc),
                             onClick = onOpenOnboarding,
                             testTag = "setting_onboarding"
                         )
@@ -202,8 +245,8 @@ fun SettingsScreen(
                         SettingsSwitchItem(
                             icon = Icons.Filled.LightMode,
                             iconTint = MaterialTheme.colorScheme.primary,
-                            title = "Light Theme",
-                            subtitle = "Toggle comfortable light theme for long playback sessions",
+                            title = stringResource(R.string.settings_light_theme),
+                            subtitle = stringResource(R.string.settings_light_theme_desc),
                             checked = isLightMode,
                             onCheckedChange = { onToggleLightMode() },
                             testTag = "setting_light_mode"
@@ -213,7 +256,7 @@ fun SettingsScreen(
 
                 // Safety & Filters Section
                 item {
-                    SettingsSectionHeader(title = "Content & Privacy")
+                    SettingsSectionHeader(title = stringResource(R.string.settings_section_content_privacy))
                 }
 
                 item {
@@ -222,7 +265,7 @@ fun SettingsScreen(
                             icon = Icons.Filled.Shield,
                             iconTint = MaterialTheme.colorScheme.primary,
                             title = stringResource(R.string.content_filters_blocklist),
-                            subtitle = "Manage hidden stations & safety filters",
+                            subtitle = stringResource(R.string.settings_content_filters_desc),
                             onClick = onOpenBlockedDialog,
                             testTag = "setting_blocked_stations"
                         )
@@ -231,7 +274,7 @@ fun SettingsScreen(
                             icon = Icons.Filled.Info,
                             iconTint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
                             title = stringResource(R.string.info),
-                            subtitle = "Data providers & API attributions",
+                            subtitle = stringResource(R.string.settings_attribution_desc),
                             onClick = onOpenAttribution,
                             testTag = "setting_attribution"
                         )
@@ -240,7 +283,7 @@ fun SettingsScreen(
 
                 // Web & Cross-Platform Section
                 item {
-                    SettingsSectionHeader(title = "Web & Cross-Platform")
+                    SettingsSectionHeader(title = stringResource(R.string.settings_section_web_pwa))
                 }
 
                 item {
@@ -248,8 +291,8 @@ fun SettingsScreen(
                         SettingsItem(
                             icon = Icons.Filled.Language,
                             iconTint = MaterialTheme.colorScheme.primary,
-                            title = "NeoTune Web (PWA)",
-                            subtitle = "neotune.ai.studio — Listen on browser, iOS & desktop",
+                            title = stringResource(R.string.settings_pwa_title),
+                            subtitle = stringResource(R.string.settings_pwa_desc),
                             onClick = {
                                 try {
                                     val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://neotune.ai.studio/")).apply {

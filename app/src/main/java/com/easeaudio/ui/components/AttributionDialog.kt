@@ -81,7 +81,7 @@ fun AttributionDialog(
                     shape = RoundedCornerShape(12.dp)
                 ) {
                     Text(
-                        text = "Open Web App (PWA): neotune.ai.studio",
+                        text = stringResource(id = R.string.open_pwa_btn),
                         style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold)
                     )
                 }

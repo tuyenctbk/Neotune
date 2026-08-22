@@ -89,7 +89,7 @@ fun AppearanceSelectionScreen(
                     ) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back",
+                            contentDescription = stringResource(R.string.back),
                             tint = if (isBackFocused) MaterialTheme.colorScheme.background else previewTheme.primary
                         )
                     }

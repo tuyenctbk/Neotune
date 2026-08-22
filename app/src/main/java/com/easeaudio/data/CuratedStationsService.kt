@@ -131,6 +131,96 @@ object CuratedStationsService {
             imageUrl = "https://somafm.com/img3/spacestation-400.jpg",
             bitrate = "256 kbps (High Quality)",
             codec = "MP3"
+        ),
+        RadioStation(
+            id = "curated_soma_seveninch",
+            name = "SomaFM: Seven Inch Soul",
+            genre = "Vintage Soul & Funk Pop",
+            country = "San Francisco, USA",
+            streamUrl = "https://ice6.somafm.com/7soul-256-mp3",
+            imageUrl = "https://somafm.com/img3/7soul-400.jpg",
+            bitrate = "256 kbps (High Quality)",
+            codec = "MP3"
+        ),
+        RadioStation(
+            id = "curated_soma_bootliquor",
+            name = "SomaFM: Boot Liquor",
+            genre = "Americana & Roots Country",
+            country = "San Francisco, USA",
+            streamUrl = "https://ice6.somafm.com/bootliquor-256-mp3",
+            imageUrl = "https://somafm.com/img3/bootliquor-400.jpg",
+            bitrate = "256 kbps (High Quality)",
+            codec = "MP3"
+        ),
+        RadioStation(
+            id = "curated_soma_thistle",
+            name = "SomaFM: ThistleRadio",
+            genre = "Celtic & Classical Folk",
+            country = "San Francisco, USA",
+            streamUrl = "https://ice6.somafm.com/thistle-256-mp3",
+            imageUrl = "https://somafm.com/img3/thistle-400.jpg",
+            bitrate = "256 kbps (High Quality)",
+            codec = "MP3"
+        ),
+        RadioStation(
+            id = "curated_soma_metal",
+            name = "SomaFM: Metal Detector",
+            genre = "Heavy Metal & Hard Rock",
+            country = "San Francisco, USA",
+            streamUrl = "https://ice6.somafm.com/metal-256-mp3",
+            imageUrl = "https://somafm.com/img3/metal-400.jpg",
+            bitrate = "256 kbps (High Quality)",
+            codec = "MP3"
+        ),
+        RadioStation(
+            id = "curated_soma_fluid",
+            name = "SomaFM: Fluid",
+            genre = "Future Hip Hop & Electronic Soul",
+            country = "San Francisco, USA",
+            streamUrl = "https://ice6.somafm.com/fluid-256-mp3",
+            imageUrl = "https://somafm.com/img3/fluid-400.jpg",
+            bitrate = "256 kbps (High Quality)",
+            codec = "MP3"
+        ),
+        RadioStation(
+            id = "curated_news_npr",
+            name = "NPR 24/7 News & Talk",
+            genre = "News & Talk",
+            country = "United States",
+            streamUrl = "https://npr-ice.streamguys1.com/live.mp3",
+            imageUrl = "https://images.unsplash.com/photo-1585829365295-ab7cd400c167?auto=format&fit=crop&w=600&q=80",
+            bitrate = "128 kbps",
+            codec = "MP3"
+        ),
+        RadioStation(
+            id = "curated_news_bbc",
+            name = "BBC World Service News",
+            genre = "News & Talk",
+            country = "United Kingdom",
+            streamUrl = "https://stream.live.vc.bbcmedia.co.uk/bbc_world_service",
+            imageUrl = "https://images.unsplash.com/photo-1504711434969-e33886168f5c?auto=format&fit=crop&w=600&q=80",
+            bitrate = "128 kbps",
+            codec = "MP3"
+        ),
+        RadioStation(
+            id = "itunes_podcast_npr_news",
+            name = "NPR News Now Podcast",
+            genre = "Podcast • News",
+            country = "United States",
+            streamUrl = "https://play.podtrac.com/npr-500005/edge1.pod.npr.org/anon.npr-podcasts/podcast/npr/newsnow/npr_news_now.mp3",
+            imageUrl = "https://images.unsplash.com/photo-1478737270239-2f02b77fc618?auto=format&fit=crop&w=600&q=80",
+            bitrate = "Podcast",
+            codec = "MP3"
+        ),
+        RadioStation(
+            id = "itunes_podcast_ted",
+            name = "TED Talks Daily Podcast",
+            genre = "Podcast • Ideas",
+            country = "United States",
+            streamUrl = "https://play.podtrac.com/ted-talks-daily/traffic.megaphone.fm/TED9170883204.mp3",
+            imageUrl = "https://images.unsplash.com/photo-1526470608268-f674ce90ebd4?auto=format&fit=crop&w=600&q=80",
+            bitrate = "Podcast",
+            codec = "MP3"
         )
     )
 
