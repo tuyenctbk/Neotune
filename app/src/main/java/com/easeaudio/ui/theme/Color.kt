@@ -30,6 +30,25 @@ data class ThemePreset(
 object AppThemeState {
     val ThemePresets = listOf(
         ThemePreset(
+            id = "matcha_zen",
+            name = "Matcha Zen Garden",
+            tagline = "SERENE JAPANESE GARDEN",
+            description = "Tranquil zen sanctuary with fresh ceremonial matcha green, bamboo mist, and stone moss",
+            background = Color(0xFF070C08),
+            surface = Color(0xFF101A12),
+            surfaceVariant = Color(0xFF1B281E),
+            primary = Color(0xFF86EFAC),
+            secondary = Color(0xFFA7F3D0),
+            tertiary = Color(0xFFBBF7D0),
+            accent = Color(0xFF4ADE80),
+            textPrimary = Color(0xFFF0FDF4),
+            textSecondary = Color(0xFF86EFAC),
+            textMuted = Color(0xFF43604C),
+            activePill = Color(0xFF86EFAC),
+            cardBorder = Color(0x3386EFAC),
+            glowColor = Color(0xFF86EFAC)
+        ),
+        ThemePreset(
             id = "nordic_aurora",
             name = "Nordic Aurora",
             tagline = "GLACIAL POLAR NIGHT",
@@ -332,6 +351,82 @@ object AppThemeState {
             activePill = Color(0xFFD1D5DB),
             cardBorder = Color(0x28D1D5DB),
             glowColor = Color(0xFFD1D5DB)
+        ),
+        ThemePreset(
+            id = "botanical_cafe",
+            name = "Botanical Greenhouse",
+            tagline = "GREENHOUSE & HAZELNUT",
+            description = "Sunlit conservatory blending freshly roasted hazelnut, warm wood, and vibrant monstera foliage",
+            background = Color(0xFF090B08),
+            surface = Color(0xFF161C13),
+            surfaceVariant = Color(0xFF222C1E),
+            primary = Color(0xFFA3E635),
+            secondary = Color(0xFFD4A373),
+            tertiary = Color(0xFFBEF264),
+            accent = Color(0xFFA3E635),
+            textPrimary = Color(0xFFF7FEE7),
+            textSecondary = Color(0xFFD4A373),
+            textMuted = Color(0xFF596749),
+            activePill = Color(0xFFA3E635),
+            cardBorder = Color(0x33A3E635),
+            glowColor = Color(0xFFA3E635)
+        ),
+        ThemePreset(
+            id = "wildflower_meadow",
+            name = "Wildflower Meadow",
+            tagline = "BLOSSOM & SPRING BREEZE",
+            description = "Blossoming floral petals of lavender flora, soft rose, and golden nectar sunlight",
+            background = Color(0xFF0C0812),
+            surface = Color(0xFF191124),
+            surfaceVariant = Color(0xFF271B36),
+            primary = Color(0xFFC084FC),
+            secondary = Color(0xFFF472B6),
+            tertiary = Color(0xFFFDE047),
+            accent = Color(0xFFC084FC),
+            textPrimary = Color(0xFFFAF5FF),
+            textSecondary = Color(0xFFD8B4FE),
+            textMuted = Color(0xFF6E5682),
+            activePill = Color(0xFFC084FC),
+            cardBorder = Color(0x33C084FC),
+            glowColor = Color(0xFFC084FC)
+        ),
+        ThemePreset(
+            id = "caramel_bistro",
+            name = "Caramel Cafe Bistro",
+            tagline = "ARTISAN ROAST & CARAMEL",
+            description = "Cozy Parisian cafe with silky vanilla froth, rich salted caramel, and toasted cinnamon",
+            background = Color(0xFF0F0A06),
+            surface = Color(0xFF1D140D),
+            surfaceVariant = Color(0xFF2E2016),
+            primary = Color(0xFFF59E0B),
+            secondary = Color(0xFFE2C499),
+            tertiary = Color(0xFFFDE68A),
+            accent = Color(0xFFF59E0B),
+            textPrimary = Color(0xFFFFFBEB),
+            textSecondary = Color(0xFFD97706),
+            textMuted = Color(0xFF784E2D),
+            activePill = Color(0xFFF59E0B),
+            cardBorder = Color(0x33F59E0B),
+            glowColor = Color(0xFFF59E0B)
+        ),
+        ThemePreset(
+            id = "forest_canopy",
+            name = "Forest Canopy",
+            tagline = "DEEP EVERGREEN & MOSS",
+            description = "Misty highland trail surrounded by deep evergreen needles, morning dew, and wild mountain moss",
+            background = Color(0xFF050B07),
+            surface = Color(0xFF0D1811),
+            surfaceVariant = Color(0xFF15251B),
+            primary = Color(0xFF22C55E),
+            secondary = Color(0xFFA8A29E),
+            tertiary = Color(0xFF86EFAC),
+            accent = Color(0xFF16A34A),
+            textPrimary = Color(0xFFF0FDF4),
+            textSecondary = Color(0xFF86EFAC),
+            textMuted = Color(0xFF3B5643),
+            activePill = Color(0xFF22C55E),
+            cardBorder = Color(0x3322C55E),
+            glowColor = Color(0xFF22C55E)
         )
     )
 
@@ -367,7 +462,7 @@ object AppThemeState {
 
     fun loadTheme(context: Context) {
         val prefs = context.getSharedPreferences("neotune_theme_prefs", Context.MODE_PRIVATE)
-        val savedThemeId = prefs.getString("selected_theme_id", "nordic_aurora") ?: "nordic_aurora"
+        val savedThemeId = prefs.getString("selected_theme_id", "matcha_zen") ?: "matcha_zen"
         val resolvedId = LegacyThemeMap[savedThemeId] ?: savedThemeId
         val matchedTheme = ThemePresets.firstOrNull { it.id == resolvedId } ?: ThemePresets[0]
         currentTheme = matchedTheme
