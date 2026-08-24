@@ -166,6 +166,7 @@ class RadioPlayerManager(private val context: Context) {
 
     private val _trackArtworkUrl = MutableStateFlow<String?>(null)
     val trackArtworkUrl: StateFlow<String?> = _trackArtworkUrl.asStateFlow()
+    private var artworkFetchJob: Job? = null
 
     private val _currentLyrics = MutableStateFlow<SongLyrics?>(null)
     val currentLyrics: StateFlow<SongLyrics?> = _currentLyrics.asStateFlow()
@@ -409,12 +410,20 @@ class RadioPlayerManager(private val context: Context) {
                         _streamTitle.value = newStreamTitle
                         _currentLyrics.value = null
 
+                        // Cancel previous artwork resolution and clear stale artwork immediately
+                        artworkFetchJob?.cancel()
+                        _trackArtworkUrl.value = null
+
                         // Asynchronously fetch live track album artwork from iTunes Search API
                         val current = _currentStation.value
-                        if (current != null && !current.isPodcast) {
-                            scope.launch {
+                        val liveStreamDefault = context.getString(R.string.live_audio_stream)
+                        if (current != null && !current.isPodcast &&
+                            !newStreamTitle.equals(current.name, ignoreCase = true) &&
+                            !newStreamTitle.equals(liveStreamDefault, ignoreCase = true)
+                        ) {
+                            artworkFetchJob = scope.launch {
                                 val art = TrackArtworkService.fetchTrackArtwork(newStreamTitle, current.name)
-                                if (art != null) {
+                                if (isActive) {
                                     _trackArtworkUrl.value = art
                                 }
                             }
@@ -1190,6 +1199,7 @@ class RadioPlayerManager(private val context: Context) {
     private fun playStationWithUrl(station: RadioStation, targetUrl: String, isFallback: Boolean) {
         // Cancel any pending URL resolution / player prep job to prevent race conditions when switching quickly
         playbackJob?.cancel()
+        artworkFetchJob?.cancel()
         
         _currentStation.value = station
         _playbackError.value = null
@@ -1749,6 +1759,7 @@ class RadioPlayerManager(private val context: Context) {
         releaseLocks()
         stopWaveAnimation()
         stopPositionPolling()
+        artworkFetchJob?.cancel()
         sleepTimerJob?.cancel()
         silentCheckJob?.cancel()
         networkQualityManager.unregisterNetworkCallback()

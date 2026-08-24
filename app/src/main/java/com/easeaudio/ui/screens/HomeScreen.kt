@@ -494,58 +494,6 @@ fun HomeScreen(
                     }
                 }
 
-                // Curated Master Quality & Lo-Fi Section
-                if (uiState.curatedAudiophileStations.isNotEmpty() && uiState.searchQuery.isEmpty() && uiState.selectedGenre == "All" && uiState.selectedTab == HomeTab.Radio) {
-                    item(span = { GridItemSpan(maxLineSpan) }) {
-                        Column(modifier = Modifier.padding(top = 16.dp, bottom = 8.dp)) {
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Text(
-                                    text = stringResource(R.string.curated_section_title),
-                                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
-                                    color = MaterialTheme.colorScheme.onSurface
-                                )
-                                Surface(
-                                    shape = RoundedCornerShape(12.dp),
-                                    color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f)
-                                ) {
-                                    Text(
-                                        text = stringResource(R.string.badge_flac_aac),
-                                        style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
-                                        color = MaterialTheme.colorScheme.primary,
-                                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
-                                    )
-                                }
-                            }
-                            Text(
-                                text = stringResource(R.string.curated_section_subtitle),
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
-                                modifier = Modifier.padding(top = 2.dp)
-                            )
-                        }
-                    }
-                    item(span = { GridItemSpan(maxLineSpan) }) {
-                        LazyRow(
-                            modifier = Modifier.fillMaxWidth(),
-                            contentPadding = PaddingValues(0.dp),
-                            horizontalArrangement = Arrangement.spacedBy(12.dp)
-                        ) {
-                            items(uiState.curatedAudiophileStations) { station ->
-                                CuratedStationCard(
-                                    station = station,
-                                    isPlaying = uiState.currentStation?.id == station.id && uiState.isPlaying,
-                                    onClick = { onStationSelect(station) },
-                                    onToggleFavorite = { onToggleFavorite(station) }
-                                )
-                            }
-                        }
-                    }
-                }
-
                 // Featured Station Hero Banner
                 if (uiState.stations.isNotEmpty() && uiState.searchQuery.isEmpty() && uiState.selectedGenre == "All") {
                     val featured = uiState.stations.first()
