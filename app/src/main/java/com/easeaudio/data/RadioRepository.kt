@@ -7,7 +7,8 @@ import kotlinx.coroutines.flow.map
 class RadioRepository(
     private val dao: RadioDao,
     private val favoriteDao: FavoriteDao,
-    private val recentSearchDao: RecentSearchDao
+    private val recentSearchDao: RecentSearchDao,
+    private val listenLaterDao: ListenLaterDao
 ) : IRadioRepository {
 
     override val defaultStations = emptyList<RadioStation>()
@@ -99,6 +100,33 @@ class RadioRepository(
     }
 
     override fun getRecentStations(): Flow<List<RadioStation>> = dao.getRecentStations()
+
+    override fun getListenLaterItems(): Flow<List<ListenLaterItem>> = listenLaterDao.getAllListenLater()
+
+    override suspend fun toggleListenLater(station: RadioStation) {
+        val isPresent = listenLaterDao.isListenLaterDirect(station.id)
+        if (isPresent) {
+            listenLaterDao.deleteById(station.id)
+        } else {
+            val item = ListenLaterItem(
+                id = station.id,
+                name = station.name,
+                genre = station.genre,
+                country = station.country,
+                streamUrl = station.streamUrl,
+                imageUrl = station.imageUrl,
+                bitrate = station.bitrate,
+                codec = station.codec,
+                isCustom = station.isCustom,
+                isPodcast = station.isPodcast
+            )
+            listenLaterDao.insert(item)
+        }
+    }
+
+    override suspend fun clearListenLater() {
+        listenLaterDao.clearAll()
+    }
 
     override suspend fun toggleFavorite(station: RadioStation) {
         val currentlyFav = station.isFavorite || favoriteDao.isFavoriteDirect(station.id)

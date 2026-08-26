@@ -29,6 +29,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.material.icons.filled.QrCode2
+import androidx.compose.foundation.border
+import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.Color
 import com.easeaudio.R
 import com.easeaudio.ui.theme.*
 import java.net.URLEncoder
@@ -44,6 +52,7 @@ fun TrackActionSheet(
     onSetAsAlarmStation: (() -> Unit)? = null,
     onBlockStation: (() -> Unit)? = null,
     onOpenLyrics: (() -> Unit)? = null,
+    onOpenQrCode: (() -> Unit)? = null,
     onDismiss: () -> Unit
 ) {
     val context = LocalContext.current
@@ -185,6 +194,18 @@ fun TrackActionSheet(
                 context.startActivity(intent)
             }
 
+            // Action Item: Scan & Share QR Code
+            if (onOpenQrCode != null) {
+                TrackActionItem(
+                    icon = Icons.Filled.QrCode2,
+                    label = stringResource(R.string.show_qr_code),
+                    tint = MaterialTheme.colorScheme.primary
+                ) {
+                    onDismiss()
+                    onOpenQrCode()
+                }
+            }
+
             // Action Item 4: Share Track (with App Download Link)
             val shareTrackMessage = stringResource(R.string.share_track_message, trackTitle, stationName, "https://play.google.com/store/apps/details?id=${context.packageName}")
             val shareTrackChooserText = stringResource(R.string.share_track_chooser)
@@ -226,13 +247,21 @@ private fun TrackActionItem(
     tint: androidx.compose.ui.graphics.Color,
     onClick: () -> Unit
 ) {
+    var isFocused by remember { mutableStateOf(false) }
+
     Surface(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 4.dp)
             .clip(RoundedCornerShape(12.dp))
+            .onFocusChanged { isFocused = it.isFocused }
+            .border(
+                width = if (isFocused) 2.dp else 0.dp,
+                color = if (isFocused) MaterialTheme.colorScheme.primary else Color.Transparent,
+                shape = RoundedCornerShape(12.dp)
+            )
             .clickable { onClick() },
-        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+        color = if (isFocused) MaterialTheme.colorScheme.primary.copy(alpha = 0.15f) else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
     ) {
         Row(
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
@@ -241,14 +270,14 @@ private fun TrackActionItem(
             Icon(
                 imageVector = icon,
                 contentDescription = null,
-                tint = tint,
+                tint = if (isFocused) MaterialTheme.colorScheme.primary else tint,
                 modifier = Modifier.size(22.dp)
             )
             Spacer(modifier = Modifier.width(14.dp))
             Text(
                 text = label,
                 style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Medium),
-                color = MaterialTheme.colorScheme.onSurface
+                color = if (isFocused) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
             )
         }
     }

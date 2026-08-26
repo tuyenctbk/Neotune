@@ -23,9 +23,50 @@ import java.util.UUID
 class RadioViewModel(application: Application) : AndroidViewModel(application) {
 
     private val db = RadioDatabase.getDatabase(application)
-    val repository: com.easeaudio.data.IRadioRepository = RadioRepository(db.radioDao(), db.favoriteDao(), db.recentSearchDao())
+    val repository: com.easeaudio.data.IRadioRepository = RadioRepository(db.radioDao(), db.favoriteDao(), db.recentSearchDao(), db.listenLaterDao())
     val playerManager: RadioPlayerManager = RadioPlayerManager.getInstance(application)
+    val audioComfortManager = com.easeaudio.data.AudioComfortManager.getInstance(application)
     private var onlineDiscoveryJob: Job? = null
+
+    // Audio Comfort & Habits flows
+    val isVolumeSafetyEnabled: StateFlow<Boolean> = audioComfortManager.isVolumeSafetyEnabled
+    val isNightAudioModeEnabled: StateFlow<Boolean> = audioComfortManager.isNightAudioModeEnabled
+    val todayListeningMinutes: StateFlow<Int> = audioComfortManager.todayListeningMinutes
+    val currentStreakDays: StateFlow<Int> = audioComfortManager.currentStreakDays
+
+    fun toggleVolumeSafety() {
+        val next = !audioComfortManager.isVolumeSafetyEnabled.value
+        audioComfortManager.setVolumeSafetyEnabled(next)
+        if (next && playerManager.volume.value > com.easeaudio.data.AudioComfortManager.VOLUME_SAFETY_CAP) {
+            playerManager.setVolume(com.easeaudio.data.AudioComfortManager.VOLUME_SAFETY_CAP)
+        }
+    }
+
+    fun toggleNightAudioMode() {
+        val next = !audioComfortManager.isNightAudioModeEnabled.value
+        audioComfortManager.setNightAudioModeEnabled(next)
+        if (next) {
+            playerManager.setEqPreset("Chill Lounge")
+        } else {
+            playerManager.setEqPreset("Balanced")
+        }
+    }
+
+    // Listen Later state flow
+    val listenLaterItems: StateFlow<List<com.easeaudio.data.ListenLaterItem>> = repository.getListenLaterItems()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    fun toggleListenLater(station: RadioStation) {
+        viewModelScope.launch {
+            repository.toggleListenLater(station)
+        }
+    }
+
+    fun clearListenLater() {
+        viewModelScope.launch {
+            repository.clearListenLater()
+        }
+    }
 
     // PlayerManager state flow delegations for Unidirectional Data Flow
     val currentStation: StateFlow<RadioStation?> = playerManager.currentStation
@@ -749,11 +790,19 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
         combine(isLoadingEpisodes, networkStatus, remoteConfig, isBatterySaverEnabled, selectedLauncherIcon) {
             loadEp, net, cfg, batt, icon -> listOf<Any?>(loadEp, net, cfg, batt, icon)
         },
-        combine(isAudioBoosterEnabled, isAutoPlayOnStartupEnabled, showAppearanceDialog, showAttributionDialog) {
-            boost, autoPlay, appearance, attribution -> listOf<Any?>(boost, autoPlay, appearance, attribution)
+        combine(isAudioBoosterEnabled, isAutoPlayOnStartupEnabled, showAppearanceDialog, showAttributionDialog, listenLaterItems) {
+            boost, autoPlay, appearance, attribution, later -> listOf<Any?>(boost, autoPlay, appearance, attribution, later)
         },
-        combine(playerSnapshot, playbackDetail, dialogState, discoveryState) {
-            ps, pd, ds, disc -> listOf<Any?>(ps, pd, ds, disc)
+        combine(
+            playerSnapshot,
+            playbackDetail,
+            dialogState,
+            discoveryState,
+            combine(isVolumeSafetyEnabled, isNightAudioModeEnabled, todayListeningMinutes, currentStreakDays) { safety, night, today, streak ->
+                listOf<Any?>(safety, night, today, streak)
+            }
+        ) { ps, pd, ds, disc, comfort ->
+            listOf<Any?>(ps, pd, ds, disc, comfort)
         }
     ) { stationData, metaData, configData, settingsData, stateGroups ->
         @Suppress("UNCHECKED_CAST")
@@ -761,6 +810,7 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
         val pd = stateGroups[1] as PlaybackDetail
         val ds = stateGroups[2] as DialogState
         val disc = stateGroups[3] as DiscoveryState
+        val comfort = stateGroups[4] as List<Any?>
 
         HomeUiState(
             stations                = stationData[0] as List<RadioStation>,
@@ -768,6 +818,7 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
             recentRadioStations     = stationData[2] as List<RadioStation>,
             recentPodcastStations   = stationData[3] as List<RadioStation>,
             favoriteStations        = stationData[4] as List<RadioStation>,
+            listenLaterItems        = settingsData[4] as List<com.easeaudio.data.ListenLaterItem>,
             blockedStations         = metaData[0] as List<RadioStation>,
             failedStationIds        = metaData[1] as Set<String>,
             demotedStationIds       = metaData[2] as Set<String>,
@@ -782,6 +833,10 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
             isAutoPlayOnStartupEnabled = settingsData[1] as Boolean,
             showAppearanceDialog    = settingsData[2] as Boolean,
             showAttributionDialog   = settingsData[3] as Boolean,
+            isVolumeSafetyEnabled   = comfort[0] as Boolean,
+            isNightAudioModeEnabled = comfort[1] as Boolean,
+            todayListeningMinutes   = comfort[2] as Int,
+            currentStreakDays       = comfort[3] as Int,
             // Player state (from typed PlayerSnapshot — no unchecked cast risk)
             currentStation          = ps.currentStation,
             isPlaying               = ps.isPlaying,
@@ -1019,7 +1074,6 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
                     _currentEpisode.value = targetEpisode
                     playerManager.playPodcastEpisode(station, targetEpisode)
                     repository.recordStationListened(station)
-                    snackbarMessage.emit("Added '${station.name}' to Recently Played")
                 } else {
                     playerManager.playStation(station)
                 }
@@ -1033,7 +1087,6 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
                 playerManager.playStation(station)
                 viewModelScope.launch {
                     repository.recordStationListened(station)
-                    snackbarMessage.emit("Added '${station.name}' to Recently Played")
                 }
             }
         }
@@ -1203,6 +1256,22 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
 
     fun setShowAttributionDialog(show: Boolean) {
         _showAttributionDialog.value = show
+    }
+
+    fun importStations(stations: List<RadioStation>) {
+        viewModelScope.launch {
+            stations.forEach { station ->
+                repository.addCustomStation(station)
+                if (station.isFavorite) {
+                    val currentFavs = favoriteStations.value
+                    if (currentFavs.none { it.id == station.id }) {
+                        repository.toggleFavorite(station.copy(isFavorite = false))
+                    }
+                }
+            }
+            refreshStations()
+            snackbarMessage.emit("Imported ${stations.size} stations into library")
+        }
     }
 
     override fun onCleared() {

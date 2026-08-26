@@ -28,6 +28,8 @@ import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Bookmark
+import androidx.compose.material.icons.filled.BookmarkBorder
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Block
@@ -100,6 +102,7 @@ fun HomeScreen(
     onCountrySelect: (String) -> Unit,
     onStationSelect: (RadioStation) -> Unit,
     onToggleFavorite: (RadioStation) -> Unit,
+    onToggleListenLater: (RadioStation) -> Unit = {},
     onBlockStation: (RadioStation) -> Unit = {},
     onDemoteStation: (RadioStation) -> Unit = {},
     onUndemoteStation: (RadioStation) -> Unit = {},
@@ -483,8 +486,10 @@ fun HomeScreen(
                                     station = station,
                                     isPlaying = uiState.currentStation?.id == station.id && uiState.isPlaying,
                                     isDemoted = uiState.demotedStationIds.contains(station.id),
+                                    isListenLater = uiState.listenLaterItems.any { it.id == station.id },
                                     onClick = { onStationSelect(station) },
                                     onToggleFavorite = { onToggleFavorite(station) },
+                                    onToggleListenLater = { onToggleListenLater(station) },
                                     onBlockStation = { onBlockStation(station) },
                                     onDemoteStation = { onDemoteStation(station) },
                                     onUndemoteStation = { onUndemoteStation(station) }
@@ -741,6 +746,7 @@ fun HomeScreen(
                 items(uiState.stations, key = { it.id }) { station ->
                     val isSelected = uiState.currentStation?.id == station.id
                     val isUnreachable = uiState.failedStationIds.contains(station.id)
+                    val isSavedToLater = uiState.listenLaterItems.any { it.id == station.id }
                     StationCard(
                         station = station,
                         isSelected = isSelected,
@@ -748,8 +754,10 @@ fun HomeScreen(
                         isDemoted = uiState.demotedStationIds.contains(station.id),
                         isLoading = isSelected && uiState.isLoading,
                         isUnreachable = isUnreachable,
+                        isListenLater = isSavedToLater,
                         onSelect = { onStationSelect(station) },
                         onToggleFavorite = { onToggleFavorite(station) },
+                        onToggleListenLater = { onToggleListenLater(station) },
                         onBlockStation = { onBlockStation(station) },
                         onDemoteStation = { onDemoteStation(station) },
                         onUndemoteStation = { onUndemoteStation(station) }
@@ -957,8 +965,10 @@ fun RecentStationCard(
     station: RadioStation,
     isPlaying: Boolean,
     isDemoted: Boolean = false,
+    isListenLater: Boolean = false,
     onClick: () -> Unit,
     onToggleFavorite: () -> Unit = {},
+    onToggleListenLater: () -> Unit = {},
     onBlockStation: () -> Unit = {},
     onDemoteStation: () -> Unit = {},
     onUndemoteStation: () -> Unit = {}
@@ -1072,6 +1082,21 @@ fun RecentStationCard(
                     onToggleFavorite()
                 }
             )
+
+            DropdownMenuItem(
+                text = { Text(if (isListenLater) "Remove from Listen Later" else "Save to Listen Later", color = MaterialTheme.colorScheme.onSurface) },
+                leadingIcon = { 
+                    Icon(
+                        imageVector = if (isListenLater) Icons.Filled.Bookmark else Icons.Filled.BookmarkBorder, 
+                        contentDescription = null, 
+                        tint = if (isListenLater) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+                    ) 
+                },
+                onClick = {
+                    showMenu = false
+                    onToggleListenLater()
+                }
+            )
             
             DropdownMenuItem(
                 text = { 
@@ -1132,8 +1157,10 @@ fun StationCard(
     isDemoted: Boolean = false,
     isLoading: Boolean = false,
     isUnreachable: Boolean = false,
+    isListenLater: Boolean = false,
     onSelect: () -> Unit,
     onToggleFavorite: () -> Unit,
+    onToggleListenLater: () -> Unit = {},
     onBlockStation: () -> Unit = {},
     onDemoteStation: () -> Unit = {},
     onUndemoteStation: () -> Unit = {}
@@ -1413,6 +1440,21 @@ fun StationCard(
                 onClick = {
                     showMenu = false
                     onToggleFavorite()
+                }
+            )
+
+            DropdownMenuItem(
+                text = { Text(if (isListenLater) "Remove from Listen Later" else "Save to Listen Later", color = MaterialTheme.colorScheme.onSurface) },
+                leadingIcon = { 
+                    Icon(
+                        imageVector = if (isListenLater) Icons.Filled.Bookmark else Icons.Filled.BookmarkBorder, 
+                        contentDescription = null, 
+                        tint = if (isListenLater) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+                    ) 
+                },
+                onClick = {
+                    showMenu = false
+                    onToggleListenLater()
                 }
             )
             

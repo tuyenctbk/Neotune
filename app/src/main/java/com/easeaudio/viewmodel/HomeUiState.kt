@@ -14,6 +14,7 @@ data class HomeUiState(
     val recentRadioStations: List<RadioStation> = emptyList(),
     val recentPodcastStations: List<RadioStation> = emptyList(),
     val favoriteStations: List<RadioStation> = emptyList(),
+    val listenLaterItems: List<com.easeaudio.data.ListenLaterItem> = emptyList(),
     val blockedStations: List<RadioStation> = emptyList(),
     val demotedStationIds: Set<String> = emptySet(),
     val failedStationIds: Set<String> = emptySet(),
@@ -64,6 +65,10 @@ data class HomeUiState(
     val isAudioBoosterEnabled: Boolean = true,
     val isBatterySaverEnabled: Boolean = false,
     val isAutoPlayOnStartupEnabled: Boolean = true,
+    val isVolumeSafetyEnabled: Boolean = false,
+    val isNightAudioModeEnabled: Boolean = false,
+    val todayListeningMinutes: Int = 0,
+    val currentStreakDays: Int = 1,
     val selectedLauncherIcon: String = "default",
     
     // UI Dialogs

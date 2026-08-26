@@ -251,6 +251,9 @@ fun MainAppContent(
 
     var showTrackActionSheet by remember { mutableStateOf(false) }
     var showGlobalLyricsSheet by remember { mutableStateOf(false) }
+    var showBackupDialog by remember { mutableStateOf(false) }
+    var showDiagnosticsDialog by remember { mutableStateOf(false) }
+    var showQrCodeDialog by remember { mutableStateOf(false) }
     val snackbarHostState = remember { SnackbarHostState() }
 
     // Collect UI notifications/snackbars (e.g., Favorites, Recently Played)
@@ -391,6 +394,9 @@ fun MainAppContent(
                                     FirebaseManager.logEvent("toggle_favorite", Bundle().apply { putString("station_name", station.name) })
                                     viewModel.toggleFavorite(station) 
                                 },
+                                onToggleListenLater = { station ->
+                                    viewModel.toggleListenLater(station)
+                                },
                                 onBlockStation = { station -> viewModel.blockStation(station.id) },
                                 onDemoteStation = { station -> viewModel.demoteStation(station.id) },
                                 onUndemoteStation = { station -> viewModel.undemoteStation(station.id) },
@@ -421,6 +427,9 @@ fun MainAppContent(
                                 onToggleFavorite = { station -> 
                                     FirebaseManager.logEvent("toggle_favorite", Bundle().apply { putString("station_name", station.name) })
                                     viewModel.toggleFavorite(station) 
+                                },
+                                onToggleListenLater = { station ->
+                                    viewModel.toggleListenLater(station)
                                 },
                                 onBlockStation = { station -> viewModel.blockStation(station.id) },
                                 onDemoteStation = { station -> viewModel.demoteStation(station.id) },
@@ -453,6 +462,9 @@ fun MainAppContent(
                                     FirebaseManager.logEvent("toggle_favorite", Bundle().apply { putString("station_name", station.name) })
                                     viewModel.toggleFavorite(station) 
                                 },
+                                onToggleListenLater = { station ->
+                                    viewModel.toggleListenLater(station)
+                                },
                                 onBlockStation = { station -> viewModel.blockStation(station.id) },
                                 onDemoteStation = { station -> viewModel.demoteStation(station.id) },
                                 onUndemoteStation = { station -> viewModel.undemoteStation(station.id) },
@@ -466,6 +478,7 @@ fun MainAppContent(
                         composable(NavRoute.Favorites.route) {
                             FavoritesScreen(
                                 favoriteStations = uiState.favoriteStations,
+                                listenLaterItems = uiState.listenLaterItems,
                                 currentStation = syncedCurrentStation,
                                 isPlaying = uiState.isPlaying,
                                 isLoading = uiState.isLoading,
@@ -478,6 +491,12 @@ fun MainAppContent(
                                 onToggleFavorite = { station -> 
                                     FirebaseManager.logEvent("toggle_favorite", Bundle().apply { putString("station_name", station.name) })
                                     viewModel.toggleFavorite(station) 
+                                },
+                                onToggleListenLater = { station ->
+                                    viewModel.toggleListenLater(station)
+                                },
+                                onClearListenLater = {
+                                    viewModel.clearListenLater()
                                 },
                                 onBlockStation = { station -> viewModel.blockStation(station.id) },
                                 onDemoteStation = { station -> viewModel.demoteStation(station.id) },
@@ -497,13 +516,21 @@ fun MainAppContent(
                                 onToggleAutoPlayOnStartup = { viewModel.toggleAutoPlayOnStartup() },
                                 isLightMode = AppThemeState.isLightMode,
                                 onToggleLightMode = { AppThemeState.setLightMode(context, !AppThemeState.isLightMode) },
+                                isVolumeSafetyEnabled = uiState.isVolumeSafetyEnabled,
+                                onToggleVolumeSafety = { viewModel.toggleVolumeSafety() },
+                                isNightAudioModeEnabled = uiState.isNightAudioModeEnabled,
+                                onToggleNightAudioMode = { viewModel.toggleNightAudioMode() },
+                                todayListeningMinutes = uiState.todayListeningMinutes,
+                                currentStreakDays = uiState.currentStreakDays,
                                 onOpenEqualizer = { viewModel.setShowEqualizerDialog(true) },
                                 onOpenSleepTimer = { viewModel.setShowSleepTimerDialog(true) },
                                 onOpenRadioAlarm = { showAlarmDialog = true },
                                 onOpenAppearance = { viewModel.setShowAppearanceDialog(true) },
                                 onOpenOnboarding = { navController.navigate(NavRoute.Onboarding.route) },
                                 onOpenBlockedDialog = { viewModel.setShowBlockedDialog(true) },
-                                onOpenAttribution = { viewModel.setShowAttributionDialog(true) }
+                                onOpenAttribution = { viewModel.setShowAttributionDialog(true) },
+                                onOpenBackup = { showBackupDialog = true },
+                                onOpenDiagnostics = { showDiagnosticsDialog = true }
                             )
 
                             if (showAlarmDialog) {
@@ -607,6 +634,7 @@ fun MainAppContent(
                                 viewModel.fetchLyricsForCurrentTrack()
                                 showGlobalLyricsSheet = true
                             },
+                            onOpenQrCode = { showQrCodeDialog = true },
                             onDismiss = { showTrackActionSheet = false }
                         )
                     }
@@ -761,6 +789,36 @@ fun MainAppContent(
 
         if (uiState.showAttributionDialog) {
             AttributionDialog(onDismiss = { viewModel.setShowAttributionDialog(false) })
+        }
+
+        if (showBackupDialog) {
+            com.easeaudio.ui.components.LibraryBackupDialog(
+                favorites = uiState.favoriteStations,
+                onImportStations = { stations ->
+                    viewModel.importStations(stations)
+                },
+                onDismiss = { showBackupDialog = false }
+            )
+        }
+
+        if (showDiagnosticsDialog) {
+            com.easeaudio.ui.components.DiagnosticsDialog(
+                station = syncedCurrentStation,
+                isPlaying = uiState.isPlaying,
+                isLoading = uiState.isLoading,
+                currentPositionMs = uiState.currentPlaybackPosition,
+                totalDurationMs = uiState.totalPlaybackDuration,
+                onDismiss = { showDiagnosticsDialog = false }
+            )
+        }
+
+        if (showQrCodeDialog && syncedCurrentStation != null) {
+            com.easeaudio.ui.components.QrCodeDialog(
+                title = syncedCurrentStation.name,
+                subtitle = syncedCurrentStation.genre,
+                url = syncedCurrentStation.streamUrl,
+                onDismiss = { showQrCodeDialog = false }
+            )
         }
 
         // Smart Engagement Dialogs

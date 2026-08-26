@@ -1,14 +1,20 @@
 package com.easeaudio.ui.screens
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Bookmark
+import androidx.compose.material.icons.filled.BookmarkBorder
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.DeleteSweep
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.FavoriteBorder
@@ -16,18 +22,25 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.foundation.border
-import androidx.compose.ui.draw.scale
 import com.easeaudio.R
+import com.easeaudio.data.ListenLaterItem
 import com.easeaudio.data.RadioStation
+import com.easeaudio.ui.components.StationCard
 import com.easeaudio.ui.theme.*
+
+enum class LibraryTab {
+    FAVORITES,
+    LISTEN_LATER
+}
 
 enum class LibraryFilter {
     ALL, RADIO, PODCASTS
@@ -37,6 +50,7 @@ enum class LibraryFilter {
 @Composable
 fun FavoritesScreen(
     favoriteStations: List<RadioStation>,
+    listenLaterItems: List<ListenLaterItem> = emptyList(),
     currentStation: RadioStation?,
     isPlaying: Boolean,
     isLoading: Boolean = false,
@@ -44,16 +58,38 @@ fun FavoritesScreen(
     failedStationIds: Set<String> = emptySet(),
     onStationSelect: (RadioStation) -> Unit,
     onToggleFavorite: (RadioStation) -> Unit,
+    onToggleListenLater: (RadioStation) -> Unit = {},
+    onClearListenLater: () -> Unit = {},
     onBlockStation: (RadioStation) -> Unit = {},
     onDemoteStation: (RadioStation) -> Unit = {},
     onUndemoteStation: (RadioStation) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
+    var selectedTab by remember { mutableStateOf(LibraryTab.FAVORITES) }
     var searchQuery by remember { mutableStateOf("") }
     var selectedFilter by remember { mutableStateOf(LibraryFilter.ALL) }
 
-    val filteredFavorites = remember(favoriteStations, searchQuery, selectedFilter) {
-        favoriteStations.filter { station ->
+    val listenLaterAsStations = remember(listenLaterItems) {
+        listenLaterItems.map { item ->
+            RadioStation(
+                id = item.id,
+                name = item.name,
+                genre = item.genre,
+                country = item.country,
+                streamUrl = item.streamUrl,
+                imageUrl = item.imageUrl,
+                bitrate = item.bitrate,
+                codec = item.codec,
+                isCustom = item.isCustom,
+                isFavorite = favoriteStations.any { it.id == item.id }
+            )
+        }
+    }
+
+    val activeStationList = if (selectedTab == LibraryTab.FAVORITES) favoriteStations else listenLaterAsStations
+
+    val filteredList = remember(activeStationList, searchQuery, selectedFilter) {
+        activeStationList.filter { station ->
             val matchesSearch = if (searchQuery.isBlank()) {
                 true
             } else {
@@ -84,38 +120,118 @@ fun FavoritesScreen(
                     .fillMaxHeight()
                     .fillMaxWidth()
             ) {
-                // Header
+                // Header Segmented Tabs (Favorites vs Listen Later)
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 20.dp, vertical = 16.dp),
+                        .padding(horizontal = 20.dp, vertical = 14.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Icon(
-                        imageVector = Icons.Filled.Favorite,
-                        contentDescription = null,
-                        tint = FavoriteHeartColor,
-                        modifier = Modifier.size(28.dp)
-                    )
-                    Spacer(modifier = Modifier.width(10.dp))
-                    Column {
-                        Text(
-                            text = stringResource(R.string.your_favorite_stations),
-                            style = MaterialTheme.typography.headlineLarge,
-                            color = MaterialTheme.colorScheme.onSurface,
-                            fontWeight = FontWeight.Bold
-                        )
-                        Text(
-                            text = "${favoriteStations.size} ${stringResource(R.string.favorites)}",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
+                    Surface(
+                        shape = RoundedCornerShape(16.dp),
+                        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f)),
+                        modifier = Modifier.padding(vertical = 2.dp)
+                    ) {
+                        Row(modifier = Modifier.padding(4.dp)) {
+                            // Favorites Tab
+                            val isFavSelected = selectedTab == LibraryTab.FAVORITES
+                            var isFavFocused by remember { mutableStateOf(false) }
+                            Button(
+                                onClick = { selectedTab = LibraryTab.FAVORITES },
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = if (isFavSelected) MaterialTheme.colorScheme.primary else Color.Transparent,
+                                    contentColor = if (isFavSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface
+                                ),
+                                shape = RoundedCornerShape(12.dp),
+                                contentPadding = PaddingValues(horizontal = 14.dp, vertical = 6.dp),
+                                modifier = Modifier
+                                    .height(38.dp)
+                                    .onFocusChanged { isFavFocused = it.isFocused }
+                                    .scale(if (isFavFocused) 1.05f else 1.0f)
+                                    .border(
+                                        width = if (isFavFocused) 2.dp else 0.dp,
+                                        color = if (isFavFocused) MaterialTheme.colorScheme.primary else Color.Transparent,
+                                        shape = RoundedCornerShape(12.dp)
+                                    )
+                                    .testTag("tab_library_favorites")
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Filled.Favorite,
+                                    contentDescription = null,
+                                    tint = if (isFavSelected) MaterialTheme.colorScheme.onPrimary else FavoriteHeartColor,
+                                    modifier = Modifier.size(16.dp)
+                                )
+                                Spacer(modifier = Modifier.width(6.dp))
+                                Text(
+                                    text = "${stringResource(R.string.tab_favorites)} (${favoriteStations.size})",
+                                    style = MaterialTheme.typography.labelLarge,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+
+                            Spacer(modifier = Modifier.width(4.dp))
+
+                            // Listen Later Tab
+                            val isLaterSelected = selectedTab == LibraryTab.LISTEN_LATER
+                            var isLaterFocused by remember { mutableStateOf(false) }
+                            Button(
+                                onClick = { selectedTab = LibraryTab.LISTEN_LATER },
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = if (isLaterSelected) MaterialTheme.colorScheme.primary else Color.Transparent,
+                                    contentColor = if (isLaterSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface
+                                ),
+                                shape = RoundedCornerShape(12.dp),
+                                contentPadding = PaddingValues(horizontal = 14.dp, vertical = 6.dp),
+                                modifier = Modifier
+                                    .height(38.dp)
+                                    .onFocusChanged { isLaterFocused = it.isFocused }
+                                    .scale(if (isLaterFocused) 1.05f else 1.0f)
+                                    .border(
+                                        width = if (isLaterFocused) 2.dp else 0.dp,
+                                        color = if (isLaterFocused) MaterialTheme.colorScheme.primary else Color.Transparent,
+                                        shape = RoundedCornerShape(12.dp)
+                                    )
+                                    .testTag("tab_library_listen_later")
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Filled.Bookmark,
+                                    contentDescription = null,
+                                    tint = if (isLaterSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier.size(16.dp)
+                                )
+                                Spacer(modifier = Modifier.width(6.dp))
+                                Text(
+                                    text = "${stringResource(R.string.tab_listen_later)} (${listenLaterItems.size})",
+                                    style = MaterialTheme.typography.labelLarge,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+                        }
+                    }
+
+                    if (selectedTab == LibraryTab.LISTEN_LATER && listenLaterItems.isNotEmpty()) {
+                        IconButton(
+                            onClick = onClearListenLater,
+                            modifier = Modifier
+                                .size(36.dp)
+                                .clip(CircleShape)
+                                .background(MaterialTheme.colorScheme.surfaceVariant)
+                                .testTag("btn_clear_listen_later")
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.DeleteSweep,
+                                contentDescription = stringResource(R.string.clear_listen_later),
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.size(20.dp)
+                            )
+                        }
                     }
                 }
 
-                // Only show Search bar and Filter pills if overall favorites list is NOT empty
-                if (favoriteStations.isNotEmpty()) {
-                    // Search Bar
+                // Search Bar and Filter pills
+                if (activeStationList.isNotEmpty()) {
                     OutlinedTextField(
                         value = searchQuery,
                         onValueChange = { searchQuery = it },
@@ -146,7 +262,7 @@ fun FavoritesScreen(
                         ),
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 20.dp, vertical = 4.dp)
+                            .padding(horizontal = 20.dp, vertical = 2.dp)
                             .testTag("favorites_search_input")
                     )
 
@@ -154,7 +270,7 @@ fun FavoritesScreen(
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 20.dp, vertical = 8.dp),
+                            .padding(horizontal = 20.dp, vertical = 6.dp),
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         LibraryFilter.entries.forEach { filter ->
@@ -167,7 +283,7 @@ fun FavoritesScreen(
                             }
                             val bgColors = ButtonDefaults.buttonColors(
                                 containerColor = if (isSelected) MaterialTheme.colorScheme.primary else if (isPillFocused) MaterialTheme.colorScheme.surfaceVariant else MaterialTheme.colorScheme.surface,
-                                contentColor = if (isSelected) MaterialTheme.colorScheme.background else if (isPillFocused) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
+                                contentColor = if (isSelected) MaterialTheme.colorScheme.onPrimary else if (isPillFocused) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
                             )
                             Button(
                                 onClick = { selectedFilter = filter },
@@ -175,7 +291,7 @@ fun FavoritesScreen(
                                 shape = RoundedCornerShape(100.dp),
                                 contentPadding = PaddingValues(horizontal = 16.dp, vertical = 4.dp),
                                 modifier = Modifier
-                                    .height(36.dp)
+                                    .height(34.dp)
                                     .onFocusChanged { isPillFocused = it.isFocused }
                                     .scale(if (isPillFocused) 1.08f else 1.0f)
                                     .border(
@@ -185,13 +301,13 @@ fun FavoritesScreen(
                                     )
                                     .testTag("lib_filter_${filter.name.lowercase()}")
                             ) {
-                                Text(label, style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.Bold)
+                                Text(label, style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold)
                             }
                         }
                     }
                 }
 
-                if (favoriteStations.isEmpty()) {
+                if (activeStationList.isEmpty()) {
                     Box(
                         modifier = Modifier
                             .fillMaxSize()
@@ -200,23 +316,32 @@ fun FavoritesScreen(
                     ) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             Icon(
-                                imageVector = Icons.Outlined.FavoriteBorder,
+                                imageVector = if (selectedTab == LibraryTab.FAVORITES) Icons.Outlined.FavoriteBorder else Icons.Filled.BookmarkBorder,
                                 contentDescription = null,
                                 tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
                                 modifier = Modifier.size(64.dp)
                             )
                             Spacer(modifier = Modifier.height(16.dp))
                             Text(
-                                text = stringResource(R.string.no_saved_favorites),
+                                text = if (selectedTab == LibraryTab.FAVORITES) stringResource(R.string.no_saved_favorites) else stringResource(R.string.listen_later_empty_title),
                                 style = MaterialTheme.typography.titleMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 fontWeight = FontWeight.Bold,
                                 textAlign = TextAlign.Center
                             )
+                            if (selectedTab == LibraryTab.LISTEN_LATER) {
+                                Spacer(modifier = Modifier.height(8.dp))
+                                Text(
+                                    text = stringResource(R.string.listen_later_empty_desc),
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                                    textAlign = TextAlign.Center,
+                                    modifier = Modifier.padding(horizontal = 24.dp)
+                                )
+                            }
                         }
                     }
-                } else if (filteredFavorites.isEmpty()) {
-                    // Show "No matches" if search/filter leaves the list empty
+                } else if (filteredList.isEmpty()) {
                     Box(
                         modifier = Modifier
                             .fillMaxSize()
@@ -248,9 +373,10 @@ fun FavoritesScreen(
                         verticalArrangement = Arrangement.spacedBy(10.dp),
                         contentPadding = PaddingValues(start = 20.dp, top = 8.dp, end = 20.dp, bottom = 80.dp)
                     ) {
-                        items(filteredFavorites, key = { it.id }) { station ->
+                        items(filteredList, key = { it.id }) { station ->
                             val isSelected = currentStation?.id == station.id
                             val isUnreachable = failedStationIds.contains(station.id)
+                            val isSavedToLater = listenLaterItems.any { it.id == station.id }
                             StationCard(
                                 station = station,
                                 isSelected = isSelected,
@@ -258,8 +384,10 @@ fun FavoritesScreen(
                                 isDemoted = demotedStationIds.contains(station.id),
                                 isLoading = isSelected && isLoading,
                                 isUnreachable = isUnreachable,
+                                isListenLater = isSavedToLater,
                                 onSelect = { onStationSelect(station) },
                                 onToggleFavorite = { onToggleFavorite(station) },
+                                onToggleListenLater = { onToggleListenLater(station) },
                                 onBlockStation = { onBlockStation(station) },
                                 onDemoteStation = { onDemoteStation(station) },
                                 onUndemoteStation = { onUndemoteStation(station) }

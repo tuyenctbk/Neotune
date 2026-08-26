@@ -1370,7 +1370,13 @@ class RadioPlayerManager(private val context: Context) {
     }
 
     fun setVolume(newVolume: Float) {
-        _volume.value = newVolume.coerceIn(0.0f, 1.0f)
+        val comfortManager = com.easeaudio.data.AudioComfortManager.getInstance(context)
+        val maxCap = if (comfortManager.isVolumeSafetyEnabled.value) {
+            com.easeaudio.data.AudioComfortManager.VOLUME_SAFETY_CAP
+        } else {
+            1.0f
+        }
+        _volume.value = newVolume.coerceIn(0.0f, maxCap)
         exoPlayer?.volume = _volume.value
     }
 
@@ -1707,6 +1713,10 @@ class RadioPlayerManager(private val context: Context) {
                                 episodeTitle = current.name
                             )
                         }
+                    }
+                    if (saveCounter % 10 == 0) {
+                        // Increment listening stats every 10 seconds of active playback
+                        com.easeaudio.data.AudioComfortManager.getInstance(context).addListeningTime(10)
                     }
                 }
             }

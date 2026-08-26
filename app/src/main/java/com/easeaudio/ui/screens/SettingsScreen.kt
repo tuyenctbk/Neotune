@@ -41,10 +41,18 @@ fun SettingsScreen(
     onToggleAutoPlayOnStartup: () -> Unit = {},
     isLightMode: Boolean = false,
     onToggleLightMode: () -> Unit = {},
+    isVolumeSafetyEnabled: Boolean = false,
+    onToggleVolumeSafety: () -> Unit = {},
+    isNightAudioModeEnabled: Boolean = false,
+    onToggleNightAudioMode: () -> Unit = {},
+    todayListeningMinutes: Int = 0,
+    currentStreakDays: Int = 1,
     onOpenAppearance: () -> Unit,
     onOpenOnboarding: () -> Unit = {},
     onOpenBlockedDialog: () -> Unit,
     onOpenAttribution: () -> Unit,
+    onOpenBackup: () -> Unit = {},
+    onOpenDiagnostics: () -> Unit = {},
     isAutomotive: Boolean = false,
     modifier: Modifier = Modifier
 ) {
@@ -96,53 +104,95 @@ fun SettingsScreen(
                                         Spacer(modifier = Modifier.height(4.dp))
                                         Text(
                                             text = stringResource(R.string.aaos_desc),
-                                            style = MaterialTheme.typography.bodyMedium,
-                                            color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.85f)
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f)
                                         )
                                     }
                                 }
-                                Spacer(modifier = Modifier.height(12.dp))
-                                Button(
-                                    onClick = {
-                                        try {
-                                            val carMediaIntent = Intent("android.car.intent.action.MEDIA_TEMPLATE").apply {
-                                                putExtra(
-                                                    "android.car.intent.extra.MEDIA_COMPONENT",
-                                                    android.content.ComponentName("com.neotune.radio", "com.easeaudio.service.RadioPlaybackService").flattenToString()
-                                                )
-                                                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                                            }
-                                            context.startActivity(carMediaIntent)
-                                        } catch (e: Exception) {
-                                            try {
-                                                val fallbackIntent = Intent(Intent.ACTION_MAIN).apply {
-                                                    addCategory(Intent.CATEGORY_APP_MUSIC)
-                                                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                                                }
-                                                context.startActivity(fallbackIntent)
-                                            } catch (ex: Exception) {
-                                                Log.e("SettingsScreen", "Failed to launch Car Media Center", ex)
-                                            }
-                                        }
-                                    },
-                                    shape = RoundedCornerShape(12.dp),
-                                    colors = ButtonDefaults.buttonColors(
-                                        containerColor = MaterialTheme.colorScheme.primary,
-                                        contentColor = MaterialTheme.colorScheme.onPrimary
-                                    ),
-                                    modifier = Modifier.fillMaxWidth()
-                                ) {
+                            }
+                        }
+                    }
+                }
+
+                // Daily Listening Habits & Streak Banner (100% on-device)
+                item {
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(20.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f)
+                        )
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(18.dp)
+                        ) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
                                     Icon(
-                                        imageVector = Icons.Filled.PlayArrow,
+                                        imageVector = Icons.Filled.LocalFireDepartment,
                                         contentDescription = null,
-                                        modifier = Modifier.size(20.dp)
+                                        tint = Color(0xFFFF7043),
+                                        modifier = Modifier.size(24.dp)
                                     )
                                     Spacer(modifier = Modifier.width(8.dp))
                                     Text(
-                                        text = stringResource(R.string.aaos_open_media_center),
-                                        style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold)
+                                        text = stringResource(R.string.listening_stats_title),
+                                        style = MaterialTheme.typography.titleMedium,
+                                        fontWeight = FontWeight.Bold,
+                                        color = MaterialTheme.colorScheme.onSurface
                                     )
                                 }
+                                Surface(
+                                    shape = RoundedCornerShape(12.dp),
+                                    color = Color(0xFFFF7043).copy(alpha = 0.15f)
+                                ) {
+                                    Text(
+                                        text = "🔥 $currentStreakDays ${stringResource(R.string.listening_stats_streak)}",
+                                        style = MaterialTheme.typography.labelMedium,
+                                        fontWeight = FontWeight.Bold,
+                                        color = Color(0xFFFF7043),
+                                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
+                                    )
+                                }
+                            }
+
+                            Spacer(modifier = Modifier.height(14.dp))
+
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Column {
+                                    Text(
+                                        text = stringResource(R.string.listening_stats_today),
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                    val hours = todayListeningMinutes / 60
+                                    val mins = todayListeningMinutes % 60
+                                    val formattedTime = if (hours > 0) {
+                                        stringResource(R.string.listening_stats_hours_mins, hours, mins)
+                                    } else {
+                                        stringResource(R.string.listening_stats_minutes, mins)
+                                    }
+                                    Text(
+                                        text = formattedTime,
+                                        style = MaterialTheme.typography.headlineSmall,
+                                        fontWeight = FontWeight.Black,
+                                        color = MaterialTheme.colorScheme.primary
+                                    )
+                                }
+
+                                Text(
+                                    text = stringResource(R.string.listening_stats_desc),
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                                    modifier = Modifier.widthIn(max = 200.dp)
+                                )
                             }
                         }
                     }
@@ -157,8 +207,37 @@ fun SettingsScreen(
                             letterSpacing = (-0.5).sp
                         ),
                         color = MaterialTheme.colorScheme.onSurface,
-                        modifier = Modifier.padding(bottom = 8.dp)
+                        modifier = Modifier.padding(bottom = 4.dp)
                     )
+                }
+
+                // Audio Comfort & Protection Section
+                item {
+                    SettingsSectionHeader(title = stringResource(R.string.settings_section_audio_comfort))
+                }
+
+                item {
+                    SettingsCard {
+                        SettingsSwitchItem(
+                            icon = Icons.Filled.HealthAndSafety,
+                            iconTint = MaterialTheme.colorScheme.primary,
+                            title = stringResource(R.string.settings_volume_safety_title),
+                            subtitle = stringResource(R.string.settings_volume_safety_desc),
+                            checked = isVolumeSafetyEnabled,
+                            onCheckedChange = { onToggleVolumeSafety() },
+                            testTag = "setting_volume_safety"
+                        )
+                        HorizontalDivider(color = MaterialTheme.colorScheme.surfaceVariant, thickness = 1.dp)
+                        SettingsSwitchItem(
+                            icon = Icons.Filled.NightsStay,
+                            iconTint = MaterialTheme.colorScheme.primary,
+                            title = stringResource(R.string.settings_night_mode_title),
+                            subtitle = stringResource(R.string.settings_night_mode_desc),
+                            checked = isNightAudioModeEnabled,
+                            onCheckedChange = { onToggleNightAudioMode() },
+                            testTag = "setting_night_mode"
+                        )
+                    }
                 }
 
                 // Audio & Playback Section
@@ -213,6 +292,15 @@ fun SettingsScreen(
                             checked = isAutoPlayOnStartupEnabled,
                             onCheckedChange = { onToggleAutoPlayOnStartup() },
                             testTag = "setting_auto_play"
+                        )
+                        HorizontalDivider(color = MaterialTheme.colorScheme.surfaceVariant, thickness = 1.dp)
+                        SettingsItem(
+                            icon = Icons.Filled.Speed,
+                            iconTint = MaterialTheme.colorScheme.primary,
+                            title = stringResource(R.string.settings_diagnostics_title),
+                            subtitle = stringResource(R.string.settings_diagnostics_desc),
+                            onClick = onOpenDiagnostics,
+                            testTag = "setting_diagnostics"
                         )
                     }
                 }
@@ -281,6 +369,24 @@ fun SettingsScreen(
                     }
                 }
 
+                // Data & Backup Section
+                item {
+                    SettingsSectionHeader(title = stringResource(R.string.settings_section_data_backup))
+                }
+
+                item {
+                    SettingsCard {
+                        SettingsItem(
+                            icon = Icons.Filled.Backup,
+                            iconTint = MaterialTheme.colorScheme.primary,
+                            title = stringResource(R.string.settings_backup_title),
+                            subtitle = stringResource(R.string.settings_backup_desc),
+                            onClick = onOpenBackup,
+                            testTag = "setting_backup_restore"
+                        )
+                    }
+                }
+
                 // Web & Cross-Platform Section
                 item {
                     SettingsSectionHeader(title = stringResource(R.string.settings_section_web_pwa))
@@ -295,61 +401,13 @@ fun SettingsScreen(
                             subtitle = stringResource(R.string.settings_pwa_desc),
                             onClick = {
                                 try {
-                                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://neotune.ai.studio/")).apply {
-                                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                                    }
-                                    context.startActivity(intent)
+                                    val pwaIntent = Intent(Intent.ACTION_VIEW, Uri.parse("https://neotune.ai.studio"))
+                                    context.startActivity(pwaIntent)
                                 } catch (e: Exception) {
-                                    Log.e("SettingsScreen", "Failed to open NeoTune PWA link", e)
+                                    Log.e("SettingsScreen", "Failed to open PWA link: ${e.message}")
                                 }
                             },
-                            testTag = "setting_neotune_pwa"
-                        )
-                    }
-                }
-
-                // Support & Community Section
-                item {
-                    SettingsSectionHeader(title = stringResource(R.string.support_development_header))
-                }
-
-                item {
-                    SettingsCard {
-                        SettingsItem(
-                            icon = Icons.Filled.LocalCafe,
-                            iconTint = Color(0xFFFF813F),
-                            title = stringResource(R.string.donate_buymeacoffee),
-                            subtitle = stringResource(R.string.donate_buymeacoffee_desc),
-                            onClick = {
-                                try {
-                                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://buymeacoffee.com/tuyenphamvn")).apply {
-                                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                                    }
-                                    context.startActivity(intent)
-                                } catch (e: Exception) {
-                                    Log.e("SettingsScreen", "Failed to open BuyMeACoffee link", e)
-                                }
-                            },
-                            testTag = "setting_donate_buymeacoffee"
-                        )
-
-                        HorizontalDivider(color = MaterialTheme.colorScheme.surfaceVariant, thickness = 1.dp)
-                        SettingsItem(
-                            icon = Icons.Filled.VolunteerActivism,
-                            iconTint = Color(0xFF0079C1),
-                            title = stringResource(R.string.donate_paypal),
-                            subtitle = stringResource(R.string.donate_paypal_desc),
-                            onClick = {
-                                try {
-                                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://paypal.me/tuyenphamvn")).apply {
-                                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                                    }
-                                    context.startActivity(intent)
-                                } catch (e: Exception) {
-                                    Log.e("SettingsScreen", "Failed to open PayPal donation link", e)
-                                }
-                            },
-                            testTag = "setting_donate_paypal"
+                            testTag = "setting_open_pwa"
                         )
                     }
                 }
@@ -359,146 +417,134 @@ fun SettingsScreen(
 }
 
 @Composable
-private fun SettingsSectionHeader(title: String) {
+fun SettingsSectionHeader(title: String) {
     Text(
-        text = title.uppercase(),
-        style = MaterialTheme.typography.labelLarge.copy(
+        text = title,
+        style = MaterialTheme.typography.titleSmall.copy(
             fontWeight = FontWeight.Bold,
-            letterSpacing = 1.2.sp
+            letterSpacing = 0.5.sp
         ),
         color = MaterialTheme.colorScheme.primary,
-        modifier = Modifier.padding(start = 4.dp, top = 8.dp, bottom = 4.dp)
+        modifier = Modifier.padding(start = 4.dp, top = 4.dp)
     )
 }
 
 @Composable
-private fun SettingsCard(content: @Composable ColumnScope.() -> Unit) {
+fun SettingsCard(content: @Composable ColumnScope.() -> Unit) {
     Surface(
-        modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
         color = MaterialTheme.colorScheme.surface,
-        border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
+        modifier = Modifier.fillMaxWidth()
     ) {
-        Column(modifier = Modifier.fillMaxWidth()) {
+        Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
             content()
         }
     }
 }
 
 @Composable
-private fun SettingsItem(
+fun SettingsItem(
     icon: ImageVector,
-    iconTint: androidx.compose.ui.graphics.Color,
+    iconTint: Color,
     title: String,
     subtitle: String,
     onClick: () -> Unit,
-    testTag: String
+    testTag: String = ""
 ) {
     var isFocused by remember { mutableStateOf(false) }
-
-    Row(
+    Surface(
+        onClick = onClick,
+        shape = RoundedCornerShape(12.dp),
+        color = if (isFocused) MaterialTheme.colorScheme.surfaceVariant else Color.Transparent,
         modifier = Modifier
             .fillMaxWidth()
             .onFocusChanged { isFocused = it.isFocused }
-            .background(if (isFocused) MaterialTheme.colorScheme.primary.copy(alpha = 0.16f) else Color.Transparent)
-            .clickable(onClick = onClick)
-            .padding(horizontal = 16.dp, vertical = 14.dp)
-            .testTag(testTag),
-        verticalAlignment = Alignment.CenterVertically
+            .testTag(testTag)
     ) {
-        Box(
+        Row(
             modifier = Modifier
-                .size(40.dp)
-                .clip(RoundedCornerShape(10.dp))
-                .background(if (isFocused) MaterialTheme.colorScheme.primary.copy(alpha = 0.28f) else MaterialTheme.colorScheme.surfaceVariant),
-            contentAlignment = Alignment.Center
-        ) {
-            Icon(
-                imageVector = icon,
-                contentDescription = title,
-                tint = if (isFocused) MaterialTheme.colorScheme.primary else iconTint,
-                modifier = Modifier.size(22.dp)
-            )
-        }
-        Spacer(modifier = Modifier.width(14.dp))
-        Column(modifier = Modifier.weight(1f)) {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
-                color = if (isFocused) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
-            )
-            Spacer(modifier = Modifier.height(2.dp))
-            Text(
-                text = subtitle,
-                style = MaterialTheme.typography.bodySmall,
-                color = if (isFocused) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
-            )
-        }
-        Icon(
-            imageVector = Icons.Filled.ChevronRight,
-            contentDescription = null,
-            tint = if (isFocused) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
-            modifier = Modifier.size(20.dp)
-        )
-    }
-}
-
-@Composable
-private fun SettingsSwitchItem(
-    icon: ImageVector,
-    iconTint: androidx.compose.ui.graphics.Color,
-    title: String,
-    subtitle: String,
-    checked: Boolean,
-    onCheckedChange: (Boolean) -> Unit,
-    testTag: String
-) {
-    var isFocused by remember { mutableStateOf(false) }
-
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .onFocusChanged { isFocused = it.isFocused }
-            .background(if (isFocused) MaterialTheme.colorScheme.primary.copy(alpha = 0.16f) else Color.Transparent)
-            .clickable { onCheckedChange(!checked) }
-            .padding(horizontal = 16.dp, vertical = 12.dp)
-            .testTag(testTag),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Box(
-            modifier = Modifier
-                .size(40.dp)
-                .clip(RoundedCornerShape(10.dp))
-                .background(if (isFocused) MaterialTheme.colorScheme.primary.copy(alpha = 0.28f) else MaterialTheme.colorScheme.surfaceVariant),
-            contentAlignment = Alignment.Center
+                .fillMaxWidth()
+                .padding(vertical = 12.dp, horizontal = 4.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
                 imageVector = icon,
                 contentDescription = null,
-                tint = if (isFocused) MaterialTheme.colorScheme.primary else iconTint,
-                modifier = Modifier.size(22.dp)
+                tint = iconTint,
+                modifier = Modifier.size(24.dp)
+            )
+            Spacer(modifier = Modifier.width(16.dp))
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.SemiBold),
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                Text(
+                    text = subtitle,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+            Icon(
+                imageVector = Icons.Filled.ChevronRight,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
+                modifier = Modifier.size(20.dp)
             )
         }
-        Spacer(modifier = Modifier.width(14.dp))
-        Column(modifier = Modifier.weight(1f)) {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
-                color = if (isFocused) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
+    }
+}
+
+@Composable
+fun SettingsSwitchItem(
+    icon: ImageVector,
+    iconTint: Color,
+    title: String,
+    subtitle: String,
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit,
+    testTag: String = ""
+) {
+    var isFocused by remember { mutableStateOf(false) }
+    Surface(
+        onClick = { onCheckedChange(!checked) },
+        shape = RoundedCornerShape(12.dp),
+        color = if (isFocused) MaterialTheme.colorScheme.surfaceVariant else Color.Transparent,
+        modifier = Modifier
+            .fillMaxWidth()
+            .onFocusChanged { isFocused = it.isFocused }
+            .testTag(testTag)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 10.dp, horizontal = 4.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = iconTint,
+                modifier = Modifier.size(24.dp)
             )
-            Text(
-                text = subtitle,
-                style = MaterialTheme.typography.bodySmall,
-                color = if (isFocused) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+            Spacer(modifier = Modifier.width(16.dp))
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.SemiBold),
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                Text(
+                    text = subtitle,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+            Switch(
+                checked = checked,
+                onCheckedChange = onCheckedChange
             )
         }
-        Switch(
-            checked = checked,
-            onCheckedChange = { onCheckedChange(it) },
-            colors = SwitchDefaults.colors(
-                checkedThumbColor = MaterialTheme.colorScheme.background,
-                checkedTrackColor = MaterialTheme.colorScheme.primary
-            )
-        )
     }
 }
