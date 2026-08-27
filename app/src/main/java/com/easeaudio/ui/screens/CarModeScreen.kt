@@ -1313,7 +1313,7 @@ private fun AutomotiveHeroPlayer(
                                     }
                                     onPlaybackSpeedChange(nextSpeed)
                                 },
-                                label = { Text("${uiState.playbackSpeed}x") },
+                                 label = { Text(stringResource(R.string.speed_format, uiState.playbackSpeed.toString())) },
                                 leadingIcon = { Icon(Icons.Filled.Speed, null, modifier = Modifier.size(16.dp), tint = MaterialTheme.colorScheme.primary) }
                             )
                         }
@@ -1330,7 +1330,7 @@ private fun AutomotiveHeroPlayer(
                             val activePresetLabel = eqPresets.find { it.key == uiState.activeEqPreset }?.labelResId?.let { stringResource(it) } ?: uiState.activeEqPreset
                             AssistChip(
                                 onClick = onOpenEqualizer,
-                                label = { Text("EQ: $activePresetLabel") },
+                                label = { Text(stringResource(R.string.eq_label, activePresetLabel)) },
                                 leadingIcon = { Icon(Icons.Filled.Tune, null, modifier = Modifier.size(16.dp), tint = MaterialTheme.colorScheme.primary) }
                             )
                         }

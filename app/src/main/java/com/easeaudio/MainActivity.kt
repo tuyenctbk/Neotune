@@ -11,8 +11,12 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandHorizontally
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.*
@@ -30,6 +34,7 @@ import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.*
 import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -159,6 +164,7 @@ fun MainAppContent(
     val isOnboardingCompleted = remember { mutableStateOf(prefs.getBoolean("is_onboarding_completed", false)) }
 
     val uiState by viewModel.homeUiState.collectAsState()
+    val hasActiveSession by viewModel.hasActiveSession.collectAsStateWithLifecycle()
 
     val startDestination = if (!isOnboardingCompleted.value) NavRoute.Onboarding.route else NavRoute.Home.route
 
@@ -297,9 +303,24 @@ fun MainAppContent(
             }
     ) {
         Row(modifier = Modifier.fillMaxSize()) {
-            if (showNavigationRail) {
+            AnimatedVisibility(
+                visible = showNavigationRail,
+                enter = expandHorizontally(
+                    animationSpec = tween(durationMillis = 350, easing = FastOutSlowInEasing),
+                    expandFrom = Alignment.Start
+                ) + fadeIn(
+                    animationSpec = tween(durationMillis = 300, easing = FastOutSlowInEasing)
+                ),
+                exit = shrinkHorizontally(
+                    animationSpec = tween(durationMillis = 300, easing = FastOutSlowInEasing),
+                    shrinkTowards = Alignment.Start
+                ) + fadeOut(
+                    animationSpec = tween(durationMillis = 250, easing = FastOutSlowInEasing)
+                )
+            ) {
                 AppNavigationRail(
                     currentRoute = currentRoute,
+                    isExpanded = showNavigationRail,
                     onNavigate = { route ->
                         if (route == NavRoute.Radio.route || route == NavRoute.Home.route) {
                             viewModel.setSelectedTab(com.easeaudio.ui.screens.HomeTab.Radio)
@@ -587,8 +608,16 @@ fun MainAppContent(
                         }
                     }
 
-                    // Mini Player
-                    if (!isFullPlayerVisible && currentRoute != NavRoute.Screensaver.route && currentRoute != NavRoute.CarMode.route && currentRoute != NavRoute.Onboarding.route) {
+                    // Mini Player - Only shown if a stream is actively playing/loading or session was explicitly started by user
+                    val isPlayerActive = syncedCurrentStation != null && (uiState.isPlaying || uiState.isLoading || hasActiveSession)
+
+                    val shouldShowMiniPlayer = !isFullPlayerVisible &&
+                            currentRoute != NavRoute.Screensaver.route &&
+                            currentRoute != NavRoute.CarMode.route &&
+                            currentRoute != NavRoute.Onboarding.route &&
+                            isPlayerActive
+
+                    if (shouldShowMiniPlayer) {
                         Column(
                             modifier = Modifier.align(Alignment.BottomCenter)
                         ) {
@@ -622,7 +651,9 @@ fun MainAppContent(
                             stationName = syncedCurrentStation?.name ?: "Radio",
                             stationGenre = syncedCurrentStation?.genre ?: "",
                             isFavorite = syncedCurrentStation?.isFavorite ?: false,
+                            isListenLater = uiState.listenLaterItems.any { it.id == syncedCurrentStation?.id },
                             onToggleFavorite = syncedCurrentStation?.let { { viewModel.toggleFavorite(it) } },
+                            onToggleListenLater = syncedCurrentStation?.let { { viewModel.toggleListenLater(it) } },
                             onSetAsAlarmStation = syncedCurrentStation?.let { st ->
                                 {
                                     com.easeaudio.alarm.RadioAlarmManager.setWakeUpStation(context, st.id, st.name, st.streamUrl)
@@ -687,6 +718,8 @@ fun MainAppContent(
                     onRequestNotificationPermission = onRequestNotificationPermission,
                     onTogglePlay = { viewModel.togglePlayPause() },
                     onToggleFavorite = { syncedCurrentStation?.let { viewModel.toggleFavorite(it) } },
+                    isListenLater = uiState.listenLaterItems.any { it.id == syncedCurrentStation?.id },
+                    onToggleListenLater = { syncedCurrentStation?.let { viewModel.toggleListenLater(it) } },
                     onVolumeChange = { viewModel.playerManager.setVolume(it) },
                     onOpenSleepTimer = { viewModel.setShowSleepTimerDialog(true) },
                     onOpenEqualizer = { viewModel.setShowEqualizerDialog(true) },
@@ -794,6 +827,7 @@ fun MainAppContent(
         if (showBackupDialog) {
             com.easeaudio.ui.components.LibraryBackupDialog(
                 favorites = uiState.favoriteStations,
+                listenLater = uiState.listenLaterItems,
                 onImportStations = { stations ->
                     viewModel.importStations(stations)
                 },

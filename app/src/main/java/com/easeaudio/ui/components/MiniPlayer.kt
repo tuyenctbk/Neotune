@@ -1,6 +1,7 @@
 package com.easeaudio.ui.components
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.*
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
@@ -27,7 +28,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Brush
@@ -73,6 +77,41 @@ fun MiniPlayer(
             var isFocused by remember { mutableStateOf(false) }
             val showFocus = isFocused
             val effectiveArtworkUrl = trackArtworkUrl?.ifBlank { null } ?: station.imageUrl
+            val context = androidx.compose.ui.platform.LocalContext.current
+            val imageRequest = remember(effectiveArtworkUrl) {
+                coil.request.ImageRequest.Builder(context)
+                    .data(effectiveArtworkUrl?.ifBlank { null })
+                    .crossfade(true)
+                    .error(R.drawable.ic_favicon)
+                    .placeholder(R.drawable.ic_favicon)
+                    .build()
+            }
+
+            // Avatar Animations: Vinyl rotation when playing, breathing shimmer when loading
+            val infiniteTransition = rememberInfiniteTransition(label = "miniAvatarAnim")
+            val rotationAngle by infiniteTransition.animateFloat(
+                initialValue = 0f,
+                targetValue = 360f,
+                animationSpec = infiniteRepeatable(
+                    animation = tween(durationMillis = 16000, easing = LinearEasing),
+                    repeatMode = RepeatMode.Restart
+                ),
+                label = "miniAvatarRotation"
+            )
+            val loadingAlpha by infiniteTransition.animateFloat(
+                initialValue = 0.5f,
+                targetValue = 1.0f,
+                animationSpec = infiniteRepeatable(
+                    animation = tween(durationMillis = 800, easing = FastOutSlowInEasing),
+                    repeatMode = RepeatMode.Reverse
+                ),
+                label = "miniAvatarLoadingAlpha"
+            )
+            val playingScale by animateFloatAsState(
+                targetValue = if (isPlaying) 1.04f else 1.0f,
+                animationSpec = spring(stiffness = Spring.StiffnessLow),
+                label = "miniAvatarScale"
+            )
             Surface(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -99,23 +138,24 @@ fun MiniPlayer(
                         .padding(8.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    // Station Artwork (Clicking or double-clicking artwork opens Fullscreen)
-                    Box(
+                    // Station Artwork with AnimatedStationAvatar subtle pulse animation
+                    AnimatedStationAvatar(
+                        imageUrl = effectiveArtworkUrl,
+                        contentDescription = station.name,
+                        isPlaying = isPlaying,
                         modifier = Modifier
                             .size(48.dp)
-                            .clip(RoundedCornerShape(10.dp))
+                            .alpha(if (isLoading) loadingAlpha else 1.0f)
                             .combinedClickable(
                                 onClick = { onOpenFullPlayer() },
                                 onDoubleClick = { onOpenFullPlayer() }
-                            )
-                    ) {
-                        AsyncImage(
-                            model = effectiveArtworkUrl,
-                            contentDescription = station.name,
-                            contentScale = ContentScale.Crop,
-                            modifier = Modifier.fillMaxSize()
-                        )
-                    }
+                            ),
+                        shape = CircleShape,
+                        borderWidth = 1.5.dp,
+                        borderColor = if (isPlaying) MaterialTheme.colorScheme.primary.copy(alpha = 0.6f) else MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f),
+                        showVinylCenter = true,
+                        enableRotation = true
+                    )
 
                     Spacer(modifier = Modifier.width(12.dp))
 
@@ -180,7 +220,7 @@ fun MiniPlayer(
 
                     // Mini Wave Visualizer
                     if (isPlaying) {
-                        AudioVisualizerCanvas(
+                        AudioVisualizer(
                             waveAmplitudes = waveAmplitudes.take(5),
                             isPlaying = isPlaying,
                             modifier = Modifier
@@ -190,7 +230,8 @@ fun MiniPlayer(
                             style = VisualizerStyle.ROUNDED_BARS,
                             primaryColor = MaterialTheme.colorScheme.primary,
                             secondaryColor = MaterialTheme.colorScheme.secondary,
-                            accentColor = MaterialTheme.colorScheme.tertiary
+                            accentColor = MaterialTheme.colorScheme.tertiary,
+                            barCount = 5
                         )
                     }
 
@@ -243,6 +284,9 @@ fun MiniPlayer(
 
                     // Play/Pause Button
                     var isPlayFocused by remember { mutableStateOf(false) }
+                    val playBtnContainerColor = if (isPlayFocused) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.primary
+                    val playBtnContentColor = if (isPlayFocused) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onPrimary
+
                     IconButton(
                         onClick = {
                             haptic.performHapticFeedback(HapticFeedbackType.LongPress)
@@ -252,20 +296,20 @@ fun MiniPlayer(
                             .size(40.dp)
                             .onFocusChanged { isPlayFocused = it.isFocused }
                             .clip(CircleShape)
-                            .background(if (isPlayFocused) MaterialTheme.colorScheme.primary else PlayButtonContainer)
+                            .background(playBtnContainerColor)
                             .testTag("mini_player_play_pause")
                     ) {
                         if (isLoading) {
                             CircularProgressIndicator(
                                 modifier = Modifier.size(20.dp),
-                                color = PlayButtonContent,
+                                color = playBtnContentColor,
                                 strokeWidth = 2.dp
                             )
                         } else {
                             Icon(
                                 imageVector = if (isPlaying) Icons.Filled.Pause else Icons.Filled.PlayArrow,
                                 contentDescription = if (isPlaying) "Pause" else "Play",
-                                tint = PlayButtonContent
+                                tint = playBtnContentColor
                             )
                         }
                     }

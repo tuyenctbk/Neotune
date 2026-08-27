@@ -32,6 +32,7 @@ import org.json.JSONObject
 @Composable
 fun LibraryBackupDialog(
     favorites: List<RadioStation>,
+    listenLater: List<com.easeaudio.data.ListenLaterItem> = emptyList(),
     onImportStations: (List<RadioStation>) -> Unit,
     onDismiss: () -> Unit
 ) {
@@ -42,7 +43,7 @@ fun LibraryBackupDialog(
     var importedCount by remember { mutableStateOf<Int?>(null) }
 
     // Generate formatted JSON string for export
-    val exportJson = remember(favorites) {
+    val exportJson = remember(favorites, listenLater) {
         try {
             val jsonArray = JSONArray()
             favorites.forEach { station ->
@@ -56,14 +57,31 @@ fun LibraryBackupDialog(
                     put("bitrate", station.bitrate)
                     put("codec", station.codec)
                     put("isCustom", station.isCustom)
+                    put("isFavorite", true)
                 }
                 jsonArray.put(obj)
+            }
+            val laterArray = JSONArray()
+            listenLater.forEach { item ->
+                val obj = JSONObject().apply {
+                    put("id", item.id)
+                    put("name", item.name)
+                    put("genre", item.genre)
+                    put("country", item.country)
+                    put("streamUrl", item.streamUrl)
+                    put("imageUrl", item.imageUrl)
+                    put("bitrate", item.bitrate)
+                    put("codec", item.codec)
+                    put("isCustom", item.isCustom)
+                }
+                laterArray.put(obj)
             }
             val root = JSONObject().apply {
                 put("app", "NeoTune")
                 put("version", "1.0")
                 put("exportedAt", System.currentTimeMillis())
                 put("stations", jsonArray)
+                put("listenLater", laterArray)
             }
             root.toString(2)
         } catch (e: Exception) {

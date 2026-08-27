@@ -28,7 +28,7 @@ data class HomeUiState(
     val currentLyrics: com.easeaudio.data.SongLyrics? = null,
     val isLoadingLyrics: Boolean = false,
     val curatedAudiophileStations: List<RadioStation> = emptyList(),
-    val waveAmplitudes: List<Float> = List(8) { 0.15f },
+    val waveAmplitudes: List<Float> = List(16) { 0.15f },
     val volume: Float = 0.85f,
     val currentPlaybackPosition: Long = 0L,
     val totalPlaybackDuration: Long = 0L,

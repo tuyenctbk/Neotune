@@ -33,10 +33,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.scale
 import coil.request.ImageRequest
-import com.easeaudio.ui.components.AudioVisualizerCanvas
+import com.easeaudio.ui.components.AnimatedStationAvatar
+import com.easeaudio.ui.components.AudioVisualizer
 import com.easeaudio.ui.components.VisualizerStyle
+import com.easeaudio.ui.components.pulseOnPlaying
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -82,6 +85,8 @@ fun PlayerScreen(
     onRequestNotificationPermission: () -> Unit = {},
     onTogglePlay: () -> Unit,
     onToggleFavorite: () -> Unit,
+    isListenLater: Boolean = false,
+    onToggleListenLater: () -> Unit = {},
     onVolumeChange: (Float) -> Unit,
     onOpenSleepTimer: () -> Unit,
     onOpenEqualizer: () -> Unit,
@@ -221,6 +226,25 @@ fun PlayerScreen(
                         )
                     }
 
+                    var isBookmarkFocused by remember { mutableStateOf(false) }
+                    IconButton(
+                        onClick = {
+                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                            onToggleListenLater()
+                        },
+                        modifier = Modifier
+                            .onFocusChanged { isBookmarkFocused = it.isFocused }
+                            .clip(CircleShape)
+                            .background(if (isBookmarkFocused) MaterialTheme.colorScheme.primary else Color.Transparent)
+                            .testTag("btn_player_listen_later")
+                    ) {
+                        Icon(
+                            imageVector = if (isListenLater) Icons.Filled.Bookmark else Icons.Filled.BookmarkBorder,
+                            contentDescription = if (isListenLater) "Remove from Listen Later" else "Save to Listen Later",
+                            tint = if (isBookmarkFocused) MaterialTheme.colorScheme.onPrimary else (if (isListenLater) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant)
+                        )
+                    }
+
                     var isShareFocused by remember { mutableStateOf(false) }
                     IconButton(
                         onClick = {
@@ -356,6 +380,7 @@ fun PlayerScreen(
                     ) {
                         StationArtworkCard(
                             station = station,
+                            isPlaying = isPlaying,
                             trackArtworkUrl = trackArtworkUrl,
                             isLoading = isLoading,
                             artScale = artScale,
@@ -431,6 +456,7 @@ fun PlayerScreen(
 
                         StationArtworkCard(
                             station = station,
+                            isPlaying = isPlaying,
                             trackArtworkUrl = trackArtworkUrl,
                             isLoading = isLoading,
                             artScale = artScale,
@@ -757,7 +783,7 @@ private fun PlayerContent(
 
                 Spacer(modifier = Modifier.height(12.dp))
 
-                AudioVisualizerCanvas(
+                AudioVisualizer(
                     waveAmplitudes = waveAmplitudes,
                     isPlaying = isPlaying,
                     modifier = Modifier
@@ -914,7 +940,7 @@ private fun PlayerContent(
                         }
                         onPlaybackSpeedChange(nextSpeed)
                     },
-                    label = { Text("${playbackSpeed}x") },
+                    label = { Text(stringResource(R.string.speed_format, playbackSpeed.toString())) },
                     leadingIcon = { Icon(Icons.Filled.Speed, null, modifier = Modifier.size(16.dp), tint = MaterialTheme.colorScheme.primary) }
                 )
             }
@@ -956,6 +982,7 @@ private fun formatDuration(ms: Long): String {
 @Composable
 private fun StationArtworkCard(
     station: RadioStation,
+    isPlaying: Boolean = false,
     trackArtworkUrl: String? = null,
     isLoading: Boolean,
     artScale: Float,
@@ -967,14 +994,28 @@ private fun StationArtworkCard(
     val effectiveUrl = trackArtworkUrl?.ifBlank { null } ?: station.imageUrl
     val imageRequest = remember(effectiveUrl) {
         ImageRequest.Builder(context)
-            .data(effectiveUrl)
+            .data(effectiveUrl?.ifBlank { null })
             .crossfade(true)
+            .error(R.drawable.ic_favicon)
+            .placeholder(R.drawable.ic_favicon)
             .build()
     }
+
+    val infiniteTransition = rememberInfiniteTransition(label = "playerArtAnim")
+    val rotationAngle by infiniteTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = 360f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = 24000, easing = LinearEasing),
+            repeatMode = RepeatMode.Restart
+        ),
+        label = "playerArtRotation"
+    )
 
     Box(
         modifier = modifier
             .scale(artScale)
+            .pulseOnPlaying(isPlaying = isPlaying, pulseTargetScale = 1.05f)
             .clip(RoundedCornerShape(cornerRadius))
             .border(
                 1.dp,
@@ -998,7 +1039,7 @@ private fun StationArtworkCard(
             modifier = Modifier
                 .fillMaxSize()
                 .blur(radius = 24.dp)
-                .alpha(0.42f)
+                .alpha(if (isPlaying) 0.55f else 0.35f)
         )
 
         // Radial depth vignette overlay
@@ -1023,31 +1064,17 @@ private fun StationArtworkCard(
                 .padding(14.dp),
             contentAlignment = Alignment.Center
         ) {
-            Surface(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .clip(RoundedCornerShape(cornerRadius - 8.dp))
-                    .border(
-                        0.5.dp,
-                        Color.White.copy(alpha = 0.15f),
-                        RoundedCornerShape(cornerRadius - 8.dp)
-                    ),
-                color = Color.Black.copy(alpha = 0.25f),
-                tonalElevation = 4.dp,
-                shadowElevation = 8.dp
-            ) {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    AsyncImage(
-                        model = imageRequest,
-                        contentDescription = station.name,
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier.fillMaxSize()
-                    )
-                }
-            }
+            AnimatedStationAvatar(
+                imageUrl = effectiveUrl,
+                contentDescription = station.name,
+                isPlaying = isPlaying,
+                modifier = Modifier.fillMaxSize(),
+                shape = RoundedCornerShape(cornerRadius - 8.dp),
+                borderWidth = 0.5.dp,
+                borderColor = Color.White.copy(alpha = 0.15f),
+                showVinylCenter = true,
+                enableRotation = true
+            )
         }
 
         // Layer 3: Glass top gloss reflection

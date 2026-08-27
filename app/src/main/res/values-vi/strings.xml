@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="back">Quay lại</string>
     <string name="app_name">NeoTune</string>
     <string name="app_description">Radio, Podcast &amp; Lo-Fi Toàn Cầu</string>
     <string name="nav_tuner">Bộ Dò Radio</string>
@@ -346,4 +347,98 @@
     <string name="donate_buymeacoffee_desc">Ủng hộ qua Buy Me a Coffee (Thẻ, Google Pay)</string>
     <string name="donate_github_sponsors">GitHub Sponsors</string>
     <string name="donate_github_sponsors_desc">Tài trợ phát triển trên GitHub (0% phí)</string>
+
+    <!-- Settings Screen, AAOS & PWA Resources -->
+    <string name="aaos_title">Android Automotive OS</string>
+    <string name="aaos_desc">Duyệt kênh và nghe trực tiếp được tích hợp ngay trên màn hình bảng điều khiển xe của bạn.</string>
+    <string name="aaos_open_media_center">Mở Trung Tâm Đa Phương Tiện Ô Tô (Duyệt &amp; Phát)</string>
+    <string name="settings_section_audio_playback">Âm Thanh &amp; Phát Nhạc</string>
+    <string name="settings_equalizer_desc">Tùy chỉnh âm trầm, âm bổng &amp; cấu hình âm thanh</string>
+    <string name="settings_sleep_timer_desc">Hẹn giờ tự động tắt khi ngủ</string>
+    <string name="settings_radio_alarm_desc">Báo thức thức dậy bằng kênh radio trực tiếp yêu thích</string>
+    <string name="settings_auto_play">Tự Động Phát Khi Mở Ứng Dụng</string>
+    <string name="settings_auto_play_desc">Tiếp tục phát kênh hoặc podcast đã nghe gần nhất</string>
+    <string name="settings_section_appearance_tour">Giao Diện &amp; Hướng Dẫn</string>
+    <string name="settings_appearance_desc">Chủ đề giao diện, màu nhấn &amp; ngôn ngữ</string>
+    <string name="settings_onboarding_desc">Xem lại hướng dẫn ban đầu &amp; thiết lập</string>
+    <string name="settings_light_theme">Giao diện sáng</string>
+    <string name="settings_light_theme_desc">Chuyển sang giao diện sáng dịu mắt cho các buổi nghe dài</string>
+    <string name="settings_section_content_privacy">Nội Dung &amp; Quyền Riêng Tư</string>
+    <string name="settings_content_filters_desc">Quản lý các kênh đã ẩn &amp; bộ lọc an toàn</string>
+    <string name="settings_attribution_desc">Nhà cung cấp dữ liệu &amp; ghi nhận nguồn API</string>
+    <string name="settings_section_web_pwa">Bản Web &amp; Đa Nền Tảng</string>
+    <string name="settings_pwa_title">NeoTune Web (PWA)</string>
+    <string name="settings_pwa_desc">neotune.ai.studio — Nghe trên trình duyệt web, iOS &amp; máy tính</string>
+    <string name="open_pwa_btn">Mở ứng dụng Web (PWA): neotune.ai.studio</string>
+
+    <!-- QR Share, Stream Diagnostics, Backup/Restore -->
+    <string name="qr_code_share_title">Quét &amp; Chia Sẻ Kênh</string>
+    <string name="qr_code_scan_hint">Quét mã QR này bằng camera điện thoại hoặc TV để phát ngay kênh này.</string>
+    <string name="copied_to_clipboard">Đã sao chép liên kết kênh vào bộ nhớ tạm</string>
+    <string name="copy_link">Sao Chép Liên Kết</string>
+    <string name="show_qr_code">Chia Sẻ Mã QR</string>
+    <string name="paste">Dán</string>
+
+    <string name="audio_diagnostics_title">Chẩn Đoán Luồng Phát</string>
+    <string name="audio_diagnostics_subtitle">Thông số bộ đệm ExoPlayer và số liệu âm thanh thời gian thực</string>
+    <string name="stream_live_active">Trực tiếp &amp; Ổn định</string>
+    <string name="stream_buffering_state">Đang nạp bộ đệm…</string>
+    <string name="stream_idle_state">Sẵn sàng / Chờ</string>
+    <string name="diag_station_name">Kênh phát</string>
+    <string name="diag_audio_codec">Bộ giải mã âm thanh</string>
+    <string name="diag_bitrate">Tốc độ bit luồng</string>
+    <string name="diag_playback_engine">Trình phát</string>
+    <string name="diag_buffer_health">Trạng thái bộ đệm</string>
+    <string name="diag_buffer_optimal">Tối ưu (Ổn định 0ms trễ)</string>
+    <string name="diag_buffer_loading">Đang nạp gói tin âm thanh…</string>
+    <string name="diag_buffer_standby">Chế độ chờ</string>
+
+    <string name="settings_section_data_backup">Sao Lưu &amp; Dữ Liệu</string>
+    <string name="settings_backup_title">Sao Lưu &amp; Khôi Phục Thư Viện (JSON)</string>
+    <string name="settings_backup_desc">Xuất hoặc nhập danh sách yêu thích và kênh tự thêm</string>
+    <string name="settings_diagnostics_title">Chất Lượng &amp; Chẩn Đoán Luồng</string>
+    <string name="settings_diagnostics_desc">Xem bộ đệm ExoPlayer, tốc độ bit, codec &amp; độ trễ</string>
+
+    <string name="backup_restore_title">Sao Lưu &amp; Khôi Phục</string>
+    <string name="backup_tab_export">Xuất JSON</string>
+    <string name="backup_tab_import">Nhập JSON</string>
+    <string name="backup_export_desc">Sao chép toàn bộ bộ sưu tập kênh dưới dạng JSON chuẩn để lưu trữ hoặc chuyển sang thiết bị khác.</string>
+    <string name="backup_copy_json">Sao chép JSON vào bộ nhớ tạm</string>
+    <string name="backup_copied_success">Đã sao chép JSON thư viện vào bộ nhớ tạm</string>
+    <string name="backup_import_desc">Dán bản sao lưu JSON NeoTune hợp lệ vào bên dưới để khôi phục hoặc hợp nhất kênh.</string>
+    <string name="backup_restore_btn">Khôi Phục &amp; Hợp Nhất</string>
+    <string name="backup_import_no_stations">Không tìm thấy mục kênh hợp lệ trong JSON.</string>
+    <string name="backup_import_invalid_json">Định dạng JSON không hợp lệ. Vui lòng kiểm tra lại dữ liệu.</string>
+    <string name="backup_import_success_format">Đã nhập thành công %1$d kênh!</string>
+
+    <!-- Listen Later Queue -->
+    <string name="tab_favorites">Yêu thích</string>
+    <string name="tab_listen_later">Nghe sau</string>
+    <string name="listen_later_empty_title">Hàng đợi nghe sau đang trống</string>
+    <string name="listen_later_empty_desc">Lưu các chương trình, bản phát thanh hoặc podcast để dễ dàng tìm và nghe lại sau.</string>
+    <string name="listen_later_added">Đã thêm vào Nghe sau</string>
+    <string name="listen_later_removed">Đã xóa khỏi Nghe sau</string>
+    <string name="add_to_listen_later">Lưu vào Nghe sau</string>
+    <string name="remove_from_listen_later">Bỏ khỏi Nghe sau</string>
+    <string name="clear_listen_later">Xóa hàng đợi</string>
+
+    <!-- Volume Safety & Night Mode -->
+    <string name="settings_section_audio_comfort">Bảo Vệ &amp; Thư Giãn Thính Giác</string>
+    <string name="settings_volume_safety_title">Khóa Âm Lượng An Toàn (Giới hạn 85%)</string>
+    <string name="settings_volume_safety_desc">Ngăn ngừa sốc âm thanh bất ngờ bằng cách giới hạn âm lượng ở mức an toàn</string>
+    <string name="volume_safety_engaged">Âm lượng được giới hạn ở mức 85% bởi Khóa An Toàn</string>
+    <string name="settings_night_mode_title">Chế Độ Âm Thanh Ban Đêm</string>
+    <string name="settings_night_mode_desc">Giảm bớt tần số cao chói tai và âm thanh giật mình để nghe êm ái hơn vào ban đêm</string>
+
+    <!-- Local Listening Habits & Stats -->
+    <string name="listening_stats_title">Thói Quen Nghe Hằng Ngày</string>
+    <string name="listening_stats_streak">Chuỗi ngày nghe</string>
+    <string name="listening_stats_today">Thời gian nghe hôm nay</string>
+    <string name="listening_stats_minutes">%1$d phút</string>
+    <string name="listening_stats_hours_mins">%1$dh %2$dm</string>
+    <string name="listening_stats_desc" formatted="false">Thống kê 100% cục bộ trên thiết bị theo dõi hành trình khám phá âm thanh của bạn</string>
+    <string name="status_playing">ĐANG PHÁT</string>
+    <string name="status_tune_in">NGHE KÊNH</string>
+    <string name="share_station_format">Đang nghe %1$s (%2$s)\nLuồng: %3$s\nBật nghe trực tiếp trên NeoTune Radio!</string>
+    <string name="speed_format">%1$sx</string>
 </resources>

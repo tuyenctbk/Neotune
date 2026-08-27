@@ -11,6 +11,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Alarm
 import androidx.compose.material.icons.filled.Block
+import androidx.compose.material.icons.filled.Bookmark
+import androidx.compose.material.icons.filled.BookmarkBorder
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Mic
@@ -48,7 +50,9 @@ fun TrackActionSheet(
     stationName: String,
     stationGenre: String = "",
     isFavorite: Boolean = false,
+    isListenLater: Boolean = false,
     onToggleFavorite: (() -> Unit)? = null,
+    onToggleListenLater: (() -> Unit)? = null,
     onSetAsAlarmStation: (() -> Unit)? = null,
     onBlockStation: (() -> Unit)? = null,
     onOpenLyrics: (() -> Unit)? = null,
@@ -155,6 +159,18 @@ fun TrackActionSheet(
                 ) {
                     onDismiss()
                     onToggleFavorite()
+                }
+            }
+
+            // Action Item: Save to / Remove from Listen Later
+            if (onToggleListenLater != null) {
+                TrackActionItem(
+                    icon = if (isListenLater) Icons.Filled.Bookmark else Icons.Filled.BookmarkBorder,
+                    label = if (isListenLater) "Remove from Listen Later" else "Save to Listen Later",
+                    tint = if (isListenLater) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
+                ) {
+                    onDismiss()
+                    onToggleListenLater()
                 }
             }
 

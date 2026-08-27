@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="back">Zurück</string>
     <string name="app_name">NeoTune</string>
     <string name="app_description">Globales Radio, Podcasts &amp; Lo-Fi</string>
     <string name="nav_tuner">Tuner</string>
@@ -346,4 +347,98 @@
     <string name="donate_buymeacoffee_desc">Einen Kaffee spendieren (Kreditkarte, Google Pay)</string>
     <string name="donate_github_sponsors">GitHub Sponsors</string>
     <string name="donate_github_sponsors_desc">Entwicklung auf GitHub sponsern (0% Gebühr)</string>
+
+    <!-- Settings Screen, AAOS & PWA Resources -->
+    <string name="aaos_title">Android Automotive OS</string>
+    <string name="aaos_desc">Sender-Navigation und Live-Wiedergabe sind direkt im Media Center-Dashboard Ihres Fahrzeugs integriert.</string>
+    <string name="aaos_open_media_center">Fahrzeug-Media-Center öffnen (Durchsuchen &amp; Abspielen)</string>
+    <string name="settings_section_audio_playback">Audio &amp; Wiedergabe</string>
+    <string name="settings_equalizer_desc">Bässe, Höhen und Audioprofile anpassen</string>
+    <string name="settings_sleep_timer_desc">Automatischen Schlummermodus einstellen</string>
+    <string name="settings_radio_alarm_desc">Mit dem Lieblingssender aufwachen</string>
+    <string name="settings_auto_play">Automatische Wiedergabe beim Start</string>
+    <string name="settings_auto_play_desc">Zuletzt gespielten Sender/Podcast beim Start fortsetzen</string>
+    <string name="settings_section_appearance_tour">Erscheinungsbild &amp; Einführung</string>
+    <string name="settings_appearance_desc">Themes, Akzentfarben und Sprachen</string>
+    <string name="settings_onboarding_desc">Einführungstour und Einrichtung wiederholen</string>
+    <string name="settings_light_theme">Helles Design</string>
+    <string name="settings_light_theme_desc">Angenehmes helles Design für lange Wiedergabesitzungen aktivieren</string>
+    <string name="settings_section_content_privacy">Inhalte &amp; Datenschutz</string>
+    <string name="settings_content_filters_desc">Versteckte Sender und Sicherheitsfilter verwalten</string>
+    <string name="settings_attribution_desc">Datenanbieter und API-Quellenangaben</string>
+    <string name="settings_section_web_pwa">Web &amp; Plattformübergreifend</string>
+    <string name="settings_pwa_title">NeoTune Web (PWA)</string>
+    <string name="settings_pwa_desc">neotune.ai.studio — Im Browser, auf iOS und Desktop hören</string>
+    <string name="open_pwa_btn">Web-App (PWA) öffnen: neotune.ai.studio</string>
+
+    <!-- QR Share, Stream Diagnostics, Backup/Restore -->
+    <string name="qr_code_share_title">Stream scannen &amp; teilen</string>
+    <string name="qr_code_scan_hint">Scannen Sie diesen QR-Code mit einem anderen Smartphone oder TV-Kamera, um diesen Sender sofort abzuspielen.</string>
+    <string name="copied_to_clipboard">Stream-Link in Zwischenablage kopiert</string>
+    <string name="copy_link">Link kopieren</string>
+    <string name="show_qr_code">QR-Code teilen</string>
+    <string name="paste">Einfügen</string>
+
+    <string name="audio_diagnostics_title">Stream-Diagnose</string>
+    <string name="audio_diagnostics_subtitle">Echtzeit-Puffer und Audiometriken von ExoPlayer</string>
+    <string name="stream_live_active">Live &amp; Stabil</string>
+    <string name="stream_buffering_state">Stream lädt…</string>
+    <string name="stream_idle_state">Bereit / Standby</string>
+    <string name="diag_station_name">Sender</string>
+    <string name="diag_audio_codec">Audio-Codec</string>
+    <string name="diag_bitrate">Bitrate</string>
+    <string name="diag_playback_engine">Wiedergabe-Engine</string>
+    <string name="diag_buffer_health">Puffer-Status</string>
+    <string name="diag_buffer_optimal">Optimal (Stabil 0ms Ausfall)</string>
+    <string name="diag_buffer_loading">Lade Audio-Paketpuffer…</string>
+    <string name="diag_buffer_standby">Standby</string>
+
+    <string name="settings_section_data_backup">Daten &amp; Bibliotheks-Backup</string>
+    <string name="settings_backup_title">Bibliothek sichern &amp; wiederherstellen (JSON)</string>
+    <string name="settings_backup_desc">Gespeicherte Favoriten und eigene Sender exportieren oder importieren</string>
+    <string name="settings_diagnostics_title">Stream-Zustand &amp; Diagnose</string>
+    <string name="settings_diagnostics_desc">ExoPlayer-Puffer, Bitrate, Codec und Latenz anzeigen</string>
+
+    <string name="backup_restore_title">Sichern &amp; Wiederherstellen</string>
+    <string name="backup_tab_export">JSON exportieren</string>
+    <string name="backup_tab_import">JSON importieren</string>
+    <string name="backup_export_desc">Kopieren Sie Ihre komplette Sammlung als Standard-JSON für Backups oder Übertragungen auf ein anderes Gerät.</string>
+    <string name="backup_copy_json">JSON in Zwischenablage kopieren</string>
+    <string name="backup_copied_success">Bibliotheks-JSON in Zwischenablage kopiert</string>
+    <string name="backup_import_desc">Fügen Sie ein gültiges NeoTune-JSON-Backup ein, um Sender wiederherzustellen oder zusammenzuführen.</string>
+    <string name="backup_restore_btn">Wiederherstellen &amp; Zusammenführen</string>
+    <string name="backup_import_no_stations">Keine gültigen Sendereinträge in JSON gefunden.</string>
+    <string name="backup_import_invalid_json">Ungültiges JSON-Format. Bitte Backup-Text prüfen.</string>
+    <string name="backup_import_success_format">%1$d Sender erfolgreich importiert!</string>
+
+    <!-- Listen Later Queue -->
+    <string name="tab_favorites">Favoriten</string>
+    <string name="tab_listen_later">Später hören</string>
+    <string name="listen_later_empty_title">Warteschlange leer</string>
+    <string name="listen_later_empty_desc">Merken Sie sich Sendungen oder Podcasts, um sie später einfach wiederzufinden.</string>
+    <string name="listen_later_added">Zu Später hören hinzugefügt</string>
+    <string name="listen_later_removed">Aus Später hören entfernt</string>
+    <string name="add_to_listen_later">Für Später hören merken</string>
+    <string name="remove_from_listen_later">Aus Später hören entfernen</string>
+    <string name="clear_listen_later">Warteschlange leeren</string>
+
+    <!-- Volume Safety & Night Mode -->
+    <string name="settings_section_audio_comfort">Hörkomfort &amp; Schutz</string>
+    <string name="settings_volume_safety_title">Lautstärkebegrenzung (85%)</string>
+    <string name="settings_volume_safety_desc">Verhindert Hörschäden durch Begrenzung der Maximallautstärke auf sichere Werte</string>
+    <string name="volume_safety_engaged">Lautstärke durch Schutzbegrenzung auf 85% limitiert</string>
+    <string name="settings_night_mode_title">Nacht-Audiomodus</string>
+    <string name="settings_night_mode_desc">Dämpft schrille Höhen und laute Spitzen für angenehmes Hören bei Nacht</string>
+
+    <!-- Local Listening Habits & Stats -->
+    <string name="listening_stats_title">Tägliche Hörgewohnheiten</string>
+    <string name="listening_stats_streak">Tage-Serie</string>
+    <string name="listening_stats_today">Heutige Hörzeit</string>
+    <string name="listening_stats_minutes">%1$d Min.</string>
+    <string name="listening_stats_hours_mins">%1$dh %2$dm</string>
+    <string name="listening_stats_desc">100% lokale On-Device-Statistiken zur Verfolgung Ihrer täglichen Hörerlebnisse</string>
+    <string name="status_playing">WIEDERGABE</string>
+    <string name="status_tune_in">EINSCHALTEN</string>
+    <string name="share_station_format">Höre %1$s (%2$s)\nStream: %3$s\nLive einschalten auf NeoTune Radio!</string>
+    <string name="speed_format">%1$sx</string>
 </resources>

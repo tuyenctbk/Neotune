@@ -27,6 +27,10 @@ data class ThemePreset(
     val glowColor: Color = primary
 )
 
+enum class ThemeMode {
+    SYSTEM, DARK, LIGHT
+}
+
 object AppThemeState {
     val ThemePresets = listOf(
         ThemePreset(
@@ -458,6 +462,8 @@ object AppThemeState {
     )
 
     var currentTheme by mutableStateOf(ThemePresets[0])
+    var themeMode by mutableStateOf(ThemeMode.SYSTEM)
+    var isSystemDark by mutableStateOf(true)
     var isLightMode by mutableStateOf(false)
 
     fun loadTheme(context: Context) {
@@ -466,7 +472,10 @@ object AppThemeState {
         val resolvedId = LegacyThemeMap[savedThemeId] ?: savedThemeId
         val matchedTheme = ThemePresets.firstOrNull { it.id == resolvedId } ?: ThemePresets[0]
         currentTheme = matchedTheme
-        isLightMode = prefs.getBoolean("is_light_mode", false)
+        
+        val modeStr = prefs.getString("theme_mode", ThemeMode.SYSTEM.name) ?: ThemeMode.SYSTEM.name
+        themeMode = try { ThemeMode.valueOf(modeStr) } catch (_: Exception) { ThemeMode.SYSTEM }
+        recomputeLightMode()
     }
 
     fun saveTheme(context: Context, themeId: String) {
@@ -476,10 +485,30 @@ object AppThemeState {
         prefs.edit().putString("selected_theme_id", themeId).apply()
     }
 
-    fun setLightMode(context: Context, enabled: Boolean) {
-        isLightMode = enabled
+    fun setThemeMode(context: Context, mode: ThemeMode) {
+        themeMode = mode
         val prefs = context.getSharedPreferences("neotune_theme_prefs", Context.MODE_PRIVATE)
-        prefs.edit().putBoolean("is_light_mode", enabled).apply()
+        prefs.edit().putString("theme_mode", mode.name).apply()
+        recomputeLightMode()
+    }
+
+    fun setLightMode(context: Context, enabled: Boolean) {
+        setThemeMode(context, if (enabled) ThemeMode.LIGHT else ThemeMode.DARK)
+    }
+
+    fun updateSystemDarkTheme(isDark: Boolean) {
+        if (isSystemDark != isDark) {
+            isSystemDark = isDark
+            recomputeLightMode()
+        }
+    }
+
+    private fun recomputeLightMode() {
+        isLightMode = when (themeMode) {
+            ThemeMode.SYSTEM -> !isSystemDark
+            ThemeMode.LIGHT -> true
+            ThemeMode.DARK -> false
+        }
     }
 }
 
@@ -501,8 +530,8 @@ val TextMuted: Color get() = if (AppThemeState.isLightMode) Color(0xFF8B8881) el
 val ActivePill: Color get() = if (AppThemeState.isLightMode) Color(0xFFE7E2D8) else AppThemeState.currentTheme.activePill
 val CardBorder: Color get() = if (AppThemeState.isLightMode) Color(0x1F000000) else AppThemeState.currentTheme.cardBorder
 
-val PlayButtonContainer: Color get() = if (AppThemeState.isLightMode) Color(0xFF1B1917) else Color.White
-val PlayButtonContent: Color get() = if (AppThemeState.isLightMode) Color(0xFFFCFAF7) else Color.Black
+val PlayButtonContainer: Color get() = if (AppThemeState.isLightMode) Color(0xFF1B1917) else AppThemeState.currentTheme.primary
+val PlayButtonContent: Color get() = if (AppThemeState.isLightMode) Color(0xFFFCFAF7) else AppThemeState.currentTheme.background
 
 val FavoriteRed = Color(0xFFFF3B30)
 

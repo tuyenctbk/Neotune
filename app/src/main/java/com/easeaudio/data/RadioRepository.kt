@@ -25,18 +25,29 @@ class RadioRepository(
         offset: Int,
         limit: Int
     ): List<RadioStation> {
-        val onlineList = RadioBrowserService.fetchTopStations(
-            limit = limit,
-            offset = offset,
-            searchQuery = query,
-            genreTag = genre,
-            country = country,
-            countryCode = countryCode
-        )
-        if (onlineList.isNotEmpty()) {
-            dao.saveStationsToCache(onlineList)
+        return try {
+            val onlineList = RadioBrowserService.fetchTopStations(
+                limit = limit,
+                offset = offset,
+                searchQuery = query,
+                genreTag = genre,
+                country = country,
+                countryCode = countryCode
+            )
+            if (onlineList.isNotEmpty()) {
+                dao.saveStationsToCache(onlineList)
+            }
+            onlineList
+        } catch (e: Exception) {
+            // Offline fallback: retrieve cached stations from Room database
+            dao.getCachedStations(
+                query = query,
+                genre = genre,
+                country = country,
+                limit = limit,
+                offset = offset
+            )
         }
-        return onlineList
     }
 
     override suspend fun discoverOnlinePodcasts(
@@ -46,18 +57,29 @@ class RadioRepository(
         offset: Int,
         limit: Int
     ): List<RadioStation> {
-        val result = iTunesPodcastService.fetchPodcasts(
-            limit = limit,
-            offset = offset,
-            searchQuery = query,
-            genre = genre,
-            country = country
-        )
-        val allItems = result.podcasts + result.liveRadioStations
-        if (allItems.isNotEmpty()) {
-            dao.saveStationsToCache(allItems)
+        return try {
+            val result = iTunesPodcastService.fetchPodcasts(
+                limit = limit,
+                offset = offset,
+                searchQuery = query,
+                genre = genre,
+                country = country
+            )
+            val allItems = result.podcasts + result.liveRadioStations
+            if (allItems.isNotEmpty()) {
+                dao.saveStationsToCache(allItems)
+            }
+            result.podcasts
+        } catch (e: Exception) {
+            // Offline fallback: retrieve cached podcasts from Room database
+            dao.getCachedStations(
+                query = query,
+                genre = genre,
+                country = country,
+                limit = limit,
+                offset = offset
+            ).filter { it.isPodcast }
         }
-        return result.podcasts
     }
 
     override suspend fun getiTunesLiveRadioStations(

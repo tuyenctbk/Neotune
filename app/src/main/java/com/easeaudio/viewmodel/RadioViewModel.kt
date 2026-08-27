@@ -72,6 +72,7 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
     val currentStation: StateFlow<RadioStation?> = playerManager.currentStation
     val isPlaying: StateFlow<Boolean> = playerManager.isPlaying
     val isLoading: StateFlow<Boolean> = playerManager.isLoading
+    val hasActiveSession: StateFlow<Boolean> = playerManager.hasActiveSession
     val playbackError: StateFlow<String?> = playerManager.playbackError
     val playbackErrorDetails: StateFlow<com.easeaudio.service.PlaybackErrorDetails?> = playerManager.playbackErrorDetails
     val streamTitle: StateFlow<String?> = playerManager.streamTitle
@@ -459,9 +460,11 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
 
     val eqPresets = listOf(
         EqPresetDisplay("Balanced", R.string.balanced),
+        EqPresetDisplay("Rock", R.string.rock),
+        EqPresetDisplay("Jazz", R.string.jazz),
+        EqPresetDisplay("Acoustic", R.string.acoustic),
         EqPresetDisplay("Bass Boost", R.string.bass_boost),
         EqPresetDisplay("Chill Lounge", R.string.chill_lounge),
-        EqPresetDisplay("Acoustic", R.string.acoustic),
         EqPresetDisplay("Vocal Focus", R.string.vocal_focus),
     )
 
@@ -608,13 +611,11 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
                         playerManager.playStation(lastPlayed)
                         snackbarMessage.emit("Auto-resumed '${lastPlayed.name}'")
                     } else {
-                        android.util.Log.i("RadioViewModel", "Preloading last played station without play: ${lastPlayed.name}")
+                        android.util.Log.i("RadioViewModel", "Preloading last played station: ${lastPlayed.name}")
                         playerManager.setPreloadedStation(lastPlayed)
                     }
-                } else if (lastPlayed == null && playerManager.currentStation.value == null) {
-                    android.util.Log.i("RadioViewModel", "Preloading default popular station without play: ${defaultPopularStation.name}")
-                    playerManager.setPreloadedStation(defaultPopularStation)
                 }
+                // On first launch (lastPlayed == null): Do not preload default station, keeping mini player hidden
             } catch (e: Exception) {
                 android.util.Log.w("RadioViewModel", "Failed to auto-resume station: ${e.message}")
             }

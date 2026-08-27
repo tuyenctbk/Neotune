@@ -7,6 +7,7 @@ import com.easeaudio.R
 import android.net.Uri
 import android.util.Log
 import androidx.annotation.OptIn
+import androidx.media3.common.MimeTypes
 import androidx.media3.common.AudioAttributes
 import androidx.media3.common.C
 import androidx.media3.common.MediaItem
@@ -15,11 +16,18 @@ import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
 import androidx.media3.common.Tracks
 import androidx.media3.common.util.UnstableApi
+import androidx.media3.datasource.DefaultDataSource
 import androidx.media3.datasource.DefaultHttpDataSource
 import androidx.media3.datasource.HttpDataSource
 import androidx.media3.exoplayer.DefaultLoadControl
+import androidx.media3.exoplayer.DefaultRenderersFactory
 import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.exoplayer.audio.AudioSink
+import androidx.media3.exoplayer.audio.DefaultAudioSink
+import androidx.media3.exoplayer.hls.HlsMediaSource
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
+import androidx.media3.exoplayer.source.MediaSource
+import androidx.media3.exoplayer.source.ProgressiveMediaSource
 import androidx.media3.session.LibraryResult
 import androidx.media3.session.MediaLibraryService
 import androidx.media3.session.MediaLibraryService.MediaLibrarySession
@@ -82,6 +90,7 @@ data class PlaybackErrorDetails(
     }
 }
 
+@OptIn(UnstableApi::class)
 class RadioPlayerManager(private val context: Context) {
 
     companion object {
@@ -107,6 +116,7 @@ class RadioPlayerManager(private val context: Context) {
     }
 
     private val TAG = "RadioPlayerManager"
+    val parametricEqProcessor = ParametricEqAudioProcessor()
     // BUG-3 fix: scope is @Volatile var so release() can cancel it and a potential
     // re-initialization path can see the updated reference. SupervisorJob ensures one
     // failing child coroutine (e.g. a crashed wave loop) does not cancel siblings.
@@ -119,6 +129,27 @@ class RadioPlayerManager(private val context: Context) {
     val remoteConfig = firebaseConfigManager.configState
 
     private var exoPlayer: ExoPlayer? = null
+    private var hlsMediaSourceFactory: HlsMediaSource.Factory? = null
+    private var progressiveMediaSourceFactory: ProgressiveMediaSource.Factory? = null
+    private var defaultMediaSourceFactory: DefaultMediaSourceFactory? = null
+
+    private fun appendToDebugLog(message: String) {
+        scope.launch(Dispatchers.IO) {
+            try {
+                val file = java.io.File(context.filesDir, "radio_player_debug.log")
+                val timestamp = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS", java.util.Locale.US).format(java.util.Date())
+                file.appendText("[$timestamp] $message\n")
+                if (file.length() > 250 * 1024) {
+                    val lines = file.readLines()
+                    if (lines.size > 500) {
+                        file.writeText(lines.takeLast(500).joinToString("\n") + "\n")
+                    }
+                }
+            } catch (e: Exception) {
+                Log.w(TAG, "Failed to write to debug log: ${e.message}")
+            }
+        }
+    }
     private var mediaLibrarySession: MediaLibrarySession? = null
     private var mediaSession: MediaSession?
         get() = mediaLibrarySession
@@ -137,6 +168,9 @@ class RadioPlayerManager(private val context: Context) {
 
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
+
+    private val _hasActiveSession = MutableStateFlow(false)
+    val hasActiveSession: StateFlow<Boolean> = _hasActiveSession.asStateFlow()
 
     private val _playbackError = MutableStateFlow<String?>(null)
     val playbackError: StateFlow<String?> = _playbackError.asStateFlow()
@@ -190,8 +224,8 @@ class RadioPlayerManager(private val context: Context) {
         }
     }
 
-    // Visualizer simulated wave amplitudes (8 bars)
-    private val _waveAmplitudes = MutableStateFlow(List(8) { 0.2f })
+    // Visualizer real-time & simulated wave amplitudes (16 frequency bands)
+    private val _waveAmplitudes = MutableStateFlow(List(16) { 0.2f })
     val waveAmplitudes: StateFlow<List<Float>> = _waveAmplitudes.asStateFlow()
 
     // Volume level 0.0f to 1.0f
@@ -294,37 +328,60 @@ class RadioPlayerManager(private val context: Context) {
         val netStatus = networkStatus.value
         val cfg = remoteConfig.value
 
-        val minBuf = if (netStatus.isWifi) 8000 else cfg.minBufferMsCellular.toInt()
-        val maxBuf = if (netStatus.isWifi) 25000 else cfg.maxBufferMsCellular.toInt()
+        val minBuf = if (netStatus.isWifi) 4000 else cfg.minBufferMsCellular.toInt().coerceAtLeast(3000)
+        val maxBuf = if (netStatus.isWifi) 15000 else cfg.maxBufferMsCellular.toInt().coerceAtLeast(10000)
 
         val loadControl = DefaultLoadControl.Builder()
             .setBufferDurationsMs(
                 minBuf,
                 maxBuf,
-                2000,
-                4000
+                1000,
+                2000
             )
             .setPrioritizeTimeOverSizeThresholds(true)
             .build()
 
+        val userAgentStr = "Mozilla/5.0 (Linux; Android 14; Mobile EaseAudio/1.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Mobile Safari/537.36"
         val httpDataSourceFactory = DefaultHttpDataSource.Factory()
-            .setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36")
+            .setUserAgent(userAgentStr)
             .setDefaultRequestProperties(
                 mapOf(
                     "Accept" to "*/*",
                     "Accept-Language" to "en-US,en;q=0.9",
-                    "User-Agent" to "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
+                    "Icy-MetaData" to "1",
+                    "User-Agent" to userAgentStr
                 )
             )
             .setAllowCrossProtocolRedirects(true)
-            .setConnectTimeoutMs(15000)
-            .setReadTimeoutMs(15000)
+            .setConnectTimeoutMs(10000)
+            .setReadTimeoutMs(10000)
 
-        val mediaSourceFactory = DefaultMediaSourceFactory(context.applicationContext)
-            .setDataSourceFactory(httpDataSourceFactory)
+        val dataSourceFactory = DefaultDataSource.Factory(context.applicationContext, httpDataSourceFactory)
 
-        exoPlayer = ExoPlayer.Builder(context.applicationContext)
-            .setMediaSourceFactory(mediaSourceFactory)
+        val hlsFactory = HlsMediaSource.Factory(dataSourceFactory)
+        val progressiveFactory = ProgressiveMediaSource.Factory(dataSourceFactory)
+        val defaultFactory = DefaultMediaSourceFactory(dataSourceFactory)
+
+        hlsMediaSourceFactory = hlsFactory
+        progressiveMediaSourceFactory = progressiveFactory
+        defaultMediaSourceFactory = defaultFactory
+
+        val renderersFactory = object : DefaultRenderersFactory(context.applicationContext) {
+            override fun buildAudioSink(
+                context: Context,
+                enableFloatOutput: Boolean,
+                enableAudioTrackPlaybackParams: Boolean
+            ): AudioSink {
+                return DefaultAudioSink.Builder(context)
+                    .setAudioProcessors(arrayOf(parametricEqProcessor))
+                    .setEnableFloatOutput(enableFloatOutput)
+                    .setEnableAudioTrackPlaybackParams(enableAudioTrackPlaybackParams)
+                    .build()
+            }
+        }
+
+        exoPlayer = ExoPlayer.Builder(context.applicationContext, renderersFactory)
+            .setMediaSourceFactory(defaultFactory)
             .setAudioAttributes(audioAttributes, true)
             .setLoadControl(loadControl)
             .setHandleAudioBecomingNoisy(true)
@@ -338,17 +395,15 @@ class RadioPlayerManager(private val context: Context) {
                             initVisualizer(audioSessionId)
                             initLoudnessEnhancer(audioSessionId)
                         }
+                        appendToDebugLog("AudioSessionIdChanged -> $audioSessionId")
                     }
 
                     override fun onIsPlayingChanged(isPlayingNow: Boolean) {
                         _isPlaying.value = isPlayingNow
                         _isLoading.value = false
+                        appendToDebugLog("IsPlayingChanged -> $isPlayingNow, Station: '${_currentStation.value?.name}'")
                         if (isPlayingNow) {
                             FirebaseManager.stopStreamBufferingTrace(success = true)
-                            // Bug #3/#5: Do NOT call startForegroundService() here.
-                            // MediaSessionService owns the foreground notification lifecycle.
-                            // Calling startService() from inside the manager bypasses that,
-                            // creating a foreground-service-without-notification window (ANR risk).
                             acquireLocks()
                             startWaveAnimation()
                             startPositionPolling()
@@ -364,7 +419,32 @@ class RadioPlayerManager(private val context: Context) {
                         }
                     }
 
+                    override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
+                        val reasonStr = when (reason) {
+                            Player.MEDIA_ITEM_TRANSITION_REASON_REPEAT -> "REPEAT"
+                            Player.MEDIA_ITEM_TRANSITION_REASON_AUTO -> "AUTO"
+                            Player.MEDIA_ITEM_TRANSITION_REASON_SEEK -> "SEEK"
+                            Player.MEDIA_ITEM_TRANSITION_REASON_PLAYLIST_CHANGED -> "PLAYLIST_CHANGED"
+                            else -> "UNKNOWN($reason)"
+                        }
+                        val logMsg = "Media3 onMediaItemTransition -> Station: '${_currentStation.value?.name}', Reason: $reasonStr, MediaId: ${mediaItem?.mediaId}, Uri: ${mediaItem?.localConfiguration?.uri}, Title: ${mediaItem?.mediaMetadata?.title}"
+                        Log.d(TAG, logMsg)
+                        appendToDebugLog(logMsg)
+                    }
+
                     override fun onPlaybackStateChanged(state: Int) {
+                        val stateStr = when (state) {
+                            Player.STATE_IDLE -> "STATE_IDLE"
+                            Player.STATE_BUFFERING -> "STATE_BUFFERING"
+                            Player.STATE_READY -> "STATE_READY"
+                            Player.STATE_ENDED -> "STATE_ENDED"
+                            else -> "UNKNOWN($state)"
+                        }
+                        val current = _currentStation.value
+                        val logMsg = "Media3 onPlaybackStateChanged -> State: $stateStr, Station: '${current?.name}', PlayWhenReady: ${exoPlayer?.playWhenReady}, IsPlaying: ${exoPlayer?.isPlaying}"
+                        Log.i(TAG, logMsg)
+                        appendToDebugLog(logMsg)
+
                         when (state) {
                             Player.STATE_BUFFERING -> {
                                 _isLoading.value = true
@@ -377,9 +457,9 @@ class RadioPlayerManager(private val context: Context) {
                                 _isLoading.value = false
                                 _playbackError.value = null
                                 FirebaseManager.stopStreamBufferingTrace(success = true)
-                                _currentStation.value?.let { current ->
-                                    if (_failedStationIds.value.contains(current.id)) {
-                                        _failedStationIds.value = _failedStationIds.value - current.id
+                                _currentStation.value?.let { currentStation ->
+                                    if (_failedStationIds.value.contains(currentStation.id)) {
+                                        _failedStationIds.value = _failedStationIds.value - currentStation.id
                                     }
                                 }
                             }
@@ -399,7 +479,9 @@ class RadioPlayerManager(private val context: Context) {
                         val albumTitle = mediaMetadata.albumTitle?.toString()
                         val genre = mediaMetadata.genre?.toString()
 
-                        Log.d(TAG, "MediaMetadata updated -> Station: ${_currentStation.value?.name}, Title: $title, Artist: $artist, Album: $albumTitle, Genre: $genre")
+                        val logMsg = "MediaMetadata updated -> Station: ${_currentStation.value?.name}, Title: $title, Artist: $artist, Album: $albumTitle, Genre: $genre"
+                        Log.d(TAG, logMsg)
+                        appendToDebugLog(logMsg)
 
                         val newStreamTitle = when {
                             !title.isNullOrBlank() && !artist.isNullOrBlank() -> "$artist - $title"
@@ -410,11 +492,9 @@ class RadioPlayerManager(private val context: Context) {
                         _streamTitle.value = newStreamTitle
                         _currentLyrics.value = null
 
-                        // Cancel previous artwork resolution and clear stale artwork immediately
                         artworkFetchJob?.cancel()
                         _trackArtworkUrl.value = null
 
-                        // Asynchronously fetch live track album artwork from iTunes Search API
                         val current = _currentStation.value
                         val liveStreamDefault = context.getString(R.string.live_audio_stream)
                         if (current != null && !current.isPodcast &&
@@ -431,15 +511,25 @@ class RadioPlayerManager(private val context: Context) {
                     }
 
                     override fun onTracksChanged(tracks: Tracks) {
+                        val trackDetails = StringBuilder("TracksChanged -> ")
                         for (group in tracks.groups) {
-                            if (group.type == C.TRACK_TYPE_AUDIO) {
-                                for (i in 0 until group.length) {
-                                    if (group.isTrackSelected(i)) {
-                                        val format = group.getTrackFormat(i)
-                                        Log.d(TAG, "Audio Stream Track Active -> Format: ${format.sampleMimeType}, SampleRate: ${format.sampleRate}Hz, Channels: ${format.channelCount}, Bitrate: ${format.bitrate}")
-                                    }
-                                }
+                            for (i in 0 until group.length) {
+                                val format = group.getTrackFormat(i)
+                                val isSupported = group.isTrackSupported(i)
+                                val isSelected = group.isTrackSelected(i)
+                                val detail = "[Type: ${group.type}, Mime: ${format.sampleMimeType}, Codecs: ${format.codecs}, SampleRate: ${format.sampleRate}Hz, Supported: $isSupported, Selected: $isSelected] "
+                                trackDetails.append(detail)
+                                Log.d(TAG, detail)
                             }
+                        }
+                        appendToDebugLog(trackDetails.toString())
+                    }
+
+                    override fun onPlayerErrorChanged(error: PlaybackException?) {
+                        if (error != null) {
+                            val logMsg = "Player Error Changed -> Code: ${error.errorCode} (${error.errorCodeName}): ${error.message}"
+                            Log.w(TAG, logMsg)
+                            appendToDebugLog(logMsg)
                         }
                     }
 
@@ -447,16 +537,24 @@ class RadioPlayerManager(private val context: Context) {
                         FirebaseManager.stopStreamBufferingTrace(success = false, reason = error.message ?: "Player Error")
                         var httpCode: Int? = null
                         var currentCause: Throwable? = error.cause
+                        val causeTree = StringBuilder()
+                        var depth = 0
                         while (currentCause != null) {
+                            causeTree.append(" [Depth $depth: ${currentCause.javaClass.simpleName}: ${currentCause.message}]")
                             if (currentCause is HttpDataSource.InvalidResponseCodeException) {
                                 httpCode = currentCause.responseCode
-                                break
                             }
                             currentCause = currentCause.cause
+                            depth++
                         }
 
                         val current = _currentStation.value
                         val currentUrl = exoPlayer?.currentMediaItem?.localConfiguration?.uri?.toString() ?: current?.streamUrl
+                        val audioFormat = exoPlayer?.audioFormat
+
+                        val errorLog = "ExoPlayer Detailed Exception -> Station: '${current?.name}', URL: '$currentUrl', ErrorCode: ${error.errorCode} (${error.errorCodeName}), Message: '${error.message}', HTTP Code: $httpCode, AudioFormat: [Mime: ${audioFormat?.sampleMimeType}, SampleRate: ${audioFormat?.sampleRate}, Channels: ${audioFormat?.channelCount}, Codecs: ${audioFormat?.codecs}], Causes: $causeTree"
+                        Log.e(TAG, errorLog, error)
+                        appendToDebugLog(errorLog)
 
                         val details = PlaybackErrorDetails(
                             stationName = current?.name ?: "Unknown Station",
@@ -466,7 +564,7 @@ class RadioPlayerManager(private val context: Context) {
                             errorCode = error.errorCode,
                             errorCodeName = error.errorCodeName,
                             errorMessage = error.message,
-                            causeMessage = error.cause?.message,
+                            causeMessage = if (causeTree.isNotEmpty()) causeTree.toString() else error.cause?.message,
                             httpStatusCode = httpCode
                         )
 
@@ -506,10 +604,12 @@ class RadioPlayerManager(private val context: Context) {
                         _isLoading.value = false
                         _isPlaying.value = false
 
+                        // Reset player source properly when station load fails
                         try {
                             exoPlayer?.stop()
+                            exoPlayer?.clearMediaItems()
                         } catch (e: Exception) {
-                            Log.w(TAG, "Error stopping player on failure: ${e.message}")
+                            Log.w(TAG, "Error resetting player source on failure: ${e.message}")
                         }
 
                         val isConnected = networkStatus.value.isConnected
@@ -1074,25 +1174,30 @@ class RadioPlayerManager(private val context: Context) {
                 val channel = vovMatch.groupValues[1].lowercase()
                 currentUrl = "https://audio-lss.vov.vn/live/$channel.m3u8"
                 Log.d(TAG, "Rewrote old VOV stream URL to active live URL: $currentUrl")
+                return@withContext currentUrl
             }
+        }
+
+        val lower = currentUrl.lowercase()
+        // If it's a direct HLS manifest, direct audio stream, or standard stream endpoint, return immediately for ExoPlayer
+        val isExplicitPlaylist = (lower.endsWith(".pls") || lower.contains(".pls?") ||
+                ((lower.endsWith(".m3u") || lower.contains(".m3u?")) && !lower.endsWith(".m3u8") && !lower.contains(".m3u8?")))
+        val isPodcastRss = lower.endsWith(".xml") || lower.endsWith(".rss") || lower.contains("/feed") || lower.contains("/rss")
+
+        if (!isExplicitPlaylist && !isPodcastRss) {
+            return@withContext currentUrl
         }
 
         try {
             var redirectCount = 0
             while (redirectCount < 3) {
-                val lower = currentUrl.lowercase()
-                val isPlaylist = lower.endsWith(".m3u") || lower.endsWith(".pls") || 
-                                 lower.contains(".m3u?") || lower.contains(".pls?") || 
-                                 lower.endsWith(".m3u8") || lower.contains(".m3u8?")
-                val isDirectAudio = lower.endsWith(".mp3") || lower.endsWith(".m4a") || lower.endsWith(".aac") || lower.endsWith(".ogg") || lower.endsWith(".flac") || lower.endsWith(".wav")
-
                 val connection = (java.net.URL(currentUrl).openConnection() as java.net.HttpURLConnection).apply {
                     (this as? javax.net.ssl.HttpsURLConnection)?.apply {
                         sslSocketFactory = com.easeaudio.util.NetworkSecurityHelper.sslSocketFactory
                         hostnameVerifier = com.easeaudio.util.NetworkSecurityHelper.hostnameVerifier
                     }
-                    connectTimeout = 8000
-                    readTimeout = 8000
+                    connectTimeout = 4000
+                    readTimeout = 4000
                     instanceFollowRedirects = true
                     setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36")
                     setRequestProperty("Accept", "*/*")
@@ -1110,17 +1215,17 @@ class RadioPlayerManager(private val context: Context) {
 
                 if (responseCode in 200..299) {
                     val contentType = (connection.contentType ?: "").lowercase()
-                    if (isDirectAudio || contentType.contains("audio") || contentType.contains("mpeg") || contentType.contains("ogg") || contentType.contains("aac") || contentType.contains("flac") || contentType.contains("wav")) {
+                    if (contentType.contains("audio") || contentType.contains("mpeg") || contentType.contains("ogg") || contentType.contains("aac") || contentType.contains("flac") || contentType.contains("wav")) {
                         connection.disconnect()
                         return@withContext currentUrl
                     }
 
-                    // Safely read up to 256KB of text to resolve playlists/RSS XML without reading large binary audio streams into memory
+                    // Safely read up to 128KB of text to resolve playlists/RSS XML without reading large binary audio streams into memory
                     val content = try {
                         val isGzip = connection.contentEncoding?.contains("gzip", ignoreCase = true) == true
                         val inputStream = if (isGzip) java.util.zip.GZIPInputStream(connection.inputStream) else connection.inputStream
                         inputStream.bufferedReader().use { reader ->
-                            val charBuffer = CharArray(262144)
+                            val charBuffer = CharArray(131072)
                             val readCount = reader.read(charBuffer, 0, charBuffer.size)
                             if (readCount > 0) String(charBuffer, 0, readCount) else ""
                         }
@@ -1194,6 +1299,7 @@ class RadioPlayerManager(private val context: Context) {
         _playbackError.value = null
         _isLoading.value = false
         _isPlaying.value = false
+        _hasActiveSession.value = false
     }
 
     private fun playStationWithUrl(station: RadioStation, targetUrl: String, isFallback: Boolean) {
@@ -1202,6 +1308,7 @@ class RadioPlayerManager(private val context: Context) {
         artworkFetchJob?.cancel()
         
         _currentStation.value = station
+        _hasActiveSession.value = true
         _playbackError.value = null
         _isLoading.value = true
         _streamTitle.value = station.name
@@ -1209,39 +1316,13 @@ class RadioPlayerManager(private val context: Context) {
         _currentLyrics.value = null
         isFallbackAttempt = isFallback
 
-        // Immediately stop previous playback so old podcast/stream stops playing instantly while resolving new URL
+        // Stop previous playback so old stream ceases immediately
         exoPlayer?.let { player ->
             try {
                 player.stop()
                 player.clearMediaItems()
             } catch (e: Exception) {
                 Log.w(TAG, "Error stopping previous player: ${e.message}")
-            }
-        }
-        // Pre-populate player metadata immediately so Automotive Now Playing screen shows station info right away
-        exoPlayer?.let { player ->
-            try {
-                val artworkUri = if (station.imageUrl.isNotBlank()) {
-                    try { Uri.parse(station.imageUrl) } catch (_: Exception) { null }
-                } else null
-
-                val immediateMetadata = MediaMetadata.Builder()
-                    .setTitle(station.name)
-                    .setArtist(station.genre)
-                    .setSubtitle(if (station.isPodcast) "Podcast" else station.country)
-                    .setArtworkUri(artworkUri)
-                    .setIsPlayable(true)
-                    .build()
-
-                val immediateItem = MediaItem.Builder()
-                    .setMediaId(station.id)
-                    .setUri(targetUrl)
-                    .setMediaMetadata(immediateMetadata)
-                    .build()
-
-                player.setMediaItem(immediateItem)
-            } catch (e: Exception) {
-                Log.w(TAG, "Error setting initial media item: ${e.message}")
             }
         }
 
@@ -1267,13 +1348,34 @@ class RadioPlayerManager(private val context: Context) {
                     .setIsPlayable(true)
                     .build()
 
-                val mediaItem = MediaItem.Builder()
+                val isHlsStream = resolvedUrl.contains(".m3u8", ignoreCase = true) || resolvedUrl.contains("hls", ignoreCase = true)
+
+                val mediaItemBuilder = MediaItem.Builder()
                     .setMediaId(station.id)
                     .setUri(resolvedUrl)
                     .setMediaMetadata(mediaMetadata)
-                    .build()
 
-                player.setMediaItem(mediaItem)
+                if (isHlsStream) {
+                    mediaItemBuilder.setMimeType(MimeTypes.APPLICATION_M3U8)
+                }
+
+                val mediaItem = mediaItemBuilder.build()
+
+                val mediaSource: MediaSource = if (isHlsStream) {
+                    hlsMediaSourceFactory?.createMediaSource(mediaItem)
+                        ?: HlsMediaSource.Factory(DefaultDataSource.Factory(context.applicationContext)).createMediaSource(mediaItem)
+                } else {
+                    progressiveMediaSourceFactory?.createMediaSource(mediaItem)
+                        ?: ProgressiveMediaSource.Factory(DefaultDataSource.Factory(context.applicationContext)).createMediaSource(mediaItem)
+                }
+
+                val sourceTypeStr = if (isHlsStream) "HLS (.m3u8)" else "Progressive (Sniffed)"
+
+                val logMsg = "Media3 setMediaSource -> Station: '${station.name}' [ID: ${station.id}], SourceType: $sourceTypeStr, Resolved URI: '$resolvedUrl' (IsFallback: $isFallback), Target URL: '$targetUrl', MetadataTitle: '${mediaMetadata.title}'"
+                Log.i(TAG, logMsg)
+                appendToDebugLog(logMsg)
+
+                player.setMediaSource(mediaSource)
                 player.prepare()
                 if (station.isPodcast) {
                     val progress = com.easeaudio.data.PodcastProgressManager.getProgress(context, station.streamUrl.ifBlank { station.id })
@@ -1410,6 +1512,7 @@ class RadioPlayerManager(private val context: Context) {
 
     fun setEqPreset(presetName: String) {
         currentEqPreset = presetName
+        parametricEqProcessor.setPreset(presetName)
         applyEqPreset(presetName)
     }
 
@@ -1521,7 +1624,7 @@ class RadioPlayerManager(private val context: Context) {
 
     private fun processFftData(fft: ByteArray) {
         if (fft.isEmpty() || !_isPlaying.value) return
-        val numBands = 8
+        val numBands = 16
         val numBins = (fft.size / 2).coerceAtLeast(1)
         val magnitudes = FloatArray(numBins)
         for (k in 1 until numBins) {
@@ -1556,7 +1659,7 @@ class RadioPlayerManager(private val context: Context) {
 
     private fun processWaveformData(waveform: ByteArray) {
         if (waveform.isEmpty() || !_isPlaying.value) return
-        val numBands = 8
+        val numBands = 16
         val chunkSize = (waveform.size / numBands).coerceAtLeast(1)
         val volFactor = _volume.value.coerceIn(0.2f, 1.0f)
         val currentAmps = _waveAmplitudes.value
@@ -1638,9 +1741,11 @@ class RadioPlayerManager(private val context: Context) {
             for (i in 0 until numBands) {
                 val freq = eq.getCenterFreq(i.toShort()) / 1000
                 val targetDb: Short = when (presetName) {
+                    "Rock" -> if (freq < 200 || freq > 4000) (maxLevel * 0.7f).toInt().toShort() else if (freq in 400..1200) (minLevel * 0.3f).toInt().toShort() else midLevel
+                    "Jazz" -> if (freq < 300) (maxLevel * 0.5f).toInt().toShort() else if (freq in 600..2500) (maxLevel * 0.3f).toInt().toShort() else (maxLevel * 0.2f).toInt().toShort()
+                    "Acoustic" -> if (freq in 1000..8000) (maxLevel * 0.5f).toInt().toShort() else midLevel
                     "Bass Boost" -> if (freq < 300) (maxLevel * 0.7f).toInt().toShort() else if (freq > 3000) (minLevel * 0.2f).toInt().toShort() else midLevel
                     "Chill Lounge" -> if (freq < 250 || freq > 4000) (maxLevel * 0.4f).toInt().toShort() else (minLevel * 0.2f).toInt().toShort()
-                    "Acoustic" -> if (freq in 1000..8000) (maxLevel * 0.5f).toInt().toShort() else midLevel
                     "Vocal Focus", "Speech" -> if (freq in 800..3500) (maxLevel * 0.6f).toInt().toShort() else if (freq < 200) (minLevel * 0.5f).toInt().toShort() else midLevel
                     else -> midLevel
                 }
@@ -1671,7 +1776,7 @@ class RadioPlayerManager(private val context: Context) {
                 delay(if (isBatterySaverMode) 500L else 120L)
                 time += 0.3f
                 val volFactor = _volume.value.coerceIn(0.2f, 1.0f)
-                val newAmplitudes = List(8) { index ->
+                val newAmplitudes = List(16) { index ->
                     // Combination of offset sine waves and slight noise creates organic, fluid audio-reactive behavior
                     val wave1 = kotlin.math.sin(time + index * 0.6f) * 0.35f
                     val wave2 = kotlin.math.sin(time * 0.75f - index * 1.1f) * 0.25f
@@ -1686,7 +1791,7 @@ class RadioPlayerManager(private val context: Context) {
 
     private fun stopWaveAnimation() {
         waveAnimationJob?.cancel()
-        _waveAmplitudes.value = List(8) { 0.15f }
+        _waveAmplitudes.value = List(16) { 0.15f }
     }
 
     private fun startPositionPolling() {

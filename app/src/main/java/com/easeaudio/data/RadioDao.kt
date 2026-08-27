@@ -26,6 +26,9 @@ interface RadioDao {
     @Query("SELECT * FROM radio_stations ORDER BY isCustom DESC, name ASC")
     suspend fun getAllStationsDirect(): List<RadioStation>
 
+    @Query("SELECT * FROM radio_stations WHERE (:query = '' OR name LIKE '%' || :query || '%') AND (:genre = '' OR genre LIKE '%' || :genre || '%') AND (:country = '' OR country LIKE '%' || :country || '%') ORDER BY isCustom DESC, isFavorite DESC, lastListenedTimestamp DESC, name ASC LIMIT :limit OFFSET :offset")
+    suspend fun getCachedStations(query: String = "", genre: String = "", country: String = "", limit: Int = 100, offset: Int = 0): List<RadioStation>
+
     @Query("SELECT * FROM radio_stations WHERE id = :id LIMIT 1")
     suspend fun getStationById(id: String): RadioStation?
 

@@ -28,9 +28,32 @@ enum class VisualizerStyle {
 }
 
 /**
- * A Compose Canvas based Audio Visualizer that reacts to the real-time stream audio frequency
- * amplitudes from Media3 ExoPlayer AudioSessionId with fluid physics, peak hold, and glowing effects.
+ * A Compose Canvas based Audio Visualizer that reacts to real-time stream audio frequency
+ * amplitudes from Media3 ExoPlayer AudioSessionId with fluid spring physics, peak hold, and glowing effects.
  */
+@Composable
+fun AudioVisualizer(
+    waveAmplitudes: List<Float>,
+    isPlaying: Boolean,
+    modifier: Modifier = Modifier,
+    style: VisualizerStyle = VisualizerStyle.ROUNDED_BARS,
+    primaryColor: Color = MaterialTheme.colorScheme.primary,
+    secondaryColor: Color = MaterialTheme.colorScheme.secondary,
+    accentColor: Color = MaterialTheme.colorScheme.tertiary,
+    barCount: Int = if (waveAmplitudes.isNotEmpty() && waveAmplitudes.size <= 8) waveAmplitudes.size else 16
+) {
+    AudioVisualizerCanvas(
+        waveAmplitudes = waveAmplitudes,
+        isPlaying = isPlaying,
+        modifier = modifier,
+        style = style,
+        primaryColor = primaryColor,
+        secondaryColor = secondaryColor,
+        accentColor = accentColor,
+        barCount = barCount
+    )
+}
+
 @Composable
 fun AudioVisualizerCanvas(
     waveAmplitudes: List<Float>,
@@ -39,7 +62,8 @@ fun AudioVisualizerCanvas(
     style: VisualizerStyle = VisualizerStyle.ROUNDED_BARS,
     primaryColor: Color = MaterialTheme.colorScheme.primary,
     secondaryColor: Color = MaterialTheme.colorScheme.secondary,
-    accentColor: Color = MaterialTheme.colorScheme.tertiary
+    accentColor: Color = MaterialTheme.colorScheme.tertiary,
+    barCount: Int = if (waveAmplitudes.isNotEmpty() && waveAmplitudes.size <= 8) waveAmplitudes.size else 16
 ) {
     val infiniteTransition = rememberInfiniteTransition(label = "viz_breathing")
     val idlePhase by infiniteTransition.animateFloat(
@@ -52,29 +76,29 @@ fun AudioVisualizerCanvas(
         label = "idle_phase"
     )
 
-    val barCount = 16
-    val animatables = remember { List(barCount) { Animatable(0.1f) } }
-    val peakAmplitudes = remember { FloatArray(barCount) { 0.1f } }
+    val actualBars = barCount.coerceIn(3, 32)
+    val animatables = remember(actualBars) { List(actualBars) { Animatable(0.1f) } }
+    val peakAmplitudes = remember(actualBars) { FloatArray(actualBars) { 0.1f } }
 
-    LaunchedEffect(waveAmplitudes, isPlaying) {
+    LaunchedEffect(waveAmplitudes, isPlaying, actualBars) {
         val targets = if (waveAmplitudes.isNotEmpty()) {
-            List(barCount) { i ->
-                val sourceIndex = (i * waveAmplitudes.size / barCount).coerceIn(0, waveAmplitudes.size - 1)
+            List(actualBars) { i ->
+                val sourceIndex = (i * waveAmplitudes.size / actualBars).coerceIn(0, waveAmplitudes.size - 1)
                 waveAmplitudes[sourceIndex].coerceIn(0.08f, 1.0f)
             }
         } else {
-            List(barCount) { 0.1f }
+            List(actualBars) { 0.1f }
         }
 
         if (isPlaying) {
-            kotlinx.coroutines.coroutineScope {
+            coroutineScope {
                 val scope = this
                 animatables.forEachIndexed { index, animatable ->
                     val target = targets[index]
                     if (target > peakAmplitudes[index]) {
                         peakAmplitudes[index] = target
                     } else {
-                        peakAmplitudes[index] = (peakAmplitudes[index] - 0.02f).coerceAtLeast(target)
+                        peakAmplitudes[index] = (peakAmplitudes[index] - 0.025f).coerceAtLeast(target)
                     }
                     scope.launch {
                         animatable.animateTo(
@@ -90,8 +114,8 @@ fun AudioVisualizerCanvas(
         }
     }
 
-    val animatedAmplitudes = remember(animatables.map { it.value }, isPlaying, idlePhase) {
-        List(barCount) { index ->
+    val animatedAmplitudes = remember(animatables.map { it.value }, isPlaying, idlePhase, actualBars) {
+        List(actualBars) { index ->
             if (isPlaying) {
                 animatables[index].value
             } else {
@@ -100,6 +124,8 @@ fun AudioVisualizerCanvas(
             }
         }
     }
+
+    val isMiniMode = actualBars <= 6
 
     Canvas(
         modifier = modifier
@@ -111,7 +137,7 @@ fun AudioVisualizerCanvas(
 
         if (width <= 0f || height <= 0f) return@Canvas
 
-        val barCount = animatedAmplitudes.size.coerceAtLeast(1)
+        val activeBarCount = animatedAmplitudes.size.coerceAtLeast(1)
         val gradientBrush = Brush.verticalGradient(
             colors = listOf(accentColor, primaryColor, secondaryColor),
             startY = 0f,
@@ -120,26 +146,28 @@ fun AudioVisualizerCanvas(
 
         when (style) {
             VisualizerStyle.ROUNDED_BARS -> {
-                val totalSpacing = width * 0.22f
-                val barSpacing = totalSpacing / (barCount + 1)
-                val barWidth = (width - totalSpacing) / barCount
+                val totalSpacing = width * (if (isMiniMode) 0.35f else 0.22f)
+                val barSpacing = totalSpacing / (activeBarCount + 1)
+                val barWidth = (width - totalSpacing) / activeBarCount
 
                 animatedAmplitudes.forEachIndexed { index, amp ->
-                    val barHeight = (height * 0.82f * amp).coerceAtLeast(4.dp.toPx())
+                    val barHeight = (height * 0.88f * amp).coerceAtLeast(if (isMiniMode) 2.dp.toPx() else 4.dp.toPx())
                     val x = barSpacing + index * (barWidth + barSpacing)
                     val y = height - barHeight
 
-                    // Subtle ambient glow behind each bar
-                    drawRoundRect(
-                        brush = Brush.verticalGradient(
-                            listOf(primaryColor.copy(alpha = 0.25f), Color.Transparent),
-                            startY = y,
-                            endY = height
-                        ),
-                        topLeft = Offset(x - 2.dp.toPx(), y - 2.dp.toPx()),
-                        size = Size(barWidth + 4.dp.toPx(), barHeight + 2.dp.toPx()),
-                        cornerRadius = CornerRadius(barWidth / 2f + 2.dp.toPx(), barWidth / 2f + 2.dp.toPx())
-                    )
+                    if (!isMiniMode && height >= 32.dp.toPx()) {
+                        // Subtle ambient glow behind each bar
+                        drawRoundRect(
+                            brush = Brush.verticalGradient(
+                                listOf(primaryColor.copy(alpha = 0.25f), Color.Transparent),
+                                startY = y,
+                                endY = height
+                            ),
+                            topLeft = Offset(x - 2.dp.toPx(), y - 2.dp.toPx()),
+                            size = Size(barWidth + 4.dp.toPx(), barHeight + 2.dp.toPx()),
+                            cornerRadius = CornerRadius(barWidth / 2f + 2.dp.toPx(), barWidth / 2f + 2.dp.toPx())
+                        )
+                    }
 
                     // Draw main rounded equalizer bar
                     drawRoundRect(
@@ -149,16 +177,18 @@ fun AudioVisualizerCanvas(
                         cornerRadius = CornerRadius(barWidth / 2f, barWidth / 2f)
                     )
 
-                    // Draw floating peak indicator dot on top of bar with peak hold physics
-                    val peakVal = if (index < peakAmplitudes.size) peakAmplitudes[index] else amp
-                    val peakBarHeight = (height * 0.82f * peakVal).coerceAtLeast(4.dp.toPx())
-                    val peakY = (height - peakBarHeight - 6.dp.toPx()).coerceAtLeast(2.dp.toPx())
+                    // Draw floating peak indicator dot on full screen
+                    if (!isMiniMode && height >= 40.dp.toPx()) {
+                        val peakVal = if (index < peakAmplitudes.size) peakAmplitudes[index] else amp
+                        val peakBarHeight = (height * 0.82f * peakVal).coerceAtLeast(4.dp.toPx())
+                        val peakY = (height - peakBarHeight - 5.dp.toPx()).coerceAtLeast(2.dp.toPx())
 
-                    drawCircle(
-                        color = Color.White,
-                        radius = (barWidth * 0.35f).coerceIn(2.dp.toPx(), 4.5.dp.toPx()),
-                        center = Offset(x + barWidth / 2f, peakY)
-                    )
+                        drawCircle(
+                            color = Color.White,
+                            radius = (barWidth * 0.32f).coerceIn(1.5.dp.toPx(), 4.dp.toPx()),
+                            center = Offset(x + barWidth / 2f, peakY)
+                        )
+                    }
                 }
             }
 

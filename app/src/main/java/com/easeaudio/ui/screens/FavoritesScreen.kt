@@ -277,9 +277,9 @@ fun FavoritesScreen(
                             val isSelected = selectedFilter == filter
                             var isPillFocused by remember { mutableStateOf(false) }
                             val label = when (filter) {
-                                LibraryFilter.ALL -> "All"
-                                LibraryFilter.RADIO -> "Radio"
-                                LibraryFilter.PODCASTS -> "Podcasts"
+                                LibraryFilter.ALL -> stringResource(R.string.all)
+                                LibraryFilter.RADIO -> stringResource(R.string.nav_radio)
+                                LibraryFilter.PODCASTS -> stringResource(R.string.nav_podcast)
                             }
                             val bgColors = ButtonDefaults.buttonColors(
                                 containerColor = if (isSelected) MaterialTheme.colorScheme.primary else if (isPillFocused) MaterialTheme.colorScheme.surfaceVariant else MaterialTheme.colorScheme.surface,

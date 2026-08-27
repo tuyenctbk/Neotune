@@ -1,9 +1,15 @@
 package com.easeaudio.ui.components
 
 import android.content.Intent
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -21,11 +27,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusProperties
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.foundation.focusable
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.input.key.*
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
@@ -55,7 +65,8 @@ fun StationCard(
     onToggleListenLater: () -> Unit = {},
     onBlockStation: () -> Unit = {},
     onDemoteStation: () -> Unit = {},
-    onUndemoteStation: () -> Unit = {}
+    onUndemoteStation: () -> Unit = {},
+    focusRequester: FocusRequester? = null
 ) {
     var isFocused by remember { mutableStateOf(false) }
     var showMenu by remember { mutableStateOf(false) }
@@ -68,17 +79,49 @@ fun StationCard(
         label = "station_card_focus_scale"
     )
 
+    val infiniteTransition = rememberInfiniteTransition(label = "station_card_glow")
+    val glowPulse by infiniteTransition.animateFloat(
+        initialValue = 0.6f,
+        targetValue = 1.0f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(1200, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "glow_pulse"
+    )
+
     Box(modifier = Modifier.fillMaxWidth()) {
         Surface(
             modifier = Modifier
                 .fillMaxWidth()
+                .then(if (focusRequester != null) Modifier.focusRequester(focusRequester) else Modifier)
                 .onFocusChanged { isFocused = it.isFocused }
+                .focusable()
+                .onKeyEvent { keyEvent ->
+                    if (keyEvent.type == KeyEventType.KeyUp) {
+                        when (keyEvent.key) {
+                            Key.DirectionCenter, Key.Enter, Key.NumPadEnter -> {
+                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                onSelect()
+                                true
+                            }
+                            Key.Menu, Key.Spacebar -> {
+                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                showMenu = true
+                                true
+                            }
+                            else -> false
+                        }
+                    } else {
+                        false
+                    }
+                }
                 .scale(focusScale)
                 .shadow(
-                    elevation = if (isFocused) 16.dp else 0.dp,
+                    elevation = if (isFocused) (14.dp + 6.dp * glowPulse) else 0.dp,
                     shape = RoundedCornerShape(18.dp),
                     spotColor = activeAccent,
-                    ambientColor = activeAccent.copy(alpha = 0.5f)
+                    ambientColor = activeAccent.copy(alpha = if (isFocused) 0.6f * glowPulse else 0f)
                 )
                 .clip(RoundedCornerShape(18.dp))
                 .combinedClickable(
@@ -97,7 +140,7 @@ fun StationCard(
                         Brush.horizontalGradient(
                             listOf(
                                 activeAccent,
-                                Color.White,
+                                Color.White.copy(alpha = 0.9f + 0.1f * glowPulse),
                                 activeAccent
                             )
                         )
@@ -129,7 +172,8 @@ fun StationCard(
                             Modifier.background(
                                 Brush.horizontalGradient(
                                     listOf(
-                                        activeAccent.copy(alpha = 0.22f),
+                                        activeAccent.copy(alpha = 0.28f * glowPulse),
+                                        activeAccent.copy(alpha = 0.08f),
                                         Color.Transparent
                                     )
                                 )
@@ -278,7 +322,7 @@ fun StationCard(
                                 )
                                 Spacer(modifier = Modifier.width(4.dp))
                                 Text(
-                                    text = if (isPlaying) "PLAYING" else "TUNE IN",
+                                    text = if (isPlaying) stringResource(R.string.status_playing) else stringResource(R.string.status_tune_in),
                                     style = MaterialTheme.typography.labelSmall.copy(
                                         fontWeight = FontWeight.Black,
                                         fontSize = 11.sp
@@ -373,7 +417,7 @@ fun StationCard(
                 onClick = {
                     showMenu = false
                     haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                    val shareText = "Listening to ${station.name} (${station.genre})\nStream: ${station.streamUrl}\nTune in live on NeoTune Radio!"
+                    val shareText = context.getString(R.string.share_station_format, station.name, station.genre, station.streamUrl)
                     val shareIntent = Intent(Intent.ACTION_SEND).apply {
                         type = "text/plain"
                         putExtra(Intent.EXTRA_SUBJECT, "Listen to ${station.name}")
