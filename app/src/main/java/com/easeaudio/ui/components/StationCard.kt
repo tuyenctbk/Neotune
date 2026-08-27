@@ -83,16 +83,7 @@ fun StationCard(
     // Only animate glow when this card is active (focused or selected) — avoids
     // running 40+ concurrent infinite animations when a full grid is on screen.
     val isActive = isFocused || isSelected
-    val infiniteTransition = rememberInfiniteTransition(label = "station_card_glow")
-    val glowPulse by infiniteTransition.animateFloat(
-        initialValue = 0.6f,
-        targetValue = if (isActive) 1.0f else 0.6f,
-        animationSpec = if (isActive) infiniteRepeatable(
-            animation = tween(1200, easing = FastOutSlowInEasing),
-            repeatMode = RepeatMode.Reverse
-        ) else snap(),
-        label = "glow_pulse"
-    )
+    val glowPulse = rememberStationCardGlow(isActive = isActive)
 
     Box(modifier = Modifier.fillMaxWidth()) {
         Surface(
@@ -442,3 +433,20 @@ fun StationCard(
         }
     }
 }
+
+@Composable
+private fun rememberStationCardGlow(isActive: Boolean): Float {
+    if (!isActive) return 0.6f
+    val infiniteTransition = rememberInfiniteTransition(label = "station_card_glow")
+    val glowPulse by infiniteTransition.animateFloat(
+        initialValue = 0.6f,
+        targetValue = 1.0f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(1200, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "glow_pulse"
+    )
+    return glowPulse
+}
+
