@@ -8,6 +8,7 @@ import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.snap
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -79,14 +80,17 @@ fun StationCard(
         label = "station_card_focus_scale"
     )
 
+    // Only animate glow when this card is active (focused or selected) — avoids
+    // running 40+ concurrent infinite animations when a full grid is on screen.
+    val isActive = isFocused || isSelected
     val infiniteTransition = rememberInfiniteTransition(label = "station_card_glow")
     val glowPulse by infiniteTransition.animateFloat(
         initialValue = 0.6f,
-        targetValue = 1.0f,
-        animationSpec = infiniteRepeatable(
+        targetValue = if (isActive) 1.0f else 0.6f,
+        animationSpec = if (isActive) infiniteRepeatable(
             animation = tween(1200, easing = FastOutSlowInEasing),
             repeatMode = RepeatMode.Reverse
-        ),
+        ) else snap(),
         label = "glow_pulse"
     )
 

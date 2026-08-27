@@ -507,6 +507,9 @@ fun SettingsSwitchItem(
     testTag: String = ""
 ) {
     var isFocused by remember { mutableStateOf(false) }
+    // Active icon tint: full primary when enabled, muted when disabled
+    val activeIconTint = if (checked) iconTint else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
+    val activeIconBg = if (checked) iconTint.copy(alpha = 0.15f) else Color.Transparent
     Surface(
         onClick = { onCheckedChange(!checked) },
         shape = RoundedCornerShape(12.dp),
@@ -522,13 +525,22 @@ fun SettingsSwitchItem(
                 .padding(vertical = 10.dp, horizontal = 4.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Icon(
-                imageVector = icon,
-                contentDescription = null,
-                tint = iconTint,
-                modifier = Modifier.size(24.dp)
-            )
-            Spacer(modifier = Modifier.width(16.dp))
+            // Icon with subtle background circle when active
+            Box(
+                modifier = Modifier
+                    .size(36.dp)
+                    .clip(androidx.compose.foundation.shape.CircleShape)
+                    .background(activeIconBg),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    tint = activeIconTint,
+                    modifier = Modifier.size(20.dp)
+                )
+            }
+            Spacer(modifier = Modifier.width(12.dp))
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = title,

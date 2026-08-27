@@ -348,7 +348,7 @@
     <string name="donate_github_sponsors_desc">在 GitHub 上贊助支持開發者 (0%手續費)</string>
     <string name="back">Back</string>
     <string name="aaos_title">Android Automotive OS</string>
-    <string name="aaos_desc">Station browsing and live playback are integrated directly into your car\\'s Media Center dashboard.</string>
+    <string name="aaos_desc">Station browsing and live playback are integrated directly into your car\'s Media Center dashboard.</string>
     <string name="aaos_open_media_center">Open Car Media Center (Browse &amp; Play)</string>
     <string name="settings_section_audio_playback">Audio &amp; Playback</string>
     <string name="settings_equalizer_desc">Customize bass, treble &amp; audio presets</string>
@@ -420,7 +420,7 @@
     <string name="settings_night_mode_desc">Attenuates piercing high frequencies and loud transients for comfortable night listening</string>
     <string name="listening_stats_title">Daily Listening Habits</string>
     <string name="listening_stats_streak">Day Streak</string>
-    <string name="listening_stats_today">Today\\'s Listening</string>
+    <string name="listening_stats_today">Today\'s Listening</string>
     <string name="listening_stats_minutes">%1$d mins</string>
     <string name="listening_stats_hours_mins">%1$dh %2$dm</string>
     <string name="listening_stats_desc">100% on-device statistics to keep track of your daily audio discovery</string>

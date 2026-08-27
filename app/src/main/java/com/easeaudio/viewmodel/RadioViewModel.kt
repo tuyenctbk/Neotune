@@ -336,7 +336,7 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
         filterAndBlockManager.filterConfig
     ) { (query, genre, country), (preferred, blocked, demoted), config ->
         FilterState(query, genre, country, preferred, blocked, demoted, config)
-    }
+    }.distinctUntilChanged() // PERF-3: skip re-emission when filter state is identical
 
     val favoriteStations: StateFlow<List<RadioStation>> = combine(
         repository.getFavoriteStations(),
@@ -657,7 +657,10 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
     // Fix: use nested typed combines (≤5 flows each) that produce typed data classes.
     // Incorrect ordering now fails at COMPILE TIME, not at runtime.
 
-    /** Groups player-level state — changes on every playback event. */
+    /** Groups player-level state — changes on every playback event.
+     *  BUG-1 fix: Uses fully typed nested combines with no listOf<Any?> casts.
+     *  Any future field ordering mistake is caught at compile time, not at runtime.
+     */
     private data class PlayerSnapshot(
         val currentStation: RadioStation?,
         val isPlaying: Boolean,
@@ -669,28 +672,37 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
         val isLoadingLyrics: Boolean
     )
 
+    private data class PlayerSnapshotBasic(
+        val currentStation: RadioStation?,
+        val isPlaying: Boolean,
+        val isLoading: Boolean,
+        val streamTitle: String?,
+        val playbackError: String?
+    )
+
     private val playerSnapshot: Flow<PlayerSnapshot> = combine(
         combine(currentStation, isPlaying, isLoading, streamTitle, playbackError) { st, play, load, title, err ->
-            listOf<Any?>(st, play, load, title, err)
+            PlayerSnapshotBasic(st, play, load, title, err)
         },
         combine(trackArtworkUrl, currentLyrics, isLoadingLyrics) { art, lyr, loadLyr ->
-            listOf<Any?>(art, lyr, loadLyr)
+            Triple(art, lyr, loadLyr)
         }
     ) { basic, extra ->
-        @Suppress("UNCHECKED_CAST")
         PlayerSnapshot(
-            currentStation = basic[0] as RadioStation?,
-            isPlaying = basic[1] as Boolean,
-            isLoading = basic[2] as Boolean,
-            streamTitle = basic[3] as String?,
-            playbackError = basic[4] as String?,
-            trackArtworkUrl = extra[0] as String?,
-            currentLyrics = extra[1] as SongLyrics?,
-            isLoadingLyrics = extra[2] as Boolean
+            currentStation    = basic.currentStation,
+            isPlaying         = basic.isPlaying,
+            isLoading         = basic.isLoading,
+            streamTitle       = basic.streamTitle,
+            playbackError     = basic.playbackError,
+            trackArtworkUrl   = extra.first,
+            currentLyrics     = extra.second,
+            isLoadingLyrics   = extra.third
         )
     }
 
-    /** Groups playback detail state. */
+    /** Groups playback detail state.
+     *  BUG-1 fix: Fully typed — no listOf<Any?> intermediate casts.
+     */
     private data class PlaybackDetail(
         val waveAmplitudes: List<Float>,
         val volume: Float,
@@ -702,24 +714,37 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
         val activeEqPreset: String
     )
 
+    private data class PlaybackDetailBasic(
+        val waveAmplitudes: List<Float>,
+        val volume: Float,
+        val currentPlaybackPosition: Long,
+        val totalPlaybackDuration: Long,
+        val playbackSpeed: Float
+    )
+
+    private data class PlaybackDetailExtra(
+        val playbackErrorDetails: com.easeaudio.service.PlaybackErrorDetails?,
+        val sleepTimerRemaining: Int?,
+        val activeEqPreset: String
+    )
+
     private val playbackDetail: Flow<PlaybackDetail> = combine(
         combine(waveAmplitudes, volume, currentPlaybackPosition, totalPlaybackDuration, playbackSpeed) {
-            wav, vol, pos, dur, spd -> listOf<Any?>(wav, vol, pos, dur, spd)
+            wav, vol, pos, dur, spd -> PlaybackDetailBasic(wav, vol, pos, dur, spd)
         },
         combine(playbackErrorDetails, sleepTimerRemaining, activeEqPreset) {
-            errDtl, sleep, eq -> listOf<Any?>(errDtl, sleep, eq)
+            errDtl, sleep, eq -> PlaybackDetailExtra(errDtl, sleep, eq)
         }
     ) { basic, extra ->
-        @Suppress("UNCHECKED_CAST")
         PlaybackDetail(
-            waveAmplitudes = basic[0] as List<Float>,
-            volume = basic[1] as Float,
-            currentPlaybackPosition = basic[2] as Long,
-            totalPlaybackDuration = basic[3] as Long,
-            playbackSpeed = basic[4] as Float,
-            playbackErrorDetails = extra[0] as com.easeaudio.service.PlaybackErrorDetails?,
-            sleepTimerRemaining = extra[1] as Int?,
-            activeEqPreset = extra[2] as String
+            waveAmplitudes          = basic.waveAmplitudes,
+            volume                  = basic.volume,
+            currentPlaybackPosition = basic.currentPlaybackPosition,
+            totalPlaybackDuration   = basic.totalPlaybackDuration,
+            playbackSpeed           = basic.playbackSpeed,
+            playbackErrorDetails    = extra.playbackErrorDetails,
+            sleepTimerRemaining     = extra.sleepTimerRemaining,
+            activeEqPreset          = extra.activeEqPreset
         )
     }
 
@@ -1005,10 +1030,12 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch {
             _isLoadingMore.value = true
             try {
-                val currentOffset = _onlineDiscoveredStations.value.size
                 val currentGenre = _selectedGenre.value
                 val isPodcastMode = _selectedTab.value == com.easeaudio.ui.screens.HomeTab.Podcast || currentGenre.equals("Podcasts", ignoreCase = true) || currentGenre.equals("Podcast", ignoreCase = true)
-                
+                // BUG-5 fix: use a dedicated podcast offset counter instead of the shared list size
+                // (the shared _onlineDiscoveredStations list mixes radio + podcast entries).
+                val currentOffset = if (isPodcastMode) podcastLoadMoreOffset else _onlineDiscoveredStations.value.size
+
                 val newResults = if (isPodcastMode) {
                     repository.discoverOnlinePodcasts(
                         query = _searchQuery.value,
@@ -1033,6 +1060,7 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
                     val existingIds = _onlineDiscoveredStations.value.map { it.id }.toSet()
                     val filteredNew = newResults.filter { !existingIds.contains(it.id) }
                     _onlineDiscoveredStations.value = _onlineDiscoveredStations.value + filteredNew
+                    if (isPodcastMode) podcastLoadMoreOffset += filteredNew.size
                     _canLoadMore.value = filteredNew.isNotEmpty() && newResults.size >= 10
                 }
             } catch (e: Exception) {
@@ -1046,6 +1074,8 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
     private var lastPlaybackClickTimestamp = 0L
     private var lastPlaybackClickStationId = ""
     private var podcastFetchJob: Job? = null
+    // BUG-5 fix: separate podcast offset tracking so pagination doesn't use the mixed radio+podcast list size
+    private var podcastLoadMoreOffset = 0
 
     fun playStation(station: RadioStation) {
         val now = System.currentTimeMillis()

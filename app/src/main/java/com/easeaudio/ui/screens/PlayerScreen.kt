@@ -119,14 +119,11 @@ fun PlayerScreen(
     }
 
     val effectiveImageUrl = trackArtworkUrl?.ifBlank { null } ?: station.imageUrl
-    val infiniteTransition = rememberInfiniteTransition(label = "pulse")
-    val artScale by infiniteTransition.animateFloat(
-        initialValue = 1.0f,
+    // Artwork scale: smoothly grows when playing, returns to resting size when paused.
+    // Using animateFloatAsState (not infiniteRepeatable) so it stops pulsing when paused.
+    val artScale by animateFloatAsState(
         targetValue = if (isPlaying) 1.03f else 1.0f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(2000, easing = FastOutSlowInEasing),
-            repeatMode = RepeatMode.Reverse
-        ),
+        animationSpec = tween(durationMillis = 2000, easing = FastOutSlowInEasing),
         label = "artPulse"
     )
 

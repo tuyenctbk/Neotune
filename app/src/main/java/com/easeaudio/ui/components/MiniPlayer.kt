@@ -87,17 +87,8 @@ fun MiniPlayer(
                     .build()
             }
 
-            // Avatar Animations: Vinyl rotation when playing, breathing shimmer when loading
+            // Avatar Animations: breathing shimmer when loading, subtle scale when playing
             val infiniteTransition = rememberInfiniteTransition(label = "miniAvatarAnim")
-            val rotationAngle by infiniteTransition.animateFloat(
-                initialValue = 0f,
-                targetValue = 360f,
-                animationSpec = infiniteRepeatable(
-                    animation = tween(durationMillis = 16000, easing = LinearEasing),
-                    repeatMode = RepeatMode.Restart
-                ),
-                label = "miniAvatarRotation"
-            )
             val loadingAlpha by infiniteTransition.animateFloat(
                 initialValue = 0.5f,
                 targetValue = 1.0f,

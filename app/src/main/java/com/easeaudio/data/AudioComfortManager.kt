@@ -53,25 +53,23 @@ class AudioComfortManager private constructor(context: Context) {
 
     private fun updateStreak() {
         val todayStr = SimpleDateFormat("yyyyMMdd", Locale.US).format(Date())
-        val lastDateStr = prefs.getString(KEY_LAST_ACTIVE_DATE, "")
+        val lastDateStr = prefs.getString(KEY_LAST_ACTIVE_DATE, null)
 
-        if (lastDateStr != todayStr) {
-            val yesterdayCal = java.util.Calendar.getInstance().apply { add(java.util.Calendar.DAY_OF_YEAR, -1) }
-            val yesterdayStr = SimpleDateFormat("yyyyMMdd", Locale.US).format(yesterdayCal.time)
-            
-            val newStreak = if (lastDateStr == yesterdayStr) {
-                prefs.getInt(KEY_STREAK_DAYS, 1) + 1
-            } else if (lastDateStr.isNullOrEmpty()) {
-                1
-            } else {
-                1
-            }
-            prefs.edit()
-                .putString(KEY_LAST_ACTIVE_DATE, todayStr)
-                .putInt(KEY_STREAK_DAYS, newStreak)
-                .apply()
-            _currentStreakDays.value = newStreak
+        if (lastDateStr == todayStr) return // Already recorded today — nothing to update
+
+        val yesterdayCal = java.util.Calendar.getInstance().apply { add(java.util.Calendar.DAY_OF_YEAR, -1) }
+        val yesterdayStr = SimpleDateFormat("yyyyMMdd", Locale.US).format(yesterdayCal.time)
+
+        val newStreak = when {
+            lastDateStr == null || lastDateStr.isBlank() -> 1          // First launch ever
+            lastDateStr == yesterdayStr -> prefs.getInt(KEY_STREAK_DAYS, 1) + 1  // Consecutive day
+            else -> 1                                                   // Missed one or more days — reset
         }
+        prefs.edit()
+            .putString(KEY_LAST_ACTIVE_DATE, todayStr)
+            .putInt(KEY_STREAK_DAYS, newStreak)
+            .apply()
+        _currentStreakDays.value = newStreak
     }
 
     private fun getTodayKey(): String {

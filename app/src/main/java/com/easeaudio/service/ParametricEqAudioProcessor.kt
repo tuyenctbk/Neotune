@@ -244,8 +244,11 @@ class ParametricEqAudioProcessor : BaseAudioProcessor() {
                 sampleVal = filters[i].process(channel, sampleVal)
             }
 
-            // Soft-clip limiter to prevent digital harsh distortion when gain is boosted
-            val clipped = sampleVal.coerceIn(-32768.0, 32767.0).toInt().toShort()
+            // Soft-clip limiter: tanh-based saturation rounds peaks smoothly instead
+            // of hard-clipping them. The final coerceIn is a safety guard only.
+            val normalized = sampleVal / 32768.0
+            val softClipped = kotlin.math.tanh(normalized) * 32768.0
+            val clipped = softClipped.coerceIn(-32768.0, 32767.0).toInt().toShort()
             buffer.putShort(clipped)
             sampleIndex++
         }
