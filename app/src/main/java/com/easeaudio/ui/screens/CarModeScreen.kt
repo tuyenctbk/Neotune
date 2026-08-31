@@ -27,6 +27,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.QueueMusic
+import androidx.compose.material.icons.automirrored.filled.VolumeDown
+import androidx.compose.material.icons.automirrored.filled.VolumeMute
+import androidx.compose.material.icons.automirrored.filled.VolumeUp
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.*
@@ -1278,7 +1281,7 @@ private fun AutomotiveHeroPlayer(
                                         },
                                         modifier = Modifier.size(30.dp)
                                     ) {
-                                        Icon(Icons.Filled.VolumeDown, contentDescription = stringResource(R.string.car_volume_down), modifier = Modifier.size(16.dp))
+                                        Icon(Icons.AutoMirrored.Filled.VolumeDown, contentDescription = stringResource(R.string.car_volume_down), modifier = Modifier.size(16.dp))
                                     }
                                     IconButton(
                                         onClick = {
@@ -1287,7 +1290,7 @@ private fun AutomotiveHeroPlayer(
                                         },
                                         modifier = Modifier.size(30.dp)
                                     ) {
-                                        Icon(Icons.Filled.VolumeMute, contentDescription = stringResource(R.string.car_volume_mute), modifier = Modifier.size(16.dp), tint = MaterialTheme.colorScheme.primary)
+                                        Icon(Icons.AutoMirrored.Filled.VolumeMute, contentDescription = stringResource(R.string.car_volume_mute), modifier = Modifier.size(16.dp), tint = MaterialTheme.colorScheme.primary)
                                     }
                                     IconButton(
                                         onClick = {
@@ -1296,7 +1299,7 @@ private fun AutomotiveHeroPlayer(
                                         },
                                         modifier = Modifier.size(30.dp)
                                     ) {
-                                        Icon(Icons.Filled.VolumeUp, contentDescription = stringResource(R.string.car_volume_up), modifier = Modifier.size(16.dp))
+                                        Icon(Icons.AutoMirrored.Filled.VolumeUp, contentDescription = stringResource(R.string.car_volume_up), modifier = Modifier.size(16.dp))
                                     }
                                 }
                             }

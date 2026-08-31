@@ -29,6 +29,8 @@ class SystemThemeService private constructor(private val application: Applicatio
         }
     }
 
+    @Deprecated("Deprecated in Java")
+    @Suppress("DEPRECATION")
     override fun onLowMemory() {
         // No-op
     }
