@@ -39,8 +39,6 @@ fun SettingsScreen(
     onToggleBatterySaver: () -> Unit = {},
     isAutoPlayOnStartupEnabled: Boolean = true,
     onToggleAutoPlayOnStartup: () -> Unit = {},
-    isLightMode: Boolean = false,
-    onToggleLightMode: () -> Unit = {},
     isVolumeSafetyEnabled: Boolean = false,
     onToggleVolumeSafety: () -> Unit = {},
     isNightAudioModeEnabled: Boolean = false,
@@ -328,16 +326,6 @@ fun SettingsScreen(
                             subtitle = stringResource(R.string.settings_onboarding_desc),
                             onClick = onOpenOnboarding,
                             testTag = "setting_onboarding"
-                        )
-                        HorizontalDivider(color = MaterialTheme.colorScheme.surfaceVariant, thickness = 1.dp)
-                        SettingsSwitchItem(
-                            icon = Icons.Filled.LightMode,
-                            iconTint = MaterialTheme.colorScheme.primary,
-                            title = stringResource(R.string.settings_light_theme),
-                            subtitle = stringResource(R.string.settings_light_theme_desc),
-                            checked = isLightMode,
-                            onCheckedChange = { onToggleLightMode() },
-                            testTag = "setting_light_mode"
                         )
                     }
                 }
