@@ -27,10 +27,6 @@ data class ThemePreset(
     val glowColor: Color = primary
 )
 
-enum class ThemeMode {
-    SYSTEM, DARK, LIGHT
-}
-
 object AppThemeState {
     val ThemePresets = listOf(
         ThemePreset(
@@ -461,77 +457,42 @@ object AppThemeState {
         "youth_cafe" to "emerald_botanical"
     )
 
-    var currentTheme by mutableStateOf(ThemePresets[0])
-    var themeMode by mutableStateOf(ThemeMode.SYSTEM)
-    var isSystemDark by mutableStateOf(true)
-    var isLightMode by mutableStateOf(false)
+    var currentTheme by mutableStateOf(ThemePresets.first { it.id == "neo_cyber" })
 
     fun loadTheme(context: Context) {
         val prefs = context.getSharedPreferences("neotune_theme_prefs", Context.MODE_PRIVATE)
-        val savedThemeId = prefs.getString("selected_theme_id", "matcha_zen") ?: "matcha_zen"
+        val savedThemeId = prefs.getString("selected_theme_id", "neo_cyber") ?: "neo_cyber"
         val resolvedId = LegacyThemeMap[savedThemeId] ?: savedThemeId
-        val matchedTheme = ThemePresets.firstOrNull { it.id == resolvedId } ?: ThemePresets[0]
-        currentTheme = matchedTheme
-        
-        val modeStr = prefs.getString("theme_mode", ThemeMode.SYSTEM.name) ?: ThemeMode.SYSTEM.name
-        themeMode = try { ThemeMode.valueOf(modeStr) } catch (_: Exception) { ThemeMode.SYSTEM }
-        recomputeLightMode()
+        currentTheme = ThemePresets.firstOrNull { it.id == resolvedId } ?: ThemePresets[0]
     }
 
     fun saveTheme(context: Context, themeId: String) {
-        val matchedTheme = ThemePresets.firstOrNull { it.id == themeId } ?: ThemePresets[0]
-        currentTheme = matchedTheme
+        currentTheme = ThemePresets.firstOrNull { it.id == themeId } ?: ThemePresets[0]
         val prefs = context.getSharedPreferences("neotune_theme_prefs", Context.MODE_PRIVATE)
         prefs.edit().putString("selected_theme_id", themeId).apply()
     }
-
-    fun setThemeMode(context: Context, mode: ThemeMode) {
-        themeMode = mode
-        val prefs = context.getSharedPreferences("neotune_theme_prefs", Context.MODE_PRIVATE)
-        prefs.edit().putString("theme_mode", mode.name).apply()
-        recomputeLightMode()
-    }
-
-    fun setLightMode(context: Context, enabled: Boolean) {
-        setThemeMode(context, if (enabled) ThemeMode.LIGHT else ThemeMode.DARK)
-    }
-
-    fun updateSystemDarkTheme(isDark: Boolean) {
-        if (isSystemDark != isDark) {
-            isSystemDark = isDark
-            recomputeLightMode()
-        }
-    }
-
-    private fun recomputeLightMode() {
-        isLightMode = when (themeMode) {
-            ThemeMode.SYSTEM -> !isSystemDark
-            ThemeMode.LIGHT -> true
-            ThemeMode.DARK -> false
-        }
-    }
 }
 
-val DarkBackground: Color get() = if (AppThemeState.isLightMode) Color(0xFFFCFAF7) else AppThemeState.currentTheme.background
-val DarkSurface: Color get() = if (AppThemeState.isLightMode) Color(0xFFF3EFE9) else AppThemeState.currentTheme.surface
-val DarkSurfaceVariant: Color get() = if (AppThemeState.isLightMode) Color(0xFFE7E2D8) else AppThemeState.currentTheme.surfaceVariant
+val DarkBackground: Color get() = AppThemeState.currentTheme.background
+val DarkSurface: Color get() = AppThemeState.currentTheme.surface
+val DarkSurfaceVariant: Color get() = AppThemeState.currentTheme.surfaceVariant
 
-val NeonCyan: Color get() = if (AppThemeState.isLightMode) Color(0xFF007585) else AppThemeState.currentTheme.primary
-val NeonPurple: Color get() = if (AppThemeState.isLightMode) Color(0xFF6B4A8C) else AppThemeState.currentTheme.secondary
-val NeonPink: Color get() = if (AppThemeState.isLightMode) Color(0xFF9E3A6B) else AppThemeState.currentTheme.tertiary
-val AccentOrange: Color get() = if (AppThemeState.isLightMode) Color(0xFFC26500) else AppThemeState.currentTheme.accent
+val NeonCyan: Color get() = AppThemeState.currentTheme.primary
+val NeonPurple: Color get() = AppThemeState.currentTheme.secondary
+val NeonPink: Color get() = AppThemeState.currentTheme.tertiary
+val AccentOrange: Color get() = AppThemeState.currentTheme.accent
 val NeonYellow: Color = Color(0xFFFFD600)
 val NeonOrange: Color = Color(0xFFFF9100)
 
-val TextPrimary: Color get() = if (AppThemeState.isLightMode) Color(0xFF1B1917) else AppThemeState.currentTheme.textPrimary
-val TextSecondary: Color get() = if (AppThemeState.isLightMode) Color(0xFF5A5752) else AppThemeState.currentTheme.textSecondary
-val TextMuted: Color get() = if (AppThemeState.isLightMode) Color(0xFF8B8881) else AppThemeState.currentTheme.textMuted
+val TextPrimary: Color get() = AppThemeState.currentTheme.textPrimary
+val TextSecondary: Color get() = AppThemeState.currentTheme.textSecondary
+val TextMuted: Color get() = AppThemeState.currentTheme.textMuted
 
-val ActivePill: Color get() = if (AppThemeState.isLightMode) Color(0xFFE7E2D8) else AppThemeState.currentTheme.activePill
-val CardBorder: Color get() = if (AppThemeState.isLightMode) Color(0x1F000000) else AppThemeState.currentTheme.cardBorder
+val ActivePill: Color get() = AppThemeState.currentTheme.activePill
+val CardBorder: Color get() = AppThemeState.currentTheme.cardBorder
 
-val PlayButtonContainer: Color get() = if (AppThemeState.isLightMode) Color(0xFF1B1917) else AppThemeState.currentTheme.primary
-val PlayButtonContent: Color get() = if (AppThemeState.isLightMode) Color(0xFFFCFAF7) else AppThemeState.currentTheme.background
+val PlayButtonContainer: Color get() = AppThemeState.currentTheme.primary
+val PlayButtonContent: Color get() = AppThemeState.currentTheme.background
 
 val FavoriteRed = Color(0xFFFF3B30)
 

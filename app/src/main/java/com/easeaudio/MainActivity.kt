@@ -535,8 +535,6 @@ fun MainAppContent(
                                 onToggleBatterySaver = { viewModel.toggleBatterySaver() },
                                 isAutoPlayOnStartupEnabled = uiState.isAutoPlayOnStartupEnabled,
                                 onToggleAutoPlayOnStartup = { viewModel.toggleAutoPlayOnStartup() },
-                                isLightMode = AppThemeState.isLightMode,
-                                onToggleLightMode = { AppThemeState.setLightMode(context, !AppThemeState.isLightMode) },
                                 isVolumeSafetyEnabled = uiState.isVolumeSafetyEnabled,
                                 onToggleVolumeSafety = { viewModel.toggleVolumeSafety() },
                                 isNightAudioModeEnabled = uiState.isNightAudioModeEnabled,

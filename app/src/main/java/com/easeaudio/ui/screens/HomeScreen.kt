@@ -120,9 +120,8 @@ fun HomeScreen(
     val isExpanded = windowSizeClass.widthSizeClass == WindowWidthSizeClass.Expanded
     val isMedium = windowSizeClass.widthSizeClass == WindowWidthSizeClass.Medium
     val columns = when (windowSizeClass.widthSizeClass) {
-        WindowWidthSizeClass.Expanded -> 4
-        WindowWidthSizeClass.Medium -> 3
-        else -> 2 // Compact (phones): 2 columns gives better density without crowding
+        WindowWidthSizeClass.Expanded -> 2 // Landscape tablet / Android TV
+        else -> 1                           // Phone or portrait tablet: single-column list
     }
 
     val gridState = rememberLazyGridState()

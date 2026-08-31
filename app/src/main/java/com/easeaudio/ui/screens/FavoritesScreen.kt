@@ -26,6 +26,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
@@ -74,6 +75,17 @@ fun FavoritesScreen(
     var selectedFilter by remember { mutableStateOf(LibraryFilter.ALL) }
     val keyboardController = LocalSoftwareKeyboardController.current
 
+    // Determine grid column count at composable scope (cannot be called inside non-composable lambda)
+    val context = LocalContext.current
+    val favColumns = remember(context) {
+        val metrics = context.resources.displayMetrics
+        val widthDp = metrics.widthPixels / metrics.density
+        when {
+            widthDp >= 840f -> 2  // Landscape tablet / Android TV: 2 columns
+            else -> 1             // Phone or portrait tablet: single-column list
+        }
+    }
+
     val listenLaterAsStations = remember(listenLaterItems) {
         listenLaterItems.map { item ->
             RadioStation(
@@ -86,6 +98,7 @@ fun FavoritesScreen(
                 bitrate = item.bitrate,
                 codec = item.codec,
                 isCustom = item.isCustom,
+                isPodcast = item.isPodcast, // BUG-FIX: was missing — podcast items played as radio
                 isFavorite = favoriteStations.any { it.id == item.id }
             )
         }
@@ -374,7 +387,7 @@ fun FavoritesScreen(
                     }
                 } else {
                     LazyVerticalGrid(
-                        columns = GridCells.Adaptive(minSize = 300.dp),
+                        columns = GridCells.Fixed(favColumns),
                         modifier = Modifier.fillMaxSize(),
                         horizontalArrangement = Arrangement.spacedBy(12.dp),
                         verticalArrangement = Arrangement.spacedBy(10.dp),

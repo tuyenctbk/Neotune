@@ -1303,6 +1303,14 @@ class RadioPlayerManager(private val context: Context) {
     }
 
     private fun playStationWithUrl(station: RadioStation, targetUrl: String, isFallback: Boolean) {
+        // Guard: if ExoPlayer was released (e.g. after a release/reinit cycle or rapid config
+        // change), the coroutine's exoPlayer?.let{} block below silently does nothing.
+        // Reinitialise here on the calling thread so the player is always valid before we launch.
+        if (exoPlayer == null) {
+            android.util.Log.w(TAG, "ExoPlayer was null when playStation called — reinitialising.")
+            setupPlayer()
+        }
+
         // Cancel any pending URL resolution / player prep job to prevent race conditions when switching quickly
         playbackJob?.cancel()
         artworkFetchJob?.cancel()
@@ -1330,7 +1338,7 @@ class RadioPlayerManager(private val context: Context) {
             val intent = Intent(context, RadioPlaybackService::class.java)
             context.startService(intent)
         } catch (e: Exception) {
-            Log.e(TAG, "Failed to start RadioPlaybackService", e)
+            Log.e(TAG, "Failed to start RadioPlaybackService — playback may still work via ExoPlayer directly", e)
         }
 
         playbackJob = scope.launch {
@@ -1391,6 +1399,9 @@ class RadioPlayerManager(private val context: Context) {
     }
 
     fun togglePlayPause() {
+        if (exoPlayer == null) {
+            setupPlayer()
+        }
         exoPlayer?.let { player ->
             if (player.isPlaying) {
                 player.pause()
