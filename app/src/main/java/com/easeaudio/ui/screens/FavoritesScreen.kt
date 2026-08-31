@@ -98,6 +98,7 @@ fun FavoritesScreen(
                 bitrate = if (item.isPodcast && !item.bitrate.equals("Podcast", ignoreCase = true) && !item.id.startsWith("itunes_", ignoreCase = true)) "Podcast" else item.bitrate,
                 codec = item.codec,
                 isCustom = item.isCustom,
+                isPodcast = item.isPodcast, // BUG-FIX: was missing — podcast items played as radio
                 isFavorite = favoriteStations.any { it.id == item.id }
             )
         }
