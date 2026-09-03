@@ -224,7 +224,7 @@ fun HomeScreen(
                     .align(Alignment.TopCenter),
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
                 verticalArrangement = Arrangement.spacedBy(10.dp),
-                contentPadding = PaddingValues(start = 20.dp, top = 8.dp, end = 20.dp, bottom = 80.dp)
+                contentPadding = PaddingValues(start = 20.dp, top = 8.dp, end = 20.dp, bottom = 108.dp)
             ) {
                 // App Header & Search Bar (Merged for minimal spacing)
                 item(span = { GridItemSpan(maxLineSpan) }) {

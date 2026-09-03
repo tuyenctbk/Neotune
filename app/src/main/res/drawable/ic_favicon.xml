@@ -1,23 +1,61 @@
 <?xml version="1.0" encoding="utf-8"?>
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
     android:width="36dp"
     android:height="36dp"
     android:viewportWidth="36"
     android:viewportHeight="36">
 
-    <!-- Left Cyan Pillar of 'N' -->
+    <!-- Radio Wave Arc (Top Right) -->
     <path
-        android:fillColor="#38C7FF"
-        android:pathData="M 7,7 L 12.5,7 L 12.5,29 L 7,29 Z" />
+        android:strokeColor="#9000F5FF"
+        android:strokeWidth="1.2"
+        android:strokeLineCap="round"
+        android:pathData="M 28,6 A 6,6 0 0 1 33,11" />
 
-    <!-- Right Orange Pillar of 'N' -->
-    <path
-        android:fillColor="#FF8C38"
-        android:pathData="M 23.5,7 L 29,7 L 29,29 L 23.5,29 Z" />
+    <!-- Pink/Magenta to Violet Diagonal Bar of 'N' -->
+    <path android:pathData="M 7,7 L 12.5,7 L 29,29 L 23.5,29 Z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:startX="7"
+                android:startY="7"
+                android:endX="29"
+                android:endY="29"
+                android:type="linear">
+                <item android:offset="0.0" android:color="#FFFF2A85" />
+                <item android:offset="1.0" android:color="#FF7928CA" />
+            </gradient>
+        </aapt:attr>
+    </path>
 
-    <!-- Pink Diagonal Bar of 'N' -->
-    <path
-        android:fillColor="#FF538A"
-        android:pathData="M 7,7 L 12.5,7 L 29,29 L 23.5,29 Z" />
+    <!-- Left Cyan Pillar of 'N' with Rounded Caps -->
+    <path android:pathData="M 8.5,7 L 11,7 A 2,2 0 0 1 13,9 L 13,27 A 2,2 0 0 1 11,29 L 8.5,29 A 2,2 0 0 1 6.5,27 L 6.5,9 A 2,2 0 0 1 8.5,7 Z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:startX="9.5"
+                android:startY="7"
+                android:endX="9.5"
+                android:endY="29"
+                android:type="linear">
+                <item android:offset="0.0" android:color="#FF00F5FF" />
+                <item android:offset="1.0" android:color="#FF0088FF" />
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- Right Amber/Orange Pillar of 'N' with Rounded Caps -->
+    <path android:pathData="M 25,7 L 27.5,7 A 2,2 0 0 1 29.5,9 L 29.5,27 A 2,2 0 0 1 27.5,29 L 25,29 A 2,2 0 0 1 23,27 L 23,9 A 2,2 0 0 1 25,7 Z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:startX="26"
+                android:startY="7"
+                android:endX="26"
+                android:endY="29"
+                android:type="linear">
+                <item android:offset="0.0" android:color="#FFFFB300" />
+                <item android:offset="1.0" android:color="#FFFF5500" />
+            </gradient>
+        </aapt:attr>
+    </path>
 
 </vector>

@@ -182,19 +182,28 @@ fun StationCard(
                         .padding(14.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
+                    val cardContext = LocalContext.current
+                    val imageRequest = remember(station.imageUrl) {
+                        coil.request.ImageRequest.Builder(cardContext)
+                            .data(station.imageUrl.ifBlank { null })
+                            .crossfade(true)
+                            .placeholder(R.drawable.ic_favicon)
+                            .error(R.drawable.ic_favicon)
+                            .build()
+                    }
                     Box(
                         modifier = Modifier
                             .size(60.dp)
                             .clip(RoundedCornerShape(14.dp))
                             .background(MaterialTheme.colorScheme.surfaceVariant)
                             .border(
-                                width = if (isFocused) 2.dp else 0.dp,
-                                color = if (isFocused) activeAccent else Color.Transparent,
+                                width = if (isFocused) 2.dp else if (isSelected) 1.5.dp else 0.dp,
+                                color = if (isFocused) activeAccent else if (isSelected) activeAccent.copy(alpha = 0.5f) else Color.Transparent,
                                 shape = RoundedCornerShape(14.dp)
                             )
                     ) {
                         AsyncImage(
-                            model = station.imageUrl,
+                            model = imageRequest,
                             contentDescription = station.name,
                             contentScale = ContentScale.Crop,
                             modifier = Modifier.fillMaxSize()

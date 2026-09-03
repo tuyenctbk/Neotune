@@ -6,21 +6,61 @@
     android:viewportWidth="108"
     android:viewportHeight="108">
 
-    <!-- Solid Dark Canvas -->
-    <path
-        android:pathData="M 0,0 h 108 v 108 h -108 z"
-        android:fillColor="#0A0C16" />
-
-    <!-- Subtle Ambient Center Glow -->
-    <path android:pathData="M 54,54 m -42,0 a 42,42 0 1,0 84,0 a 42,42 0 1,0 -84,0">
+    <!-- Cosmic Dark Gradient Canvas -->
+    <path android:pathData="M 0,0 h 108 v 108 h -108 z">
         <aapt:attr name="android:fillColor">
             <gradient
-                android:centerX="54"
-                android:centerY="54"
-                android:gradientRadius="42"
+                android:startX="0"
+                android:startY="0"
+                android:endX="108"
+                android:endY="108"
+                android:type="linear">
+                <item android:offset="0.0" android:color="#FF060810" />
+                <item android:offset="0.5" android:color="#FF0A0E1A" />
+                <item android:offset="1.0" android:color="#FF0E162B" />
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- Concentric Audio Wave / Vinyl Rings -->
+    <path
+        android:strokeColor="#1838C7FF"
+        android:strokeWidth="1.0"
+        android:pathData="M 54,54 m -28,0 a 28,28 0 1,0 56,0 a 28,28 0 1,0 -56,0" />
+    <path
+        android:strokeColor="#1238C7FF"
+        android:strokeWidth="1.0"
+        android:pathData="M 54,54 m -38,0 a 38,38 0 1,0 76,0 a 38,38 0 1,0 -76,0" />
+    <path
+        android:strokeColor="#0A38C7FF"
+        android:strokeWidth="1.0"
+        android:pathData="M 54,54 m -47,0 a 47,47 0 1,0 94,0 a 47,47 0 1,0 -94,0" />
+
+    <!-- Ambient Cyan Glow (Behind left & center) -->
+    <path android:pathData="M 54,54 m -46,0 a 46,46 0 1,0 92,0 a 46,46 0 1,0 -92,0">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:centerX="44"
+                android:centerY="46"
+                android:gradientRadius="44"
                 android:type="radial">
-                <item android:offset="0.0" android:color="#2238C7FF" />
-                <item android:offset="0.6" android:color="#10FF538A" />
+                <item android:offset="0.0" android:color="#3500F5FF" />
+                <item android:offset="0.45" android:color="#180088FF" />
+                <item android:offset="1.0" android:color="#00000000" />
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- Ambient Magenta Glow (Behind right) -->
+    <path android:pathData="M 54,54 m -36,0 a 36,36 0 1,0 72,0 a 36,36 0 1,0 -72,0">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:centerX="68"
+                android:centerY="60"
+                android:gradientRadius="36"
+                android:type="radial">
+                <item android:offset="0.0" android:color="#28FF2A85" />
+                <item android:offset="0.6" android:color="#107928CA" />
                 <item android:offset="1.0" android:color="#00000000" />
             </gradient>
         </aapt:attr>

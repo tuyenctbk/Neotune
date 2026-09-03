@@ -11,6 +11,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.gestures.detectVerticalDragGestures
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -103,32 +105,53 @@ fun MiniPlayer(
                 animationSpec = spring(stiffness = Spring.StiffnessLow),
                 label = "miniAvatarScale"
             )
+
             Surface(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 12.dp, vertical = 6.dp)
                     .onFocusChanged { isFocused = it.isFocused }
                     .clip(RoundedCornerShape(16.dp))
+                    .pointerInput(Unit) {
+                        detectVerticalDragGestures { _, dragAmount ->
+                            if (dragAmount < -18f) {
+                                onOpenFullPlayer()
+                            }
+                        }
+                    }
                     .combinedClickable(
                         onClick = { onOpenFullPlayer() },
                         onDoubleClick = { onOpenFullPlayer() }
                     )
                     .border(
-                        width = if (showFocus) 2.5.dp else 0.dp,
-                        color = if (showFocus) MaterialTheme.colorScheme.primary else Color.Transparent,
+                        width = if (showFocus) 2.5.dp else 1.dp,
+                        color = if (showFocus) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.35f),
                         shape = RoundedCornerShape(16.dp)
                     )
                     .testTag("mini_player_bar"),
                 color = MaterialTheme.colorScheme.surfaceVariant,
                 tonalElevation = 8.dp,
-                shadowElevation = 6.dp
+                shadowElevation = 8.dp
             ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(8.dp),
-                    verticalAlignment = Alignment.CenterVertically
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
+                    // Subtle drag handle indicator indicating swipe-up to expand
+                    Box(
+                        modifier = Modifier
+                            .padding(top = 5.dp)
+                            .width(36.dp)
+                            .height(3.5.dp)
+                            .clip(CircleShape)
+                            .background(MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.35f))
+                    )
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(start = 10.dp, end = 10.dp, top = 4.dp, bottom = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
                     // Station Artwork with AnimatedStationAvatar subtle pulse animation
                     AnimatedStationAvatar(
                         imageUrl = effectiveArtworkUrl,
@@ -308,6 +331,7 @@ fun MiniPlayer(
             }
         }
     }
+}
 }
 
 private fun formatDurationShort(ms: Long): String {
