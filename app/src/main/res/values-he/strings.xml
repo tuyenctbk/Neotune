@@ -429,4 +429,6 @@
     <string name="share_station_format">Listening to %1$s (%2$s)\nStream: %3$s\nTune in live on NeoTune Radio!</string>
     <string name="speed_format">%1$sx</string>
 
+    <string name="settings_auto_screensaver">שומר מסך אווירתי</string>
+    <string name="settings_auto_screensaver_desc">הפעל שומר מסך אווירתי באופן אוטומטי לאחר 5 דקות של חוסر פעילות</string>
 </resources>

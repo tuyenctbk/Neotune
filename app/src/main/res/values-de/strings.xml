@@ -441,4 +441,6 @@
     <string name="status_tune_in">EINSCHALTEN</string>
     <string name="share_station_format">Höre %1$s (%2$s)\nStream: %3$s\nLive einschalten auf NeoTune Radio!</string>
     <string name="speed_format">%1$sx</string>
+    <string name="settings_auto_screensaver">Ambient-Bildschirmschoner</string>
+    <string name="settings_auto_screensaver_desc">Ambient-Bildschirmschoner nach 5 Minuten Inaktivität automatisch starten</string>
 </resources>

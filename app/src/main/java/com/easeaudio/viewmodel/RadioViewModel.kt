@@ -562,6 +562,9 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
     private val _isAutoPlayOnStartupEnabled = MutableStateFlow(appPrefs.getBoolean("is_auto_play_on_startup_enabled", false))
     val isAutoPlayOnStartupEnabled: StateFlow<Boolean> = _isAutoPlayOnStartupEnabled.asStateFlow()
 
+    private val _isAutoScreensaverEnabled = MutableStateFlow(appPrefs.getBoolean("is_auto_screensaver_enabled", false))
+    val isAutoScreensaverEnabled: StateFlow<Boolean> = _isAutoScreensaverEnabled.asStateFlow()
+
     private val _selectedLauncherIcon = MutableStateFlow(com.easeaudio.util.AppIconManager.getCurrentIconTheme(getApplication()))
     val selectedLauncherIcon: StateFlow<String> = _selectedLauncherIcon.asStateFlow()
 
@@ -628,6 +631,15 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
         appPrefs.edit().putBoolean("is_auto_play_on_startup_enabled", newValue).apply()
         viewModelScope.launch {
             snackbarMessage.emit(if (newValue) "Auto-Play on Startup Enabled" else "Auto-Play on Startup Disabled")
+        }
+    }
+
+    fun toggleAutoScreensaver() {
+        val newValue = !_isAutoScreensaverEnabled.value
+        _isAutoScreensaverEnabled.value = newValue
+        appPrefs.edit().putBoolean("is_auto_screensaver_enabled", newValue).apply()
+        viewModelScope.launch {
+            snackbarMessage.emit(if (newValue) "Ambient Screensaver Enabled" else "Ambient Screensaver Disabled")
         }
     }
 
@@ -816,8 +828,15 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
         combine(isLoadingEpisodes, networkStatus, remoteConfig, isBatterySaverEnabled, selectedLauncherIcon) {
             loadEp, net, cfg, batt, icon -> listOf<Any?>(loadEp, net, cfg, batt, icon)
         },
-        combine(isAudioBoosterEnabled, isAutoPlayOnStartupEnabled, showAppearanceDialog, showAttributionDialog, listenLaterItems) {
-            boost, autoPlay, appearance, attribution, later -> listOf<Any?>(boost, autoPlay, appearance, attribution, later)
+        combine(
+            isAudioBoosterEnabled,
+            isAutoPlayOnStartupEnabled,
+            isAutoScreensaverEnabled,
+            combine(showAppearanceDialog, showAttributionDialog, listenLaterItems) { app, attr, later ->
+                listOf<Any?>(app, attr, later)
+            }
+        ) { boost, autoPlay, autoScreensaver, dialogs ->
+            listOf<Any?>(boost, autoPlay, autoScreensaver, dialogs[0], dialogs[1], dialogs[2])
         },
         combine(
             playerSnapshot,
@@ -844,7 +863,7 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
             recentRadioStations     = stationData[2] as List<RadioStation>,
             recentPodcastStations   = stationData[3] as List<RadioStation>,
             favoriteStations        = stationData[4] as List<RadioStation>,
-            listenLaterItems        = settingsData[4] as List<com.easeaudio.data.ListenLaterItem>,
+            listenLaterItems        = settingsData[5] as List<com.easeaudio.data.ListenLaterItem>,
             blockedStations         = metaData[0] as List<RadioStation>,
             failedStationIds        = metaData[1] as Set<String>,
             demotedStationIds       = metaData[2] as Set<String>,
@@ -857,8 +876,9 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
             selectedLauncherIcon    = configData[4] as String,
             isAudioBoosterEnabled   = settingsData[0] as Boolean,
             isAutoPlayOnStartupEnabled = settingsData[1] as Boolean,
-            showAppearanceDialog    = settingsData[2] as Boolean,
-            showAttributionDialog   = settingsData[3] as Boolean,
+            isAutoScreensaverEnabled = settingsData[2] as Boolean,
+            showAppearanceDialog    = settingsData[3] as Boolean,
+            showAttributionDialog   = settingsData[4] as Boolean,
             isVolumeSafetyEnabled   = comfort[0] as Boolean,
             isNightAudioModeEnabled = comfort[1] as Boolean,
             todayListeningMinutes   = comfort[2] as Int,

@@ -65,6 +65,7 @@ data class HomeUiState(
     val isAudioBoosterEnabled: Boolean = true,
     val isBatterySaverEnabled: Boolean = false,
     val isAutoPlayOnStartupEnabled: Boolean = true,
+    val isAutoScreensaverEnabled: Boolean = false,
     val isVolumeSafetyEnabled: Boolean = false,
     val isNightAudioModeEnabled: Boolean = false,
     val todayListeningMinutes: Int = 0,

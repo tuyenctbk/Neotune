@@ -414,6 +414,8 @@
     <string name="settings_radio_alarm_desc">Wake up to your favorite live stream</string>
     <string name="settings_auto_play">Auto-Play on Startup</string>
     <string name="settings_auto_play_desc">Resume the last played station/podcast on app launch</string>
+    <string name="settings_auto_screensaver">Ambient Screensaver</string>
+    <string name="settings_auto_screensaver_desc">Automatically launch ambient screensaver after 5 minutes of inactivity</string>
     <string name="settings_section_appearance_tour">Appearance &amp; Tour</string>
     <string name="settings_appearance_desc">Themes, accent colors &amp; languages</string>
     <string name="settings_onboarding_desc">Replay onboarding walkthrough &amp; setup</string>

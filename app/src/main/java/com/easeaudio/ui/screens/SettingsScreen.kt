@@ -39,6 +39,8 @@ fun SettingsScreen(
     onToggleBatterySaver: () -> Unit = {},
     isAutoPlayOnStartupEnabled: Boolean = true,
     onToggleAutoPlayOnStartup: () -> Unit = {},
+    isAutoScreensaverEnabled: Boolean = false,
+    onToggleAutoScreensaver: () -> Unit = {},
     isVolumeSafetyEnabled: Boolean = false,
     onToggleVolumeSafety: () -> Unit = {},
     isNightAudioModeEnabled: Boolean = false,
@@ -291,6 +293,16 @@ fun SettingsScreen(
                             checked = isAutoPlayOnStartupEnabled,
                             onCheckedChange = { onToggleAutoPlayOnStartup() },
                             testTag = "setting_auto_play"
+                        )
+                        HorizontalDivider(color = MaterialTheme.colorScheme.surfaceVariant, thickness = 1.dp)
+                        SettingsSwitchItem(
+                            icon = Icons.Filled.Bedtime,
+                            iconTint = MaterialTheme.colorScheme.primary,
+                            title = stringResource(R.string.settings_auto_screensaver),
+                            subtitle = stringResource(R.string.settings_auto_screensaver_desc),
+                            checked = isAutoScreensaverEnabled,
+                            onCheckedChange = { onToggleAutoScreensaver() },
+                            testTag = "setting_auto_screensaver"
                         )
                         HorizontalDivider(color = MaterialTheme.colorScheme.surfaceVariant, thickness = 1.dp)
                         SettingsItem(

@@ -425,4 +425,6 @@
     <string name="share_station_format">Listening to %1$s (%2$s)\nStream: %3$s\nTune in live on NeoTune Radio!</string>
     <string name="speed_format">%1$sx</string>
 
+    <string name="settings_auto_screensaver">એમ્બિયન્ટ સ્ક્રીનસેવર</string>
+    <string name="settings_auto_screensaver_desc">૫ મિનિટની નિષ્ક્રિયતા પછી આપમેળે એમ્બિયન્ટ સ્ક્રીનસેવર શરૂ કરો</string>
 </resources>

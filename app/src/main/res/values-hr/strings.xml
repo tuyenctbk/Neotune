@@ -425,4 +425,6 @@
     <string name="share_station_format">Listening to %1$s (%2$s)\nStream: %3$s\nTune in live on NeoTune Radio!</string>
     <string name="speed_format">%1$sx</string>
 
+    <string name="settings_auto_screensaver">Ambijentalni čuvar zaslona</string>
+    <string name="settings_auto_screensaver_desc">Automatski pokreni čuvar zaslona nakon 5 minuta neaktivnosti</string>
 </resources>

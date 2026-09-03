@@ -441,4 +441,6 @@
     <string name="status_tune_in">SINTONIZAR</string>
     <string name="share_station_format">Escuchando %1$s (%2$s)\nEmisión: %3$s\n¡Sintoniza en vivo en NeoTune Radio!</string>
     <string name="speed_format">%1$sx</string>
+    <string name="settings_auto_screensaver">Salvapantallas ambiental</string>
+    <string name="settings_auto_screensaver_desc">Activar automáticamente el salvapantallas tras 5 minutos de inactividad</string>
 </resources>

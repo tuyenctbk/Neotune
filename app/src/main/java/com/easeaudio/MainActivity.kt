@@ -33,6 +33,7 @@ import androidx.compose.material3.windowsizeclass.WindowSizeClass
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
@@ -151,6 +152,14 @@ class MainActivity : ComponentActivity() {
             else -> super.onKeyDown(keyCode, event)
         }
     }
+
+    var lastInteractionTimeMs: Long = System.currentTimeMillis()
+        private set
+
+    override fun onUserInteraction() {
+        super.onUserInteraction()
+        lastInteractionTimeMs = System.currentTimeMillis()
+    }
 }
 
 @Composable
@@ -161,12 +170,32 @@ fun MainAppContent(
 ) {
     val context = LocalContext.current
     val prefs = remember { context.getSharedPreferences("neotune_prefs", Context.MODE_PRIVATE) }
-    val isOnboardingCompleted = remember { mutableStateOf(prefs.getBoolean("is_onboarding_completed", false)) }
+    val isOnboardingCompleted = remember {
+        val hasCompleted = prefs.getBoolean("is_onboarding_completed", false)
+        if (!hasCompleted) {
+            // Migration check: If this user updated from a previous version (database or prior prefs exist),
+            // mark onboarding completed automatically so existing users are never forced into onboarding on update.
+            val isExistingUser = prefs.all.isNotEmpty() ||
+                    context.getDatabasePath("easeaudio_database").exists() ||
+                    context.getSharedPreferences("audio_comfort_prefs", Context.MODE_PRIVATE).all.isNotEmpty() ||
+                    context.getSharedPreferences("neotune_engagement_prefs", Context.MODE_PRIVATE).all.isNotEmpty()
+            if (isExistingUser) {
+                prefs.edit().putBoolean("is_onboarding_completed", true).apply()
+                mutableStateOf(true)
+            } else {
+                mutableStateOf(false)
+            }
+        } else {
+            mutableStateOf(true)
+        }
+    }
 
     val uiState by viewModel.homeUiState.collectAsState()
     val hasActiveSession by viewModel.hasActiveSession.collectAsStateWithLifecycle()
 
-    val startDestination = if (!isOnboardingCompleted.value) NavRoute.Onboarding.route else NavRoute.Home.route
+    val startDestination = rememberSaveable {
+        if (!isOnboardingCompleted.value) NavRoute.Onboarding.route else NavRoute.Home.route
+    }
 
 
     var hasNotificationPermission by remember {
@@ -218,6 +247,7 @@ fun MainAppContent(
         isOnboardingCompleted.value = true
         navController.navigate(NavRoute.Home.route) {
             popUpTo(NavRoute.Onboarding.route) { inclusive = true }
+            launchSingleTop = true
         }
     }
 
@@ -245,13 +275,37 @@ fun MainAppContent(
         val uiModeManager = context.getSystemService(Context.UI_MODE_SERVICE) as? android.app.UiModeManager
         uiModeManager?.currentModeType == android.content.res.Configuration.UI_MODE_TYPE_TELEVISION
     }
-    var lastInteractionTime by remember { mutableStateOf(System.currentTimeMillis()) }
+    var screensaverDismissedByUser by remember { mutableStateOf(false) }
 
-    LaunchedEffect(uiState.isPlaying, currentRoute, lastInteractionTime) {
-        if (isTv && uiState.isPlaying && currentRoute != NavRoute.Screensaver.route && currentRoute != NavRoute.Onboarding.route) {
-            delay(15000L) // Auto launch screensaver after 15 seconds of inactivity
-            isFullPlayerVisible = false
-            navController.navigate(NavRoute.Screensaver.route)
+    // When navigating away from Screensaver (e.g. back to home/player/settings),
+    // mark that the user explicitly dismissed it so it does NOT repeatedly re-open.
+    DisposableEffect(currentRoute) {
+        onDispose {
+            if (currentRoute == NavRoute.Screensaver.route) {
+                screensaverDismissedByUser = true
+            }
+        }
+    }
+
+    // Reset screensaver dismissed flag when the user starts a new station
+    LaunchedEffect(uiState.currentStation?.id) {
+        screensaverDismissedByUser = false
+    }
+
+    LaunchedEffect(uiState.isPlaying, currentRoute, uiState.isAutoScreensaverEnabled, screensaverDismissedByUser) {
+        if (uiState.isAutoScreensaverEnabled &&
+            uiState.isPlaying &&
+            !screensaverDismissedByUser &&
+            currentRoute != NavRoute.Screensaver.route &&
+            currentRoute != NavRoute.Onboarding.route
+        ) {
+            delay(300_000L) // 5 minutes of idle time (NOT 15 seconds!)
+            if (uiState.isPlaying && !screensaverDismissedByUser && currentRoute != NavRoute.Screensaver.route) {
+                isFullPlayerVisible = false
+                navController.navigate(NavRoute.Screensaver.route) {
+                    launchSingleTop = true
+                }
+            }
         }
     }
 
@@ -287,20 +341,7 @@ fun MainAppContent(
     val showNavigationRail = windowSizeClass.widthSizeClass != WindowWidthSizeClass.Compact && currentRoute != NavRoute.Onboarding.route && currentRoute != NavRoute.CarMode.route && currentRoute != NavRoute.Screensaver.route && !isFullPlayerVisible
 
     Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .pointerInput(Unit) {
-                awaitPointerEventScope {
-                    while (true) {
-                        awaitPointerEvent()
-                        lastInteractionTime = System.currentTimeMillis()
-                    }
-                }
-            }
-            .onPreviewKeyEvent {
-                lastInteractionTime = System.currentTimeMillis()
-                false
-            }
+        modifier = Modifier.fillMaxSize()
     ) {
         Row(modifier = Modifier.fillMaxSize()) {
             AnimatedVisibility(
@@ -535,6 +576,8 @@ fun MainAppContent(
                                 onToggleBatterySaver = { viewModel.toggleBatterySaver() },
                                 isAutoPlayOnStartupEnabled = uiState.isAutoPlayOnStartupEnabled,
                                 onToggleAutoPlayOnStartup = { viewModel.toggleAutoPlayOnStartup() },
+                                isAutoScreensaverEnabled = uiState.isAutoScreensaverEnabled,
+                                onToggleAutoScreensaver = { viewModel.toggleAutoScreensaver() },
                                 isVolumeSafetyEnabled = uiState.isVolumeSafetyEnabled,
                                 onToggleVolumeSafety = { viewModel.toggleVolumeSafety() },
                                 isNightAudioModeEnabled = uiState.isNightAudioModeEnabled,

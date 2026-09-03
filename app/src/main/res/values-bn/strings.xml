@@ -424,4 +424,6 @@
     <string name="status_tune_in">TUNE IN</string>
     <string name="share_station_format">Listening to %1$s (%2$s)\nStream: %3$s\nTune in live on NeoTune Radio!</string>
     <string name="speed_format">%1$sx</string>
+    <string name="settings_auto_screensaver">অ্যাম্বিয়েন্ট স্ক্রিনসেভার</string>
+    <string name="settings_auto_screensaver_desc">৫ মিনিট নিষ্ক্রিয়তার পর স্বয়ংক্রিয়ভাবে অ্যাম্বিয়েন্ট স্ক্রিনসেভার চালু করুন</string>
 </resources>
