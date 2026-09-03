@@ -52,6 +52,7 @@ fun SettingsScreen(
     onOpenBackup: () -> Unit = {},
     onOpenDiagnostics: () -> Unit = {},
     isAutomotive: Boolean = false,
+    bottomPadding: androidx.compose.ui.unit.Dp = 108.dp,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
@@ -69,7 +70,7 @@ fun SettingsScreen(
                 modifier = Modifier
                     .fillMaxHeight()
                     .widthIn(max = 700.dp),
-                contentPadding = PaddingValues(horizontal = 20.dp, vertical = 16.dp),
+                contentPadding = PaddingValues(start = 20.dp, top = 16.dp, end = 20.dp, bottom = bottomPadding),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 // Automotive OS Info Banner

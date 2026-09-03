@@ -84,7 +84,7 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
     val playbackSpeed: StateFlow<Float> = playerManager.playbackSpeed
     val networkStatus: StateFlow<com.easeaudio.network.NetworkStatus> = playerManager.networkStatus
     val remoteConfig: StateFlow<com.easeaudio.firebase.AppRemoteConfig> = playerManager.remoteConfig
-    val failedStationIds: StateFlow<Set<String>> = MutableStateFlow<Set<String>>(emptySet()).asStateFlow()
+    val failedStationIds: StateFlow<Set<String>> = playerManager.failedStationIds
     val trackArtworkUrl: StateFlow<String?> = playerManager.trackArtworkUrl
     val currentLyrics: StateFlow<SongLyrics?> = playerManager.currentLyrics
     val isLoadingLyrics: StateFlow<Boolean> = playerManager.isLoadingLyrics

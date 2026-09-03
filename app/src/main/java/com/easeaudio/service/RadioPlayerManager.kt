@@ -298,9 +298,11 @@ class RadioPlayerManager(private val context: Context) {
         }
     }
 
-    // BUG-4 fix: both flags are read/written from multiple threads (Main listener + IO coroutine);
+    // BUG-4 fix: flags are read/written from multiple threads (Main listener + IO coroutine);
     // @Volatile ensures visibility across threads without heavier synchronization.
     @Volatile private var isFallbackAttempt = false
+    @Volatile private var isCurrentAttemptHls = false
+    @Volatile private var isCurrentAttemptForcedProgressive = false
 
     @OptIn(UnstableApi::class)
     private fun setupPlayer() {
@@ -581,6 +583,20 @@ class RadioPlayerManager(private val context: Context) {
                             crashlytics.recordException(error)
                         } catch (e: Exception) {
                             // Firebase Crashlytics not configured or initialized yet
+                        }
+
+                        // Fallback 1: If stream failed with manifest malformed error while playing as HLS, retry as Progressive
+                        if (current != null && isCurrentAttemptHls && (error.errorCode == PlaybackException.ERROR_CODE_PARSING_MANIFEST_MALFORMED || error.cause is androidx.media3.common.ParserException || error.message?.contains("#EXTM3U", ignoreCase = true) == true)) {
+                            Log.w(TAG, "Stream failed with manifest parsing error (${error.errorCodeName}). Retrying station '${current.name}' with ProgressiveMediaSource...")
+                            playStationWithUrl(current, currentUrl ?: current.streamUrl, isFallback = true, forceProgressive = true)
+                            return
+                        }
+
+                        // Fallback 2: If stream failed with container unsupported while playing as Progressive, retry as HLS
+                        if (current != null && !isCurrentAttemptHls && !isCurrentAttemptForcedProgressive && error.errorCode == PlaybackException.ERROR_CODE_PARSING_CONTAINER_UNSUPPORTED) {
+                            Log.w(TAG, "Progressive stream parsing failed with ${error.errorCodeName}. Retrying station '${current.name}' with HlsMediaSource...")
+                            playStationWithUrl(current, currentUrl ?: current.streamUrl, isFallback = true, forceHls = true)
+                            return
                         }
 
                         if (current != null && !isFallbackAttempt) {
@@ -1125,10 +1141,32 @@ class RadioPlayerManager(private val context: Context) {
                     country = if (station.country != "Global") station.country else ""
                 )
 
-                val freshStream = results.firstOrNull { candidate ->
+                var freshStream = results.firstOrNull { candidate ->
                     candidate.streamUrl.isNotBlank() &&
                             candidate.streamUrl != station.streamUrl &&
                             candidate.streamUrl != failedUrl
+                }
+
+                // If country-filtered search didn't yield alternative stream, search globally without country filter
+                if (freshStream == null && station.country.isNotBlank() && station.country != "Global") {
+                    val globalResults = com.easeaudio.data.RadioBrowserService.fetchTopStations(
+                        limit = 10,
+                        searchQuery = queryName,
+                        country = ""
+                    )
+                    freshStream = globalResults.firstOrNull { candidate ->
+                        candidate.streamUrl.isNotBlank() &&
+                                candidate.streamUrl != station.streamUrl &&
+                                candidate.streamUrl != failedUrl
+                    }
+                }
+
+                // Known reliable fallback for XONE FM if not resolved by directory search
+                if (freshStream == null && station.name.contains("xone", ignoreCase = true)) {
+                    val xoneBackup = "https://stream.zeno.fm/dnukwf7q3a0uv"
+                    if (xoneBackup != failedUrl && xoneBackup != station.streamUrl) {
+                        freshStream = station.copy(streamUrl = xoneBackup)
+                    }
                 }
 
                 if (freshStream != null) {
@@ -1136,6 +1174,9 @@ class RadioPlayerManager(private val context: Context) {
                     withContext(Dispatchers.Main) {
                         val updatedStation = station.copy(streamUrl = freshStream.streamUrl)
                         _currentStation.value = updatedStation
+                        _failedStationIds.value = _failedStationIds.value - station.id
+                        _playbackError.value = null
+                        _isLoading.value = true
                         playStationWithUrl(updatedStation, freshStream.streamUrl, isFallback = true)
                     }
                     return@launch
@@ -1163,7 +1204,7 @@ class RadioPlayerManager(private val context: Context) {
         }
     }
 
-    private suspend fun resolveDirectStreamUrl(rawUrl: String): String = withContext(Dispatchers.IO) {
+    private suspend fun resolveDirectStreamUrl(rawUrl: String, station: RadioStation? = null): String = withContext(Dispatchers.IO) {
         if (rawUrl.isBlank()) return@withContext rawUrl
         var currentUrl = rawUrl.trim()
         
@@ -1176,6 +1217,22 @@ class RadioPlayerManager(private val context: Context) {
                 Log.d(TAG, "Rewrote old VOV stream URL to active live URL: $currentUrl")
                 return@withContext currentUrl
             }
+        }
+
+        // Rewrite dead Zing MP3 (zmdcdn.me / zmp3) stream URLs (e.g. XONE FM, Chạm Radio, Zing Bolero) to active live streams
+        if (currentUrl.contains("zmdcdn.me", ignoreCase = true) || currentUrl.contains("zmp3", ignoreCase = true)) {
+            if (station?.name?.contains("xone", ignoreCase = true) == true || currentUrl.contains("e75e51f26db784e9dda6")) {
+                val activeXoneUrl = "https://stream.zeno.fm/dnukwf7q3a0uv"
+                Log.d(TAG, "Rewrote dead Zing MP3 XONE FM URL to active stream: $activeXoneUrl")
+                return@withContext activeXoneUrl
+            }
+        }
+        if (station?.name?.contains("xone fm", ignoreCase = true) == true &&
+            (currentUrl.isBlank() || currentUrl.contains("zmdcdn.me", ignoreCase = true) || currentUrl.contains("zmp3", ignoreCase = true))
+        ) {
+            val activeXoneUrl = "https://stream.zeno.fm/dnukwf7q3a0uv"
+            Log.d(TAG, "Directed XONE FM to verified active stream: $activeXoneUrl")
+            return@withContext activeXoneUrl
         }
 
         val lower = currentUrl.lowercase()
@@ -1302,7 +1359,13 @@ class RadioPlayerManager(private val context: Context) {
         _hasActiveSession.value = false
     }
 
-    private fun playStationWithUrl(station: RadioStation, targetUrl: String, isFallback: Boolean) {
+    private fun playStationWithUrl(
+        station: RadioStation,
+        targetUrl: String,
+        isFallback: Boolean,
+        forceProgressive: Boolean = false,
+        forceHls: Boolean = false
+    ) {
         // Guard: if ExoPlayer was released (e.g. after a release/reinit cycle or rapid config
         // change), the coroutine's exoPlayer?.let{} block below silently does nothing.
         // Reinitialise here on the calling thread so the player is always valid before we launch.
@@ -1316,6 +1379,7 @@ class RadioPlayerManager(private val context: Context) {
         artworkFetchJob?.cancel()
         
         _currentStation.value = station
+        _failedStationIds.value = _failedStationIds.value - station.id
         _hasActiveSession.value = true
         _playbackError.value = null
         _isLoading.value = true
@@ -1342,7 +1406,7 @@ class RadioPlayerManager(private val context: Context) {
         }
 
         playbackJob = scope.launch {
-            val resolvedUrl = resolveDirectStreamUrl(targetUrl)
+            val resolvedUrl = resolveDirectStreamUrl(targetUrl, station)
             exoPlayer?.let { player ->
                 val artworkUri = if (station.imageUrl.isNotBlank()) {
                     try { Uri.parse(station.imageUrl) } catch (_: Exception) { null }
@@ -1356,7 +1420,16 @@ class RadioPlayerManager(private val context: Context) {
                     .setIsPlayable(true)
                     .build()
 
-                val isHlsStream = resolvedUrl.contains(".m3u8", ignoreCase = true) || resolvedUrl.contains("hls", ignoreCase = true)
+                val parsedUri = try { Uri.parse(resolvedUrl) } catch (_: Exception) { null }
+                val urlPath = parsedUri?.path ?: ""
+                val isHlsDetected = resolvedUrl.contains(".m3u8", ignoreCase = true) ||
+                        urlPath.endsWith("/hls", ignoreCase = true) ||
+                        urlPath.contains("/hls/", ignoreCase = true) ||
+                        urlPath.contains("/zhls/", ignoreCase = true)
+
+                val isHlsStream = if (forceProgressive) false else if (forceHls) true else isHlsDetected
+                isCurrentAttemptHls = isHlsStream
+                isCurrentAttemptForcedProgressive = forceProgressive
 
                 val mediaItemBuilder = MediaItem.Builder()
                     .setMediaId(station.id)
@@ -1379,7 +1452,7 @@ class RadioPlayerManager(private val context: Context) {
 
                 val sourceTypeStr = if (isHlsStream) "HLS (.m3u8)" else "Progressive (Sniffed)"
 
-                val logMsg = "Media3 setMediaSource -> Station: '${station.name}' [ID: ${station.id}], SourceType: $sourceTypeStr, Resolved URI: '$resolvedUrl' (IsFallback: $isFallback), Target URL: '$targetUrl', MetadataTitle: '${mediaMetadata.title}'"
+                val logMsg = "Media3 setMediaSource -> Station: '${station.name}' [ID: ${station.id}], SourceType: $sourceTypeStr, Resolved URI: '$resolvedUrl' (IsFallback: $isFallback, ForceProg: $forceProgressive, ForceHls: $forceHls), Target URL: '$targetUrl', MetadataTitle: '${mediaMetadata.title}'"
                 Log.i(TAG, logMsg)
                 appendToDebugLog(logMsg)
 
