@@ -426,4 +426,22 @@
     <string name="speed_format">%1$sx</string>
     <string name="settings_auto_screensaver">Ambient-näytönsäästäjä</string>
     <string name="settings_auto_screensaver_desc">Käynnistä näytönsäästäjä automaattisesti 5 minuutin käyttämättömyyden jälkeen</string>
+
+    <!-- Continue Listening / History Section -->
+    <string name="continue_listening">Jatka kuuntelua</string>
+    <string name="continue_listening_radio">Jatka radiota</string>
+    <string name="continue_listening_podcast">Jatka podcastia</string>
+    <string name="tab_recent">Viimeisimmät</string>
+    <string name="tab_most_played">Useimmin toistettu</string>
+    <string name="no_history_yet">Ei vielä historiaa — aloita kuuntelu!</string>
+    <string name="no_most_played_yet">Toista asemia nähdäksesi suosikkisi</string>
+
+    <!-- App icon / favicon accessibility -->
+    <string name="app_icon_desc">NeoTune-kuvake</string>
+    <string name="search_expand_hint">Napauta hakeaksesi</string>
+    <string name="search_collapse_hint">Pienennä haku</string>
+    <string name="tab_featured">Suositellut</string>
+    <string name="featured_podcast">Suositeltu podcast</string>
+    <string name="no_featured_yet">Ei suositeltuja suoratoistoja tällä hetkellä</string>
+
 </resources>

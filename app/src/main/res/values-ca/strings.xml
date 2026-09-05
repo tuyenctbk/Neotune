@@ -426,4 +426,22 @@
     <string name="speed_format">%1$sx</string>
     <string name="settings_auto_screensaver">Estalvi de pantalla ambiental</string>
     <string name="settings_auto_screensaver_desc">Inicia automàticament l\'estalvi de pantalla ambiental després de 5 minuts d\'inactivitat</string>
+
+    <!-- Continue Listening / History Section -->
+    <string name="continue_listening">Continua escoltant</string>
+    <string name="continue_listening_radio">Continua la ràdio</string>
+    <string name="continue_listening_podcast">Continua el podcast</string>
+    <string name="tab_recent">Recent</string>
+    <string name="tab_most_played">Més reproduïts</string>
+    <string name="no_history_yet">Sense historial — comença a escoltar!</string>
+    <string name="no_most_played_yet">Reprodueix emissores per veure les teves preferides</string>
+
+    <!-- App icon / favicon accessibility -->
+    <string name="app_icon_desc">Icona de NeoTune</string>
+    <string name="search_expand_hint">Toca per cercar</string>
+    <string name="search_collapse_hint">Replega la cerca</string>
+    <string name="tab_featured">Destacats</string>
+    <string name="featured_podcast">Pòdcast destacat</string>
+    <string name="no_featured_yet">De moment no hi ha reproduccions destacades</string>
+
 </resources>

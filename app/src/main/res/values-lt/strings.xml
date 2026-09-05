@@ -426,4 +426,22 @@
     <string name="speed_format">%1$sx</string>
     <string name="settings_auto_screensaver">Aplinkos ekrano užsklanda</string>
     <string name="settings_auto_screensaver_desc">Automatiškai paleisti ekrano užsklandą po 5 minučių neveiklumo</string>
+
+    <!-- Continue Listening / History Section -->
+    <string name="continue_listening">Tęsti klausymą</string>
+    <string name="continue_listening_radio">Tęsti radiją</string>
+    <string name="continue_listening_podcast">Tęsti podcast\'ą</string>
+    <string name="tab_recent">Naujausi</string>
+    <string name="tab_most_played">Dažniausiai grota</string>
+    <string name="no_history_yet">Dar nėra istorijos — pradėkite klausytis!</string>
+    <string name="no_most_played_yet">Leiskite stotis ir čia matysite mėgstamiausias</string>
+
+    <!-- App icon / favicon accessibility -->
+    <string name="app_icon_desc">NeoTune piktograma</string>
+    <string name="search_expand_hint">Palieskite norėdami ieškoti</string>
+    <string name="search_collapse_hint">Sutraukti paiešką</string>
+    <string name="tab_featured">Rekomenduojami</string>
+    <string name="featured_podcast">Rekomenduojama tinklalaidė</string>
+    <string name="no_featured_yet">Šiuo metu rekomenduojamų srautų nėra</string>
+
 </resources>

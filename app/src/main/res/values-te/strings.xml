@@ -426,4 +426,22 @@
     <string name="speed_format">%1$sx</string>
     <string name="settings_auto_screensaver">యాంబియంట్ స్క్రీన్‌సేవర్</string>
     <string name="settings_auto_screensaver_desc">5 నిమిషాల నిష్క్రియాత్మకత తర్వాత ఆటోమేటిక్‌గా స్క్రీన్‌సేవర్‌ను ప్రారంభించండి</string>
+
+    <!-- Continue Listening / History Section -->
+    <string name="continue_listening">వినడం కొనసాగించండి</string>
+    <string name="continue_listening_radio">రేడియో కొనసాగించండి</string>
+    <string name="continue_listening_podcast">పాడ్కాస్ట్ కొనసాగించండి</string>
+    <string name="tab_recent">ఇటీవలి</string>
+    <string name="tab_most_played">అత్యధికంగా ప్లే అయినవి</string>
+    <string name="no_history_yet">ఇంకా చరిత్ర లేదు — వినడం ప్రారంభించండి!</string>
+    <string name="no_most_played_yet">మీ టాప్ పిక్స్ చూడటానికి స్టేషన్లు ప్లే చేయండి</string>
+
+    <!-- App icon / favicon accessibility -->
+    <string name="app_icon_desc">NeoTune చిహ్నం</string>
+    <string name="search_expand_hint">వెతకడానికి ట్యాప్ చేయండి</string>
+    <string name="search_collapse_hint">శోధనను కుదించండి</string>
+    <string name="tab_featured">విశేషాలు</string>
+    <string name="featured_podcast">ప్రత్యేక పోడ్‌కాస్ట్</string>
+    <string name="no_featured_yet">ప్రస్తుతం ప్రత్యేక స్ట్రీమ్‌లు ఏవీ లేవు</string>
+
 </resources>

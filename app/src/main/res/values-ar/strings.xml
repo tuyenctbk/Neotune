@@ -426,4 +426,22 @@
     <string name="speed_format">%1$sx</string>
     <string name="settings_auto_screensaver">شاشة التوقف المحيطية</string>
     <string name="settings_auto_screensaver_desc">تشغيل شاشة التوقف المحيطية تلقائياً بعد 5 دقائق من عدم النشاط</string>
+
+    <!-- Continue Listening / History Section -->
+    <string name="continue_listening">تابع الاستماع</string>
+    <string name="continue_listening_radio">تابع الاستماع للراديو</string>
+    <string name="continue_listening_podcast">تابع استماع البودكاست</string>
+    <string name="tab_recent">الأخيرة</string>
+    <string name="tab_most_played">الأكثر تشغيلاً</string>
+    <string name="no_history_yet">لا يوجد سجل بعد — ابدأ الاستماع!</string>
+    <string name="no_most_played_yet">شغّل المحطات لرؤية أفضل اختياراتك</string>
+
+    <!-- App icon / favicon accessibility -->
+    <string name="app_icon_desc">أيقونة NeoTune</string>
+    <string name="search_expand_hint">اضغط للبحث</string>
+    <string name="search_collapse_hint">طي البحث</string>
+    <string name="tab_featured">مميز</string>
+    <string name="featured_podcast">بودكاست مميز</string>
+    <string name="no_featured_yet">لا توجد بثوث مميزة حاليًا</string>
+
 </resources>

@@ -426,4 +426,22 @@
     <string name="speed_format">%1$sx</string>
     <string name="settings_auto_screensaver">Környezeti képernyővédő</string>
     <string name="settings_auto_screensaver_desc">Környezeti képernyővédő automatikus indítása 5 perc inaktivitás után</string>
+
+    <!-- Continue Listening / History Section -->
+    <string name="continue_listening">Hallgatás folytatása</string>
+    <string name="continue_listening_radio">Rádió folytatása</string>
+    <string name="continue_listening_podcast">Podcast folytatása</string>
+    <string name="tab_recent">Legutóbbi</string>
+    <string name="tab_most_played">Legtöbbet hallgatott</string>
+    <string name="no_history_yet">Még nincs előzmény — kezdj el hallgatni!</string>
+    <string name="no_most_played_yet">Lejátszott állomások itt jelennek meg</string>
+
+    <!-- App icon / favicon accessibility -->
+    <string name="app_icon_desc">NeoTune ikon</string>
+    <string name="search_expand_hint">Kereséshez koppintson</string>
+    <string name="search_collapse_hint">Keresés összecsukása</string>
+    <string name="tab_featured">Kiemelt</string>
+    <string name="featured_podcast">Kiemelt podcast</string>
+    <string name="no_featured_yet">Jelenleg nincsenek kiemelt adások</string>
+
 </resources>

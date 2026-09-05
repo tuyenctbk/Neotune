@@ -17,6 +17,12 @@ interface RadioDao {
     @Query("SELECT * FROM radio_stations WHERE lastListenedTimestamp > 0 ORDER BY lastListenedTimestamp DESC LIMIT 20")
     suspend fun getRecentStationsDirect(): List<RadioStation>
 
+    @Query("SELECT * FROM radio_stations WHERE playCount > 0 ORDER BY playCount DESC, lastListenedTimestamp DESC LIMIT 20")
+    fun getMostPlayedStations(): Flow<List<RadioStation>>
+
+    @Query("SELECT * FROM radio_stations WHERE playCount > 0 ORDER BY playCount DESC, lastListenedTimestamp DESC LIMIT 20")
+    suspend fun getMostPlayedStationsDirect(): List<RadioStation>
+
     @Query("SELECT * FROM radio_stations WHERE isCustom = 1 ORDER BY name ASC")
     fun getCustomStations(): Flow<List<RadioStation>>
 
@@ -45,7 +51,7 @@ interface RadioDao {
     /**
      * BUG-2 fix: previously issued N SELECT + N INSERT statements (one per station).
      * Now issues 1 bulk SELECT and 1 bulk INSERT, reducing DB round-trips by ~98%
-     * while still preserving user data (isFavorite, isCustom, lastListenedTimestamp).
+     * while still preserving user data (isFavorite, isCustom, lastListenedTimestamp, playCount).
      */
     @Transaction
     suspend fun saveStationsToCache(stations: List<RadioStation>) {
@@ -57,7 +63,8 @@ interface RadioDao {
                 incoming.copy(
                     isFavorite = existing.isFavorite,
                     isCustom = existing.isCustom,
-                    lastListenedTimestamp = existing.lastListenedTimestamp
+                    lastListenedTimestamp = existing.lastListenedTimestamp,
+                    playCount = existing.playCount
                 )
             } else {
                 incoming
@@ -74,4 +81,7 @@ interface RadioDao {
 
     @Query("UPDATE radio_stations SET lastListenedTimestamp = :timestamp WHERE id = :id")
     suspend fun updateLastListened(id: String, timestamp: Long)
+
+    @Query("UPDATE radio_stations SET playCount = playCount + 1, lastListenedTimestamp = :timestamp WHERE id = :id")
+    suspend fun incrementPlayCount(id: String, timestamp: Long = System.currentTimeMillis())
 }

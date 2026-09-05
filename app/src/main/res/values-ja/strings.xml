@@ -430,4 +430,22 @@
     <string name="speed_format">%1$sx</string>
     <string name="settings_auto_screensaver">アンビエント スクリーンセーバー</string>
     <string name="settings_auto_screensaver_desc">5分間操作がない場合、自動的にスクリーンセーバーを起動します</string>
+
+    <!-- Continue Listening / History Section -->
+    <string name="continue_listening">聴き続ける</string>
+    <string name="continue_listening_radio">ラジオを続ける</string>
+    <string name="continue_listening_podcast">ポッドキャストを続ける</string>
+    <string name="tab_recent">最近</string>
+    <string name="tab_most_played">最多再生</string>
+    <string name="no_history_yet">まだ履歴がありません — 聴き始めましょう！</string>
+    <string name="no_most_played_yet">再生するとお気に入りが表示されます</string>
+
+    <!-- App icon / favicon accessibility -->
+    <string name="app_icon_desc">NeoTuneアイコン</string>
+    <string name="search_expand_hint">タップして検索</string>
+    <string name="search_collapse_hint">検索を閉じる</string>
+    <string name="tab_featured">おすすめ</string>
+    <string name="featured_podcast">おすすめポッドキャスト</string>
+    <string name="no_featured_yet">現在おすすめの配信はありません</string>
+
 </resources>

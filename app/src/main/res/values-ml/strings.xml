@@ -426,4 +426,22 @@
     <string name="speed_format">%1$sx</string>
     <string name="settings_auto_screensaver">ആംബിയന്റ് സ്ക്രീൻസേവർ</string>
     <string name="settings_auto_screensaver_desc">5 മിനിറ്റ് നിഷ്ക്രിയത്വത്തിന് ശേഷം ആംബിയന്റ് സ്ക്രീൻസേവർ യാന്ത്രികമായി ആരംഭിക്കുക</string>
+
+    <!-- Continue Listening / History Section -->
+    <string name="continue_listening">ശ്രദ്ധിക്കൽ തുടരുക</string>
+    <string name="continue_listening_radio">റേഡിയോ തുടരുക</string>
+    <string name="continue_listening_podcast">പോഡ്കാസ്റ്റ് തുടരുക</string>
+    <string name="tab_recent">അടുത്തിടെ</string>
+    <string name="tab_most_played">ഏറ്റവും കൂടുതൽ</string>
+    <string name="no_history_yet">ഇതുവരെ ചരിത്രമൊന്നുമില്ല — ശ്രദ്ധിക്കൽ തുടങ്ങൂ!</string>
+    <string name="no_most_played_yet">ടോപ്പ് ചോയ്‌സുകൾ കാണാൻ സ്‌റ്റേഷനുകൾ പ്ലേ ചെയ്യുക</string>
+
+    <!-- App icon / favicon accessibility -->
+    <string name="app_icon_desc">NeoTune ഐക്കൺ</string>
+    <string name="search_expand_hint">തിരയാൻ ടാപ്പ് ചെയ്യുക</string>
+    <string name="search_collapse_hint">തിരയൽ ചുരുക്കുക</string>
+    <string name="tab_featured">ഫീച്ചർ ചെയ്തവ</string>
+    <string name="featured_podcast">ഫീച്ചർ ചെയ്ത പോഡ്‌കാസ്റ്റ്</string>
+    <string name="no_featured_yet">ഇപ്പോൾ ഫീച്ചർ ചെയ്ത സ്ട്രീമുകളൊന്നുമില്ല</string>
+
 </resources>

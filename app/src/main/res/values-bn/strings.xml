@@ -426,4 +426,22 @@
     <string name="speed_format">%1$sx</string>
     <string name="settings_auto_screensaver">অ্যাম্বিয়েন্ট স্ক্রিনসেভার</string>
     <string name="settings_auto_screensaver_desc">৫ মিনিট নিষ্ক্রিয়তার পর স্বয়ংক্রিয়ভাবে অ্যাম্বিয়েন্ট স্ক্রিনসেভার চালু করুন</string>
+
+    <!-- Continue Listening / History Section -->
+    <string name="continue_listening">শোনা চালিয়ে যান</string>
+    <string name="continue_listening_radio">রেডিও শোনা চালিয়ে যান</string>
+    <string name="continue_listening_podcast">পডকাস্ট শোনা চালিয়ে যান</string>
+    <string name="tab_recent">সাম্প্রতিক</string>
+    <string name="tab_most_played">সর্বাধিক বাজানো</string>
+    <string name="no_history_yet">এখনো কোনো ইতিহাস নেই — শুনতে শুরু করুন!</string>
+    <string name="no_most_played_yet">আপনার শীর্ষ পছন্দ দেখতে স্টেশন চালান</string>
+
+    <!-- App icon / favicon accessibility -->
+    <string name="app_icon_desc">NeoTune আইকন</string>
+    <string name="search_expand_hint">অনুসন্ধান করতে ট্যাপ করুন</string>
+    <string name="search_collapse_hint">অনুসন্ধান সংকুচিত করুন</string>
+    <string name="tab_featured">বৈশিষ্ট্যযুক্ত</string>
+    <string name="featured_podcast">বৈশিষ্ট্যযুক্ত পডকাস্ট</string>
+    <string name="no_featured_yet">বর্তমানে কোনও বৈশিষ্ট্যযুক্ত স্ট্রিম নেই</string>
+
 </resources>

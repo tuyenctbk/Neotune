@@ -7,7 +7,7 @@ import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 
-@Database(entities = [RadioStation::class, FavoriteStation::class, RecentSearchQuery::class, ListenLaterItem::class], version = 4, exportSchema = false)
+@Database(entities = [RadioStation::class, FavoriteStation::class, RecentSearchQuery::class, ListenLaterItem::class], version = 5, exportSchema = false)
 abstract class RadioDatabase : RoomDatabase() {
     abstract fun radioDao(): RadioDao
     abstract fun favoriteDao(): FavoriteDao
@@ -71,6 +71,15 @@ abstract class RadioDatabase : RoomDatabase() {
             }
         }
 
+        /** v4 → v5: added playCount column to radio_stations */
+        private val MIGRATION_4_5 = object : Migration(4, 5) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL(
+                    "ALTER TABLE `radio_stations` ADD COLUMN `playCount` INTEGER NOT NULL DEFAULT 0"
+                )
+            }
+        }
+
         fun getDatabase(context: Context): RadioDatabase {
             return INSTANCE ?: synchronized(this) {
                 val instance = Room.databaseBuilder(
@@ -78,7 +87,7 @@ abstract class RadioDatabase : RoomDatabase() {
                     RadioDatabase::class.java,
                     "easeaudio_database"
                 )
-                .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4)
+                .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5)
                 // Fallback ONLY for truly unrecoverable gaps (e.g. downgrade).
                 // This is a last-resort safety net, not the primary migration strategy.
                 .fallbackToDestructiveMigration(true)

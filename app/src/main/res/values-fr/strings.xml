@@ -430,4 +430,22 @@
     <string name="speed_format">%1$sx</string>
     <string name="settings_auto_screensaver">Écran de veille d\'ambiance</string>
     <string name="settings_auto_screensaver_desc">Lancer automatiquement l\'écran de veille après 5 minutes d\'inactivité</string>
+
+    <!-- Continue Listening / History Section -->
+    <string name="continue_listening">Continuer l\'écoute</string>
+    <string name="continue_listening_radio">Continuer la radio</string>
+    <string name="continue_listening_podcast">Continuer le podcast</string>
+    <string name="tab_recent">Récents</string>
+    <string name="tab_most_played">Plus écoutés</string>
+    <string name="no_history_yet">Pas d\'historique — commencez à écouter !</string>
+    <string name="no_most_played_yet">Jouez des stations pour voir vos favoris</string>
+
+    <!-- App icon / favicon accessibility -->
+    <string name="app_icon_desc">Icône NeoTune</string>
+    <string name="search_expand_hint">Appuyer pour rechercher</string>
+    <string name="search_collapse_hint">Réduire la recherche</string>
+    <string name="tab_featured">En vedette</string>
+    <string name="featured_podcast">Podcast en vedette</string>
+    <string name="no_featured_yet">Aucun flux en vedette pour le moment</string>
+
 </resources>

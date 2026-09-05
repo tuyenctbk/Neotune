@@ -551,6 +551,21 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
         list.filter { it.isPodcast }.take(10)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
+    val mostPlayedStations: StateFlow<List<RadioStation>> = combine(
+        repository.getMostPlayedStations(),
+        filterAndBlockManager.blockedStationIds
+    ) { mostPlayed, _ ->
+        mostPlayed.filter { filterAndBlockManager.shouldIncludeStation(it) }.take(10)
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    val mostPlayedRadioStations: StateFlow<List<RadioStation>> = mostPlayedStations.map { list ->
+        list.filter { !it.isPodcast }.take(10)
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    val mostPlayedPodcastStations: StateFlow<List<RadioStation>> = mostPlayedStations.map { list ->
+        list.filter { it.isPodcast }.take(10)
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
     fun refreshRecentStations() {
         // Automatically updated via Room reactive flows
     }
@@ -819,8 +834,13 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     val homeUiState: StateFlow<HomeUiState> = combine(
-        combine(stations, recentStations, recentRadioStations, recentPodcastStations, favoriteStations) {
-            st, recent, recentRadio, recentPodcast, favs -> listOf<Any?>(st, recent, recentRadio, recentPodcast, favs)
+        combine(
+            stations,
+            recentStations,
+            combine(recentRadioStations, recentPodcastStations, mostPlayedRadioStations, mostPlayedPodcastStations) { rr, rp, mr, mp -> listOf(rr, rp, mr, mp) },
+            favoriteStations
+        ) { st, recent, streamGroups, favs ->
+            listOf<Any?>(st, recent, streamGroups[0], streamGroups[1], favs, streamGroups[2], streamGroups[3])
         },
         combine(blockedStations, failedStationIds, demotedStationIds, currentEpisodesList, currentEpisode) {
             blocked, failed, demoted, episodes, episode -> listOf<Any?>(blocked, failed, demoted, episodes, episode)
@@ -863,6 +883,8 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
             recentRadioStations     = stationData[2] as List<RadioStation>,
             recentPodcastStations   = stationData[3] as List<RadioStation>,
             favoriteStations        = stationData[4] as List<RadioStation>,
+            mostPlayedRadioStations = stationData[5] as List<RadioStation>,
+            mostPlayedPodcastStations = stationData[6] as List<RadioStation>,
             listenLaterItems        = settingsData[5] as List<com.easeaudio.data.ListenLaterItem>,
             blockedStations         = metaData[0] as List<RadioStation>,
             failedStationIds        = metaData[1] as Set<String>,

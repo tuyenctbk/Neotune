@@ -426,4 +426,22 @@
     <string name="speed_format">%1$sx</string>
     <string name="settings_auto_screensaver">محافظ صفحه محیطی</string>
     <string name="settings_auto_screensaver_desc">راه‌اندازی خودکار محافظ صفحه پس از ۵ دقیقه عدم فعالیت</string>
+
+    <!-- Continue Listening / History Section -->
+    <string name="continue_listening">ادامه گوش دادن</string>
+    <string name="continue_listening_radio">ادامه رادیو</string>
+    <string name="continue_listening_podcast">ادامه پادکست</string>
+    <string name="tab_recent">اخیر</string>
+    <string name="tab_most_played">بیشترین پخش</string>
+    <string name="no_history_yet">هنوز تاریخچه‌ای وجود ندارد — شروع به گوش دادن کنید!</string>
+    <string name="no_most_played_yet">ایستگاه‌ها را پخش کنید تا برترین‌ها را ببینید</string>
+
+    <!-- App icon / favicon accessibility -->
+    <string name="app_icon_desc">نماد NeoTune</string>
+    <string name="search_expand_hint">برای جستجو ضربه بزنید</string>
+    <string name="search_collapse_hint">جمع کردن جستجو</string>
+    <string name="tab_featured">برگزیده‌ها</string>
+    <string name="featured_podcast">پادکست برگزیده</string>
+    <string name="no_featured_yet">در حال حاضر هیچ پخش برگزیده‌ای وجود ندارد</string>
+
 </resources>

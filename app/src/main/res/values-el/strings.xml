@@ -426,4 +426,22 @@
     <string name="speed_format">%1$sx</string>
     <string name="settings_auto_screensaver">Προφύλαξη οθόνης περιβάλλοντος</string>
     <string name="settings_auto_screensaver_desc">Αυτόματη εκκίνηση προφύλαξης οθόνης μετά από 5 λεπτά αδράνειας</string>
+
+    <!-- Continue Listening / History Section -->
+    <string name="continue_listening">Συνέχεια ακρόασης</string>
+    <string name="continue_listening_radio">Συνέχεια ραδιοφώνου</string>
+    <string name="continue_listening_podcast">Συνέχεια podcast</string>
+    <string name="tab_recent">Πρόσφατα</string>
+    <string name="tab_most_played">Πιο δημοφιλή</string>
+    <string name="no_history_yet">Δεν υπάρχει ιστορικό — ξεκινήστε να ακούτε!</string>
+    <string name="no_most_played_yet">Αναπαράγετε σταθμούς για να δείτε τα αγαπημένα σας</string>
+
+    <!-- App icon / favicon accessibility -->
+    <string name="app_icon_desc">Εικονίδιο NeoTune</string>
+    <string name="search_expand_hint">Πατήστε για αναζήτηση</string>
+    <string name="search_collapse_hint">Σύμπτυξη αναζήτησης</string>
+    <string name="tab_featured">Προτεινόμενα</string>
+    <string name="featured_podcast">Προτεινόμενο podcast</string>
+    <string name="no_featured_yet">Δεν υπάρχουν προτεινόμενες ροές αυτήν τη στιγμή</string>
+
 </resources>

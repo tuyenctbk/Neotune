@@ -443,4 +443,22 @@
     <string name="speed_format">%1$sx</string>
     <string name="settings_auto_screensaver">Màn hình chờ Ambient</string>
     <string name="settings_auto_screensaver_desc">Tự động bật màn hình chờ sau 5 phút không thao tác</string>
+
+    <!-- Continue Listening / History Section -->
+    <string name="continue_listening">Tiếp tục nghe</string>
+    <string name="continue_listening_radio">Tiếp tục nghe radio</string>
+    <string name="continue_listening_podcast">Tiếp tục nghe podcast</string>
+    <string name="tab_recent">Gần đây</string>
+    <string name="tab_most_played">Nghe nhiều nhất</string>
+    <string name="no_history_yet">Chưa có lịch sử — hãy bắt đầu nghe!</string>
+    <string name="no_most_played_yet">Phát các đài để xem lựa chọn hàng đầu</string>
+
+    <!-- App icon / favicon accessibility -->
+    <string name="app_icon_desc">Biểu tượng NeoTune</string>
+    <string name="search_expand_hint">Nhấn để tìm kiếm</string>
+    <string name="search_collapse_hint">Thu gọn tìm kiếm</string>
+    <string name="tab_featured">Nổi bật</string>
+    <string name="featured_podcast">Podcast nổi bật</string>
+    <string name="no_featured_yet">Hiện chưa có luồng nổi bật nào</string>
+
 </resources>

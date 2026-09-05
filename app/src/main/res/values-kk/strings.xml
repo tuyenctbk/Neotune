@@ -426,4 +426,22 @@
     <string name="speed_format">%1$sx</string>
     <string name="settings_auto_screensaver">Амбиентті экран сақтағыш</string>
     <string name="settings_auto_screensaver_desc">5 минут әрекетсіздіктен кейін экран сақтағышты автоматты түрде қосу</string>
+
+    <!-- Continue Listening / History Section -->
+    <string name="continue_listening">Тыңдауды жалғастыру</string>
+    <string name="continue_listening_radio">Радиоды жалғастыру</string>
+    <string name="continue_listening_podcast">Подкасты жалғастыру</string>
+    <string name="tab_recent">Жақында</string>
+    <string name="tab_most_played">Ең көп тыңдалған</string>
+    <string name="no_history_yet">Тарих жоқ — тыңдауды бастаңыз!</string>
+    <string name="no_most_played_yet">Үздіктерді көру үшін станцияларды ойнатыңыз</string>
+
+    <!-- App icon / favicon accessibility -->
+    <string name="app_icon_desc">NeoTune белгісі</string>
+    <string name="search_expand_hint">Іздеу үшін басыңыз</string>
+    <string name="search_collapse_hint">Іздеуді жию</string>
+    <string name="tab_featured">Ұсынылғандар</string>
+    <string name="featured_podcast">Ұсынылған подкаст</string>
+    <string name="no_featured_yet">Қазір ұсынылған ағындар жоқ</string>
+
 </resources>

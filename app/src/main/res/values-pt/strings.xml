@@ -430,4 +430,22 @@
     <string name="speed_format">%1$sx</string>
     <string name="settings_auto_screensaver">Protetor de tela ambiente</string>
     <string name="settings_auto_screensaver_desc">Iniciar protetor de tela automaticamente após 5 minutos de inatividade</string>
+
+    <!-- Continue Listening / History Section -->
+    <string name="continue_listening">Continuar a ouvir</string>
+    <string name="continue_listening_radio">Continuar rádio</string>
+    <string name="continue_listening_podcast">Continuar podcast</string>
+    <string name="tab_recent">Recentes</string>
+    <string name="tab_most_played">Mais reproduzidos</string>
+    <string name="no_history_yet">Sem histórico — começa a ouvir!</string>
+    <string name="no_most_played_yet">Toca emissoras para ver as tuas favoritas</string>
+
+    <!-- App icon / favicon accessibility -->
+    <string name="app_icon_desc">Ícone do NeoTune</string>
+    <string name="search_expand_hint">Toque para pesquisar</string>
+    <string name="search_collapse_hint">Recolher pesquisa</string>
+    <string name="tab_featured">Em destaque</string>
+    <string name="featured_podcast">Podcast em destaque</string>
+    <string name="no_featured_yet">Sem transmissões em destaque no momento</string>
+
 </resources>

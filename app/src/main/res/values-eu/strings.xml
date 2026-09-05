@@ -426,4 +426,22 @@
     <string name="speed_format">%1$sx</string>
     <string name="settings_auto_screensaver">Pantaila-babesle girotua</string>
     <string name="settings_auto_screensaver_desc">Abiarazi automatikoki pantaila-babeslea 5 minutuko ez-aktibitatearen ondoren</string>
+
+    <!-- Continue Listening / History Section -->
+    <string name="continue_listening">Jarraitu entzuten</string>
+    <string name="continue_listening_radio">Jarraitu irratia entzuten</string>
+    <string name="continue_listening_podcast">Jarraitu podcast-a entzuten</string>
+    <string name="tab_recent">Duela gutxi</string>
+    <string name="tab_most_played">Gehien erreproduzitua</string>
+    <string name="no_history_yet">Oraindik ez dago historikorik — hasi entzuten!</string>
+    <string name="no_most_played_yet">Erreproduzitu kateak zure gogokoenak ikusteko</string>
+
+    <!-- App icon / favicon accessibility -->
+    <string name="app_icon_desc">NeoTune ikonoa</string>
+    <string name="search_expand_hint">Sakatu bilatzeko</string>
+    <string name="search_collapse_hint">Tolestu bilaketa</string>
+    <string name="tab_featured">Nabarmenduak</string>
+    <string name="featured_podcast">Nabarmendutako podcasta</string>
+    <string name="no_featured_yet">Momentu honetan ez dago korronte nabarmendurik</string>
+
 </resources>

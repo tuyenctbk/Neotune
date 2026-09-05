@@ -426,4 +426,22 @@
     <string name="speed_format">%1$sx</string>
     <string name="settings_auto_screensaver">Šetrič obrazovky Ambient</string>
     <string name="settings_auto_screensaver_desc">Automaticky spustiť šetrič obrazovky po 5 minútach nečinnosti</string>
+
+    <!-- Continue Listening / History Section -->
+    <string name="continue_listening">Pokračovať v počúvaní</string>
+    <string name="continue_listening_radio">Pokračovať v rádiu</string>
+    <string name="continue_listening_podcast">Pokračovať v podcaste</string>
+    <string name="tab_recent">Nedávne</string>
+    <string name="tab_most_played">Najčastejšie hrané</string>
+    <string name="no_history_yet">Žiadna história — začnite počúvať!</string>
+    <string name="no_most_played_yet">Prehrávajte stanice a uvidíte obľúbené</string>
+
+    <!-- App icon / favicon accessibility -->
+    <string name="app_icon_desc">Ikona NeoTune</string>
+    <string name="search_expand_hint">Klepnutím vyhľadajte</string>
+    <string name="search_collapse_hint">Zbaliť vyhľadávanie</string>
+    <string name="tab_featured">Odporúčané</string>
+    <string name="featured_podcast">Odporúčaný podcast</string>
+    <string name="no_featured_yet">Momentálne nie sú k dispozícii žiadne odporúčané streamy</string>
+
 </resources>

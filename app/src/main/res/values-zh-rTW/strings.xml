@@ -430,4 +430,22 @@
     <string name="speed_format">%1$sx</string>
     <string name="settings_auto_screensaver">氛圍螢幕保護程式</string>
     <string name="settings_auto_screensaver_desc">閒置5分鐘後自動開啟環境氛圍螢幕保護程式</string>
+
+    <!-- Continue Listening / History Section -->
+    <string name="continue_listening">繼續收聽</string>
+    <string name="continue_listening_radio">繼續收聽電台</string>
+    <string name="continue_listening_podcast">繼續收聽播客</string>
+    <string name="tab_recent">最近</string>
+    <string name="tab_most_played">最常播放</string>
+    <string name="no_history_yet">尚無歷史記錄 — 開始收聽吧！</string>
+    <string name="no_most_played_yet">播放電台以查看您的最愛</string>
+
+    <!-- App icon / favicon accessibility -->
+    <string name="app_icon_desc">NeoTune 圖示</string>
+    <string name="search_expand_hint">點擊搜尋</string>
+    <string name="search_collapse_hint">收起搜尋</string>
+    <string name="tab_featured">精選</string>
+    <string name="featured_podcast">精選播客</string>
+    <string name="no_featured_yet">暫無精選電台</string>
+
 </resources>

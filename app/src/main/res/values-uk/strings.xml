@@ -426,4 +426,22 @@
     <string name="speed_format">%1$sx</string>
     <string name="settings_auto_screensaver">Фонова заставка</string>
     <string name="settings_auto_screensaver_desc">Автоматично запускати заставку після 5 хвилин бездіяльності</string>
+
+    <!-- Continue Listening / History Section -->
+    <string name="continue_listening">Продовжити прослуховування</string>
+    <string name="continue_listening_radio">Продовжити радіо</string>
+    <string name="continue_listening_podcast">Продовжити подкаст</string>
+    <string name="tab_recent">Нещодавні</string>
+    <string name="tab_most_played">Найчастіше прослухані</string>
+    <string name="no_history_yet">Ще немає історії — почніть слухати!</string>
+    <string name="no_most_played_yet">Відтворюйте станції, щоб побачити улюблені</string>
+
+    <!-- App icon / favicon accessibility -->
+    <string name="app_icon_desc">Іконка NeoTune</string>
+    <string name="search_expand_hint">Натисніть для пошуку</string>
+    <string name="search_collapse_hint">Згорнути пошук</string>
+    <string name="tab_featured">Рекомендовані</string>
+    <string name="featured_podcast">Рекомендований подкаст</string>
+    <string name="no_featured_yet">Наразі немає рекомендованих трансляцій</string>
+
 </resources>

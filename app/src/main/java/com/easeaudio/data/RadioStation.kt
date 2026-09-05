@@ -15,7 +15,8 @@ data class RadioStation(
     val codec: String = "AAC/MP3",
     val isFavorite: Boolean = false,
     val isCustom: Boolean = false,
-    val lastListenedTimestamp: Long = 0L
+    val lastListenedTimestamp: Long = 0L,
+    val playCount: Int = 0
 ) {
     val isPodcast: Boolean
         get() = id.startsWith("itunes_", ignoreCase = true) ||

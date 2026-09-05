@@ -426,4 +426,22 @@
     <string name="speed_format">%1$sx</string>
     <string name="settings_auto_screensaver">Амбијентални чувар екрана</string>
     <string name="settings_auto_screensaver_desc">Аутоматски покрени чувар екрана након 5 минута неактивности</string>
+
+    <!-- Continue Listening / History Section -->
+    <string name="continue_listening">Настави са слушањем</string>
+    <string name="continue_listening_radio">Настави радио</string>
+    <string name="continue_listening_podcast">Настави podcast</string>
+    <string name="tab_recent">Скорашњи</string>
+    <string name="tab_most_played">Највише слушано</string>
+    <string name="no_history_yet">Нема историје — почните да слушате!</string>
+    <string name="no_most_played_yet">Пустите станице да видите омиљене</string>
+
+    <!-- App icon / favicon accessibility -->
+    <string name="app_icon_desc">Икона NeoTune</string>
+    <string name="search_expand_hint">Додирните за претрагу</string>
+    <string name="search_collapse_hint">Скупи претрагу</string>
+    <string name="tab_featured">Издвојено</string>
+    <string name="featured_podcast">Издвојени подкаст</string>
+    <string name="no_featured_yet">Тренутно нема издвојених стримова</string>
+
 </resources>

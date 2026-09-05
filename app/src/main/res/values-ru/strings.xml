@@ -430,4 +430,22 @@
     <string name="speed_format">%1$sx</string>
     <string name="settings_auto_screensaver">Фоновая заставка</string>
     <string name="settings_auto_screensaver_desc">Автоматически запускать заставку после 5 минут бездействия</string>
+
+    <!-- Continue Listening / History Section -->
+    <string name="continue_listening">Продолжить прослушивание</string>
+    <string name="continue_listening_radio">Продолжить радио</string>
+    <string name="continue_listening_podcast">Продолжить подкаст</string>
+    <string name="tab_recent">Недавние</string>
+    <string name="tab_most_played">Чаще всего</string>
+    <string name="no_history_yet">Пока нет истории — начните слушать!</string>
+    <string name="no_most_played_yet">Воспроизводите станции, чтобы увидеть любимые</string>
+
+    <!-- App icon / favicon accessibility -->
+    <string name="app_icon_desc">Иконка NeoTune</string>
+    <string name="search_expand_hint">Нажмите для поиска</string>
+    <string name="search_collapse_hint">Свернуть поиск</string>
+    <string name="tab_featured">Избранное</string>
+    <string name="featured_podcast">Рекомендуемый подкаст</string>
+    <string name="no_featured_yet">В данный момент нет рекомендуемых трансляций</string>
+
 </resources>

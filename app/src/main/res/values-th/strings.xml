@@ -426,4 +426,22 @@
     <string name="speed_format">%1$sx</string>
     <string name="settings_auto_screensaver">สกรีนเซฟเวอร์บรรยากาศ</string>
     <string name="settings_auto_screensaver_desc">เปิดใช้สกรีนเซฟเวอร์โดยอัตโนมัติหลังจากไม่มีการใช้งาน 5 นาที</string>
+
+    <!-- Continue Listening / History Section -->
+    <string name="continue_listening">ฟังต่อ</string>
+    <string name="continue_listening_radio">ฟังวิทยุต่อ</string>
+    <string name="continue_listening_podcast">ฟังพอดแคสต์ต่อ</string>
+    <string name="tab_recent">ล่าสุด</string>
+    <string name="tab_most_played">เล่นบ่อยที่สุด</string>
+    <string name="no_history_yet">ยังไม่มีประวัติ — เริ่มฟังเลย!</string>
+    <string name="no_most_played_yet">เล่นสถานีเพื่อดูรายการโปรดของคุณ</string>
+
+    <!-- App icon / favicon accessibility -->
+    <string name="app_icon_desc">ไอคอน NeoTune</string>
+    <string name="search_expand_hint">แตะเพื่อค้นหา</string>
+    <string name="search_collapse_hint">ยุบการค้นหา</string>
+    <string name="tab_featured">แนะนำ</string>
+    <string name="featured_podcast">พอดแคสต์แนะนำ</string>
+    <string name="no_featured_yet">ไม่มีสตรีมแนะนำในขณะนี้</string>
+
 </resources>

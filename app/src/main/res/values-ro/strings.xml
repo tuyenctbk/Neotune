@@ -426,4 +426,22 @@
     <string name="speed_format">%1$sx</string>
     <string name="settings_auto_screensaver">Screensaver ambiental</string>
     <string name="settings_auto_screensaver_desc">Porniți automat screensaverul după 5 minute de inactivitate</string>
+
+    <!-- Continue Listening / History Section -->
+    <string name="continue_listening">Continuați să ascultați</string>
+    <string name="continue_listening_radio">Continuați radioul</string>
+    <string name="continue_listening_podcast">Continuați podcast-ul</string>
+    <string name="tab_recent">Recent</string>
+    <string name="tab_most_played">Cele mai ascultate</string>
+    <string name="no_history_yet">Fără istoric — comenzi să ascultați!</string>
+    <string name="no_most_played_yet">Redați stații pentru a vedea favoritele</string>
+
+    <!-- App icon / favicon accessibility -->
+    <string name="app_icon_desc">Pictograma NeoTune</string>
+    <string name="search_expand_hint">Apăsați pentru căutare</string>
+    <string name="search_collapse_hint">Restrângeți căutarea</string>
+    <string name="tab_featured">Recomandate</string>
+    <string name="featured_podcast">Podcast recomandat</string>
+    <string name="no_featured_yet">Niciun flux recomandat în acest moment</string>
+
 </resources>

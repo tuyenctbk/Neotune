@@ -426,4 +426,22 @@
     <string name="speed_format">%1$sx</string>
     <string name="settings_auto_screensaver">Wygaszacz ekranu Ambient</string>
     <string name="settings_auto_screensaver_desc">Uruchamiaj wygaszacz ekranu automatycznie po 5 minutach bezczynności</string>
+
+    <!-- Continue Listening / History Section -->
+    <string name="continue_listening">Kontynuuj słuchanie</string>
+    <string name="continue_listening_radio">Kontynuuj radio</string>
+    <string name="continue_listening_podcast">Kontynuuj podcast</string>
+    <string name="tab_recent">Ostatnie</string>
+    <string name="tab_most_played">Najczęściej odtwarzane</string>
+    <string name="no_history_yet">Brak historii — zacznij słuchać!</string>
+    <string name="no_most_played_yet">Odtwarzaj stacje, aby zobaczyć ulubione</string>
+
+    <!-- App icon / favicon accessibility -->
+    <string name="app_icon_desc">Ikona NeoTune</string>
+    <string name="search_expand_hint">Dotknij, aby wyszukać</string>
+    <string name="search_collapse_hint">Zwiń wyszukiwanie</string>
+    <string name="tab_featured">Polecane</string>
+    <string name="featured_podcast">Polecany podcast</string>
+    <string name="no_featured_yet">Brak polecanych transmisji w tej chwili</string>
+
 </resources>

@@ -427,4 +427,22 @@
 
     <string name="settings_auto_screensaver">Ambijentalni čuvar zaslona</string>
     <string name="settings_auto_screensaver_desc">Automatski pokreni čuvar zaslona nakon 5 minuta neaktivnosti</string>
+
+    <!-- Continue Listening / History Section -->
+    <string name="continue_listening">Nastavi slušati</string>
+    <string name="continue_listening_radio">Nastavi radio</string>
+    <string name="continue_listening_podcast">Nastavi podcast</string>
+    <string name="tab_recent">Nedavni</string>
+    <string name="tab_most_played">Najslušanije</string>
+    <string name="no_history_yet">Nema povijesti — počnite slušati!</string>
+    <string name="no_most_played_yet">Reproducirajte postaje da vidite omiljene</string>
+
+    <!-- App icon / favicon accessibility -->
+    <string name="app_icon_desc">NeoTune ikona</string>
+    <string name="search_expand_hint">Dodirnite za pretraživanje</string>
+    <string name="search_collapse_hint">Sažmi pretraživanje</string>
+    <string name="tab_featured">Istaknuto</string>
+    <string name="featured_podcast">Istaknuti podcast</string>
+    <string name="no_featured_yet">Trenutačno nema istaknutih streamova</string>
+
 </resources>

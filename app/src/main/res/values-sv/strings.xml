@@ -426,4 +426,22 @@
     <string name="speed_format">%1$sx</string>
     <string name="settings_auto_screensaver">Ambient skärmsläckare</string>
     <string name="settings_auto_screensaver_desc">Starta skärmsläckare automatiskt efter 5 minuters inaktivitet</string>
+
+    <!-- Continue Listening / History Section -->
+    <string name="continue_listening">Fortsätt lyssna</string>
+    <string name="continue_listening_radio">Fortsätt radio</string>
+    <string name="continue_listening_podcast">Fortsätt podcast</string>
+    <string name="tab_recent">Senaste</string>
+    <string name="tab_most_played">Mest spelade</string>
+    <string name="no_history_yet">Ingen historik än — börja lyssna!</string>
+    <string name="no_most_played_yet">Spela upp stationer för att se dina favoriter</string>
+
+    <!-- App icon / favicon accessibility -->
+    <string name="app_icon_desc">NeoTune-ikon</string>
+    <string name="search_expand_hint">Tryck för att söka</string>
+    <string name="search_collapse_hint">Dölj sökning</string>
+    <string name="tab_featured">Utvalda</string>
+    <string name="featured_podcast">Utvald podcast</string>
+    <string name="no_featured_yet">Inga utvalda strömmar just nu</string>
+
 </resources>

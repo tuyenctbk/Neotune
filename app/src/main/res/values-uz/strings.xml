@@ -426,4 +426,22 @@
     <string name="speed_format">%1$sx</string>
     <string name="settings_auto_screensaver">Muhit ekran pardasi</string>
     <string name="settings_auto_screensaver_desc">5 daqiqa harakatsizlikdan soʻng ekran pardasini avtomatik ishga tushirish</string>
+
+    <!-- Continue Listening / History Section -->
+    <string name="continue_listening">Tinglashni davom ettiring</string>
+    <string name="continue_listening_radio">Radioni davom ettiring</string>
+    <string name="continue_listening_podcast">Podkastni davom ettiring</string>
+    <string name="tab_recent">So\'nggi</string>
+    <string name="tab_most_played">Ko\'p tinglangan</string>
+    <string name="no_history_yet">Hali tarix yo\'q — tinglashni boshlang!</string>
+    <string name="no_most_played_yet">Sevimlilarni ko\'rish uchun stansiyalarni ijro eting</string>
+
+    <!-- App icon / favicon accessibility -->
+    <string name="app_icon_desc">NeoTune belgisi</string>
+    <string name="search_expand_hint">Qidirish uchun bosing</string>
+    <string name="search_collapse_hint">Qidirishni yoping</string>
+    <string name="tab_featured">Tavsiya etilganlar</string>
+    <string name="featured_podcast">Tavsiya etilgan podkast</string>
+    <string name="no_featured_yet">Hozirda tavsiya etilgan translatsiyalar yo\'q</string>
+
 </resources>

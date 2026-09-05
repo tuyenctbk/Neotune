@@ -426,4 +426,22 @@
     <string name="speed_format">%1$sx</string>
     <string name="settings_auto_screensaver">Kilinzi cha skrini cha mandhari</string>
     <string name="settings_auto_screensaver_desc">Washa kilinzi cha skrini kiotomatiki baada ya dakika 5 za kutofanya kazi</string>
+
+    <!-- Continue Listening / History Section -->
+    <string name="continue_listening">Endelea kusikiliza</string>
+    <string name="continue_listening_radio">Endelea redio</string>
+    <string name="continue_listening_podcast">Endelea podcast</string>
+    <string name="tab_recent">Hivi karibuni</string>
+    <string name="tab_most_played">Zilizochezwa zaidi</string>
+    <string name="no_history_yet">Bado hakuna historia — anza kusikiliza!</string>
+    <string name="no_most_played_yet">Cheza vituo ili kuona vipendwa vyako</string>
+
+    <!-- App icon / favicon accessibility -->
+    <string name="app_icon_desc">Ikoni ya NeoTune</string>
+    <string name="search_expand_hint">Gonga ili kutafuta</string>
+    <string name="search_collapse_hint">Kunja utafutaji</string>
+    <string name="tab_featured">Zilizoangaziwa</string>
+    <string name="featured_podcast">Podikasti Iliyoangaziwa</string>
+    <string name="no_featured_yet">Hakuna mitiririko iliyoangaziwa kwa sasa</string>
+
 </resources>

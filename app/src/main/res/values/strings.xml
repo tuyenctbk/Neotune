@@ -108,8 +108,9 @@
     <string name="banner_back_online">Back Online</string>
     <string name="banner_weak_connection">Weak Connection</string>
 
-    <!-- Featured station label -->
+    <!-- Featured / Quick Resume labels -->
     <string name="featured_station">FEATURED STATION</string>
+    <string name="quick_resume">Quick Resume</string>
 
     <!-- Appearance / Theme screen -->
     <string name="appearance_subtitle">Interface &amp; Color palette for your space</string>
@@ -499,4 +500,22 @@
     <string name="status_tune_in">TUNE IN</string>
     <string name="share_station_format">Listening to %1$s (%2$s)\nStream: %3$s\nTune in live on NeoTune Radio!</string>
     <string name="speed_format">%1$sx</string>
+
+    <!-- Continue Listening / History Section -->
+    <string name="continue_listening">Continue Listening</string>
+    <string name="continue_listening_radio">Continue Radio</string>
+    <string name="continue_listening_podcast">Continue Podcast</string>
+    <string name="tab_recent">Recent</string>
+    <string name="tab_most_played">Most Played</string>
+    <string name="tab_featured">Featured</string>
+    <string name="featured_podcast">Featured Podcast</string>
+    <string name="no_history_yet">No history yet — start listening!</string>
+    <string name="no_most_played_yet">Play stations to see your top picks here</string>
+    <string name="no_featured_yet">No featured streams right now</string>
+
+    <!-- App icon / favicon accessibility -->
+    <string name="app_icon_desc">NeoTune icon</string>
+    <string name="search_expand_hint">Tap to search</string>
+    <string name="search_collapse_hint">Collapse search</string>
 </resources>
+

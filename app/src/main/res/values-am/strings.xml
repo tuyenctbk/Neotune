@@ -426,4 +426,22 @@
     <string name="speed_format">%1$sx</string>
     <string name="settings_auto_screensaver">የአካባቢ ስክሪን ቆጣቢ</string>
     <string name="settings_auto_screensaver_desc">ከ5 ደቂቃዎች እንቅስቃሴ-አልባነት በኋላ የአካባቢ ስክሪን ቆጣቢን በራስ-ሰር ያስጀምሩ</string>
+
+    <!-- Continue Listening / History Section -->
+    <string name="continue_listening">ማዳመጥ ይቀጥሉ</string>
+    <string name="continue_listening_radio">ሬዲዮ ማዳመጥ ይቀጥሉ</string>
+    <string name="continue_listening_podcast">ፖድካስት ማዳመጥ ይቀጥሉ</string>
+    <string name="tab_recent">የቅርቡ</string>
+    <string name="tab_most_played">በብዛት የተጫወተ</string>
+    <string name="no_history_yet">ታሪክ የለም — ማዳመጥ ይጀምሩ!</string>
+    <string name="no_most_played_yet">ምርጥ ምርጫዎችዎን ለማየት ይጫወቱ</string>
+
+    <!-- App icon / favicon accessibility -->
+    <string name="app_icon_desc">NeoTune አዶ</string>
+    <string name="search_expand_hint">ለመፈለግ ይንኩ</string>
+    <string name="search_collapse_hint">ፍለጋ ሰብስቡ</string>
+    <string name="tab_featured">ተለይተው የቀረቡ</string>
+    <string name="featured_podcast">ተለይቶ የቀረበ ፖድካስት</string>
+    <string name="no_featured_yet">በአሁኑ ጊዜ ምንም ተለይተው የቀረቡ ዥረቶች የሉም</string>
+
 </resources>

@@ -3,81 +3,106 @@
     xmlns:aapt="http://schemas.android.com/aapt"
     android:width="108dp"
     android:height="108dp"
-    android:viewportWidth="108"
-    android:viewportHeight="108">
+    android:viewportWidth="512"
+    android:viewportHeight="512">
 
-    <!-- Soft Drop Shadow behind 'N' Emblem -->
+    <!-- Soft Drop Shadow behind Arches & Bars -->
+    <path
+        android:strokeColor="#50000000"
+        android:strokeWidth="19"
+        android:strokeLineCap="round"
+        android:pathData="M 128,258.8 A 128,128 0 0 1 384,258.8" />
+    <path
+        android:strokeColor="#40000000"
+        android:strokeWidth="19"
+        android:strokeLineCap="round"
+        android:pathData="M 163.2,258.8 A 92.8,92.8 0 0 1 348.8,258.8" />
+
     <path
         android:fillColor="#50000000"
-        android:pathData="M 33,35 L 43,35 L 75,77 L 65,77 Z" />
-    <path
-        android:fillColor="#40000000"
-        android:pathData="M 37,35 L 39,35 A 4.5,4.5 0 0 1 43.5,39.5 L 43.5,72.5 A 4.5,4.5 0 0 1 39,77 L 37,77 A 4.5,4.5 0 0 1 32.5,72.5 L 32.5,39.5 A 4.5,4.5 0 0 1 37,35 Z" />
-    <path
-        android:fillColor="#40000000"
-        android:pathData="M 69,35 L 71,35 A 4.5,4.5 0 0 1 75.5,39.5 L 75.5,72.5 A 4.5,4.5 0 0 1 71,77 L 69,77 A 4.5,4.5 0 0 1 64.5,72.5 L 64.5,39.5 A 4.5,4.5 0 0 1 69,35 Z" />
+        android:pathData="M 174.4,306 a 11.2,11.2 0 0,1 11.2,11.2 v 51.2 a 11.2,11.2 0 0,1 -22.4,0 v -51.2 a 11.2,11.2 0 0,1 11.2,-11.2 Z
+                          M 214.4,276.4 a 11.2,11.2 0 0,1 11.2,11.2 v 80.8 a 11.2,11.2 0 0,1 -22.4,0 v -80.8 a 11.2,11.2 0 0,1 11.2,-11.2 Z
+                          M 256,238 a 11.2,11.2 0 0,1 11.2,11.2 v 119.2 a 11.2,11.2 0 0,1 -22.4,0 v -119.2 a 11.2,11.2 0 0,1 11.2,-11.2 Z
+                          M 297.6,276.4 a 11.2,11.2 0 0,1 11.2,11.2 v 80.8 a 11.2,11.2 0 0,1 -22.4,0 v -80.8 a 11.2,11.2 0 0,1 11.2,-11.2 Z
+                          M 337.6,306 a 11.2,11.2 0 0,1 11.2,11.2 v 51.2 a 11.2,11.2 0 0,1 -22.4,0 v -51.2 a 11.2,11.2 0 0,1 11.2,-11.2 Z" />
 
-    <!-- Radio Wave Arcs (Emitting from top right) -->
+    <!-- Radio Waves (Concentric Arches) with Glow & Gradient -->
+    <!-- Outer Arch Ambient Halo -->
     <path
-        android:strokeColor="#7000E5FF"
-        android:strokeWidth="2.2"
+        android:strokeColor="#5000F0FF"
+        android:strokeWidth="24"
         android:strokeLineCap="round"
-        android:pathData="M 76,26 A 9,9 0 0 1 82.5,33" />
-    <path
-        android:strokeColor="#B000F5FF"
-        android:strokeWidth="2.5"
-        android:strokeLineCap="round"
-        android:pathData="M 79,20 A 16,16 0 0 1 90,34" />
-    <path
-        android:strokeColor="#5000F5FF"
-        android:strokeWidth="2.0"
-        android:strokeLineCap="round"
-        android:pathData="M 83,14 A 23,23 0 0 1 97,35" />
+        android:pathData="M 128,252.8 A 128,128 0 0 1 384,252.8" />
 
-    <!-- Pink/Magenta to Violet Diagonal Bar of 'N' -->
-    <path android:pathData="M 32.5,32 L 43.5,32 L 75.5,76 L 64.5,76 Z">
-        <aapt:attr name="android:fillColor">
+    <!-- Outer Arch -->
+    <path
+        android:strokeWidth="17.6"
+        android:strokeLineCap="round"
+        android:strokeAlpha="0.85"
+        android:pathData="M 128,252.8 A 128,128 0 0 1 384,252.8">
+        <aapt:attr name="android:strokeColor">
             <gradient
-                android:startX="32.5"
-                android:startY="32"
-                android:endX="75.5"
-                android:endY="76"
+                android:startX="128"
+                android:startY="252.8"
+                android:endX="384"
+                android:endY="252.8"
                 android:type="linear">
-                <item android:offset="0.0" android:color="#FFFF2A85" />
-                <item android:offset="0.55" android:color="#FFE02096" />
-                <item android:offset="1.0" android:color="#FF7928CA" />
+                <item android:offset="0.0" android:color="#FF00F0FF" />
+                <item android:offset="0.45" android:color="#FFA855F7" />
+                <item android:offset="1.0" android:color="#FFEC4899" />
             </gradient>
         </aapt:attr>
     </path>
 
-    <!-- Left Cyan Pillar of 'N' with Smooth Rounded Caps -->
-    <path android:pathData="M 37,32 L 39,32 A 4.5,4.5 0 0 1 43.5,36.5 L 43.5,71.5 A 4.5,4.5 0 0 1 39,76 L 37,76 A 4.5,4.5 0 0 1 32.5,71.5 L 32.5,36.5 A 4.5,4.5 0 0 1 37,32 Z">
-        <aapt:attr name="android:fillColor">
+    <!-- Inner Arch -->
+    <path
+        android:strokeWidth="17.6"
+        android:strokeLineCap="round"
+        android:pathData="M 163.2,252.8 A 92.8,92.8 0 0 1 348.8,252.8">
+        <aapt:attr name="android:strokeColor">
             <gradient
-                android:startX="38"
-                android:startY="32"
-                android:endX="38"
-                android:endY="76"
+                android:startX="163.2"
+                android:startY="252.8"
+                android:endX="348.8"
+                android:endY="252.8"
                 android:type="linear">
-                <item android:offset="0.0" android:color="#FF00F5FF" />
-                <item android:offset="1.0" android:color="#FF0088FF" />
+                <item android:offset="0.0" android:color="#FF00F0FF" />
+                <item android:offset="0.45" android:color="#FFA855F7" />
+                <item android:offset="1.0" android:color="#FFEC4899" />
             </gradient>
         </aapt:attr>
     </path>
 
-    <!-- Right Amber/Orange Pillar of 'N' with Smooth Rounded Caps -->
-    <path android:pathData="M 69,32 L 71,32 A 4.5,4.5 0 0 1 75.5,36.5 L 75.5,71.5 A 4.5,4.5 0 0 1 71,76 L 69,76 A 4.5,4.5 0 0 1 64.5,71.5 L 64.5,36.5 A 4.5,4.5 0 0 1 69,32 Z">
+    <!-- 5 Equalizer Pillar Bars -->
+    <path android:pathData="M 174.4,300 a 11.2,11.2 0 0,1 11.2,11.2 v 51.2 a 11.2,11.2 0 0,1 -22.4,0 v -51.2 a 11.2,11.2 0 0,1 11.2,-11.2 Z
+                            M 214.4,270.4 a 11.2,11.2 0 0,1 11.2,11.2 v 80.8 a 11.2,11.2 0 0,1 -22.4,0 v -80.8 a 11.2,11.2 0 0,1 11.2,-11.2 Z
+                            M 256,232 a 11.2,11.2 0 0,1 11.2,11.2 v 119.2 a 11.2,11.2 0 0,1 -22.4,0 v -119.2 a 11.2,11.2 0 0,1 11.2,-11.2 Z
+                            M 297.6,270.4 a 11.2,11.2 0 0,1 11.2,11.2 v 80.8 a 11.2,11.2 0 0,1 -22.4,0 v -80.8 a 11.2,11.2 0 0,1 11.2,-11.2 Z
+                            M 337.6,300 a 11.2,11.2 0 0,1 11.2,11.2 v 51.2 a 11.2,11.2 0 0,1 -22.4,0 v -51.2 a 11.2,11.2 0 0,1 11.2,-11.2 Z">
         <aapt:attr name="android:fillColor">
             <gradient
-                android:startX="70"
-                android:startY="32"
-                android:endX="70"
-                android:endY="76"
+                android:startX="256"
+                android:startY="232"
+                android:endX="256"
+                android:endY="373.6"
                 android:type="linear">
-                <item android:offset="0.0" android:color="#FFFFB300" />
-                <item android:offset="1.0" android:color="#FFFF5500" />
+                <item android:offset="0.0" android:color="#FF38BDF8" />
+                <item android:offset="0.35" android:color="#FFC084FC" />
+                <item android:offset="0.70" android:color="#FFE879F9" />
+                <item android:offset="1.0" android:color="#FFF43F5E" />
             </gradient>
         </aapt:attr>
     </path>
 
+    <!-- Glowing Transmitter Beacon Dot at Apex -->
+    <path
+        android:fillColor="#FF00F0FF"
+        android:fillAlpha="0.35"
+        android:pathData="M 256,161.6 m -20.8,0 a 20.8,20.8 0 1,0 41.6,0 a 20.8,20.8 0 1,0 -41.6,0" />
+    <path
+        android:fillColor="#FF00F0FF"
+        android:pathData="M 256,161.6 m -16,0 a 16,16 0 1,0 32,0 a 16,16 0 1,0 -32,0" />
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M 256,161.6 m -8,0 a 8,8 0 1,0 16,0 a 8,8 0 1,0 -16,0" />
 </vector>

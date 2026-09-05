@@ -426,4 +426,22 @@
     <string name="speed_format">%1$sx</string>
     <string name="settings_auto_screensaver">ஆம்பியன்ட் ஸ்கிரீன்சேவர்</string>
     <string name="settings_auto_screensaver_desc">5 நிமிடங்கள் செயலற்ற நிலைக்குப் பிறகு தானாகவே ஸ்கிரீன்சேவரைத் தொடங்குங்கள்</string>
+
+    <!-- Continue Listening / History Section -->
+    <string name="continue_listening">கேட்கலை தொடரவும்</string>
+    <string name="continue_listening_radio">ரேடியோ தொடரவும்</string>
+    <string name="continue_listening_podcast">பாட்காஸ்ட் தொடரவும்</string>
+    <string name="tab_recent">சமீபத்திய</string>
+    <string name="tab_most_played">அதிகம் பார்க்கப்பட்டவை</string>
+    <string name="no_history_yet">இன்னும் வரலாறு இல்லை — கேட்கத் தொடங்குங்கள்!</string>
+    <string name="no_most_played_yet">உங்கள் விருப்பங்களை பார்க்க நிலையங்களை இயக்கவும்</string>
+
+    <!-- App icon / favicon accessibility -->
+    <string name="app_icon_desc">NeoTune சின்னம்</string>
+    <string name="search_expand_hint">தேட தட்டவும்</string>
+    <string name="search_collapse_hint">தேடலை சுருக்கு</string>
+    <string name="tab_featured">சிறப்பம்சங்கள்</string>
+    <string name="featured_podcast">சிறப்பு பாட்காஸ்ட்</string>
+    <string name="no_featured_yet">தற்போது சிறப்பு ஸ்ட்ரீம்கள் எதுவும் இல்லை</string>
+
 </resources>

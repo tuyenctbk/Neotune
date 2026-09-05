@@ -1,23 +1,89 @@
 <?xml version="1.0" encoding="utf-8"?>
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
     android:width="192dp"
     android:height="192dp"
-    android:viewportWidth="192"
-    android:viewportHeight="192">
+    android:viewportWidth="512"
+    android:viewportHeight="512">
 
-    <!-- Left Cyan Pillar of 'N' -->
+    <!-- Soft Ambient Glow behind Splash Graphic -->
     <path
-        android:fillColor="#38C7FF"
-        android:pathData="M 58,56 L 78,56 L 78,136 L 58,136 Z" />
+        android:strokeColor="#5000F0FF"
+        android:strokeWidth="26"
+        android:strokeLineCap="round"
+        android:strokeAlpha="0.45"
+        android:pathData="M 128,252.8 A 128,128 0 0 1 384,252.8" />
 
-    <!-- Right Orange Pillar of 'N' -->
+    <!-- Outer Arch -->
     <path
-        android:fillColor="#FF8C38"
-        android:pathData="M 114,56 L 134,56 L 134,136 L 114,136 Z" />
+        android:strokeWidth="17.6"
+        android:strokeLineCap="round"
+        android:strokeAlpha="0.88"
+        android:pathData="M 128,252.8 A 128,128 0 0 1 384,252.8">
+        <aapt:attr name="android:strokeColor">
+            <gradient
+                android:startX="128"
+                android:startY="252.8"
+                android:endX="384"
+                android:endY="252.8"
+                android:type="linear">
+                <item android:offset="0.0" android:color="#FF00F0FF" />
+                <item android:offset="0.45" android:color="#FFA855F7" />
+                <item android:offset="1.0" android:color="#FFEC4899" />
+            </gradient>
+        </aapt:attr>
+    </path>
 
-    <!-- Pink Diagonal Bar of 'N' -->
+    <!-- Inner Arch -->
     <path
-        android:fillColor="#FF538A"
-        android:pathData="M 58,56 L 78,56 L 134,136 L 114,136 Z" />
+        android:strokeWidth="17.6"
+        android:strokeLineCap="round"
+        android:pathData="M 163.2,252.8 A 92.8,92.8 0 0 1 348.8,252.8">
+        <aapt:attr name="android:strokeColor">
+            <gradient
+                android:startX="163.2"
+                android:startY="252.8"
+                android:endX="348.8"
+                android:endY="252.8"
+                android:type="linear">
+                <item android:offset="0.0" android:color="#FF00F0FF" />
+                <item android:offset="0.45" android:color="#FFA855F7" />
+                <item android:offset="1.0" android:color="#FFEC4899" />
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- 5 Equalizer Pillar Bars -->
+    <path android:pathData="M 174.4,300 a 11.2,11.2 0 0,1 11.2,11.2 v 51.2 a 11.2,11.2 0 0,1 -22.4,0 v -51.2 a 11.2,11.2 0 0,1 11.2,-11.2 Z
+                            M 214.4,270.4 a 11.2,11.2 0 0,1 11.2,11.2 v 80.8 a 11.2,11.2 0 0,1 -22.4,0 v -80.8 a 11.2,11.2 0 0,1 11.2,-11.2 Z
+                            M 256,232 a 11.2,11.2 0 0,1 11.2,11.2 v 119.2 a 11.2,11.2 0 0,1 -22.4,0 v -119.2 a 11.2,11.2 0 0,1 11.2,-11.2 Z
+                            M 297.6,270.4 a 11.2,11.2 0 0,1 11.2,11.2 v 80.8 a 11.2,11.2 0 0,1 -22.4,0 v -80.8 a 11.2,11.2 0 0,1 11.2,-11.2 Z
+                            M 337.6,300 a 11.2,11.2 0 0,1 11.2,11.2 v 51.2 a 11.2,11.2 0 0,1 -22.4,0 v -51.2 a 11.2,11.2 0 0,1 11.2,-11.2 Z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:startX="256"
+                android:startY="232"
+                android:endX="256"
+                android:endY="373.6"
+                android:type="linear">
+                <item android:offset="0.0" android:color="#FF38BDF8" />
+                <item android:offset="0.35" android:color="#FFC084FC" />
+                <item android:offset="0.70" android:color="#FFE879F9" />
+                <item android:offset="1.0" android:color="#FFF43F5E" />
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- Transmitter Beacon Dot at Apex -->
+    <path
+        android:fillColor="#FF00F0FF"
+        android:fillAlpha="0.35"
+        android:pathData="M 256,161.6 m -20.8,0 a 20.8,20.8 0 1,0 41.6,0 a 20.8,20.8 0 1,0 -41.6,0" />
+    <path
+        android:fillColor="#FF00F0FF"
+        android:pathData="M 256,161.6 m -16,0 a 16,16 0 1,0 32,0 a 16,16 0 1,0 -32,0" />
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M 256,161.6 m -8,0 a 8,8 0 1,0 16,0 a 8,8 0 1,0 -16,0" />
 
 </vector>

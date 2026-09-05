@@ -426,4 +426,22 @@
     <string name="speed_format">%1$sx</string>
     <string name="settings_auto_screensaver">Ambient-schermbeveiliging</string>
     <string name="settings_auto_screensaver_desc">Start schermbeveiliging automatisch na 5 minuten inactiviteit</string>
+
+    <!-- Continue Listening / History Section -->
+    <string name="continue_listening">Ga verder met luisteren</string>
+    <string name="continue_listening_radio">Ga door met radio</string>
+    <string name="continue_listening_podcast">Ga door met podcast</string>
+    <string name="tab_recent">Recent</string>
+    <string name="tab_most_played">Meest afgespeeld</string>
+    <string name="no_history_yet">Nog geen geschiedenis — begin met luisteren!</string>
+    <string name="no_most_played_yet">Speel stations af om je favorieten te zien</string>
+
+    <!-- App icon / favicon accessibility -->
+    <string name="app_icon_desc">NeoTune-pictogram</string>
+    <string name="search_expand_hint">Tik om te zoeken</string>
+    <string name="search_collapse_hint">Zoeken inklappen</string>
+    <string name="tab_featured">Uitgelicht</string>
+    <string name="featured_podcast">Uitgelichte podcast</string>
+    <string name="no_featured_yet">Momenteel geen uitgelichte streams</string>
+
 </resources>

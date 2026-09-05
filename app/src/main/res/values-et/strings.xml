@@ -426,4 +426,22 @@
     <string name="speed_format">%1$sx</string>
     <string name="settings_auto_screensaver">Ambientne ekraanisäästja</string>
     <string name="settings_auto_screensaver_desc">Käivita ekraanisäästja automaatselt pärast 5-minutilist tegevusetust</string>
+
+    <!-- Continue Listening / History Section -->
+    <string name="continue_listening">Jätka kuulamist</string>
+    <string name="continue_listening_radio">Jätka raadiot</string>
+    <string name="continue_listening_podcast">Jätka podcasti</string>
+    <string name="tab_recent">Hiljutised</string>
+    <string name="tab_most_played">Enim mängitud</string>
+    <string name="no_history_yet">Ajalugu puudub — alusta kuulamist!</string>
+    <string name="no_most_played_yet">Jaamu esitades kuvatakse lemmikud</string>
+
+    <!-- App icon / favicon accessibility -->
+    <string name="app_icon_desc">NeoTune ikoon</string>
+    <string name="search_expand_hint">Otsimiseks puudutage</string>
+    <string name="search_collapse_hint">Ahenda otsing</string>
+    <string name="tab_featured">Esiletõstetud</string>
+    <string name="featured_podcast">Esiletõstetud taskuhääling</string>
+    <string name="no_featured_yet">Hetkel pole ühtegi esiletõstetud voogu</string>
+
 </resources>

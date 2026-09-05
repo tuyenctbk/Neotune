@@ -443,4 +443,22 @@
     <string name="speed_format">%1$sx</string>
     <string name="settings_auto_screensaver">Ambient-Bildschirmschoner</string>
     <string name="settings_auto_screensaver_desc">Ambient-Bildschirmschoner nach 5 Minuten Inaktivität automatisch starten</string>
+
+    <!-- Continue Listening / History Section -->
+    <string name="continue_listening">Weiterhören</string>
+    <string name="continue_listening_radio">Radio weiterhören</string>
+    <string name="continue_listening_podcast">Podcast weiterhören</string>
+    <string name="tab_recent">Zuletzt</string>
+    <string name="tab_most_played">Am häufigsten</string>
+    <string name="no_history_yet">Noch kein Verlauf — fange an zu hören!</string>
+    <string name="no_most_played_yet">Stationen abspielen, um Favoriten zu sehen</string>
+
+    <!-- App icon / favicon accessibility -->
+    <string name="app_icon_desc">NeoTune-Symbol</string>
+    <string name="search_expand_hint">Zum Suchen tippen</string>
+    <string name="search_collapse_hint">Suche einklappen</string>
+    <string name="tab_featured">Empfohlen</string>
+    <string name="featured_podcast">Empfohlener Podcast</string>
+    <string name="no_featured_yet">Derzeit keine empfohlenen Streams</string>
+
 </resources>

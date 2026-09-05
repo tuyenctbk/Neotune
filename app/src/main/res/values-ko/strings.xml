@@ -430,4 +430,22 @@
     <string name="speed_format">%1$sx</string>
     <string name="settings_auto_screensaver">앰비언트 화면 보호기</string>
     <string name="settings_auto_screensaver_desc">5분 동안 활동이 없으면 화면 보호기를 자동으로 실행합니다</string>
+
+    <!-- Continue Listening / History Section -->
+    <string name="continue_listening">계속 듣기</string>
+    <string name="continue_listening_radio">라디오 계속 듣기</string>
+    <string name="continue_listening_podcast">팟캐스트 계속 듣기</string>
+    <string name="tab_recent">최근</string>
+    <string name="tab_most_played">가장 많이 재생</string>
+    <string name="no_history_yet">아직 기록이 없습니다 — 지금 들어보세요!</string>
+    <string name="no_most_played_yet">즐겨찾기를 보려면 방송국을 재생하세요</string>
+
+    <!-- App icon / favicon accessibility -->
+    <string name="app_icon_desc">NeoTune 아이콘</string>
+    <string name="search_expand_hint">검색하려면 탭하세요</string>
+    <string name="search_collapse_hint">검색 접기</string>
+    <string name="tab_featured">추천</string>
+    <string name="featured_podcast">추천 팟캐스트</string>
+    <string name="no_featured_yet">현재 추천 스트림이 없습니다</string>
+
 </resources>

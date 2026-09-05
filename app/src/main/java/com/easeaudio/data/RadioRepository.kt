@@ -172,8 +172,15 @@ class RadioRepository(
         }
     }
 
+    override fun getMostPlayedStations(): Flow<List<RadioStation>> = dao.getMostPlayedStations()
+
     override suspend fun recordStationListened(station: RadioStation) {
-        val updated = station.copy(lastListenedTimestamp = System.currentTimeMillis())
+        val existing = dao.getStationById(station.id)
+        val currentPlayCount = existing?.playCount ?: station.playCount
+        val updated = station.copy(
+            lastListenedTimestamp = System.currentTimeMillis(),
+            playCount = currentPlayCount + 1
+        )
         dao.insertOrUpdateStation(updated)
     }
 

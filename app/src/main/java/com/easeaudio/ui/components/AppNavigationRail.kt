@@ -9,6 +9,8 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.focusable
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
@@ -27,6 +29,7 @@ import androidx.compose.ui.input.key.*
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 
 @Composable
@@ -76,17 +79,48 @@ fun AppNavigationRail(
                     var isFocused by remember { mutableStateOf(false) }
 
                     val itemScale by animateFloatAsState(
-                        targetValue = if (isFocused) 1.14f else if (isSelected) 1.05f else 1.0f,
-                        animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessLow),
+                        targetValue = if (isFocused) 1.05f else if (isSelected) 1.02f else 1.0f,
+                        animationSpec = tween(durationMillis = 160, easing = FastOutSlowInEasing),
                         label = "rail_item_scale"
                     )
 
-                    Box(
+                    Column(
                         modifier = Modifier
-                            .padding(vertical = 6.dp, horizontal = 4.dp)
+                            .width(72.dp)
+                            .padding(vertical = 4.dp, horizontal = 4.dp)
                             .scale(itemScale)
+                            .clip(RoundedCornerShape(14.dp))
+                            .background(
+                                color = when {
+                                    isSelected && isFocused -> selectedAccent.copy(alpha = 0.28f)
+                                    isSelected -> selectedAccent.copy(alpha = 0.16f)
+                                    isFocused -> MaterialTheme.colorScheme.surfaceVariant
+                                    else -> Color.Transparent
+                                },
+                                shape = RoundedCornerShape(14.dp)
+                            )
+                            .border(
+                                width = when {
+                                    isSelected && isFocused -> 2.5.dp
+                                    isFocused -> 2.dp
+                                    else -> 0.dp
+                                },
+                                color = when {
+                                    isSelected && isFocused -> Color.White
+                                    isFocused -> selectedAccent
+                                    else -> Color.Transparent
+                                },
+                                shape = RoundedCornerShape(14.dp)
+                            )
                             .onFocusChanged { isFocused = it.isFocused }
                             .focusable()
+                            .clickable(
+                                interactionSource = remember { MutableInteractionSource() },
+                                indication = null
+                            ) {
+                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                onNavigate(item.route)
+                            }
                             .onKeyEvent { keyEvent ->
                                 if (keyEvent.type == KeyEventType.KeyUp) {
                                     when (keyEvent.key) {
@@ -101,49 +135,25 @@ fun AppNavigationRail(
                                     false
                                 }
                             }
-                            .shadow(
-                                elevation = if (isFocused) 12.dp else 0.dp,
-                                shape = RoundedCornerShape(16.dp),
-                                spotColor = selectedAccent,
-                                ambientColor = selectedAccent.copy(alpha = 0.5f)
-                            )
-                            .clip(RoundedCornerShape(16.dp))
-                            .border(
-                                width = if (isFocused) 2.5.dp else 0.dp,
-                                brush = if (isFocused) {
-                                    Brush.horizontalGradient(
-                                        listOf(selectedAccent, Color.White, selectedAccent)
-                                    )
-                                } else Brush.horizontalGradient(listOf(Color.Transparent, Color.Transparent)),
-                                shape = RoundedCornerShape(16.dp)
-                            )
-                            .testTag("nav_rail_item_${item.route}")
+                            .padding(vertical = 10.dp, horizontal = 4.dp)
+                            .testTag("nav_rail_item_${item.route}"),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
                     ) {
-                        NavigationRailItem(
-                            selected = isSelected,
-                            onClick = {
-                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                                onNavigate(item.route)
-                            },
-                            icon = {
-                                Icon(
-                                    imageVector = if (isSelected) item.selectedIcon else item.unselectedIcon,
-                                    contentDescription = localizedTitle
-                                )
-                            },
-                            label = {
-                                Text(
-                                    text = localizedTitle,
-                                    style = MaterialTheme.typography.labelSmall
-                                )
-                            },
-                            colors = NavigationRailItemDefaults.colors(
-                                selectedIconColor = selectedAccent,
-                                selectedTextColor = selectedAccent,
-                                indicatorColor = if (isFocused) selectedAccent.copy(alpha = 0.35f) else selectedAccent.copy(alpha = 0.15f),
-                                unselectedIconColor = if (isFocused) selectedAccent else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
-                                unselectedTextColor = if (isFocused) selectedAccent else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
-                            )
+                        Icon(
+                            imageVector = if (isSelected) item.selectedIcon else item.unselectedIcon,
+                            contentDescription = localizedTitle,
+                            tint = if (isSelected || isFocused) selectedAccent else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.65f),
+                            modifier = Modifier.size(24.dp)
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = localizedTitle,
+                            style = MaterialTheme.typography.labelSmall.copy(
+                                fontWeight = if (isSelected || isFocused) FontWeight.Bold else FontWeight.Medium
+                            ),
+                            color = if (isSelected || isFocused) selectedAccent else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.65f),
+                            maxLines = 1
                         )
                     }
                 }

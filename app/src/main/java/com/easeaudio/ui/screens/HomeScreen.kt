@@ -1,10 +1,19 @@
 package com.easeaudio.ui.screens
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.expandHorizontally
+import androidx.compose.animation.shrinkHorizontally
+import androidx.compose.animation.togetherWith
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.platform.LocalFocusManager
+import kotlinx.coroutines.delay
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -12,6 +21,8 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
+import androidx.activity.compose.BackHandler
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
@@ -20,7 +31,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.ui.platform.LocalContext
 import android.content.Intent
+import androidx.compose.material.icons.automirrored.filled.TrendingUp
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Bedtime
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
@@ -58,8 +71,11 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.focus.focusProperties
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
@@ -89,6 +105,10 @@ import androidx.lifecycle.Lifecycle
 
 enum class HomeTab {
     Radio, Podcast
+}
+
+enum class ContinueListeningTab {
+    Recent, MostPlayed, Featured
 }
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
@@ -123,14 +143,34 @@ fun HomeScreen(
         WindowWidthSizeClass.Expanded -> 2 // Landscape tablet / Android TV
         else -> 1                           // Phone or portrait tablet: single-column list
     }
+    val isTv = rememberIsTv()
 
     val gridState = rememberLazyGridState()
     var showCountryDialog by remember { mutableStateOf(false) }
     val keyboardController = LocalSoftwareKeyboardController.current
+    val focusManager = LocalFocusManager.current
+
+    var continueListeningTab by rememberSaveable { mutableStateOf(ContinueListeningTab.Recent) }
+    var userExplicitlySelectedTab by rememberSaveable { mutableStateOf(false) }
+    val continueChipFocusRequester = remember { FocusRequester() }
+
+    val featuredList = remember(uiState.selectedTab, uiState.curatedAudiophileStations, uiState.stations) {
+        if (uiState.selectedTab == HomeTab.Radio) {
+            uiState.curatedAudiophileStations.ifEmpty {
+                uiState.stations.filter { !it.isPodcast }
+            }
+        } else {
+            uiState.stations.filter { it.isPodcast }.ifEmpty { uiState.stations }
+        }
+    }
 
     val latestRecentList = if (uiState.selectedTab == HomeTab.Radio) uiState.recentRadioStations else uiState.recentPodcastStations
     var displayedRecentList by remember { mutableStateOf<List<RadioStation>>(emptyList()) }
     val currentRecentList by rememberUpdatedState(latestRecentList)
+
+    val latestMostPlayedList = if (uiState.selectedTab == HomeTab.Radio) uiState.mostPlayedRadioStations else uiState.mostPlayedPodcastStations
+    var displayedMostPlayedList by remember { mutableStateOf<List<RadioStation>>(emptyList()) }
+    val currentMostPlayedList by rememberUpdatedState(latestMostPlayedList)
 
     val lifecycleOwner = LocalLifecycleOwner.current
     DisposableEffect(lifecycleOwner, uiState.selectedTab) {
@@ -139,12 +179,18 @@ fun HomeScreen(
                 if (currentRecentList.isNotEmpty()) {
                     displayedRecentList = currentRecentList
                 }
+                if (currentMostPlayedList.isNotEmpty()) {
+                    displayedMostPlayedList = currentMostPlayedList
+                }
             }
         }
         lifecycleOwner.lifecycle.addObserver(observer)
         
         if (latestRecentList.isNotEmpty()) {
             displayedRecentList = latestRecentList
+        }
+        if (latestMostPlayedList.isNotEmpty()) {
+            displayedMostPlayedList = latestMostPlayedList
         }
 
         onDispose {
@@ -155,6 +201,22 @@ fun HomeScreen(
     LaunchedEffect(latestRecentList) {
         if (displayedRecentList.isEmpty() && latestRecentList.isNotEmpty()) {
             displayedRecentList = latestRecentList
+        }
+    }
+
+    LaunchedEffect(latestMostPlayedList) {
+        if (displayedMostPlayedList.isEmpty() && latestMostPlayedList.isNotEmpty()) {
+            displayedMostPlayedList = latestMostPlayedList
+        }
+    }
+
+    LaunchedEffect(latestRecentList, featuredList) {
+        if (!userExplicitlySelectedTab) {
+            if (latestRecentList.isNotEmpty()) {
+                continueListeningTab = ContinueListeningTab.Recent
+            } else if (featuredList.isNotEmpty() && continueListeningTab == ContinueListeningTab.Recent && latestMostPlayedList.isEmpty()) {
+                continueListeningTab = ContinueListeningTab.Featured
+            }
         }
     }
     
@@ -226,120 +288,217 @@ fun HomeScreen(
                 verticalArrangement = Arrangement.spacedBy(10.dp),
                 contentPadding = PaddingValues(start = 20.dp, top = 8.dp, end = 20.dp, bottom = 108.dp)
             ) {
-                // App Header & Search Bar (Merged for minimal spacing)
+                // ── Unified Top Bar (Mobile, Tablet, Android TV) ──────────────────
+                // Single row: Brand Favicon (always visible) | Animated expanding search pill | Country Picker (hides when searching)
                 item(span = { GridItemSpan(maxLineSpan) }) {
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(top = 12.dp, bottom = 4.dp)
+                            .padding(top = 8.dp, bottom = 4.dp)
                     ) {
-                        // Title Row
+                        var isSearchFocused by rememberSaveable { mutableStateOf(false) }
+                        val isSearchExpanded = isSearchFocused || uiState.searchQuery.isNotEmpty()
+                        val searchFocusRequester = remember { FocusRequester() }
+
+                        LaunchedEffect(isSearchFocused) {
+                            if (isSearchFocused) {
+                                delay(60)
+                                try { searchFocusRequester.requestFocus() } catch (_: Exception) {}
+                                keyboardController?.show()
+                            }
+                        }
+
+                        BackHandler(enabled = isSearchExpanded) {
+                            isSearchFocused = false
+                            focusManager.clearFocus()
+                            keyboardController?.hide()
+                            if (uiState.searchQuery.isNotEmpty()) onSearchQueryChange("")
+                        }
+
+                        // Single top-bar row: Favicon (always) | Search (expands) | Country Picker (hides when searching)
                         Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(56.dp),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                modifier = Modifier.weight(1f)
-                            ) {
-                                Icon(
-                                    painter = androidx.compose.ui.res.painterResource(id = R.drawable.ic_favicon),
-                                    contentDescription = "NeoTune Logo",
-                                    tint = Color.Unspecified,
-                                    modifier = Modifier.size(if (isExpanded) 48.dp else 36.dp)
-                                )
-                                Spacer(modifier = Modifier.width(10.dp))
-                                Text(
-                                    text = stringResource(R.string.app_name),
-                                    style = (if (isExpanded) MaterialTheme.typography.headlineLarge else MaterialTheme.typography.headlineMedium).copy(
-                                        fontSize = if (isExpanded) 36.sp else 28.sp,
-                                        fontWeight = FontWeight.Black,
-                                        letterSpacing = (-0.8).sp
-                                    ),
-                                    color = MaterialTheme.colorScheme.onSurface
-                                )
+                            // ── Brand Favicon (always visible) ──
+                            Icon(
+                                painter = androidx.compose.ui.res.painterResource(id = R.drawable.ic_favicon),
+                                contentDescription = stringResource(R.string.app_icon_desc),
+                                tint = Color.Unspecified,
+                                modifier = Modifier
+                                    .size(if (isTv) 48.dp else 44.dp)
+                                    .padding(horizontal = 2.dp)
+                            )
+
+                            // ── Search Area (expands to full remaining width when active) ──
+                            AnimatedContent(
+                                targetState = isSearchExpanded,
+                                transitionSpec = {
+                                    (fadeIn(animationSpec = tween(200)) + expandHorizontally(expandFrom = androidx.compose.ui.Alignment.Start)) togetherWith
+                                    (fadeOut(animationSpec = tween(160)) + shrinkHorizontally(shrinkTowards = androidx.compose.ui.Alignment.Start))
+                                },
+                                modifier = Modifier.weight(1f),
+                                label = "TopBarSearchTransition"
+                            ) { expanded ->
+                                if (expanded) {
+                                    // Full search text field (overlaps country picker)
+                                    OutlinedTextField(
+                                        value = uiState.searchQuery,
+                                        onValueChange = onSearchQueryChange,
+                                        placeholder = {
+                                            Text(
+                                                text = stringResource(R.string.search_placeholder),
+                                                style = MaterialTheme.typography.bodyMedium,
+                                                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                                                maxLines = 1,
+                                                overflow = TextOverflow.Ellipsis
+                                            )
+                                        },
+                                        leadingIcon = {
+                                            IconButton(
+                                                onClick = {
+                                                    isSearchFocused = false
+                                                    focusManager.clearFocus()
+                                                    keyboardController?.hide()
+                                                    if (uiState.searchQuery.isNotEmpty()) onSearchQueryChange("")
+                                                }
+                                            ) {
+                                                Icon(
+                                                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                                    contentDescription = "Collapse search",
+                                                    tint = MaterialTheme.colorScheme.primary,
+                                                    modifier = Modifier.size(22.dp)
+                                                )
+                                            }
+                                        },
+                                        trailingIcon = {
+                                            if (uiState.searchQuery.isNotEmpty()) {
+                                                IconButton(onClick = { onSearchQueryChange("") }) {
+                                                    Icon(
+                                                        imageVector = Icons.Filled.Close,
+                                                        contentDescription = "Clear search",
+                                                        tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                                                        modifier = Modifier.size(18.dp)
+                                                    )
+                                                }
+                                            }
+                                        },
+                                        singleLine = true,
+                                        textStyle = MaterialTheme.typography.bodyMedium.copy(color = MaterialTheme.colorScheme.onSurface),
+                                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+                                        keyboardActions = KeyboardActions(
+                                            onSearch = {
+                                                keyboardController?.hide()
+                                                focusManager.clearFocus()
+                                                if (uiState.searchQuery.isNotBlank()) onSaveSearchQuery(uiState.searchQuery)
+                                            }
+                                        ),
+                                        shape = RoundedCornerShape(24.dp),
+                                        colors = OutlinedTextFieldDefaults.colors(
+                                            focusedContainerColor = MaterialTheme.colorScheme.surface,
+                                            unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.45f),
+                                            focusedBorderColor = MaterialTheme.colorScheme.primary,
+                                            unfocusedBorderColor = Color.Transparent,
+                                            focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                                            unfocusedTextColor = MaterialTheme.colorScheme.onSurface
+                                        ),
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .heightIn(min = 46.dp)
+                                            .focusRequester(searchFocusRequester)
+                                            .onFocusChanged { if (!it.isFocused && !isSearchExpanded) isSearchFocused = false }
+                                            .testTag("input_search_stations")
+                                    )
+                                } else {
+                                    // Collapsed search pill
+                                    var isPillFocused by remember { mutableStateOf(false) }
+                                    Surface(
+                                        onClick = { isSearchFocused = true },
+                                        shape = RoundedCornerShape(24.dp),
+                                        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.45f),
+                                        border = BorderStroke(
+                                            width = if (isPillFocused) 2.dp else 1.dp,
+                                            color = if (isPillFocused) MaterialTheme.colorScheme.primary else Color.Transparent
+                                        ),
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .height(if (isTv) 50.dp else 46.dp)
+                                            .onFocusChanged { isPillFocused = it.isFocused }
+                                            .testTag("input_search_stations")
+                                    ) {
+                                        Row(
+                                            modifier = Modifier
+                                                .fillMaxSize()
+                                                .padding(horizontal = 14.dp),
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            horizontalArrangement = Arrangement.spacedBy(10.dp)
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.Filled.Search,
+                                                contentDescription = null,
+                                                tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                                                modifier = Modifier.size(20.dp)
+                                            )
+                                            Text(
+                                                text = if (uiState.searchQuery.isNotEmpty()) uiState.searchQuery
+                                                       else stringResource(R.string.search_placeholder),
+                                                style = MaterialTheme.typography.bodyMedium,
+                                                color = if (uiState.searchQuery.isNotEmpty()) MaterialTheme.colorScheme.onSurface
+                                                        else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                                                maxLines = 1,
+                                                overflow = TextOverflow.Ellipsis
+                                            )
+                                        }
+                                    }
+                                }
                             }
 
-                            if (uiState.selectedTab == HomeTab.Radio) {
+                            // ── Country Picker (hidden when search is active) ──
+                            AnimatedVisibility(
+                                visible = !isSearchExpanded && uiState.selectedTab == HomeTab.Radio,
+                                enter = fadeIn(tween(180)) + expandHorizontally(),
+                                exit = fadeOut(tween(140)) + shrinkHorizontally()
+                            ) {
                                 val currentCountryObj = uiState.availableCountries.find { it.name == uiState.selectedCountry }
                                 val isGlobal = uiState.selectedCountry == "Global" || uiState.selectedCountry == "All" || currentCountryObj?.code?.isEmpty() == true
                                 val flag = currentCountryObj?.flag ?: "🌐"
-
+                                var isFlagFocused by remember { mutableStateOf(false) }
                                 IconButton(
                                     onClick = { showCountryDialog = true },
-                                    modifier = Modifier.testTag("btn_header_country_picker")
+                                    modifier = Modifier
+                                        .onFocusChanged { isFlagFocused = it.isFocused }
+                                        .border(
+                                            width = if (isFlagFocused) 2.dp else 0.dp,
+                                            color = if (isFlagFocused) MaterialTheme.colorScheme.primary else Color.Transparent,
+                                            shape = RoundedCornerShape(8.dp)
+                                        )
+                                        .testTag("btn_header_country_picker")
                                 ) {
                                     if (isGlobal) {
                                         Icon(
                                             imageVector = Icons.Filled.Language,
                                             contentDescription = "Global",
-                                            tint = MaterialTheme.colorScheme.onSurface,
-                                            modifier = Modifier.size(24.dp)
+                                            tint = if (isFlagFocused) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
+                                            modifier = Modifier.size(if (isTv) 28.dp else 24.dp)
                                         )
                                     } else {
-                                        Text(text = flag, fontSize = 22.sp)
+                                        Text(text = flag, fontSize = if (isTv) 26.sp else 22.sp)
                                     }
                                 }
                             }
                         }
 
-                        Spacer(modifier = Modifier.height(10.dp)) // Minimal gap
-
-                        // Search Input
-                        OutlinedTextField(
-                            value = uiState.searchQuery,
-                            onValueChange = onSearchQueryChange,
-                            placeholder = { Text(stringResource(R.string.search_placeholder), color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)) },
-                            leadingIcon = { Icon(imageVector = Icons.Filled.Search, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)) },
-                            trailingIcon = {
-                                if (uiState.searchQuery.isNotEmpty()) {
-                                    IconButton(onClick = { onSearchQueryChange("") }) {
-                                        Icon(
-                                            imageVector = Icons.Filled.Close,
-                                            contentDescription = "Clear search",
-                                            tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
-                                        )
-                                    }
-                                }
-                            },
-                            singleLine = true,
-                            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-                            keyboardActions = KeyboardActions(
-                                onSearch = {
-                                    keyboardController?.hide()
-                                    if (uiState.searchQuery.isNotBlank()) {
-                                        onSaveSearchQuery(uiState.searchQuery)
-                                    }
-                                }
-                            ),
-                            shape = RoundedCornerShape(16.dp),
-                            colors = OutlinedTextFieldDefaults.colors(
-                                focusedContainerColor = MaterialTheme.colorScheme.surface,
-                                unfocusedContainerColor = MaterialTheme.colorScheme.surface,
-                                focusedBorderColor = MaterialTheme.colorScheme.primary,
-                                unfocusedBorderColor = Color.Transparent,
-                                focusedTextColor = MaterialTheme.colorScheme.onSurface,
-                                unfocusedTextColor = MaterialTheme.colorScheme.onSurface
-                            ),
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .testTag("input_search_stations")
-                        )
-
-                        // Search Suggestions
+                        // Search Suggestions (shown when search is active)
                         val suggestions = remember(uiState.recentSearchQueries, uiState.searchQuery) {
                             val trimmed = uiState.searchQuery.trim()
-                            if (trimmed.isEmpty()) {
-                                uiState.recentSearchQueries
-                            } else {
-                                uiState.recentSearchQueries.filter {
-                                    it.contains(trimmed, ignoreCase = true)
-                                }
-                            }
+                            if (trimmed.isEmpty()) uiState.recentSearchQueries
+                            else uiState.recentSearchQueries.filter { it.contains(trimmed, ignoreCase = true) }
                         }
 
-                        if (suggestions.isNotEmpty()) {
+                        if (isSearchExpanded && suggestions.isNotEmpty()) {
                             Spacer(modifier = Modifier.height(8.dp))
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
@@ -444,8 +603,10 @@ fun HomeScreen(
                                         else Color.Transparent
                                     )
                                     .border(
-                                        width = if (isPillFocused) 2.dp else if (isSelected) 0.dp else 1.dp,
-                                        color = if (isPillFocused) MaterialTheme.colorScheme.primary else if (isSelected) Color.Transparent else MaterialTheme.colorScheme.outline,
+                                        width = if (isPillFocused) 2.5.dp else if (isSelected) 0.dp else 1.dp,
+                                        color = if (isPillFocused) {
+                                            if (isSelected) Color.White else MaterialTheme.colorScheme.primary
+                                        } else if (isSelected) Color.Transparent else MaterialTheme.colorScheme.outline,
                                         shape = CircleShape
                                     )
                                     .clickable {
@@ -468,228 +629,173 @@ fun HomeScreen(
                     }
                 }
 
-                // Recent Streams Section
-                val activeRecentList = displayedRecentList
-                if (activeRecentList.isNotEmpty() && uiState.searchQuery.isEmpty() && uiState.selectedGenre == "All") {
-                    item(span = { GridItemSpan(maxLineSpan) }) {
-                        Text(
-                            text = stringResource(R.string.recent_streams),
-                            style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
-                            color = MaterialTheme.colorScheme.onSurface,
-                            modifier = Modifier.padding(vertical = 8.dp)
-                        )
+                // ── Continue & Discover Section (Recent, Most Played & Featured) ──
+                // Unified section with interactive toggle chips.
+                val hasContinueOrFeatured = displayedRecentList.isNotEmpty() || displayedMostPlayedList.isNotEmpty() || featuredList.isNotEmpty()
+                if (hasContinueOrFeatured && uiState.searchQuery.isEmpty() && uiState.selectedGenre == "All") {
+                    val activeStreamList = when (continueListeningTab) {
+                        ContinueListeningTab.Recent -> displayedRecentList
+                        ContinueListeningTab.MostPlayed -> displayedMostPlayedList
+                        ContinueListeningTab.Featured -> featuredList
                     }
+
+                    // Header row: Section title + Recent / Most Played / Featured toggle chips
                     item(span = { GridItemSpan(maxLineSpan) }) {
-                        LazyRow(
-                            modifier = Modifier.fillMaxWidth(),
-                            contentPadding = PaddingValues(0.dp),
-                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 4.dp, bottom = 4.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
-                            items(activeRecentList.take(10)) { station ->
-                                RecentStationCard(
-                                    station = station,
-                                    isPlaying = uiState.currentStation?.id == station.id && uiState.isPlaying,
-                                    isDemoted = uiState.demotedStationIds.contains(station.id),
-                                    isListenLater = uiState.listenLaterItems.any { it.id == station.id },
-                                    onClick = { onStationSelect(station) },
-                                    onToggleFavorite = { onToggleFavorite(station) },
-                                    onToggleListenLater = { onToggleListenLater(station) },
-                                    onBlockStation = { onBlockStation(station) },
-                                    onDemoteStation = { onDemoteStation(station) },
-                                    onUndemoteStation = { onUndemoteStation(station) }
+                            Text(
+                                text = if (continueListeningTab == ContinueListeningTab.Featured) stringResource(R.string.tab_featured) else stringResource(R.string.continue_listening),
+                                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+
+                            Row(
+                                horizontalArrangement = Arrangement.spacedBy(6.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                ContinueTabChip(
+                                    label = stringResource(R.string.tab_recent),
+                                    isSelected = continueListeningTab == ContinueListeningTab.Recent,
+                                    modifier = if (continueListeningTab == ContinueListeningTab.Recent) Modifier.focusRequester(continueChipFocusRequester) else Modifier,
+                                    onClick = {
+                                        userExplicitlySelectedTab = true
+                                        continueListeningTab = ContinueListeningTab.Recent
+                                    }
+                                )
+                                ContinueTabChip(
+                                    label = stringResource(R.string.tab_most_played),
+                                    isSelected = continueListeningTab == ContinueListeningTab.MostPlayed,
+                                    modifier = if (continueListeningTab == ContinueListeningTab.MostPlayed) Modifier.focusRequester(continueChipFocusRequester) else Modifier,
+                                    onClick = {
+                                        userExplicitlySelectedTab = true
+                                        continueListeningTab = ContinueListeningTab.MostPlayed
+                                    }
+                                )
+                                ContinueTabChip(
+                                    label = stringResource(R.string.tab_featured),
+                                    isSelected = continueListeningTab == ContinueListeningTab.Featured,
+                                    modifier = if (continueListeningTab == ContinueListeningTab.Featured) Modifier.focusRequester(continueChipFocusRequester) else Modifier,
+                                    onClick = {
+                                        userExplicitlySelectedTab = true
+                                        continueListeningTab = ContinueListeningTab.Featured
+                                    }
                                 )
                             }
                         }
                     }
-                }
 
-                // Featured Station Hero Banner
-                if (uiState.stations.isNotEmpty() && uiState.searchQuery.isEmpty() && uiState.selectedGenre == "All") {
-                    val featured = uiState.stations.first()
-                    item(span = { GridItemSpan(maxLineSpan) }) {
-                        var isHeroFocused by remember { mutableStateOf(false) }
-                        var showHeroMenu by remember { mutableStateOf(false) }
-                        val isFeaturedDemoted = uiState.demotedStationIds.contains(featured.id)
-                        val heroScale by animateFloatAsState(
-                            targetValue = if (isHeroFocused) 1.03f else 1.0f,
-                            animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessLow),
-                            label = "hero_focus_scale"
-                        )
-                        
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 6.dp)
-                        ) {
-                            Surface(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .onFocusChanged { isHeroFocused = it.isFocused }
-                                    .focusable()
-                                    .onKeyEvent { keyEvent ->
-                                        if (keyEvent.type == KeyEventType.KeyUp) {
-                                            when (keyEvent.key) {
-                                                Key.DirectionCenter, Key.Enter, Key.NumPadEnter, Key.Spacebar -> {
-                                                    onStationSelect(featured)
-                                                    true
-                                                }
-                                                Key.Menu -> {
-                                                    showHeroMenu = true
-                                                    true
-                                                }
-                                                else -> false
-                                            }
-                                        } else false
+                    if (activeStreamList.isNotEmpty()) {
+                        val resumeStation = activeStreamList.first()
+                        val otherStations = activeStreamList.drop(1).take(10)
+
+                        item(span = { GridItemSpan(maxLineSpan) }) {
+                            val badgeText = when (continueListeningTab) {
+                                ContinueListeningTab.Recent -> stringResource(if (uiState.selectedTab == HomeTab.Podcast) R.string.continue_listening_podcast else R.string.continue_listening_radio)
+                                ContinueListeningTab.MostPlayed -> {
+                                    if (resumeStation.playCount > 0) {
+                                        "${stringResource(R.string.tab_most_played)} • ${resumeStation.playCount}"
+                                    } else {
+                                        stringResource(R.string.tab_most_played)
                                     }
-                                    .scale(heroScale)
-                                    .shadow(
-                                        elevation = if (isHeroFocused) 16.dp else 0.dp,
-                                        shape = RoundedCornerShape(20.dp),
-                                        spotColor = MaterialTheme.colorScheme.primary,
-                                        ambientColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
-                                    )
-                                    .clip(RoundedCornerShape(20.dp))
-                                    .combinedClickable(
-                                        onClick = { onStationSelect(featured) },
-                                        onLongClick = { showHeroMenu = true }
-                                    )
-                                    .border(
-                                        width = if (isHeroFocused) 3.5.dp else 0.dp,
-                                        brush = if (isHeroFocused) {
-                                            Brush.horizontalGradient(
-                                                listOf(
-                                                    MaterialTheme.colorScheme.primary,
-                                                    Color.White,
-                                                    MaterialTheme.colorScheme.primary
-                                                )
-                                            )
-                                        } else Brush.horizontalGradient(listOf(Color.Transparent, Color.Transparent)),
-                                        shape = RoundedCornerShape(20.dp)
-                                    )
-                                    .testTag("hero_featured_card"),
-                                color = MaterialTheme.colorScheme.surface
-                            ) {
-                                Box(modifier = Modifier.fillMaxWidth().height(if (isExpanded) 220.dp else 160.dp)) {
-                                    AsyncImage(
-                                        model = featured.imageUrl,
-                                        contentDescription = featured.name,
-                                        contentScale = ContentScale.Crop,
-                                        modifier = Modifier.fillMaxSize()
-                                    )
-                                    Box(
-                                        modifier = Modifier
-                                            .fillMaxSize()
-                                            .background(
-                                                Brush.verticalGradient(
-                                                    listOf(Color.Transparent, MaterialTheme.colorScheme.background.copy(alpha = 0.95f))
-                                                )
-                                            )
-                                    )
-                                    Row(
-                                        modifier = Modifier
-                                            .fillMaxSize()
-                                            .padding(if (isExpanded) 24.dp else 16.dp),
-                                        verticalAlignment = Alignment.Bottom,
-                                        horizontalArrangement = Arrangement.SpaceBetween
-                                    ) {
-                                        Column(modifier = Modifier.weight(1f)) {
-                                            Text(
-                                                text = stringResource(R.string.featured_station),
-                                                style = MaterialTheme.typography.labelMedium,
-                                                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
-                                                fontWeight = FontWeight.Bold
-                                            )
-                                            Text(
-                                                text = featured.name,
-                                                style = if (isExpanded) MaterialTheme.typography.headlineMedium else MaterialTheme.typography.titleLarge,
-                                                color = MaterialTheme.colorScheme.onSurface,
-                                                maxLines = 1,
-                                                overflow = TextOverflow.Ellipsis
-                                            )
-                                            Text(
-                                                text = "${featured.genre} • ${featured.bitrate}",
-                                                style = MaterialTheme.typography.bodyMedium,
-                                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                                            )
-                                        }
+                                }
+                                ContinueListeningTab.Featured -> stringResource(if (uiState.selectedTab == HomeTab.Podcast) R.string.featured_podcast else R.string.featured_station)
+                            }
 
-                                        Box(
-                                            modifier = Modifier
-                                                .size(if (isExpanded) 64.dp else 48.dp)
-                                                .clip(CircleShape)
-                                                .background(Color.White),
-                                            contentAlignment = Alignment.Center
-                                        ) {
-                                            val isFeaturedSelected = uiState.currentStation?.id == featured.id
-                                            if (isFeaturedSelected && uiState.isLoading) {
-                                                CircularProgressIndicator(
-                                                    modifier = Modifier.size(if (isExpanded) 32.dp else 24.dp),
-                                                    color = MaterialTheme.colorScheme.background,
-                                                    strokeWidth = 2.5.dp
-                                                )
-                                            } else {
-                                                Icon(
-                                                    imageVector = if (isFeaturedSelected && uiState.isPlaying) Icons.Filled.Pause else Icons.Filled.PlayArrow,
-                                                    contentDescription = "Play Featured",
-                                                    tint = MaterialTheme.colorScheme.background,
-                                                    modifier = Modifier.size(if (isExpanded) 32.dp else 24.dp)
-                                                )
-                                            }
-                                        }
+                            val badgeIcon = when (continueListeningTab) {
+                                ContinueListeningTab.Recent -> Icons.Filled.PlayArrow
+                                ContinueListeningTab.MostPlayed -> Icons.AutoMirrored.Filled.TrendingUp
+                                ContinueListeningTab.Featured -> Icons.Filled.Star
+                            }
+
+                            QuickResumeCard(
+                                station = resumeStation,
+                                isPodcast = uiState.selectedTab == HomeTab.Podcast,
+                                badgeText = badgeText,
+                                badgeIcon = badgeIcon,
+                                isExpanded = isExpanded,
+                                isPlaying = uiState.currentStation?.id == resumeStation.id && uiState.isPlaying,
+                                isLoading = uiState.currentStation?.id == resumeStation.id && uiState.isLoading,
+                                isDemoted = uiState.demotedStationIds.contains(resumeStation.id),
+                                modifier = Modifier.focusProperties {
+                                    up = continueChipFocusRequester
+                                },
+                                onClick = { onStationSelect(resumeStation) },
+                                onToggleFavorite = { onToggleFavorite(resumeStation) },
+                                onDemoteStation = { onDemoteStation(resumeStation) },
+                                onUndemoteStation = { onUndemoteStation(resumeStation) },
+                                onBlockStation = { onBlockStation(resumeStation) }
+                            )
+                        }
+
+                        if (otherStations.isNotEmpty()) {
+                            item(span = { GridItemSpan(maxLineSpan) }) {
+                                LazyRow(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    contentPadding = PaddingValues(0.dp),
+                                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                                ) {
+                                    items(otherStations) { station ->
+                                        RecentStationCard(
+                                            station = station,
+                                            isPlaying = uiState.currentStation?.id == station.id && uiState.isPlaying,
+                                            isDemoted = uiState.demotedStationIds.contains(station.id),
+                                            isListenLater = uiState.listenLaterItems.any { it.id == station.id },
+                                            onClick = { onStationSelect(station) },
+                                            onToggleFavorite = { onToggleFavorite(station) },
+                                            onToggleListenLater = { onToggleListenLater(station) },
+                                            onBlockStation = { onBlockStation(station) },
+                                            onDemoteStation = { onDemoteStation(station) },
+                                            onUndemoteStation = { onUndemoteStation(station) }
+                                        )
                                     }
                                 }
                             }
-                            
-                            DropdownMenu(
-                                expanded = showHeroMenu,
-                                onDismissRequest = { showHeroMenu = false },
-                                modifier = Modifier.background(MaterialTheme.colorScheme.surfaceVariant)
+                        }
+                    } else {
+                        // Empty state for the selected tab
+                        item(span = { GridItemSpan(maxLineSpan) }) {
+                            Surface(
+                                shape = RoundedCornerShape(16.dp),
+                                color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f),
+                                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.2f)),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 4.dp)
                             ) {
-                                DropdownMenuItem(
-                                    text = { Text(if (featured.isFavorite) stringResource(R.string.remove_from_favorites) else stringResource(R.string.add_to_favorites), color = MaterialTheme.colorScheme.onSurface) },
-                                    leadingIcon = { 
-                                        Icon(
-                                            imageVector = if (featured.isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder, 
-                                            contentDescription = null, 
-                                            tint = if (featured.isFavorite) FavoriteHeartColor else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
-                                        ) 
-                                    },
-                                    onClick = {
-                                        showHeroMenu = false
-                                        onToggleFavorite(featured)
-                                    }
-                                )
-                                
-                                DropdownMenuItem(
-                                    text = { 
-                                        Text(
-                                            if (isFeaturedDemoted) stringResource(R.string.move_to_top) else stringResource(R.string.move_to_bottom), 
-                                            color = MaterialTheme.colorScheme.onSurface
-                                        ) 
-                                    },
-                                    leadingIcon = { 
-                                        Icon(
-                                            imageVector = if (isFeaturedDemoted) Icons.Filled.ArrowUpward else Icons.Filled.ArrowDownward, 
-                                            contentDescription = null, 
-                                            tint = MaterialTheme.colorScheme.primary
-                                        ) 
-                                    },
-                                    onClick = {
-                                        showHeroMenu = false
-                                        if (isFeaturedDemoted) onUndemoteStation(featured) else onDemoteStation(featured)
-                                    }
-                                )
-
-                                HorizontalDivider(color = MaterialTheme.colorScheme.outline, thickness = 1.dp)
-
-                                DropdownMenuItem(
-                                    text = { Text(stringResource(R.string.block_this_station), color = Color(0xFFEF5350)) },
-                                    leadingIcon = { Icon(Icons.Filled.Block, contentDescription = null, tint = Color(0xFFEF5350)) },
-                                    onClick = {
-                                        showHeroMenu = false
-                                        onBlockStation(featured)
-                                    }
-                                )
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(16.dp),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                                ) {
+                                    Icon(
+                                        imageVector = when (continueListeningTab) {
+                                            ContinueListeningTab.Recent -> Icons.Outlined.History
+                                            ContinueListeningTab.MostPlayed -> Icons.AutoMirrored.Filled.TrendingUp
+                                            ContinueListeningTab.Featured -> Icons.Filled.Star
+                                        },
+                                        contentDescription = null,
+                                        tint = MaterialTheme.colorScheme.primary,
+                                        modifier = Modifier.size(24.dp)
+                                    )
+                                    Text(
+                                        text = stringResource(
+                                            when (continueListeningTab) {
+                                                ContinueListeningTab.Recent -> R.string.no_history_yet
+                                                ContinueListeningTab.MostPlayed -> R.string.no_most_played_yet
+                                                ContinueListeningTab.Featured -> R.string.no_featured_yet
+                                            }
+                                        ),
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
+                                    )
+                                }
                             }
                         }
                     }
@@ -1022,6 +1128,292 @@ fun CuratedStationCard(
                 }
             )
         }
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun QuickResumeCard(
+    station: RadioStation,
+    isPodcast: Boolean = false,
+    badgeText: String? = null,
+    badgeIcon: ImageVector = Icons.Filled.PlayArrow,
+    isExpanded: Boolean,
+    isPlaying: Boolean,
+    isLoading: Boolean,
+    isDemoted: Boolean = false,
+    onClick: () -> Unit,
+    onToggleFavorite: () -> Unit = {},
+    onDemoteStation: () -> Unit = {},
+    onUndemoteStation: () -> Unit = {},
+    onBlockStation: () -> Unit = {}
+) {
+    var isFocused by remember { mutableStateOf(false) }
+    var showMenu by remember { mutableStateOf(false) }
+    val haptic = LocalHapticFeedback.current
+    val focusScale by animateFloatAsState(
+        targetValue = if (isFocused) 1.02f else 1.0f,
+        animationSpec = tween(durationMillis = 150, easing = FastOutSlowInEasing),
+        label = "resume_card_scale"
+    )
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp)
+    ) {
+        Surface(
+            modifier = Modifier
+                .fillMaxWidth()
+                .onFocusChanged { isFocused = it.isFocused }
+                .focusable()
+                .onKeyEvent { keyEvent ->
+                    if (keyEvent.type == KeyEventType.KeyUp) {
+                        when (keyEvent.key) {
+                            Key.DirectionCenter, Key.Enter, Key.NumPadEnter, Key.Spacebar -> {
+                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                onClick()
+                                true
+                            }
+                            Key.Menu -> {
+                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                showMenu = true
+                                true
+                            }
+                            else -> false
+                        }
+                    } else false
+                }
+                .scale(focusScale)
+                .clip(RoundedCornerShape(16.dp))
+                .combinedClickable(
+                    onClick = {
+                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                        onClick()
+                    },
+                    onLongClick = {
+                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                        showMenu = true
+                    }
+                )
+                .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.45f))
+                .border(
+                    width = if (isFocused) 2.5.dp else 1.dp,
+                    color = if (isFocused) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline.copy(alpha = 0.25f),
+                    shape = RoundedCornerShape(16.dp)
+                )
+                .testTag("hero_featured_card"),
+            color = Color.Transparent
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(if (isExpanded) 96.dp else 82.dp)
+                    .padding(if (isExpanded) 12.dp else 10.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(14.dp)
+            ) {
+                // Station Art Thumbnail
+                val artSize = if (isExpanded) 72.dp else 62.dp
+                Box(
+                    modifier = Modifier
+                        .size(artSize)
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(MaterialTheme.colorScheme.surfaceVariant)
+                ) {
+                    AsyncImage(
+                        model = station.imageUrl,
+                        contentDescription = station.name,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
+
+                // Station Info Column
+                Column(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        Icon(
+                            imageVector = badgeIcon,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(12.dp)
+                        )
+                        Text(
+                            text = (badgeText ?: stringResource(if (isPodcast) R.string.continue_listening_podcast else R.string.continue_listening_radio)).uppercase(),
+                            style = MaterialTheme.typography.labelSmall.copy(
+                                fontWeight = FontWeight.ExtraBold,
+                                letterSpacing = 0.8.sp
+                            ),
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(2.dp))
+                    Text(
+                        text = station.name,
+                        style = if (isExpanded) MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold) 
+                                else MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
+                        color = MaterialTheme.colorScheme.onSurface,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    Spacer(modifier = Modifier.height(2.dp))
+                    Text(
+                        text = "${station.genre} • ${if (station.bitrate.isNotBlank()) station.bitrate else "Live"}",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+
+                // Action Button (Play / Pause / Loading)
+                Box(
+                    modifier = Modifier
+                        .size(if (isExpanded) 50.dp else 42.dp)
+                        .clip(CircleShape)
+                        .background(MaterialTheme.colorScheme.primary),
+                    contentAlignment = Alignment.Center
+                ) {
+                    if (isLoading) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(if (isExpanded) 24.dp else 20.dp),
+                            color = MaterialTheme.colorScheme.onPrimary,
+                            strokeWidth = 2.5.dp
+                        )
+                    } else {
+                        Icon(
+                            imageVector = if (isPlaying) Icons.Filled.Pause else Icons.Filled.PlayArrow,
+                            contentDescription = if (isPlaying) "Pause" else "Play",
+                            tint = MaterialTheme.colorScheme.onPrimary,
+                            modifier = Modifier.size(if (isExpanded) 26.dp else 22.dp)
+                        )
+                    }
+                }
+            }
+        }
+
+        // Context / Options Dropdown Menu
+        DropdownMenu(
+            expanded = showMenu,
+            onDismissRequest = { showMenu = false },
+            modifier = Modifier.background(MaterialTheme.colorScheme.surfaceVariant)
+        ) {
+            DropdownMenuItem(
+                text = {
+                    Text(
+                        text = if (station.isFavorite) stringResource(R.string.remove_from_favorites) else stringResource(R.string.add_to_favorites),
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                },
+                leadingIcon = {
+                    Icon(
+                        imageVector = if (station.isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
+                        contentDescription = null,
+                        tint = if (station.isFavorite) FavoriteHeartColor else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+                    )
+                },
+                onClick = {
+                    showMenu = false
+                    onToggleFavorite()
+                }
+            )
+
+            DropdownMenuItem(
+                text = {
+                    Text(
+                        text = if (isDemoted) stringResource(R.string.move_to_top) else stringResource(R.string.move_to_bottom),
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                },
+                leadingIcon = {
+                    Icon(
+                        imageVector = if (isDemoted) Icons.Filled.ArrowUpward else Icons.Filled.ArrowDownward,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                },
+                onClick = {
+                    showMenu = false
+                    if (isDemoted) onUndemoteStation() else onDemoteStation()
+                }
+            )
+
+            HorizontalDivider(color = MaterialTheme.colorScheme.outline, thickness = 1.dp)
+
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.block_this_station), color = Color(0xFFEF5350)) },
+                leadingIcon = { Icon(Icons.Filled.Block, contentDescription = null, tint = Color(0xFFEF5350)) },
+                onClick = {
+                    showMenu = false
+                    onBlockStation()
+                }
+            )
+        }
+    }
+}
+
+@Composable
+fun ContinueTabChip(
+    label: String,
+    isSelected: Boolean,
+    onClick: () -> Unit
+) {
+    var isFocused by remember { mutableStateOf(false) }
+    val haptic = LocalHapticFeedback.current
+
+    // Unmistakably distinguish Selected (persistent selection) vs Focused (remote cursor)
+    val chipBackground = when {
+        isSelected -> MaterialTheme.colorScheme.primary
+        isFocused -> MaterialTheme.colorScheme.surfaceVariant
+        else -> Color.Transparent
+    }
+
+    val chipBorderColor = when {
+        isSelected && isFocused -> Color.White
+        isFocused -> MaterialTheme.colorScheme.primary
+        isSelected -> Color.Transparent
+        else -> MaterialTheme.colorScheme.outline.copy(alpha = 0.35f)
+    }
+
+    val chipBorderWidth = when {
+        isSelected && isFocused -> 2.5.dp
+        isFocused -> 2.dp
+        isSelected -> 0.dp
+        else -> 1.dp
+    }
+
+    val chipTextColor = when {
+        isSelected -> MaterialTheme.colorScheme.background // High-contrast black on cyan
+        isFocused -> MaterialTheme.colorScheme.primary     // Cyan text on dark surface
+        else -> MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
+    }
+
+    Surface(
+        onClick = {
+            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+            onClick()
+        },
+        shape = RoundedCornerShape(16.dp),
+        color = chipBackground,
+        border = if (chipBorderWidth > 0.dp) BorderStroke(chipBorderWidth, chipBorderColor) else null,
+        modifier = Modifier
+            .onFocusChanged { isFocused = it.isFocused }
+            .padding(vertical = 2.dp)
+    ) {
+        Text(
+            text = label,
+            style = MaterialTheme.typography.labelMedium.copy(
+                fontWeight = if (isSelected || isFocused) FontWeight.Bold else FontWeight.Medium
+            ),
+            color = chipTextColor,
+            modifier = Modifier.padding(horizontal = 14.dp, vertical = 6.dp)
+        )
     }
 }
 

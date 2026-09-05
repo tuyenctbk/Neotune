@@ -426,4 +426,22 @@
     <string name="speed_format">%1$sx</string>
     <string name="settings_auto_screensaver">Gaisotnes ekrānsaudzētājs</string>
     <string name="settings_auto_screensaver_desc">Automātiski palaist ekrānsaudzētāju pēc 5 minūšu dīkstāves</string>
+
+    <!-- Continue Listening / History Section -->
+    <string name="continue_listening">Turpināt klausīties</string>
+    <string name="continue_listening_radio">Turpināt radio</string>
+    <string name="continue_listening_podcast">Turpināt podcast</string>
+    <string name="tab_recent">Nesenie</string>
+    <string name="tab_most_played">Visvairāk atskaņotie</string>
+    <string name="no_history_yet">Vēl nav vēstures — sāciet klausīties!</string>
+    <string name="no_most_played_yet">Atskaņojiet stacijas, lai redzētu favorītus</string>
+
+    <!-- App icon / favicon accessibility -->
+    <string name="app_icon_desc">NeoTune ikona</string>
+    <string name="search_expand_hint">Pieskarieties, lai meklētu</string>
+    <string name="search_collapse_hint">Sakļaut meklēšanu</string>
+    <string name="tab_featured">Ieteiktie</string>
+    <string name="featured_podcast">Ieteiktā aplāde</string>
+    <string name="no_featured_yet">Pašlaik nav ieteikto straumju</string>
+
 </resources>

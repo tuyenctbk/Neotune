@@ -427,4 +427,22 @@
 
     <string name="settings_auto_screensaver">एम्बिएंट स्क्रीनसेवर</string>
     <string name="settings_auto_screensaver_desc">5 मिनट की निष्क्रियता के बाद स्वचालित रूप से एम्बिएंट स्क्रीनसेवर प्रारंभ करें</string>
+
+    <!-- Continue Listening / History Section -->
+    <string name="continue_listening">सुनना जारी रखें</string>
+    <string name="continue_listening_radio">रेडियो जारी रखें</string>
+    <string name="continue_listening_podcast">पॉडकास्ट जारी रखें</string>
+    <string name="tab_recent">हाल के</string>
+    <string name="tab_most_played">सबसे ज्यादा बजाया</string>
+    <string name="no_history_yet">अभी कोई इतिहास नहीं — सुनना शुरू करें!</string>
+    <string name="no_most_played_yet">अपने टॉप पसंद देखने के लिए स्टेशन चलाएं</string>
+
+    <!-- App icon / favicon accessibility -->
+    <string name="app_icon_desc">NeoTune आइकन</string>
+    <string name="search_expand_hint">खोजने के लिए टैप करें</string>
+    <string name="search_collapse_hint">खोज बंद करें</string>
+    <string name="tab_featured">विशेष</string>
+    <string name="featured_podcast">विशेष पॉडकास्ट</string>
+    <string name="no_featured_yet">इस समय कोई विशेष स्ट्रीम उपलब्ध नहीं है</string>
+
 </resources>

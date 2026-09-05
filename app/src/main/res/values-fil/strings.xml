@@ -426,4 +426,22 @@
     <string name="speed_format">%1$sx</string>
     <string name="settings_auto_screensaver">Ambient Screensaver</string>
     <string name="settings_auto_screensaver_desc">Awtomatikong ilunsad ang ambient screensaver pagkatapos ng 5 minutong walang aktibidad</string>
+
+    <!-- Continue Listening / History Section -->
+    <string name="continue_listening">Ipagpatuloy ang pakikinig</string>
+    <string name="continue_listening_radio">Ipagpatuloy ang radyo</string>
+    <string name="continue_listening_podcast">Ipagpatuloy ang podcast</string>
+    <string name="tab_recent">Kamakailan</string>
+    <string name="tab_most_played">Pinakamaraming nilaro</string>
+    <string name="no_history_yet">Walang kasaysayan pa — magsimulang makinig!</string>
+    <string name="no_most_played_yet">I-play ang mga estasyon para makita ang iyong mga paborito</string>
+
+    <!-- App icon / favicon accessibility -->
+    <string name="app_icon_desc">Icon ng NeoTune</string>
+    <string name="search_expand_hint">I-tap para maghanap</string>
+    <string name="search_collapse_hint">I-collapse ang paghahanap</string>
+    <string name="tab_featured">Itinatampok</string>
+    <string name="featured_podcast">Itinatampok na podcast</string>
+    <string name="no_featured_yet">Walang itinatampok na stream sa kasalukuyan</string>
+
 </resources>

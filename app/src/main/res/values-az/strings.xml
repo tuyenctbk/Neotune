@@ -426,4 +426,22 @@
     <string name="speed_format">%1$sx</string>
     <string name="settings_auto_screensaver">Mühit ekran qoruyucusu</string>
     <string name="settings_auto_screensaver_desc">5 dəqiqə hərəkətsizlikdən sonra mühit ekran qoruyucusunu avtomatik işə salın</string>
+
+    <!-- Continue Listening / History Section -->
+    <string name="continue_listening">Dinləməyə davam et</string>
+    <string name="continue_listening_radio">Radionu dinləməyə davam et</string>
+    <string name="continue_listening_podcast">Podkastı dinləməyə davam et</string>
+    <string name="tab_recent">Son</string>
+    <string name="tab_most_played">Ən çox dinlənilən</string>
+    <string name="no_history_yet">Tarix yoxdur — dinləməyə başlayın!</string>
+    <string name="no_most_played_yet">Ən çox dinlənilənləri görmək üçün oynayın</string>
+
+    <!-- App icon / favicon accessibility -->
+    <string name="app_icon_desc">NeoTune ikonu</string>
+    <string name="search_expand_hint">Axtarmaq üçün vurun</string>
+    <string name="search_collapse_hint">Axtarışı bağla</string>
+    <string name="tab_featured">Seçilmişlər</string>
+    <string name="featured_podcast">Seçilmiş podkast</string>
+    <string name="no_featured_yet">Hal-hazırda seçilmiş yayım yoxdur</string>
+
 </resources>

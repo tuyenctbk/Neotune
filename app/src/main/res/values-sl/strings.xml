@@ -426,4 +426,22 @@
     <string name="speed_format">%1$sx</string>
     <string name="settings_auto_screensaver">Ambientni ohranjevalnik zaslona</string>
     <string name="settings_auto_screensaver_desc">Samodejno zaženi ohranjevalnik zaslona po 5 minutah nedejavnosti</string>
+
+    <!-- Continue Listening / History Section -->
+    <string name="continue_listening">Nadaljuj poslušanje</string>
+    <string name="continue_listening_radio">Nadaljuj radio</string>
+    <string name="continue_listening_podcast">Nadaljuj podcast</string>
+    <string name="tab_recent">Nedavno</string>
+    <string name="tab_most_played">Najpogosteje predvajano</string>
+    <string name="no_history_yet">Še ni zgodovine — začni poslušati!</string>
+    <string name="no_most_played_yet">Predvajaj postaje, da vidiš priljubljene</string>
+
+    <!-- App icon / favicon accessibility -->
+    <string name="app_icon_desc">Ikona NeoTune</string>
+    <string name="search_expand_hint">Dotaknite se za iskanje</string>
+    <string name="search_collapse_hint">Skrči iskanje</string>
+    <string name="tab_featured">Priporočeno</string>
+    <string name="featured_podcast">Priporočen podkast</string>
+    <string name="no_featured_yet">Trenutno ni priporočenih tokov</string>
+
 </resources>

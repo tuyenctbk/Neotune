@@ -426,4 +426,22 @@
     <string name="speed_format">%1$sx</string>
     <string name="settings_auto_screensaver">ამბიენტური ეკრანმზოგი</string>
     <string name="settings_auto_screensaver_desc">ეკრანმზოგის ავტომატური გაშვება 5 წუთის უმოქმედობის შემდეგ</string>
+
+    <!-- Continue Listening / History Section -->
+    <string name="continue_listening">მოსმენის გაგრძელება</string>
+    <string name="continue_listening_radio">რადიოს გაგრძელება</string>
+    <string name="continue_listening_podcast">პოდკასტის გაგრძელება</string>
+    <string name="tab_recent">ბოლოს</string>
+    <string name="tab_most_played">ყველაზე ხშირად</string>
+    <string name="no_history_yet">ჯერ ისტორია არ არის — დაიწყეთ მოსმენა!</string>
+    <string name="no_most_played_yet">გაუშვი სადგურები საუკეთესოების სანახავად</string>
+
+    <!-- App icon / favicon accessibility -->
+    <string name="app_icon_desc">NeoTune-ის ხატი</string>
+    <string name="search_expand_hint">ძებნისთვის შეეხეთ</string>
+    <string name="search_collapse_hint">ძებნის ჩახუფვა</string>
+    <string name="tab_featured">რჩეული</string>
+    <string name="featured_podcast">რჩეული პოდკასტი</string>
+    <string name="no_featured_yet">ამჟამად რჩეული ნაკადები არ არის</string>
+
 </resources>

@@ -426,4 +426,22 @@
     <string name="speed_format">%1$sx</string>
     <string name="settings_auto_screensaver">Միջավայրի էկրանապահ</string>
     <string name="settings_auto_screensaver_desc">Ավտոմատ գործարկել էկրանապահը 5 րոպե անգործությունից հետո</string>
+
+    <!-- Continue Listening / History Section -->
+    <string name="continue_listening">Շարունակել լսել</string>
+    <string name="continue_listening_radio">Շարունակել ռադիոն</string>
+    <string name="continue_listening_podcast">Շարունակել podcast-ը</string>
+    <string name="tab_recent">Վերջին</string>
+    <string name="tab_most_played">Ամենաշատ նվագված</string>
+    <string name="no_history_yet">Դեռ պատմություն չկա — սկսեք լսել!</string>
+    <string name="no_most_played_yet">Ռադիոկայաններ նվագելու դեպքում կհայտնվեն</string>
+
+    <!-- App icon / favicon accessibility -->
+    <string name="app_icon_desc">NeoTune պատկերանշան</string>
+    <string name="search_expand_hint">Հպեք որոնելու համար</string>
+    <string name="search_collapse_hint">Ծալել որոնումը</string>
+    <string name="tab_featured">Ընտրված</string>
+    <string name="featured_podcast">Ընտրված փոդքասթ</string>
+    <string name="no_featured_yet">Այս պահին ընտրված հեռարձակումներ չկան</string>
+
 </resources>

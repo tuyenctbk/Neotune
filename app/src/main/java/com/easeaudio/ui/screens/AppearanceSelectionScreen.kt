@@ -372,24 +372,34 @@ fun ThemeSelectionCard(
                     modifier = Modifier.fillMaxSize(),
                     verticalArrangement = Arrangement.SpaceBetween
                 ) {
-                    // Header line
+                    // Header: favicon dot + search pill (mirrors new top bar)
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
+                        horizontalArrangement = Arrangement.spacedBy(4.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
+                        // Favicon dot
                         Box(
                             modifier = Modifier
-                                .width(34.dp)
-                                .height(4.dp)
-                                .clip(RoundedCornerShape(2.dp))
-                                .background(theme.textPrimary.copy(alpha = 0.85f))
+                                .size(7.dp)
+                                .clip(CircleShape)
+                                .background(theme.primary)
                         )
+                        // Search pill
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                                .height(5.dp)
+                                .clip(RoundedCornerShape(2.5.dp))
+                                .background(theme.surface)
+                                .border(0.5.dp, theme.cardBorder, RoundedCornerShape(2.5.dp))
+                        )
+                        // Globe icon dot
                         Box(
                             modifier = Modifier
                                 .size(5.dp)
                                 .clip(CircleShape)
-                                .background(theme.primary)
+                                .background(theme.textMuted.copy(alpha = 0.7f))
                         )
                     }
 

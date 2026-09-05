@@ -426,4 +426,22 @@
     <string name="speed_format">%1$sx</string>
     <string name="settings_auto_screensaver">ایمبینٹ اسکرین سیور</string>
     <string name="settings_auto_screensaver_desc">5 منٹ کی غیر سرگرمی کے بعد خودکار طور پر اسکرین سیور شروع کریں</string>
+
+    <!-- Continue Listening / History Section -->
+    <string name="continue_listening">سننا جاری رکھیں</string>
+    <string name="continue_listening_radio">ریڈیو جاری رکھیں</string>
+    <string name="continue_listening_podcast">پوڈکاسٹ جاری رکھیں</string>
+    <string name="tab_recent">حالیہ</string>
+    <string name="tab_most_played">سب سے زیادہ چلایا گیا</string>
+    <string name="no_history_yet">ابھی تک کوئی تاریخ نہیں — سننا شروع کریں!</string>
+    <string name="no_most_played_yet">اپنے ٹاپ انتخاب دیکھنے کے لیے اسٹیشن چلائیں</string>
+
+    <!-- App icon / favicon accessibility -->
+    <string name="app_icon_desc">NeoTune آئیکن</string>
+    <string name="search_expand_hint">تلاش کرنے کے لیے ٹیپ کریں</string>
+    <string name="search_collapse_hint">تلاش بند کریں</string>
+    <string name="tab_featured">نمایاں</string>
+    <string name="featured_podcast">نمایاں پوڈ کاسٹ</string>
+    <string name="no_featured_yet">فی الحال کوئی نمایاں سلسلہ دستیاب نہیں ہے</string>
+
 </resources>

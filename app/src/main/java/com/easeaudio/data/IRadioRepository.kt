@@ -32,6 +32,7 @@ interface IRadioRepository {
 
     fun getFavoriteStations(): Flow<List<RadioStation>>
     fun getRecentStations(): Flow<List<RadioStation>>
+    fun getMostPlayedStations(): Flow<List<RadioStation>>
 
     fun getListenLaterItems(): Flow<List<ListenLaterItem>>
     suspend fun toggleListenLater(station: RadioStation)

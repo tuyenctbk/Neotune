@@ -426,4 +426,22 @@
     <string name="speed_format">%1$sx</string>
     <string name="settings_auto_screensaver">Omringende skermskut</string>
     <string name="settings_auto_screensaver_desc">Begin omringende skermskut outomaties na 5 minute se onaktiwiteit</string>
+
+    <!-- Continue Listening / History Section -->
+    <string name="continue_listening">Gaan luister</string>
+    <string name="continue_listening_radio">Gaan radio luister</string>
+    <string name="continue_listening_podcast">Gaan podcast luister</string>
+    <string name="tab_recent">Onlangs</string>
+    <string name="tab_most_played">Meeste gespeel</string>
+    <string name="no_history_yet">Nog geen geskiedenis — begin luister!</string>
+    <string name="no_most_played_yet">Speel stasies om jou topkeuses hier te sien</string>
+
+    <!-- App icon / favicon accessibility -->
+    <string name="app_icon_desc">NeoTune-ikoon</string>
+    <string name="search_expand_hint">Tik om te soek</string>
+    <string name="search_collapse_hint">Sluit soek</string>
+    <string name="tab_featured">Uitgestal</string>
+    <string name="featured_podcast">Uitgestalde potgooi</string>
+    <string name="no_featured_yet">Geen uitgestalde strome op die oomblik nie</string>
+
 </resources>

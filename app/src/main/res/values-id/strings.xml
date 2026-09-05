@@ -426,4 +426,22 @@
     <string name="speed_format">%1$sx</string>
     <string name="settings_auto_screensaver">Screensaver Ambien</string>
     <string name="settings_auto_screensaver_desc">Luncurkan screensaver ambien otomatis setelah 5 menit tidak ada aktivitas</string>
+
+    <!-- Continue Listening / History Section -->
+    <string name="continue_listening">Lanjutkan mendengarkan</string>
+    <string name="continue_listening_radio">Lanjutkan radio</string>
+    <string name="continue_listening_podcast">Lanjutkan podcast</string>
+    <string name="tab_recent">Terbaru</string>
+    <string name="tab_most_played">Paling sering diputar</string>
+    <string name="no_history_yet">Belum ada riwayat — mulai mendengarkan!</string>
+    <string name="no_most_played_yet">Mainkan stasiun untuk melihat pilihan terbaik</string>
+
+    <!-- App icon / favicon accessibility -->
+    <string name="app_icon_desc">Ikon NeoTune</string>
+    <string name="search_expand_hint">Ketuk untuk mencari</string>
+    <string name="search_collapse_hint">Ciutkan pencarian</string>
+    <string name="tab_featured">Unggulan</string>
+    <string name="featured_podcast">Podcast Unggulan</string>
+    <string name="no_featured_yet">Belum ada streaming unggulan saat ini</string>
+
 </resources>

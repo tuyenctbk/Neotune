@@ -426,4 +426,22 @@
     <string name="speed_format">%1$sx</string>
     <string name="settings_auto_screensaver">Ambient pauseskjerm</string>
     <string name="settings_auto_screensaver_desc">Start pauseskjerm automatisk etter 5 minutters inaktivitet</string>
+
+    <!-- Continue Listening / History Section -->
+    <string name="continue_listening">Fortsett å lytte</string>
+    <string name="continue_listening_radio">Fortsett radio</string>
+    <string name="continue_listening_podcast">Fortsett podcast</string>
+    <string name="tab_recent">Nylige</string>
+    <string name="tab_most_played">Mest spilt</string>
+    <string name="no_history_yet">Ingen historikk ennå — begynn å lytte!</string>
+    <string name="no_most_played_yet">Spill av stasjoner for å se favorittene dine</string>
+
+    <!-- App icon / favicon accessibility -->
+    <string name="app_icon_desc">NeoTune-ikon</string>
+    <string name="search_expand_hint">Trykk for å søke</string>
+    <string name="search_collapse_hint">Skjul søk</string>
+    <string name="tab_featured">Utvalgte</string>
+    <string name="featured_podcast">Utvalgt podkast</string>
+    <string name="no_featured_yet">Ingen utvalgte strømmer for øyeblikket</string>
+
 </resources>

@@ -431,4 +431,22 @@
 
     <string name="settings_auto_screensaver">שומר מסך אווירתי</string>
     <string name="settings_auto_screensaver_desc">הפעל שומר מסך אווירתי באופן אוטומטי לאחר 5 דקות של חוסر פעילות</string>
+
+    <!-- Continue Listening / History Section -->
+    <string name="continue_listening">המשך להאזין</string>
+    <string name="continue_listening_radio">המשך לרדיו</string>
+    <string name="continue_listening_podcast">המשך פודקאסט</string>
+    <string name="tab_recent">אחרונים</string>
+    <string name="tab_most_played">מושמעים ביותר</string>
+    <string name="no_history_yet">אין היסטוריה עדיין — התחל להאזין!</string>
+    <string name="no_most_played_yet">הפעל תחנות כדי לראות את המועדפים שלך</string>
+
+    <!-- App icon / favicon accessibility -->
+    <string name="app_icon_desc">סמל NeoTune</string>
+    <string name="search_expand_hint">הקש לחיפוש</string>
+    <string name="search_collapse_hint">כווץ חיפוש</string>
+    <string name="tab_featured">מומלצים</string>
+    <string name="featured_podcast">פודקאסט מומלץ</string>
+    <string name="no_featured_yet">אין כרגע שידורים מומלצים</string>
+
 </resources>

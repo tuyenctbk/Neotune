@@ -13,6 +13,8 @@ data class HomeUiState(
     val recentStations: List<RadioStation> = emptyList(),
     val recentRadioStations: List<RadioStation> = emptyList(),
     val recentPodcastStations: List<RadioStation> = emptyList(),
+    val mostPlayedRadioStations: List<RadioStation> = emptyList(),
+    val mostPlayedPodcastStations: List<RadioStation> = emptyList(),
     val favoriteStations: List<RadioStation> = emptyList(),
     val listenLaterItems: List<com.easeaudio.data.ListenLaterItem> = emptyList(),
     val blockedStations: List<RadioStation> = emptyList(),
