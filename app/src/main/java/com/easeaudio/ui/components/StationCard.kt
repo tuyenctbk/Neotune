@@ -183,12 +183,18 @@ fun StationCard(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     val cardContext = LocalContext.current
-                    val imageRequest = remember(station.imageUrl) {
+                    val resolvedImageUrl = remember(station.name, station.imageUrl) {
+                        com.easeaudio.util.StationLogoResolver.resolveStationLogo(
+                            name = station.name,
+                            favicon = station.imageUrl,
+                            homepage = "",
+                            tags = station.genre
+                        )
+                    }
+                    val imageRequest = remember(resolvedImageUrl) {
                         coil.request.ImageRequest.Builder(cardContext)
-                            .data(station.imageUrl.ifBlank { null })
+                            .data(resolvedImageUrl.ifBlank { null })
                             .crossfade(true)
-                            .placeholder(R.drawable.ic_favicon)
-                            .error(R.drawable.ic_favicon)
                             .build()
                     }
                     Box(
@@ -202,11 +208,31 @@ fun StationCard(
                                 shape = RoundedCornerShape(14.dp)
                             )
                     ) {
-                        AsyncImage(
+                        coil.compose.SubcomposeAsyncImage(
                             model = imageRequest,
                             contentDescription = station.name,
                             contentScale = ContentScale.Crop,
-                            modifier = Modifier.fillMaxSize()
+                            modifier = Modifier.fillMaxSize(),
+                            loading = {
+                                Box(
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Icon(
+                                        painter = androidx.compose.ui.res.painterResource(id = R.drawable.ic_favicon),
+                                        contentDescription = null,
+                                        tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.35f),
+                                        modifier = Modifier.size(24.dp)
+                                    )
+                                }
+                            },
+                            error = {
+                                StationMonogramAvatar(
+                                    name = station.name,
+                                    genre = station.genre,
+                                    modifier = Modifier.fillMaxSize()
+                                )
+                            }
                         )
                         if (isSelected) {
                             Box(

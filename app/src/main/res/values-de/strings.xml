@@ -461,4 +461,5 @@
     <string name="featured_podcast">Empfohlener Podcast</string>
     <string name="no_featured_yet">Derzeit keine empfohlenen Streams</string>
 
+    <string name="quick_resume">Schnell fortsetzen</string>
 </resources>

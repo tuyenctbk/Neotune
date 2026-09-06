@@ -201,7 +201,8 @@ object RadioBrowserService {
                             rawUrl.isNotBlank() -> rawUrl
                             else -> ""
                         }
-                        val favicon = item.optString("favicon", "")
+                        val favicon = item.optString("favicon", "").trim()
+                        val homepage = item.optString("homepage", "").trim()
                         val country = item.optString("country", "Global")
                         val tags = item.optString("tags", "General")
                         val bitrateVal = item.optInt("bitrate", 128)
@@ -213,7 +214,12 @@ object RadioBrowserService {
                                       tags.contains("explicit", ignoreCase = true)
                         
                         if (!isAdult && name.isNotBlank() && streamUrl.isNotBlank() && (streamUrl.startsWith("http://") || streamUrl.startsWith("https://"))) {
-                            val imageUrl = if (favicon.startsWith("http")) favicon else getRandomDefaultImage(tags)
+                            val imageUrl = com.easeaudio.util.StationLogoResolver.resolveStationLogo(
+                                name = name,
+                                favicon = favicon,
+                                homepage = homepage,
+                                tags = tags
+                            )
                             val rawGenre = tags.split(",").firstOrNull { t ->
                                 val lower = t.trim().lowercase()
                                 lower != "radio" && lower != "live" && lower != "online" && lower != "stream"
@@ -281,20 +287,7 @@ object RadioBrowserService {
     }
 
     private fun getRandomDefaultImage(tags: String): String {
-        return when {
-            tags.contains("news", true) || tags.contains("talk", true) || tags.contains("report", true) ->
-                "https://images.unsplash.com/photo-1585829365295-ab7cd400c167?auto=format&fit=crop&w=600&q=80"
-            tags.contains("jazz", true) ->
-                "https://images.unsplash.com/photo-1511192336575-5a79af67a629?auto=format&fit=crop&w=600&q=80"
-            tags.contains("lofi", true) || tags.contains("chill", true) ->
-                "https://images.unsplash.com/photo-1518609878373-06d740f60d8b?auto=format&fit=crop&w=600&q=80"
-            tags.contains("rock", true) ->
-                "https://images.unsplash.com/photo-1498038432885-c6f3f1b912ee?auto=format&fit=crop&w=600&q=80"
-            tags.contains("classical", true) || tags.contains("piano", true) ->
-                "https://images.unsplash.com/photo-1520523839897-bd0b52f945a0?auto=format&fit=crop&w=600&q=80"
-            else ->
-                "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=600&q=80"
-        }
+        return com.easeaudio.util.StationLogoResolver.getRandomDefaultImage(tags)
     }
 
     /**

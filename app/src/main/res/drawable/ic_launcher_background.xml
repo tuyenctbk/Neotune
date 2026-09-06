@@ -6,48 +6,93 @@
     android:viewportWidth="512"
     android:viewportHeight="512">
 
-    <!-- Cosmic Radial Dark Gradient Canvas -->
+    <!-- Deep Cyber-Obsidian Canvas Base -->
     <path android:pathData="M 0,0 h 512 v 512 h -512 z">
         <aapt:attr name="android:fillColor">
             <gradient
                 android:centerX="256"
-                android:centerY="102.4"
-                android:gradientRadius="409.6"
+                android:centerY="180"
+                android:gradientRadius="420"
                 android:type="radial">
-                <item android:offset="0.0" android:color="#FF280F4A" />
-                <item android:offset="0.55" android:color="#FF120524" />
-                <item android:offset="1.0" android:color="#FF06020D" />
+                <item android:offset="0.0" android:color="#FF0D1527" />
+                <item android:offset="0.45" android:color="#FF070B18" />
+                <item android:offset="0.85" android:color="#FF03050C" />
+                <item android:offset="1.0" android:color="#FF010206" />
             </gradient>
         </aapt:attr>
     </path>
 
-    <!-- Concentric Ambient Audio Waves -->
-    <path
-        android:strokeColor="#1500F0FF"
-        android:strokeWidth="1.5"
-        android:pathData="M 256,256 m -140,0 a 140,140 0 1,0 280,0 a 140,140 0 1,0 -280,0" />
-    <path
-        android:strokeColor="#10A855F7"
-        android:strokeWidth="1.5"
-        android:pathData="M 256,256 m -190,0 a 190,190 0 1,0 380,0 a 190,190 0 1,0 -380,0" />
-    <path
-        android:strokeColor="#0DEC4899"
-        android:strokeWidth="1.5"
-        android:pathData="M 256,256 m -230,0 a 230,230 0 1,0 460,0 a 230,230 0 1,0 -460,0" />
-
-    <!-- Ambient Cyan Glow (Centered behind transmitter and equalizer) -->
-    <path android:pathData="M 256,256 m -180,0 a 180,180 0 1,0 360,0 a 180,180 0 1,0 -360,0">
+    <!-- Bottom Audio Resonance Floor Glow (Synth Magenta) -->
+    <path android:pathData="M 0,220 h 512 v 292 h -512 z">
         <aapt:attr name="android:fillColor">
             <gradient
                 android:centerX="256"
-                android:centerY="240"
-                android:gradientRadius="180"
+                android:centerY="460"
+                android:gradientRadius="240"
                 android:type="radial">
-                <item android:offset="0.0" android:color="#3000F0FF" />
-                <item android:offset="0.5" android:color="#14A855F7" />
+                <item android:offset="0.0" android:color="#2CE879F9" />
+                <item android:offset="0.5" android:color="#15EC4899" />
                 <item android:offset="1.0" android:color="#00000000" />
             </gradient>
         </aapt:attr>
     </path>
+
+    <!-- Primary Transmitter Core Bloom (Behind Beacon & Arch Apex) -->
+    <path android:pathData="M 256,210 m -210,0 a 210,210 0 1,0 420,0 a 210,210 0 1,0 -420,0">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:centerX="256"
+                android:centerY="190"
+                android:gradientRadius="200"
+                android:type="radial">
+                <item android:offset="0.0" android:color="#5000F0FF" />
+                <item android:offset="0.32" android:color="#3238BDF8" />
+                <item android:offset="0.65" android:color="#188B5CF6" />
+                <item android:offset="1.0" android:color="#00000000" />
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- Sub-bass Violet Halo (Centered on Equalizer Core) -->
+    <path android:pathData="M 256,280 m -170,0 a 170,170 0 1,0 340,0 a 170,170 0 1,0 -340,0">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:centerX="256"
+                android:centerY="290"
+                android:gradientRadius="160"
+                android:type="radial">
+                <item android:offset="0.0" android:color="#38A855F7" />
+                <item android:offset="0.55" android:color="#166366F1" />
+                <item android:offset="1.0" android:color="#00000000" />
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- Cyber Reticle / Acoustic Crosshairs (Subtle Precision HUD Lines) -->
+    <path
+        android:strokeColor="#1838BDF8"
+        android:strokeWidth="1.5"
+        android:strokeLineCap="round"
+        android:pathData="M 256,48 V 88 M 256,424 V 464 M 48,256 H 88 M 424,256 H 464" />
+
+    <!-- Outer Sonic Harmonic Rings (Distinct, High-Def Ripple Waves) -->
+    <path
+        android:strokeColor="#2200F0FF"
+        android:strokeWidth="2.5"
+        android:pathData="M 256,256 m -135,0 a 135,135 0 1,0 270,0 a 135,135 0 1,0 -270,0" />
+    <path
+        android:strokeColor="#1C818CF8"
+        android:strokeWidth="2.0"
+        android:pathData="M 256,256 m -185,0 a 185,185 0 1,0 370,0 a 185,185 0 1,0 -370,0" />
+    <path
+        android:strokeColor="#14C084FC"
+        android:strokeWidth="2.0"
+        android:pathData="M 256,256 m -230,0 a 230,230 0 1,0 460,0 a 230,230 0 1,0 -460,0" />
+
+    <!-- Corner Ambient Flares for Full Edge Bleed (adaptive squircle/round fill) -->
+    <path
+        android:strokeColor="#1000F0FF"
+        android:strokeWidth="1.5"
+        android:pathData="M 256,256 m -245,0 a 245,245 0 1,0 490,0 a 245,245 0 1,0 -490,0" />
 
 </vector>

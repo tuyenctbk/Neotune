@@ -21,6 +21,8 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.rememberScrollState
 import androidx.activity.compose.BackHandler
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.foundation.lazy.LazyRow
@@ -88,8 +90,6 @@ import androidx.compose.ui.res.stringResource
 import com.easeaudio.R
 import com.easeaudio.data.RadioStation
 import com.easeaudio.ui.components.StationCard
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
 import com.easeaudio.ui.theme.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
@@ -641,50 +641,115 @@ fun HomeScreen(
 
                     // Header row: Section title + Recent / Most Played / Featured toggle chips
                     item(span = { GridItemSpan(maxLineSpan) }) {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(top = 4.dp, bottom = 4.dp),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
-                                text = if (continueListeningTab == ContinueListeningTab.Featured) stringResource(R.string.tab_featured) else stringResource(R.string.continue_listening),
-                                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-                                color = MaterialTheme.colorScheme.onSurface
-                            )
-
+                        if (isExpanded) {
+                            // Large screen (TV / Tablet): Title on left, filter chips on right
                             Row(
-                                horizontalArrangement = Arrangement.spacedBy(6.dp),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(top = 16.dp, bottom = 8.dp),
+                                horizontalArrangement = Arrangement.SpaceBetween,
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                ContinueTabChip(
-                                    label = stringResource(R.string.tab_recent),
-                                    isSelected = continueListeningTab == ContinueListeningTab.Recent,
-                                    modifier = if (continueListeningTab == ContinueListeningTab.Recent) Modifier.focusRequester(continueChipFocusRequester) else Modifier,
-                                    onClick = {
-                                        userExplicitlySelectedTab = true
-                                        continueListeningTab = ContinueListeningTab.Recent
-                                    }
+                                Text(
+                                    text = stringResource(R.string.continue_listening),
+                                    style = MaterialTheme.typography.titleLarge.copy(
+                                        fontWeight = FontWeight.Bold,
+                                        letterSpacing = (-0.3).sp
+                                    ),
+                                    color = MaterialTheme.colorScheme.onSurface
                                 )
-                                ContinueTabChip(
-                                    label = stringResource(R.string.tab_most_played),
-                                    isSelected = continueListeningTab == ContinueListeningTab.MostPlayed,
-                                    modifier = if (continueListeningTab == ContinueListeningTab.MostPlayed) Modifier.focusRequester(continueChipFocusRequester) else Modifier,
-                                    onClick = {
-                                        userExplicitlySelectedTab = true
-                                        continueListeningTab = ContinueListeningTab.MostPlayed
-                                    }
+
+                                Row(
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    ContinueTabChip(
+                                        label = stringResource(R.string.tab_recent),
+                                        icon = Icons.Outlined.History,
+                                        isSelected = continueListeningTab == ContinueListeningTab.Recent,
+                                        modifier = if (continueListeningTab == ContinueListeningTab.Recent) Modifier.focusRequester(continueChipFocusRequester) else Modifier,
+                                        onClick = {
+                                            userExplicitlySelectedTab = true
+                                            continueListeningTab = ContinueListeningTab.Recent
+                                        }
+                                    )
+                                    ContinueTabChip(
+                                        label = stringResource(R.string.tab_most_played),
+                                        icon = Icons.AutoMirrored.Filled.TrendingUp,
+                                        isSelected = continueListeningTab == ContinueListeningTab.MostPlayed,
+                                        modifier = if (continueListeningTab == ContinueListeningTab.MostPlayed) Modifier.focusRequester(continueChipFocusRequester) else Modifier,
+                                        onClick = {
+                                            userExplicitlySelectedTab = true
+                                            continueListeningTab = ContinueListeningTab.MostPlayed
+                                        }
+                                    )
+                                    ContinueTabChip(
+                                        label = stringResource(R.string.tab_featured),
+                                        icon = Icons.Filled.Star,
+                                        isSelected = continueListeningTab == ContinueListeningTab.Featured,
+                                        modifier = if (continueListeningTab == ContinueListeningTab.Featured) Modifier.focusRequester(continueChipFocusRequester) else Modifier,
+                                        onClick = {
+                                            userExplicitlySelectedTab = true
+                                            continueListeningTab = ContinueListeningTab.Featured
+                                        }
+                                    )
+                                }
+                            }
+                        } else {
+                            // Compact / Mobile phone layout: 2 clean tiers with plenty of breathing room
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(top = 16.dp, bottom = 8.dp),
+                                verticalArrangement = Arrangement.spacedBy(10.dp)
+                            ) {
+                                Text(
+                                    text = stringResource(R.string.continue_listening),
+                                    style = MaterialTheme.typography.titleLarge.copy(
+                                        fontWeight = FontWeight.Bold,
+                                        letterSpacing = (-0.3).sp
+                                    ),
+                                    color = MaterialTheme.colorScheme.onSurface
                                 )
-                                ContinueTabChip(
-                                    label = stringResource(R.string.tab_featured),
-                                    isSelected = continueListeningTab == ContinueListeningTab.Featured,
-                                    modifier = if (continueListeningTab == ContinueListeningTab.Featured) Modifier.focusRequester(continueChipFocusRequester) else Modifier,
-                                    onClick = {
-                                        userExplicitlySelectedTab = true
-                                        continueListeningTab = ContinueListeningTab.Featured
-                                    }
-                                )
+
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .horizontalScroll(rememberScrollState()),
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    ContinueTabChip(
+                                        label = stringResource(R.string.tab_recent),
+                                        icon = Icons.Outlined.History,
+                                        isSelected = continueListeningTab == ContinueListeningTab.Recent,
+                                        modifier = if (continueListeningTab == ContinueListeningTab.Recent) Modifier.focusRequester(continueChipFocusRequester) else Modifier,
+                                        onClick = {
+                                            userExplicitlySelectedTab = true
+                                            continueListeningTab = ContinueListeningTab.Recent
+                                        }
+                                    )
+                                    ContinueTabChip(
+                                        label = stringResource(R.string.tab_most_played),
+                                        icon = Icons.AutoMirrored.Filled.TrendingUp,
+                                        isSelected = continueListeningTab == ContinueListeningTab.MostPlayed,
+                                        modifier = if (continueListeningTab == ContinueListeningTab.MostPlayed) Modifier.focusRequester(continueChipFocusRequester) else Modifier,
+                                        onClick = {
+                                            userExplicitlySelectedTab = true
+                                            continueListeningTab = ContinueListeningTab.MostPlayed
+                                        }
+                                    )
+                                    ContinueTabChip(
+                                        label = stringResource(R.string.tab_featured),
+                                        icon = Icons.Filled.Star,
+                                        isSelected = continueListeningTab == ContinueListeningTab.Featured,
+                                        modifier = if (continueListeningTab == ContinueListeningTab.Featured) Modifier.focusRequester(continueChipFocusRequester) else Modifier,
+                                        onClick = {
+                                            userExplicitlySelectedTab = true
+                                            continueListeningTab = ContinueListeningTab.Featured
+                                        }
+                                    )
+                                }
                             }
                         }
                     }
@@ -1024,11 +1089,26 @@ fun CuratedStationCard(
                         shape = RoundedCornerShape(16.dp)
                     )
             ) {
-                AsyncImage(
-                    model = station.imageUrl,
+                val resolvedArt = remember(station.name, station.imageUrl) {
+                    com.easeaudio.util.StationLogoResolver.resolveStationLogo(
+                        name = station.name,
+                        favicon = station.imageUrl,
+                        homepage = "",
+                        tags = station.genre
+                    )
+                }
+                coil.compose.SubcomposeAsyncImage(
+                    model = resolvedArt,
                     contentDescription = station.name,
                     contentScale = ContentScale.Crop,
-                    modifier = Modifier.fillMaxSize()
+                    modifier = Modifier.fillMaxSize(),
+                    error = {
+                        com.easeaudio.ui.components.StationMonogramAvatar(
+                            name = station.name,
+                            genre = station.genre,
+                            modifier = Modifier.fillMaxSize()
+                        )
+                    }
                 )
                 // Gradient Overlay
                 Box(
@@ -1142,6 +1222,7 @@ fun QuickResumeCard(
     isPlaying: Boolean,
     isLoading: Boolean,
     isDemoted: Boolean = false,
+    modifier: Modifier = Modifier,
     onClick: () -> Unit,
     onToggleFavorite: () -> Unit = {},
     onDemoteStation: () -> Unit = {},
@@ -1163,7 +1244,7 @@ fun QuickResumeCard(
             .padding(vertical = 4.dp)
     ) {
         Surface(
-            modifier = Modifier
+            modifier = modifier
                 .fillMaxWidth()
                 .onFocusChanged { isFocused = it.isFocused }
                 .focusable()
@@ -1196,7 +1277,14 @@ fun QuickResumeCard(
                         showMenu = true
                     }
                 )
-                .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.45f))
+                .background(
+                    Brush.horizontalGradient(
+                        listOf(
+                            MaterialTheme.colorScheme.surfaceVariant.copy(alpha = if (isFocused) 0.7f else 0.55f),
+                            MaterialTheme.colorScheme.surfaceVariant.copy(alpha = if (isFocused) 0.45f else 0.28f)
+                        )
+                    )
+                )
                 .border(
                     width = if (isFocused) 2.5.dp else 1.dp,
                     color = if (isFocused) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline.copy(alpha = 0.25f),
@@ -1208,24 +1296,39 @@ fun QuickResumeCard(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(if (isExpanded) 96.dp else 82.dp)
+                    .height(if (isExpanded) 96.dp else 84.dp)
                     .padding(if (isExpanded) 12.dp else 10.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(14.dp)
             ) {
                 // Station Art Thumbnail
-                val artSize = if (isExpanded) 72.dp else 62.dp
+                val artSize = if (isExpanded) 72.dp else 64.dp
                 Box(
                     modifier = Modifier
                         .size(artSize)
                         .clip(RoundedCornerShape(12.dp))
                         .background(MaterialTheme.colorScheme.surfaceVariant)
                 ) {
-                    AsyncImage(
-                        model = station.imageUrl,
+                    val resolvedArt = remember(station.name, station.imageUrl) {
+                        com.easeaudio.util.StationLogoResolver.resolveStationLogo(
+                            name = station.name,
+                            favicon = station.imageUrl,
+                            homepage = "",
+                            tags = station.genre
+                        )
+                    }
+                    coil.compose.SubcomposeAsyncImage(
+                        model = resolvedArt,
                         contentDescription = station.name,
                         contentScale = ContentScale.Crop,
-                        modifier = Modifier.fillMaxSize()
+                        modifier = Modifier.fillMaxSize(),
+                        error = {
+                            com.easeaudio.ui.components.StationMonogramAvatar(
+                                name = station.name,
+                                genre = station.genre,
+                                modifier = Modifier.fillMaxSize()
+                            )
+                        }
                     )
                 }
 
@@ -1234,26 +1337,34 @@ fun QuickResumeCard(
                     modifier = Modifier.weight(1f),
                     verticalArrangement = Arrangement.Center
                 ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    Surface(
+                        shape = RoundedCornerShape(6.dp),
+                        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.14f),
+                        border = BorderStroke(0.5.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.3f))
                     ) {
-                        Icon(
-                            imageVector = badgeIcon,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.size(12.dp)
-                        )
-                        Text(
-                            text = (badgeText ?: stringResource(if (isPodcast) R.string.continue_listening_podcast else R.string.continue_listening_radio)).uppercase(),
-                            style = MaterialTheme.typography.labelSmall.copy(
-                                fontWeight = FontWeight.ExtraBold,
-                                letterSpacing = 0.8.sp
-                            ),
-                            color = MaterialTheme.colorScheme.primary
-                        )
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(4.dp),
+                            modifier = Modifier.padding(horizontal = 7.dp, vertical = 2.5.dp)
+                        ) {
+                            Icon(
+                                imageVector = badgeIcon,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.size(11.dp)
+                            )
+                            Text(
+                                text = (badgeText ?: stringResource(if (isPodcast) R.string.continue_listening_podcast else R.string.continue_listening_radio)).uppercase(),
+                                style = MaterialTheme.typography.labelSmall.copy(
+                                    fontWeight = FontWeight.ExtraBold,
+                                    fontSize = 10.sp,
+                                    letterSpacing = 0.6.sp
+                                ),
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        }
                     }
-                    Spacer(modifier = Modifier.height(2.dp))
+                    Spacer(modifier = Modifier.height(4.dp))
                     Text(
                         text = station.name,
                         style = if (isExpanded) MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold) 
@@ -1362,6 +1473,8 @@ fun QuickResumeCard(
 fun ContinueTabChip(
     label: String,
     isSelected: Boolean,
+    modifier: Modifier = Modifier,
+    icon: ImageVector? = null,
     onClick: () -> Unit
 ) {
     var isFocused by remember { mutableStateOf(false) }
@@ -1371,14 +1484,14 @@ fun ContinueTabChip(
     val chipBackground = when {
         isSelected -> MaterialTheme.colorScheme.primary
         isFocused -> MaterialTheme.colorScheme.surfaceVariant
-        else -> Color.Transparent
+        else -> MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f)
     }
 
     val chipBorderColor = when {
         isSelected && isFocused -> Color.White
         isFocused -> MaterialTheme.colorScheme.primary
         isSelected -> Color.Transparent
-        else -> MaterialTheme.colorScheme.outline.copy(alpha = 0.35f)
+        else -> MaterialTheme.colorScheme.outline.copy(alpha = 0.25f)
     }
 
     val chipBorderWidth = when {
@@ -1391,7 +1504,7 @@ fun ContinueTabChip(
     val chipTextColor = when {
         isSelected -> MaterialTheme.colorScheme.background // High-contrast black on cyan
         isFocused -> MaterialTheme.colorScheme.primary     // Cyan text on dark surface
-        else -> MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
+        else -> MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.85f)
     }
 
     Surface(
@@ -1399,21 +1512,34 @@ fun ContinueTabChip(
             haptic.performHapticFeedback(HapticFeedbackType.LongPress)
             onClick()
         },
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(20.dp),
         color = chipBackground,
         border = if (chipBorderWidth > 0.dp) BorderStroke(chipBorderWidth, chipBorderColor) else null,
-        modifier = Modifier
+        modifier = modifier
             .onFocusChanged { isFocused = it.isFocused }
             .padding(vertical = 2.dp)
     ) {
-        Text(
-            text = label,
-            style = MaterialTheme.typography.labelMedium.copy(
-                fontWeight = if (isSelected || isFocused) FontWeight.Bold else FontWeight.Medium
-            ),
-            color = chipTextColor,
-            modifier = Modifier.padding(horizontal = 14.dp, vertical = 6.dp)
-        )
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
+            modifier = Modifier.padding(horizontal = 13.dp, vertical = 6.dp)
+        ) {
+            if (icon != null) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    tint = chipTextColor,
+                    modifier = Modifier.size(14.dp)
+                )
+            }
+            Text(
+                text = label,
+                style = MaterialTheme.typography.labelMedium.copy(
+                    fontWeight = if (isSelected || isFocused) FontWeight.Bold else FontWeight.Medium
+                ),
+                color = chipTextColor
+            )
+        }
     }
 }
 
@@ -1445,7 +1571,7 @@ fun RecentStationCard(
     Box {
         Column(
             modifier = Modifier
-                .width(112.dp)
+                .width(100.dp)
                 .onFocusChanged { isFocused = it.isFocused }
                 .focusable()
                 .onKeyEvent { keyEvent ->
@@ -1481,17 +1607,17 @@ fun RecentStationCard(
         ) {
             Box(
                 modifier = Modifier
-                    .size(84.dp)
+                    .size(80.dp)
                     .shadow(
                         elevation = if (isFocused) 14.dp else 0.dp,
-                        shape = RoundedCornerShape(18.dp),
+                        shape = RoundedCornerShape(16.dp),
                         spotColor = activeAccent,
                         ambientColor = activeAccent.copy(alpha = 0.5f)
                     )
-                    .clip(RoundedCornerShape(18.dp))
+                    .clip(RoundedCornerShape(16.dp))
                     .background(MaterialTheme.colorScheme.surfaceVariant)
                     .border(
-                        width = if (isFocused) 3.5.dp else 0.dp,
+                        width = if (isFocused) 3.dp else 0.5.dp,
                         brush = if (isFocused) {
                             Brush.horizontalGradient(
                                 listOf(
@@ -1500,15 +1626,35 @@ fun RecentStationCard(
                                     activeAccent
                                 )
                             )
-                        } else Brush.horizontalGradient(listOf(Color.Transparent, Color.Transparent)),
-                        shape = RoundedCornerShape(18.dp)
+                        } else Brush.horizontalGradient(
+                            listOf(
+                                MaterialTheme.colorScheme.outline.copy(alpha = 0.25f),
+                                MaterialTheme.colorScheme.outline.copy(alpha = 0.25f)
+                            )
+                        ),
+                        shape = RoundedCornerShape(16.dp)
                     )
             ) {
-                AsyncImage(
-                    model = station.imageUrl,
+                val resolvedArt = remember(station.name, station.imageUrl) {
+                    com.easeaudio.util.StationLogoResolver.resolveStationLogo(
+                        name = station.name,
+                        favicon = station.imageUrl,
+                        homepage = "",
+                        tags = station.genre
+                    )
+                }
+                coil.compose.SubcomposeAsyncImage(
+                    model = resolvedArt,
                     contentDescription = null,
                     contentScale = ContentScale.Crop,
-                    modifier = Modifier.fillMaxSize()
+                    modifier = Modifier.fillMaxSize(),
+                    error = {
+                        com.easeaudio.ui.components.StationMonogramAvatar(
+                            name = station.name,
+                            genre = station.genre,
+                            modifier = Modifier.fillMaxSize()
+                        )
+                    }
                 )
                 if (isPlaying) {
                     Box(

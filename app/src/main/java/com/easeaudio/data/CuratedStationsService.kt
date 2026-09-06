@@ -18,7 +18,7 @@ object CuratedStationsService {
             genre = "Audiophile Eclectic Rock",
             country = "United States",
             streamUrl = "https://stream.radioparadise.com/aac-320",
-            imageUrl = "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=600&q=80",
+            imageUrl = "https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https%3A%2F%2Fradioparadise.com&size=128",
             bitrate = "320 kbps (Lossless Master)",
             codec = "AAC-HD"
         ),
@@ -28,7 +28,7 @@ object CuratedStationsService {
             genre = "Chillout & Acoustic",
             country = "United States",
             streamUrl = "https://stream.radioparadise.com/mellow-320",
-            imageUrl = "https://images.unsplash.com/photo-1518609878373-06d740f60d8b?auto=format&fit=crop&w=600&q=80",
+            imageUrl = "https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https%3A%2F%2Fradioparadise.com&size=128",
             bitrate = "320 kbps (Lossless Master)",
             codec = "AAC-HD"
         ),
@@ -38,7 +38,7 @@ object CuratedStationsService {
             genre = "Classic & Modern Rock",
             country = "United States",
             streamUrl = "https://stream.radioparadise.com/rock-320",
-            imageUrl = "https://images.unsplash.com/photo-1498038432885-c6f3f1b912ee?auto=format&fit=crop&w=600&q=80",
+            imageUrl = "https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https%3A%2F%2Fradioparadise.com&size=128",
             bitrate = "320 kbps (Lossless Master)",
             codec = "AAC-HD"
         ),
@@ -48,7 +48,7 @@ object CuratedStationsService {
             genre = "World & Fusion",
             country = "United States",
             streamUrl = "https://stream.radioparadise.com/global-320",
-            imageUrl = "https://images.unsplash.com/photo-1459749411175-04bf5292ceea?auto=format&fit=crop&w=600&q=80",
+            imageUrl = "https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https%3A%2F%2Fradioparadise.com&size=128",
             bitrate = "320 kbps (Lossless Master)",
             codec = "AAC-HD"
         ),

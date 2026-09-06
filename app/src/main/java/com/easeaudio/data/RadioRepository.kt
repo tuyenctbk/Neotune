@@ -13,8 +13,28 @@ class RadioRepository(
 
     override val defaultStations = emptyList<RadioStation>()
 
+    private fun sanitizeStation(station: RadioStation): RadioStation {
+        val currentUrl = station.imageUrl.trim()
+        val isBrokenOrIco = currentUrl.isBlank() ||
+                currentUrl.contains(".ico", ignoreCase = true) ||
+                currentUrl.contains("europe1.fr", ignoreCase = true) ||
+                com.easeaudio.util.StationLogoResolver.isKnownBroadcaster(station.name)
+
+        return if (isBrokenOrIco) {
+            val resolved = com.easeaudio.util.StationLogoResolver.resolveStationLogo(
+                name = station.name,
+                favicon = currentUrl,
+                homepage = "",
+                tags = station.genre
+            )
+            if (resolved != currentUrl) station.copy(imageUrl = resolved) else station
+        } else {
+            station
+        }
+    }
+
     override fun getAllStations(): Flow<List<RadioStation>> {
-        return dao.getAllStations()
+        return dao.getAllStations().map { list -> list.map { sanitizeStation(it) } }
     }
 
     override suspend fun discoverOnlineStations(
@@ -33,7 +53,7 @@ class RadioRepository(
                 genreTag = genre,
                 country = country,
                 countryCode = countryCode
-            )
+            ).map { sanitizeStation(it) }
             if (onlineList.isNotEmpty()) {
                 dao.saveStationsToCache(onlineList)
             }
@@ -46,7 +66,7 @@ class RadioRepository(
                 country = country,
                 limit = limit,
                 offset = offset
-            )
+            ).map { sanitizeStation(it) }
         }
     }
 
@@ -117,11 +137,11 @@ class RadioRepository(
             val merged = mutableMapOf<String, RadioStation>()
             radioFavs.forEach { merged[it.id] = it.copy(isFavorite = true) }
             favEntityMap.forEach { (id, station) -> merged[id] = station }
-            merged.values.toList()
+            merged.values.map { sanitizeStation(it) }
         }
     }
 
-    override fun getRecentStations(): Flow<List<RadioStation>> = dao.getRecentStations()
+    override fun getRecentStations(): Flow<List<RadioStation>> = dao.getRecentStations().map { list -> list.map { sanitizeStation(it) } }
 
     override fun getListenLaterItems(): Flow<List<ListenLaterItem>> = listenLaterDao.getAllListenLater()
 
@@ -172,7 +192,7 @@ class RadioRepository(
         }
     }
 
-    override fun getMostPlayedStations(): Flow<List<RadioStation>> = dao.getMostPlayedStations()
+    override fun getMostPlayedStations(): Flow<List<RadioStation>> = dao.getMostPlayedStations().map { list -> list.map { sanitizeStation(it) } }
 
     override suspend fun recordStationListened(station: RadioStation) {
         val existing = dao.getStationById(station.id)
