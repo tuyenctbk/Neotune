@@ -60,7 +60,7 @@ fun SettingsScreen(
     val context = LocalContext.current
     Scaffold(
         modifier = modifier.fillMaxSize(),
-        containerColor = MaterialTheme.colorScheme.background
+        containerColor = Color.Transparent
     ) { innerPadding ->
         Box(
             modifier = Modifier

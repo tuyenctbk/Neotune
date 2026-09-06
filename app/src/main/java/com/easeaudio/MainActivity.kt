@@ -341,7 +341,9 @@ fun MainAppContent(
     val showNavigationRail = windowSizeClass.widthSizeClass != WindowWidthSizeClass.Compact && currentRoute != NavRoute.Onboarding.route && currentRoute != NavRoute.CarMode.route && currentRoute != NavRoute.Screensaver.route && !isFullPlayerVisible
 
     Box(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
+            .themeAmbientBackground()
     ) {
         Row(modifier = Modifier.fillMaxSize()) {
             AnimatedVisibility(
@@ -380,6 +382,7 @@ fun MainAppContent(
             }
             
             Scaffold(
+                containerColor = Color.Transparent,
                 snackbarHost = {
                     SnackbarHost(hostState = snackbarHostState) { data ->
                         Snackbar(

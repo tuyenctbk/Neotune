@@ -41,6 +41,7 @@ import androidx.compose.ui.window.DialogProperties
 import com.easeaudio.R
 import com.easeaudio.ui.components.AudioVisualizerCanvas
 import com.easeaudio.ui.components.VisualizerStyle
+import com.easeaudio.ui.components.themeAmbientBackground
 import com.easeaudio.ui.theme.*
 
 @Composable
@@ -62,8 +63,10 @@ fun AppearanceSelectionScreen(
         )
     ) {
         Surface(
-            modifier = Modifier.fillMaxSize(),
-            color = MaterialTheme.colorScheme.background
+            modifier = Modifier
+                .fillMaxSize()
+                .themeAmbientBackground(previewTheme),
+            color = Color.Transparent
         ) {
             Column(
                 modifier = Modifier

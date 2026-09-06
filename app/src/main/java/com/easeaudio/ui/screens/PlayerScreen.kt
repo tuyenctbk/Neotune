@@ -166,7 +166,7 @@ fun PlayerScreen(
                     )
                 )
             ),
-        containerColor = solidBackground,
+        containerColor = Color.Transparent,
         topBar = {
             Row(
                 modifier = Modifier
