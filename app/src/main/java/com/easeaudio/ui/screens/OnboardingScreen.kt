@@ -45,6 +45,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import com.easeaudio.R
+import com.easeaudio.ui.components.themeAmbientBackground
 import com.easeaudio.ui.theme.*
 import kotlinx.coroutines.launch
 
@@ -104,7 +105,7 @@ fun OnboardingScreen(
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
+            .themeAmbientBackground()
             .statusBarsPadding()
             .navigationBarsPadding()
     ) {
