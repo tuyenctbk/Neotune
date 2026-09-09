@@ -86,6 +86,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import coil.compose.AsyncImagePainter
+import coil.compose.SubcomposeAsyncImageContent
 import androidx.compose.ui.res.stringResource
 import com.easeaudio.R
 import com.easeaudio.data.RadioStation
@@ -1098,18 +1100,23 @@ fun CuratedStationCard(
                     )
                 }
                 coil.compose.SubcomposeAsyncImage(
-                    model = resolvedArt,
+                    model = resolvedArt.ifBlank { null },
                     contentDescription = station.name,
                     contentScale = ContentScale.Crop,
-                    modifier = Modifier.fillMaxSize(),
-                    error = {
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    val state = painter.state
+                    if (state is AsyncImagePainter.State.Success) {
+                        SubcomposeAsyncImageContent()
+                    } else {
                         com.easeaudio.ui.components.StationMonogramAvatar(
                             name = station.name,
                             genre = station.genre,
+                            isPodcast = station.isPodcast,
                             modifier = Modifier.fillMaxSize()
                         )
                     }
-                )
+                }
                 // Gradient Overlay
                 Box(
                     modifier = Modifier
@@ -1318,18 +1325,23 @@ fun QuickResumeCard(
                         )
                     }
                     coil.compose.SubcomposeAsyncImage(
-                        model = resolvedArt,
+                        model = resolvedArt.ifBlank { null },
                         contentDescription = station.name,
                         contentScale = ContentScale.Crop,
-                        modifier = Modifier.fillMaxSize(),
-                        error = {
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        val state = painter.state
+                        if (state is AsyncImagePainter.State.Success) {
+                            SubcomposeAsyncImageContent()
+                        } else {
                             com.easeaudio.ui.components.StationMonogramAvatar(
                                 name = station.name,
                                 genre = station.genre,
+                                isPodcast = station.isPodcast,
                                 modifier = Modifier.fillMaxSize()
                             )
                         }
-                    )
+                    }
                 }
 
                 // Station Info Column
@@ -1644,18 +1656,23 @@ fun RecentStationCard(
                     )
                 }
                 coil.compose.SubcomposeAsyncImage(
-                    model = resolvedArt,
+                    model = resolvedArt.ifBlank { null },
                     contentDescription = null,
                     contentScale = ContentScale.Crop,
-                    modifier = Modifier.fillMaxSize(),
-                    error = {
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    val state = painter.state
+                    if (state is AsyncImagePainter.State.Success) {
+                        SubcomposeAsyncImageContent()
+                    } else {
                         com.easeaudio.ui.components.StationMonogramAvatar(
                             name = station.name,
                             genre = station.genre,
+                            isPodcast = station.isPodcast,
                             modifier = Modifier.fillMaxSize()
                         )
                     }
-                )
+                }
                 if (isPlaying) {
                     Box(
                         modifier = Modifier

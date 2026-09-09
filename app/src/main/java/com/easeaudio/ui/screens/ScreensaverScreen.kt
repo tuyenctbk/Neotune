@@ -185,10 +185,20 @@ fun ScreensaverScreen(
         // LAYER 1: Full Screen Background Image / Ambient Theme
         when (selectedTheme) {
             AmbientTheme.STATION_ART -> {
-                val effectiveArt = trackArtworkUrl?.ifBlank { null } ?: currentStation?.imageUrl
-                if (effectiveArt?.isNotEmpty() == true) {
+                val resolvedArt = remember(trackArtworkUrl, currentStation?.name, currentStation?.imageUrl, currentStation?.genre) {
+                    trackArtworkUrl?.ifBlank { null }
+                        ?: currentStation?.let {
+                            com.easeaudio.util.StationLogoResolver.resolveStationLogo(
+                                name = it.name,
+                                favicon = it.imageUrl,
+                                homepage = "",
+                                tags = it.genre
+                            ).ifBlank { null }
+                        }
+                }
+                if (resolvedArt?.isNotEmpty() == true) {
                     AsyncImage(
-                        model = effectiveArt,
+                        model = resolvedArt,
                         contentDescription = "Background Cover Art",
                         contentScale = ContentScale.Crop,
                         modifier = Modifier

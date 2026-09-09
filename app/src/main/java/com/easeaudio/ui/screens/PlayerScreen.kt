@@ -60,6 +60,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import coil.compose.AsyncImagePainter
+import coil.compose.SubcomposeAsyncImageContent
 import androidx.compose.ui.res.stringResource
 import com.easeaudio.ui.components.NotificationPermissionReminder
 import android.os.Build
@@ -988,13 +990,19 @@ private fun StationArtworkCard(
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
-    val effectiveUrl = trackArtworkUrl?.ifBlank { null } ?: station.imageUrl
+    val resolvedStationUrl = remember(station.name, station.imageUrl, station.genre) {
+        com.easeaudio.util.StationLogoResolver.resolveStationLogo(
+            name = station.name,
+            favicon = station.imageUrl,
+            homepage = "",
+            tags = station.genre
+        )
+    }
+    val effectiveUrl = trackArtworkUrl?.ifBlank { null } ?: resolvedStationUrl.ifBlank { null }
     val imageRequest = remember(effectiveUrl) {
         ImageRequest.Builder(context)
-            .data(effectiveUrl?.ifBlank { null })
+            .data(effectiveUrl)
             .crossfade(true)
-            .error(R.drawable.ic_favicon)
-            .placeholder(R.drawable.ic_favicon)
             .build()
     }
 
@@ -1029,7 +1037,7 @@ private fun StationArtworkCard(
         contentAlignment = Alignment.Center
     ) {
         // Layer 1: Ambient Blurred Glow Background from the Station Artwork
-        AsyncImage(
+        coil.compose.SubcomposeAsyncImage(
             model = imageRequest,
             contentDescription = null,
             contentScale = ContentScale.Crop,
@@ -1037,7 +1045,25 @@ private fun StationArtworkCard(
                 .fillMaxSize()
                 .blur(radius = 24.dp)
                 .alpha(if (isPlaying) 0.55f else 0.35f)
-        )
+        ) {
+            val state = painter.state
+            if (state is AsyncImagePainter.State.Success) {
+                SubcomposeAsyncImageContent()
+            } else {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(
+                            Brush.radialGradient(
+                                listOf(
+                                    paletteVibrant.copy(alpha = 0.5f),
+                                    Color.Transparent
+                                )
+                            )
+                        )
+                )
+            }
+        }
 
         // Radial depth vignette overlay
         Box(
@@ -1065,6 +1091,9 @@ private fun StationArtworkCard(
                 imageUrl = effectiveUrl,
                 contentDescription = station.name,
                 isPlaying = isPlaying,
+                stationName = station.name,
+                genre = station.genre,
+                isPodcast = station.isPodcast,
                 modifier = Modifier.fillMaxSize(),
                 shape = RoundedCornerShape(cornerRadius - 8.dp),
                 borderWidth = 0.5.dp,

@@ -148,14 +148,26 @@ fun PodcastEpisodesSheet(
                             .padding(bottom = 16.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        AsyncImage(
+                        coil.compose.SubcomposeAsyncImage(
                             model = show.imageUrl,
                             contentDescription = show.name,
                             contentScale = ContentScale.Crop,
                             modifier = Modifier
                                 .size(64.dp)
                                 .clip(RoundedCornerShape(14.dp))
-                        )
+                        ) {
+                            val state = painter.state
+                            if (state is coil.compose.AsyncImagePainter.State.Success) {
+                                coil.compose.SubcomposeAsyncImageContent()
+                            } else {
+                                StationMonogramAvatar(
+                                    name = show.name,
+                                    genre = show.genre,
+                                    isPodcast = true,
+                                    modifier = Modifier.fillMaxSize()
+                                )
+                            }
+                        }
                         Spacer(modifier = Modifier.width(14.dp))
                         Column(modifier = Modifier.weight(1f)) {
                             Text(
@@ -468,7 +480,7 @@ fun PodcastEpisodeDetailView(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            AsyncImage(
+            coil.compose.SubcomposeAsyncImage(
                 model = episode.artworkUrl.ifBlank { show.imageUrl },
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
@@ -476,7 +488,19 @@ fun PodcastEpisodeDetailView(
                     .size(90.dp)
                     .clip(RoundedCornerShape(12.dp))
                     .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(12.dp))
-            )
+            ) {
+                val state = painter.state
+                if (state is coil.compose.AsyncImagePainter.State.Success) {
+                    coil.compose.SubcomposeAsyncImageContent()
+                } else {
+                    StationMonogramAvatar(
+                        name = show.name,
+                        genre = show.genre,
+                        isPodcast = true,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
+            }
             Spacer(modifier = Modifier.width(16.dp))
             Column(modifier = Modifier.weight(1f)) {
                 Text(
@@ -836,14 +860,26 @@ fun PodcastEpisodeDetailView(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    AsyncImage(
+                    coil.compose.SubcomposeAsyncImage(
                         model = episode.artworkUrl.ifBlank { show.imageUrl },
                         contentDescription = null,
                         contentScale = ContentScale.Crop,
                         modifier = Modifier
                             .size(54.dp)
                             .clip(RoundedCornerShape(8.dp))
-                    )
+                    ) {
+                        val state = painter.state
+                        if (state is coil.compose.AsyncImagePainter.State.Success) {
+                            coil.compose.SubcomposeAsyncImageContent()
+                        } else {
+                            StationMonogramAvatar(
+                                name = show.name,
+                                genre = show.genre,
+                                isPodcast = true,
+                                modifier = Modifier.fillMaxSize()
+                            )
+                        }
+                    }
                     Spacer(modifier = Modifier.width(14.dp))
                     Column {
                         Text(

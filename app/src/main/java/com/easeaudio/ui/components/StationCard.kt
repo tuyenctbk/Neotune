@@ -47,6 +47,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import coil.compose.AsyncImagePainter
+import coil.compose.SubcomposeAsyncImageContent
 import com.easeaudio.R
 import com.easeaudio.data.RadioStation
 import com.easeaudio.ui.theme.FavoriteHeartColor
@@ -212,28 +214,20 @@ fun StationCard(
                             model = imageRequest,
                             contentDescription = station.name,
                             contentScale = ContentScale.Crop,
-                            modifier = Modifier.fillMaxSize(),
-                            loading = {
-                                Box(
-                                    modifier = Modifier.fillMaxSize(),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Icon(
-                                        painter = androidx.compose.ui.res.painterResource(id = R.drawable.ic_favicon),
-                                        contentDescription = null,
-                                        tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.35f),
-                                        modifier = Modifier.size(24.dp)
-                                    )
-                                }
-                            },
-                            error = {
+                            modifier = Modifier.fillMaxSize()
+                        ) {
+                            val state = painter.state
+                            if (state is AsyncImagePainter.State.Success) {
+                                SubcomposeAsyncImageContent()
+                            } else {
                                 StationMonogramAvatar(
                                     name = station.name,
                                     genre = station.genre,
+                                    isPodcast = station.isPodcast,
                                     modifier = Modifier.fillMaxSize()
                                 )
                             }
-                        )
+                        }
                         if (isSelected) {
                             Box(
                                 modifier = Modifier

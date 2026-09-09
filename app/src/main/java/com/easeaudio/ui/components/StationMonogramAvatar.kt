@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.Radio
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -13,8 +14,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -23,6 +26,8 @@ import androidx.compose.ui.unit.sp
 fun StationMonogramAvatar(
     name: String,
     genre: String = "",
+    isPodcast: Boolean = false,
+    shape: androidx.compose.ui.graphics.Shape? = null,
     modifier: Modifier = Modifier
 ) {
     val gradients = remember {
@@ -51,13 +56,16 @@ fun StationMonogramAvatar(
         }
     }
 
+    val isActuallyPodcast = isPodcast || genre.contains("podcast", ignoreCase = true) || name.contains("podcast", ignoreCase = true)
+
     Box(
         modifier = modifier
+            .then(if (shape != null) Modifier.clip(shape) else Modifier)
             .background(Brush.linearGradient(colors = gradientColors)),
         contentAlignment = Alignment.Center
     ) {
         Icon(
-            imageVector = Icons.Filled.Radio,
+            imageVector = if (isActuallyPodcast) Icons.Filled.Mic else Icons.Filled.Radio,
             contentDescription = null,
             tint = Color.White.copy(alpha = 0.14f),
             modifier = Modifier

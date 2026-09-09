@@ -839,10 +839,20 @@ private fun AutomotiveHeroPlayer(
                         // Artwork with glowing border and 1-tap heart
                         val artSize = if (availableHeight < 400.dp) 88.dp else 104.dp
                         val carContext = LocalContext.current
-                        val effectiveArtworkUrl = uiState.trackArtworkUrl?.ifBlank { null } ?: currentStation?.imageUrl
-                        val carImageRequest = remember(effectiveArtworkUrl) {
+                        val resolvedCarArtUrl = remember(uiState.trackArtworkUrl, currentStation?.name, currentStation?.imageUrl, currentStation?.genre) {
+                            uiState.trackArtworkUrl?.ifBlank { null }
+                                ?: currentStation?.let {
+                                    com.easeaudio.util.StationLogoResolver.resolveStationLogo(
+                                        name = it.name,
+                                        favicon = it.imageUrl,
+                                        homepage = "",
+                                        tags = it.genre
+                                    ).ifBlank { null }
+                                }
+                        }
+                        val carImageRequest = remember(resolvedCarArtUrl) {
                             ImageRequest.Builder(carContext)
-                                .data(effectiveArtworkUrl)
+                                .data(resolvedCarArtUrl)
                                 .crossfade(true)
                                 .build()
                         }
@@ -859,20 +869,23 @@ private fun AutomotiveHeroPlayer(
                                 ),
                             contentAlignment = Alignment.Center
                         ) {
-                            if (effectiveArtworkUrl?.isNotEmpty() == true) {
-                                AsyncImage(
-                                    model = carImageRequest,
-                                    contentDescription = currentStation?.name,
-                                    contentScale = ContentScale.Crop,
-                                    modifier = Modifier.fillMaxSize()
-                                )
-                            } else {
-                                Icon(
-                                    imageVector = if (isPodcast) Icons.Filled.Mic else Icons.Filled.Radio,
-                                    contentDescription = null,
-                                    modifier = Modifier.size(44.dp),
-                                    tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
-                                )
+                            coil.compose.SubcomposeAsyncImage(
+                                model = carImageRequest,
+                                contentDescription = currentStation?.name,
+                                contentScale = ContentScale.Crop,
+                                modifier = Modifier.fillMaxSize()
+                            ) {
+                                val state = painter.state
+                                if (state is coil.compose.AsyncImagePainter.State.Success) {
+                                    coil.compose.SubcomposeAsyncImageContent()
+                                } else {
+                                    com.easeaudio.ui.components.StationMonogramAvatar(
+                                        name = currentStation?.name ?: "",
+                                        genre = currentStation?.genre ?: "",
+                                        isPodcast = isPodcast,
+                                        modifier = Modifier.fillMaxSize()
+                                    )
+                                }
                             }
 
                             if (isLoading) {
@@ -1451,14 +1464,26 @@ private fun AutomotiveHeroPlayer(
                                                     .padding(horizontal = 8.dp, vertical = 6.dp),
                                                 verticalAlignment = Alignment.CenterVertically
                                             ) {
-                                                AsyncImage(
+                                                coil.compose.SubcomposeAsyncImage(
                                                     model = episode.artworkUrl.ifBlank { currentStation?.imageUrl },
                                                     contentDescription = null,
                                                     contentScale = ContentScale.Crop,
                                                     modifier = Modifier
                                                         .size(36.dp)
                                                         .clip(RoundedCornerShape(6.dp))
-                                                )
+                                                ) {
+                                                    val epState = painter.state
+                                                    if (epState is coil.compose.AsyncImagePainter.State.Success) {
+                                                        coil.compose.SubcomposeAsyncImageContent()
+                                                    } else {
+                                                        com.easeaudio.ui.components.StationMonogramAvatar(
+                                                            name = currentStation?.name ?: "",
+                                                            genre = currentStation?.genre ?: "",
+                                                            isPodcast = true,
+                                                            modifier = Modifier.fillMaxSize()
+                                                        )
+                                                    }
+                                                }
                                                 Spacer(modifier = Modifier.width(8.dp))
                                                 Column(modifier = Modifier.weight(1f)) {
                                                     Text(
@@ -1602,11 +1627,21 @@ private fun AutomotiveHeroPlayer(
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 // Large Artwork
-                val effectiveArtworkUrl = uiState.trackArtworkUrl?.ifBlank { null } ?: currentStation?.imageUrl
                 val carContext = LocalContext.current
-                val carImageRequest = remember(effectiveArtworkUrl) {
+                val resolvedPortraitArtUrl = remember(uiState.trackArtworkUrl, currentStation?.name, currentStation?.imageUrl, currentStation?.genre) {
+                    uiState.trackArtworkUrl?.ifBlank { null }
+                        ?: currentStation?.let {
+                            com.easeaudio.util.StationLogoResolver.resolveStationLogo(
+                                name = it.name,
+                                favicon = it.imageUrl,
+                                homepage = "",
+                                tags = it.genre
+                            ).ifBlank { null }
+                        }
+                }
+                val carImageRequest = remember(resolvedPortraitArtUrl) {
                     ImageRequest.Builder(carContext)
-                        .data(effectiveArtworkUrl)
+                        .data(resolvedPortraitArtUrl)
                         .crossfade(true)
                         .build()
                 }
@@ -1623,20 +1658,23 @@ private fun AutomotiveHeroPlayer(
                         ),
                     contentAlignment = Alignment.Center
                 ) {
-                    if (effectiveArtworkUrl?.isNotEmpty() == true) {
-                        AsyncImage(
-                            model = carImageRequest,
-                            contentDescription = currentStation?.name,
-                            contentScale = ContentScale.Crop,
-                            modifier = Modifier.fillMaxSize()
-                        )
-                    } else {
-                        Icon(
-                            imageVector = if (isPodcast) Icons.Filled.Mic else Icons.Filled.Radio,
-                            contentDescription = null,
-                            modifier = Modifier.size(54.dp),
-                            tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
-                        )
+                    coil.compose.SubcomposeAsyncImage(
+                        model = carImageRequest,
+                        contentDescription = currentStation?.name,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        val state = painter.state
+                        if (state is coil.compose.AsyncImagePainter.State.Success) {
+                            coil.compose.SubcomposeAsyncImageContent()
+                        } else {
+                            com.easeaudio.ui.components.StationMonogramAvatar(
+                                name = currentStation?.name ?: "",
+                                genre = currentStation?.genre ?: "",
+                                isPodcast = isPodcast,
+                                modifier = Modifier.fillMaxSize()
+                            )
+                        }
                     }
                     if (isLoading) {
                         Box(
@@ -1913,14 +1951,31 @@ private fun AutomotiveStationList(
                         .padding(horizontal = 8.dp, vertical = 6.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    AsyncImage(
-                        model = station.imageUrl,
+                    val favResolvedUrl = remember(station.name, station.imageUrl, station.genre) {
+                        com.easeaudio.util.StationLogoResolver.resolveStationLogo(
+                            name = station.name, favicon = station.imageUrl, homepage = "", tags = station.genre
+                        ).ifBlank { null }
+                    }
+                    coil.compose.SubcomposeAsyncImage(
+                        model = favResolvedUrl,
                         contentDescription = null,
                         contentScale = ContentScale.Crop,
                         modifier = Modifier
                             .size(38.dp)
                             .clip(RoundedCornerShape(6.dp))
-                    )
+                    ) {
+                        val favState = painter.state
+                        if (favState is coil.compose.AsyncImagePainter.State.Success) {
+                            coil.compose.SubcomposeAsyncImageContent()
+                        } else {
+                            com.easeaudio.ui.components.StationMonogramAvatar(
+                                name = station.name,
+                                genre = station.genre,
+                                isPodcast = station.isPodcast,
+                                modifier = Modifier.fillMaxSize()
+                            )
+                        }
+                    }
                     Spacer(modifier = Modifier.width(8.dp))
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
@@ -2143,14 +2198,31 @@ private fun CuratedAudiophileCarRow(
                             .padding(horizontal = 8.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        AsyncImage(
-                            model = station.imageUrl,
+                        val curatedResolvedUrl = remember(station.name, station.imageUrl, station.genre) {
+                            com.easeaudio.util.StationLogoResolver.resolveStationLogo(
+                                name = station.name, favicon = station.imageUrl, homepage = "", tags = station.genre
+                            ).ifBlank { null }
+                        }
+                        coil.compose.SubcomposeAsyncImage(
+                            model = curatedResolvedUrl,
                             contentDescription = null,
                             contentScale = ContentScale.Crop,
                             modifier = Modifier
                                 .size(38.dp)
                                 .clip(RoundedCornerShape(8.dp))
-                        )
+                        ) {
+                            val state = painter.state
+                            if (state is coil.compose.AsyncImagePainter.State.Success) {
+                                coil.compose.SubcomposeAsyncImageContent()
+                            } else {
+                                com.easeaudio.ui.components.StationMonogramAvatar(
+                                    name = station.name,
+                                    genre = station.genre,
+                                    isPodcast = station.isPodcast,
+                                    modifier = Modifier.fillMaxSize()
+                                )
+                            }
+                        }
                         Spacer(modifier = Modifier.width(8.dp))
                         Column(modifier = Modifier.weight(1f)) {
                             Text(
@@ -2299,12 +2371,29 @@ private fun AutomotiveGrid(
                             .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f)),
                         contentAlignment = Alignment.Center
                     ) {
-                        AsyncImage(
-                            model = station.imageUrl,
+                        val listCardResolvedUrl = remember(station.name, station.imageUrl, station.genre) {
+                            com.easeaudio.util.StationLogoResolver.resolveStationLogo(
+                                name = station.name, favicon = station.imageUrl, homepage = "", tags = station.genre
+                            ).ifBlank { null }
+                        }
+                        coil.compose.SubcomposeAsyncImage(
+                            model = listCardResolvedUrl,
                             contentDescription = null,
                             contentScale = ContentScale.Crop,
                             modifier = Modifier.fillMaxSize()
-                        )
+                        ) {
+                            val lcState = painter.state
+                            if (lcState is coil.compose.AsyncImagePainter.State.Success) {
+                                coil.compose.SubcomposeAsyncImageContent()
+                            } else {
+                                com.easeaudio.ui.components.StationMonogramAvatar(
+                                    name = station.name,
+                                    genre = station.genre,
+                                    isPodcast = station.isPodcast,
+                                    modifier = Modifier.fillMaxSize()
+                                )
+                            }
+                        }
 
                         if (isSelected && isPlaying) {
                             Box(
@@ -2419,14 +2508,31 @@ private fun CarMiniPlayer(
                 .padding(horizontal = 12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            AsyncImage(
-                model = station.imageUrl,
+            val miniBarResolvedUrl = remember(station.name, station.imageUrl, station.genre) {
+                com.easeaudio.util.StationLogoResolver.resolveStationLogo(
+                    name = station.name, favicon = station.imageUrl, homepage = "", tags = station.genre
+                ).ifBlank { null }
+            }
+            coil.compose.SubcomposeAsyncImage(
+                model = miniBarResolvedUrl,
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .size(42.dp)
                     .clip(RoundedCornerShape(8.dp))
-            )
+            ) {
+                val mbState = painter.state
+                if (mbState is coil.compose.AsyncImagePainter.State.Success) {
+                    coil.compose.SubcomposeAsyncImageContent()
+                } else {
+                    com.easeaudio.ui.components.StationMonogramAvatar(
+                        name = station.name,
+                        genre = station.genre,
+                        isPodcast = station.isPodcast,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
+            }
 
             Spacer(modifier = Modifier.width(10.dp))
 

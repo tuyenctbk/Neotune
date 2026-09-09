@@ -47,7 +47,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil.compose.AsyncImage
 import com.easeaudio.R
 import com.easeaudio.data.RadioStation
 import com.easeaudio.ui.theme.*
@@ -78,16 +77,15 @@ fun MiniPlayer(
         if (station != null) {
             var isFocused by remember { mutableStateOf(false) }
             val showFocus = isFocused
-            val effectiveArtworkUrl = trackArtworkUrl?.ifBlank { null } ?: station.imageUrl
-            val context = androidx.compose.ui.platform.LocalContext.current
-            val imageRequest = remember(effectiveArtworkUrl) {
-                coil.request.ImageRequest.Builder(context)
-                    .data(effectiveArtworkUrl?.ifBlank { null })
-                    .crossfade(true)
-                    .error(R.drawable.ic_favicon)
-                    .placeholder(R.drawable.ic_favicon)
-                    .build()
+            val resolvedStationUrl = remember(station.name, station.imageUrl, station.genre) {
+                com.easeaudio.util.StationLogoResolver.resolveStationLogo(
+                    name = station.name,
+                    favicon = station.imageUrl,
+                    homepage = "",
+                    tags = station.genre
+                )
             }
+            val effectiveArtworkUrl = trackArtworkUrl?.ifBlank { null } ?: resolvedStationUrl.ifBlank { null }
 
             // Avatar Animations: breathing shimmer when loading, subtle scale when playing
             val infiniteTransition = rememberInfiniteTransition(label = "miniAvatarAnim")
@@ -157,6 +155,9 @@ fun MiniPlayer(
                         imageUrl = effectiveArtworkUrl,
                         contentDescription = station.name,
                         isPlaying = isPlaying,
+                        stationName = station.name,
+                        genre = station.genre,
+                        isPodcast = station.isPodcast,
                         modifier = Modifier
                             .size(48.dp)
                             .alpha(if (isLoading) loadingAlpha else 1.0f)

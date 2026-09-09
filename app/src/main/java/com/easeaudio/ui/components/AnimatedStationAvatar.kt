@@ -16,13 +16,16 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
+import coil.compose.AsyncImagePainter
+import coil.compose.SubcomposeAsyncImage
+import coil.compose.SubcomposeAsyncImageContent
 import coil.request.ImageRequest
-import com.easeaudio.R
+import com.easeaudio.util.StationLogoResolver
 
 /**
  * AnimatedStationAvatar renders a station's artwork image with a clean, gentle scale breathing
- * animation whenever [isPlaying] is true.
+ * animation whenever [isPlaying] is true. If the image is loading, missing, or fails to load,
+ * it renders a vibrant [StationMonogramAvatar] with distinctive station initials.
  *
  * @param imageUrl Stream or station cover artwork URL.
  * @param contentDescription Accessibility description for screen readers.
@@ -31,8 +34,11 @@ import com.easeaudio.R
  * @param shape Shape outline clipping for the avatar image.
  * @param borderWidth Width of the avatar outer border.
  * @param borderColor Color of the avatar outer border.
- * @param showVinylCenter Deprecated. Kept for backwards compatibility but ignored for a simpler animation.
- * @param enableRotation Deprecated. Kept for backwards compatibility but ignored for a simpler animation.
+ * @param stationName Station or podcast title used for initials monogram and logo resolution.
+ * @param genre Station genre for contextual fallback styling.
+ * @param isPodcast Whether the media item is a podcast.
+ * @param showVinylCenter Deprecated. Kept for backwards compatibility.
+ * @param enableRotation Deprecated. Kept for backwards compatibility.
  */
 @Composable
 fun AnimatedStationAvatar(
@@ -43,16 +49,27 @@ fun AnimatedStationAvatar(
     shape: Shape = CircleShape,
     borderWidth: Dp = 1.5.dp,
     borderColor: Color = MaterialTheme.colorScheme.primary,
+    stationName: String = "",
+    genre: String = "",
+    isPodcast: Boolean = false,
     showVinylCenter: Boolean = false,
     enableRotation: Boolean = false
 ) {
     val context = LocalContext.current
-    val imageRequest = remember(imageUrl) {
+    val effectiveName = stationName.ifBlank { contentDescription ?: "" }
+    val effectiveUrl = remember(imageUrl, effectiveName, genre) {
+        val raw = imageUrl?.trim().orEmpty()
+        if (raw.isNotBlank()) {
+            StationLogoResolver.resolveStationLogo(effectiveName, raw, "", genre).ifBlank { raw }
+        } else {
+            StationLogoResolver.resolveStationLogo(effectiveName, "", "", genre).ifBlank { null }
+        }
+    }
+
+    val imageRequest = remember(effectiveUrl) {
         ImageRequest.Builder(context)
-            .data(imageUrl?.ifBlank { null })
+            .data(effectiveUrl?.ifBlank { null })
             .crossfade(true)
-            .error(R.drawable.ic_favicon)
-            .placeholder(R.drawable.ic_favicon)
             .build()
     }
 
@@ -78,12 +95,25 @@ fun AnimatedStationAvatar(
             .border(width = borderWidth, color = borderColor, shape = shape),
         contentAlignment = Alignment.Center
     ) {
-        AsyncImage(
+        SubcomposeAsyncImage(
             model = imageRequest,
             contentDescription = contentDescription,
             contentScale = ContentScale.Crop,
             modifier = Modifier.fillMaxSize()
-        )
+        ) {
+            val state = painter.state
+            if (state is AsyncImagePainter.State.Success) {
+                SubcomposeAsyncImageContent()
+            } else {
+                StationMonogramAvatar(
+                    name = effectiveName,
+                    genre = genre,
+                    isPodcast = isPodcast,
+                    shape = shape,
+                    modifier = Modifier.fillMaxSize()
+                )
+            }
+        }
     }
 }
 
