@@ -20,8 +20,7 @@
     <!-- Required by Leanback store rules: must declare microphone as not required -->
     <uses-feature android:name="android.hardware.microphone" android:required="false" />
 
-    <!-- Android Auto & Android Automotive OS (AAOS) compatibility -->
-    <uses-feature android:name="android.hardware.type.automotive" android:required="false" />
+    <!-- Android Auto & display compatibility -->
     <uses-feature android:name="android.hardware.wifi" android:required="false" />
     <uses-feature android:name="android.hardware.screen.portrait" android:required="false" />
     <uses-feature android:name="android.hardware.screen.landscape" android:required="false" />
