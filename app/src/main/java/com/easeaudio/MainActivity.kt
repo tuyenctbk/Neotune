@@ -193,8 +193,17 @@ fun MainAppContent(
     val uiState by viewModel.homeUiState.collectAsState()
     val hasActiveSession by viewModel.hasActiveSession.collectAsStateWithLifecycle()
 
+    // Detect AAOS (Android Automotive OS) hardware — auto-redirect to Car Mode UI
+    val isAutomotive = remember {
+        context.packageManager.hasSystemFeature("android.hardware.type.automotive")
+    }
+
     val startDestination = rememberSaveable {
-        if (!isOnboardingCompleted.value) NavRoute.Onboarding.route else NavRoute.Home.route
+        when {
+            isAutomotive -> NavRoute.CarMode.route  // Always launch directly to Car Mode on AAOS
+            !isOnboardingCompleted.value -> NavRoute.Onboarding.route
+            else -> NavRoute.Home.route
+        }
     }
 
 
@@ -899,28 +908,31 @@ fun MainAppContent(
             )
         }
 
-        // Smart Engagement Dialogs
-        when (activePrompt) {
-            com.easeaudio.engagement.EngagementPromptType.RATE_5_STARS -> {
-                RateAppDialog(
-                    onRateSubmitted = { stars -> viewModel.smartEngagementManager.onRatingCompleted(stars) },
-                    onDismiss = { viewModel.smartEngagementManager.onRatingDismissed() }
-                )
+        // Smart Engagement Dialogs — suppressed entirely on AAOS to avoid
+        // driver-distracting popups (AAOS UXR policy: no interruptive modals while driving)
+        if (!isAutomotive) {
+            when (activePrompt) {
+                com.easeaudio.engagement.EngagementPromptType.RATE_5_STARS -> {
+                    RateAppDialog(
+                        onRateSubmitted = { stars -> viewModel.smartEngagementManager.onRatingCompleted(stars) },
+                        onDismiss = { viewModel.smartEngagementManager.onRatingDismissed() }
+                    )
+                }
+                com.easeaudio.engagement.EngagementPromptType.SHARE_APP -> {
+                    ShareAppDialog(
+                        onShareConfirmed = { viewModel.smartEngagementManager.onShareCompleted() },
+                        onDismiss = { viewModel.smartEngagementManager.onShareDismissed() }
+                    )
+                }
+                com.easeaudio.engagement.EngagementPromptType.UPDATE_APP -> {
+                    UpdateAppDialog(
+                        updateInfo = updateInfo,
+                        onUpdateConfirmed = { viewModel.smartEngagementManager.onUpdateConfirmed() },
+                        onDismiss = { viewModel.smartEngagementManager.onUpdateDismissed() }
+                    )
+                }
+                com.easeaudio.engagement.EngagementPromptType.NONE -> {}
             }
-            com.easeaudio.engagement.EngagementPromptType.SHARE_APP -> {
-                ShareAppDialog(
-                    onShareConfirmed = { viewModel.smartEngagementManager.onShareCompleted() },
-                    onDismiss = { viewModel.smartEngagementManager.onShareDismissed() }
-                )
-            }
-            com.easeaudio.engagement.EngagementPromptType.UPDATE_APP -> {
-                UpdateAppDialog(
-                    updateInfo = updateInfo,
-                    onUpdateConfirmed = { viewModel.smartEngagementManager.onUpdateConfirmed() },
-                    onDismiss = { viewModel.smartEngagementManager.onUpdateDismissed() }
-                )
-            }
-            com.easeaudio.engagement.EngagementPromptType.NONE -> {}
         }
     }
 }

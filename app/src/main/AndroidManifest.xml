@@ -21,6 +21,7 @@
     <uses-feature android:name="android.hardware.microphone" android:required="false" />
 
     <!-- Android Auto & Android Automotive OS (AAOS) compatibility -->
+    <uses-feature android:name="android.hardware.type.automotive" android:required="false" />
     <uses-feature android:name="android.hardware.wifi" android:required="false" />
     <uses-feature android:name="android.hardware.screen.portrait" android:required="false" />
     <uses-feature android:name="android.hardware.screen.landscape" android:required="false" />
@@ -42,6 +43,24 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
 
+        <!--
+            Android Auto / AAOS: declares this app as a media app.
+            The host (Auto or AAOS system) reads this to show the app in the
+            media launcher and route playback controls to RadioPlaybackService.
+        -->
+        <meta-data
+            android:name="com.google.android.gms.car.application"
+            android:resource="@xml/automotive_app_desc" />
+
+        <!--
+            Notification small icon used in the Auto notification panel,
+            lock screen controls, and AAOS media notification bar.
+            Must be a single-color (monochrome) vector drawable.
+        -->
+        <meta-data
+            android:name="com.google.android.gms.car.notification.SmallIcon"
+            android:resource="@drawable/ic_notification" />
+
         <activity
             android:name=".MainActivity"
             android:banner="@drawable/tv_banner"
@@ -55,6 +74,16 @@
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.APPLICATION_PREFERENCES" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+            <!--
+                AAOS: allows the vehicle OS to launch the phone-side UI
+                when the user taps the app from the car's media launcher
+                while the phone is connected (Android Auto projection mode).
+            -->
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.CAR_MODE" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
@@ -110,14 +139,46 @@
             android:exported="true"
             android:foregroundServiceType="mediaPlayback">
             <intent-filter>
+                <!--
+                    android.media.browse.MediaBrowserService MUST be the first action listed.
+                    AAOS CarMediaService uses this to discover and connect to the media browser.
+                    Media3 MediaLibraryService implements this interface via its compat layer.
+                -->
+                <action android:name="android.media.browse.MediaBrowserService" />
                 <action android:name="androidx.media3.session.MediaLibraryService" />
                 <action android:name="androidx.media3.session.MediaSessionService" />
-                <action android:name="android.media.browse.MediaBrowserService" />
                 <action android:name="android.intent.action.MEDIA_BUTTON" />
                 <action android:name="android.media.action.MEDIA_PLAY_FROM_SEARCH" />
             </intent-filter>
             <meta-data
                 android:name="androidx.media3.session.MBS_COMPAT_MODE"
+                android:value="true" />
+            <!--
+                Android Auto: declares the notification small-icon at the
+                service level so the Auto media notification panel can
+                display the correct icon without launching the full app.
+            -->
+            <meta-data
+                android:name="android.media.SMALL_ICON"
+                android:resource="@drawable/ic_notification" />
+            <!--
+                AAOS: Declares this service as an Android Auto MEDIA category app.
+                Required for the car to categorize and present this app in the correct
+                section of the media launcher (not as a generic app).
+            -->
+            <meta-data
+                android:name="android.auto.app_category"
+                android:value="media" />
+            <!--
+                AAOS: opt-in for the car media browser (MediaSource).
+                The MediaConnectorService / MediaSource class in com.android.car.media
+                checks for this metadata before presenting an app in the in-car media
+                browser. Without it the service gets logged as "non media template app"
+                and is excluded from the in-car app switcher (though the MediaSession
+                still works for home-screen widget and media key control).
+            -->
+            <meta-data
+                android:name="android.car.media.media_template"
                 android:value="true" />
         </service>
 

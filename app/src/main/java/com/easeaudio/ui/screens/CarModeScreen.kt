@@ -52,6 +52,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import coil.compose.SubcomposeAsyncImage
+import coil.compose.SubcomposeAsyncImageContent
+import coil.compose.AsyncImagePainter
 import coil.request.ImageRequest
 import com.easeaudio.R
 import com.easeaudio.data.CuratedStationsService
@@ -169,7 +172,7 @@ fun CarModeScreen(
             val now = Date()
             currentClockTime = timeFormat.format(now)
             currentClockDate = dateFormat.format(now)
-            delay(10000L)
+            delay(1000L)  // Update every second for accurate cockpit clock display
         }
     }
 
@@ -508,6 +511,11 @@ private fun CarSideNav(
     onToggleAntiGlare: () -> Unit,
     onExit: () -> Unit
 ) {
+    val context = LocalContext.current
+    val isAutomotive = remember {
+        context.packageManager.hasSystemFeature("android.hardware.type.automotive")
+    }
+
     NavigationRail(
         containerColor = if (isAntiGlare) Color(0xFF080C10) else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f),
         header = {
@@ -515,19 +523,36 @@ private fun CarSideNav(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier.padding(top = 8.dp)
             ) {
-                IconButton(
-                    onClick = onExit,
-                    modifier = Modifier
-                        .size(44.dp)
-                        .clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f))
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.Close,
-                        contentDescription = stringResource(R.string.exit_car_mode),
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.size(22.dp)
-                    )
+                if (!isAutomotive) {
+                    IconButton(
+                        onClick = onExit,
+                        modifier = Modifier
+                            .size(44.dp)
+                            .clip(CircleShape)
+                            .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f))
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Close,
+                            contentDescription = stringResource(R.string.exit_car_mode),
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.size(22.dp)
+                        )
+                    }
+                } else {
+                    Box(
+                        modifier = Modifier
+                            .size(42.dp)
+                            .clip(CircleShape)
+                            .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Radio,
+                            contentDescription = "NeoTune Radio",
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(22.dp)
+                        )
+                    }
                 }
             }
         },
@@ -736,21 +761,28 @@ private fun CarTopNav(
             )
         }
 
-        Spacer(modifier = Modifier.width(4.dp))
+        val navContext = LocalContext.current
+        val isAutomotive = remember {
+            navContext.packageManager.hasSystemFeature("android.hardware.type.automotive")
+        }
 
-        IconButton(
-            onClick = onExit,
-            modifier = Modifier
-                .size(38.dp)
-                .clip(CircleShape)
-                .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f))
-        ) {
-            Icon(
-                imageVector = Icons.Filled.Close,
-                contentDescription = stringResource(R.string.exit_car_mode),
-                tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.size(18.dp)
-            )
+        if (!isAutomotive) {
+            Spacer(modifier = Modifier.width(4.dp))
+
+            IconButton(
+                onClick = onExit,
+                modifier = Modifier
+                    .size(38.dp)
+                    .clip(CircleShape)
+                    .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f))
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Close,
+                    contentDescription = stringResource(R.string.exit_car_mode),
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.size(18.dp)
+                )
+            }
         }
     }
 }
@@ -869,15 +901,15 @@ private fun AutomotiveHeroPlayer(
                                 ),
                             contentAlignment = Alignment.Center
                         ) {
-                            coil.compose.SubcomposeAsyncImage(
+                            SubcomposeAsyncImage(
                                 model = carImageRequest,
                                 contentDescription = currentStation?.name,
                                 contentScale = ContentScale.Crop,
                                 modifier = Modifier.fillMaxSize()
                             ) {
                                 val state = painter.state
-                                if (state is coil.compose.AsyncImagePainter.State.Success) {
-                                    coil.compose.SubcomposeAsyncImageContent()
+                                if (state is AsyncImagePainter.State.Success) {
+                                    SubcomposeAsyncImageContent()
                                 } else {
                                     com.easeaudio.ui.components.StationMonogramAvatar(
                                         name = currentStation?.name ?: "",
@@ -1464,7 +1496,7 @@ private fun AutomotiveHeroPlayer(
                                                     .padding(horizontal = 8.dp, vertical = 6.dp),
                                                 verticalAlignment = Alignment.CenterVertically
                                             ) {
-                                                coil.compose.SubcomposeAsyncImage(
+                                                SubcomposeAsyncImage(
                                                     model = episode.artworkUrl.ifBlank { currentStation?.imageUrl },
                                                     contentDescription = null,
                                                     contentScale = ContentScale.Crop,
@@ -1473,8 +1505,8 @@ private fun AutomotiveHeroPlayer(
                                                         .clip(RoundedCornerShape(6.dp))
                                                 ) {
                                                     val epState = painter.state
-                                                    if (epState is coil.compose.AsyncImagePainter.State.Success) {
-                                                        coil.compose.SubcomposeAsyncImageContent()
+                                                    if (epState is AsyncImagePainter.State.Success) {
+                                                        SubcomposeAsyncImageContent()
                                                     } else {
                                                         com.easeaudio.ui.components.StationMonogramAvatar(
                                                             name = currentStation?.name ?: "",
@@ -1658,15 +1690,15 @@ private fun AutomotiveHeroPlayer(
                         ),
                     contentAlignment = Alignment.Center
                 ) {
-                    coil.compose.SubcomposeAsyncImage(
+                    SubcomposeAsyncImage(
                         model = carImageRequest,
                         contentDescription = currentStation?.name,
                         contentScale = ContentScale.Crop,
                         modifier = Modifier.fillMaxSize()
                     ) {
                         val state = painter.state
-                        if (state is coil.compose.AsyncImagePainter.State.Success) {
-                            coil.compose.SubcomposeAsyncImageContent()
+                        if (state is AsyncImagePainter.State.Success) {
+                            SubcomposeAsyncImageContent()
                         } else {
                             com.easeaudio.ui.components.StationMonogramAvatar(
                                 name = currentStation?.name ?: "",
@@ -1956,7 +1988,7 @@ private fun AutomotiveStationList(
                             name = station.name, favicon = station.imageUrl, homepage = "", tags = station.genre
                         ).ifBlank { null }
                     }
-                    coil.compose.SubcomposeAsyncImage(
+                    SubcomposeAsyncImage(
                         model = favResolvedUrl,
                         contentDescription = null,
                         contentScale = ContentScale.Crop,
@@ -1965,8 +1997,8 @@ private fun AutomotiveStationList(
                             .clip(RoundedCornerShape(6.dp))
                     ) {
                         val favState = painter.state
-                        if (favState is coil.compose.AsyncImagePainter.State.Success) {
-                            coil.compose.SubcomposeAsyncImageContent()
+                        if (favState is AsyncImagePainter.State.Success) {
+                            SubcomposeAsyncImageContent()
                         } else {
                             com.easeaudio.ui.components.StationMonogramAvatar(
                                 name = station.name,
@@ -2203,7 +2235,7 @@ private fun CuratedAudiophileCarRow(
                                 name = station.name, favicon = station.imageUrl, homepage = "", tags = station.genre
                             ).ifBlank { null }
                         }
-                        coil.compose.SubcomposeAsyncImage(
+                        SubcomposeAsyncImage(
                             model = curatedResolvedUrl,
                             contentDescription = null,
                             contentScale = ContentScale.Crop,
@@ -2212,8 +2244,8 @@ private fun CuratedAudiophileCarRow(
                                 .clip(RoundedCornerShape(8.dp))
                         ) {
                             val state = painter.state
-                            if (state is coil.compose.AsyncImagePainter.State.Success) {
-                                coil.compose.SubcomposeAsyncImageContent()
+                            if (state is AsyncImagePainter.State.Success) {
+                                SubcomposeAsyncImageContent()
                             } else {
                                 com.easeaudio.ui.components.StationMonogramAvatar(
                                     name = station.name,
@@ -2332,6 +2364,7 @@ private fun AutomotiveGrid(
     LazyVerticalGrid(
         columns = GridCells.Fixed(columns),
         state = gridState,
+        contentPadding = PaddingValues(top = 4.dp, start = 4.dp, end = 4.dp, bottom = 84.dp),
         horizontalArrangement = Arrangement.spacedBy(12.dp),
         verticalArrangement = Arrangement.spacedBy(10.dp),
         modifier = modifier
@@ -2376,15 +2409,15 @@ private fun AutomotiveGrid(
                                 name = station.name, favicon = station.imageUrl, homepage = "", tags = station.genre
                             ).ifBlank { null }
                         }
-                        coil.compose.SubcomposeAsyncImage(
+                        SubcomposeAsyncImage(
                             model = listCardResolvedUrl,
                             contentDescription = null,
                             contentScale = ContentScale.Crop,
                             modifier = Modifier.fillMaxSize()
                         ) {
                             val lcState = painter.state
-                            if (lcState is coil.compose.AsyncImagePainter.State.Success) {
-                                coil.compose.SubcomposeAsyncImageContent()
+                            if (lcState is AsyncImagePainter.State.Success) {
+                                SubcomposeAsyncImageContent()
                             } else {
                                 com.easeaudio.ui.components.StationMonogramAvatar(
                                     name = station.name,
@@ -2513,7 +2546,7 @@ private fun CarMiniPlayer(
                     name = station.name, favicon = station.imageUrl, homepage = "", tags = station.genre
                 ).ifBlank { null }
             }
-            coil.compose.SubcomposeAsyncImage(
+            SubcomposeAsyncImage(
                 model = miniBarResolvedUrl,
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
@@ -2522,8 +2555,8 @@ private fun CarMiniPlayer(
                     .clip(RoundedCornerShape(8.dp))
             ) {
                 val mbState = painter.state
-                if (mbState is coil.compose.AsyncImagePainter.State.Success) {
-                    coil.compose.SubcomposeAsyncImageContent()
+                if (mbState is AsyncImagePainter.State.Success) {
+                    SubcomposeAsyncImageContent()
                 } else {
                     com.easeaudio.ui.components.StationMonogramAvatar(
                         name = station.name,

@@ -54,6 +54,11 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import com.easeaudio.util.StationLogoResolver
+import androidx.media3.session.SessionCommand
+import androidx.media3.session.SessionResult
+import androidx.media3.session.CommandButton
+import android.os.Bundle
 
 data class PlaybackErrorDetails(
     val stationName: String,
@@ -113,6 +118,11 @@ class RadioPlayerManager(private val context: Context) {
                 instance ?: RadioPlayerManager(context.applicationContext).also { instance = it }
             }
         }
+
+        // Custom session commands for Android Auto / AAOS media controls bar
+        const val CMD_THUMB_UP   = "com.neotune.radio.CMD_THUMB_UP"
+        const val CMD_SKIP_NEXT  = "com.neotune.radio.CMD_SKIP_NEXT"
+        const val CMD_THUMB_DOWN = "com.neotune.radio.CMD_THUMB_DOWN"
     }
 
     private val TAG = "RadioPlayerManager"
@@ -747,17 +757,63 @@ class RadioPlayerManager(private val context: Context) {
                     }
                 }
 
+                // CommandButtons shown in Android Auto / AAOS media controls bar.
+                // Declared before the callback so onConnect() can reference them when setting the custom layout.
+                val thumbUpButton = CommandButton.Builder(CommandButton.ICON_HEART_UNFILLED)
+                    .setDisplayName("Favorite")
+                    .setSessionCommand(SessionCommand(CMD_THUMB_UP, Bundle.EMPTY))
+                    .build()
+                val skipNextButton = CommandButton.Builder(CommandButton.ICON_NEXT)
+                    .setDisplayName("Next Station")
+                    .setSessionCommand(SessionCommand(CMD_SKIP_NEXT, Bundle.EMPTY))
+                    .build()
+                val thumbDownButton = CommandButton.Builder(CommandButton.ICON_SKIP_FORWARD_5)
+                    .setDisplayName("Skip Station")
+                    .setSessionCommand(SessionCommand(CMD_THUMB_DOWN, Bundle.EMPTY))
+                    .build()
+
                 val mediaLibraryCallback = object : MediaLibrarySession.Callback {
+
+                    // Grant Car Media / Android Auto full playback + browsing permissions when they connect.
+                    // Without this, com.android.car.media and com.google.android.projection.gearhead
+                    // connect but receive SessionResult.RESULT_ERROR_PERMISSION_DENIED on every command.
+                    override fun onConnect(
+                        session: MediaSession,
+                        controller: MediaSession.ControllerInfo
+                    ): MediaSession.ConnectionResult {
+                        val sessionCommands = MediaSession.ConnectionResult.DEFAULT_SESSION_AND_LIBRARY_COMMANDS.buildUpon()
+                            .add(SessionCommand(CMD_THUMB_UP, Bundle.EMPTY))
+                            .add(SessionCommand(CMD_SKIP_NEXT, Bundle.EMPTY))
+                            .add(SessionCommand(CMD_THUMB_DOWN, Bundle.EMPTY))
+                            .build()
+                        val playerCommands = MediaSession.ConnectionResult.DEFAULT_PLAYER_COMMANDS.buildUpon()
+                            .add(Player.COMMAND_SEEK_TO_NEXT)
+                            .add(Player.COMMAND_SEEK_TO_PREVIOUS)
+                            .add(Player.COMMAND_SEEK_TO_NEXT_MEDIA_ITEM)
+                            .add(Player.COMMAND_SEEK_TO_PREVIOUS_MEDIA_ITEM)
+                            .build()
+                        return MediaSession.ConnectionResult.AcceptedResultBuilder(session)
+                            .setAvailableSessionCommands(sessionCommands)
+                            .setAvailablePlayerCommands(playerCommands)
+                            .setCustomLayout(listOf(thumbUpButton, skipNextButton, thumbDownButton))
+                            .build()
+                    }
+
                     override fun onGetLibraryRoot(
                         session: MediaLibrarySession,
                         browser: MediaSession.ControllerInfo,
                         params: MediaLibraryService.LibraryParams?
                     ): ListenableFuture<LibraryResult<MediaItem>> {
+                        // When AAOS / Android Auto asks for "recent" root (e.g. after phone reconnects),
+                        // return the same root and let onGetChildren serve recently played items from "folder_recent".
+                        // Returning an error here would cause the car HMI to show a blank / not-available state.
+                        val rootId = if (params?.isRecent == true) "folder_recent" else "root_neotune"
+                        val rootTitle = if (params?.isRecent == true) "Recently Played" else "Neotune"
                         val rootItem = createFolderItem(
-                            id = "root_neotune",
-                            title = "Neotune",
+                            id = rootId,
+                            title = rootTitle,
                             mediaType = MediaMetadata.MEDIA_TYPE_FOLDER_MIXED,
-                            subtitle = "Internet Radio & Podcasts"
+                            subtitle = if (params?.isRecent == true) "Pick up where you left off" else "Internet Radio & Podcasts"
                         )
                         return Futures.immediateFuture(LibraryResult.ofItem(rootItem, params))
                     }
@@ -775,6 +831,10 @@ class RadioPlayerManager(private val context: Context) {
                             try {
                                 val items = mutableListOf<MediaItem>()
                                 when (parentId) {
+                                    // When AAOS uses "folder_recent" as the library root (isRecent=true flow),
+                                    // it will call onGetChildren("folder_recent") directly — handled by the
+                                    // dedicated "folder_recent" branch below. The standard root still provides
+                                    // the full folder hierarchy.
                                     "root_neotune", "root", "/" -> {
                                         items.add(createFolderItem("folder_favorites", "Favorites", MediaMetadata.MEDIA_TYPE_FOLDER_RADIO_STATIONS, "Starred stations & podcasts"))
                                         items.add(createFolderItem("folder_top", "Top & Trending", MediaMetadata.MEDIA_TYPE_FOLDER_RADIO_STATIONS, "Featured global streams"))
@@ -994,6 +1054,7 @@ class RadioPlayerManager(private val context: Context) {
                         return future
                     }
 
+                    @OptIn(UnstableApi::class)
                     override fun onPlaybackResumption(
                         mediaSession: MediaSession,
                         controller: MediaSession.ControllerInfo
@@ -1026,7 +1087,7 @@ class RadioPlayerManager(private val context: Context) {
                                     }
                                     future.set(itemsWithStart)
                                 } else {
-                                    future.setException(UnsupportedOperationException("No station to resume"))
+                                    future.setException(UnsupportedOperationException("No recent station to resume"))
                                 }
                             } catch (e: Exception) {
                                 future.setException(e)
@@ -1053,10 +1114,67 @@ class RadioPlayerManager(private val context: Context) {
                         }
                         return super.onPlayerCommandRequest(session, controller, playerCommand)
                     }
+
+                    override fun onCustomCommand(
+                        session: MediaSession,
+                        controller: MediaSession.ControllerInfo,
+                        customCommand: SessionCommand,
+                        args: Bundle
+                    ): ListenableFuture<SessionResult> {
+                        when (customCommand.customAction) {
+                            CMD_THUMB_UP -> {
+                                val station = _currentStation.value
+                                if (station != null) {
+                                    scope.launch(Dispatchers.IO) {
+                                        try {
+                                            val db = RadioDatabase.getDatabase(context)
+                                            val isFav = db.favoriteDao().isFavoriteDirect(station.id)
+                                            if (isFav) {
+                                                db.favoriteDao().deleteFavoriteById(station.id)
+                                                db.radioDao().updateFavoriteStatus(station.id, false)
+                                                knownStations[station.id] = station.copy(isFavorite = false)
+                                            } else {
+                                                val favEntity = com.easeaudio.data.FavoriteStation(
+                                                    id = station.id,
+                                                    name = station.name,
+                                                    streamUrl = station.streamUrl,
+                                                    genre = station.genre,
+                                                    country = station.country,
+                                                    imageUrl = station.imageUrl,
+                                                    bitrate = station.bitrate,
+                                                    codec = station.codec,
+                                                    isCustom = station.isCustom
+                                                )
+                                                db.favoriteDao().insertFavorite(favEntity)
+                                                db.radioDao().updateFavoriteStatus(station.id, true)
+                                                knownStations[station.id] = station.copy(isFavorite = true)
+                                            }
+                                            withContext(Dispatchers.Main) {
+                                                _currentStation.value = knownStations[station.id]
+                                            }
+                                        } catch (e: Exception) {
+                                            Log.w(TAG, "Error toggling favorite from Auto: ${e.message}")
+                                        }
+                                    }
+                                }
+                            }
+                            CMD_SKIP_NEXT -> {
+                                scope.launch(Dispatchers.Main) { playNextStation(currentStationList) }
+                            }
+                            CMD_THUMB_DOWN -> {
+                                // Skip to next (thumb-down = skip this station)
+                                scope.launch(Dispatchers.Main) { playNextStation(currentStationList) }
+                            }
+                        }
+                        return Futures.immediateFuture(SessionResult(SessionResult.RESULT_SUCCESS))
+                    }
                 }
 
+                // Use applicationContext + explicit session ID so AAOS CarMediaService can
+                // reliably discover and reconnect to this session after process restart.
                 mediaLibrarySession = MediaLibrarySession.Builder(context.applicationContext, forwardingPlayer, mediaLibraryCallback)
                     .setSessionActivity(pendingIntent)
+                    .setId("neotune_radio_session")
                     .build().also {
                         sharedMediaLibrarySession = it
                     }
@@ -1067,8 +1185,22 @@ class RadioPlayerManager(private val context: Context) {
     }
 
     fun stationToMediaItem(station: RadioStation): MediaItem {
+        // Resolve best-available artwork URL (handles .ico files, blocked domains,
+        // known broadcaster domains, and genre-themed Unsplash fallbacks).
+        // This ensures Android Auto and AAOS always show a proper image in the
+        // Now Playing card rather than a blank / broken icon.
+        val resolvedArtworkUrl = try {
+            StationLogoResolver.resolveStationLogo(
+                name = station.name,
+                favicon = station.imageUrl,
+                homepage = "",
+                tags = station.genre
+            ).ifBlank { null }
+        } catch (e: Exception) {
+            if (station.imageUrl.isNotBlank()) station.imageUrl else null
+        }
         val artworkUri = try {
-            if (station.imageUrl.isNotBlank()) Uri.parse(station.imageUrl) else null
+            if (resolvedArtworkUrl != null) Uri.parse(resolvedArtworkUrl) else null
         } catch (e: Exception) {
             null
         }

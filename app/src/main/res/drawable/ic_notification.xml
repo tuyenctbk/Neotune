@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    ic_notification.xml  — Monochrome notification / status-bar icon
+    Android Auto & AAOS require a single-color (white on transparent) icon.
+    This uses the same radio-tower + equalizer bars motif as the launcher icon.
+    Size: 24dp × 24dp (standard notification icon), viewport 24x24.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24"
+    android:tint="?attr/colorControlNormal">
+
+    <!-- Outer radio-wave arc -->
+    <path
+        android:pathData="M 5,11.5 A 7,7 0 0 1 19,11.5"
+        android:strokeColor="@android:color/white"
+        android:strokeWidth="1.5"
+        android:strokeLineCap="round"
+        android:fillColor="@android:color/transparent" />
+
+    <!-- Inner radio-wave arc -->
+    <path
+        android:pathData="M 7.5,11.5 A 4.5,4.5 0 0 1 16.5,11.5"
+        android:strokeColor="@android:color/white"
+        android:strokeWidth="1.5"
+        android:strokeLineCap="round"
+        android:fillColor="@android:color/transparent" />
+
+    <!-- Beacon dot at tower tip -->
+    <path
+        android:pathData="M 12,8 m -1.2,0 a 1.2,1.2 0 1,0 2.4,0 a 1.2,1.2 0 1,0 -2.4,0"
+        android:fillColor="@android:color/white" />
+
+    <!-- 5 equalizer bars (short | mid | tall | mid | short) -->
+    <!-- Bar 1 (leftmost, short) -->
+    <path
+        android:pathData="M 7,17 L 7,21"
+        android:strokeColor="@android:color/white"
+        android:strokeWidth="1.4"
+        android:strokeLineCap="round" />
+    <!-- Bar 2 -->
+    <path
+        android:pathData="M 9.5,15.5 L 9.5,21"
+        android:strokeColor="@android:color/white"
+        android:strokeWidth="1.4"
+        android:strokeLineCap="round" />
+    <!-- Bar 3 (center, tallest) -->
+    <path
+        android:pathData="M 12,13.5 L 12,21"
+        android:strokeColor="@android:color/white"
+        android:strokeWidth="1.4"
+        android:strokeLineCap="round" />
+    <!-- Bar 4 -->
+    <path
+        android:pathData="M 14.5,15.5 L 14.5,21"
+        android:strokeColor="@android:color/white"
+        android:strokeWidth="1.4"
+        android:strokeLineCap="round" />
+    <!-- Bar 5 (rightmost, short) -->
+    <path
+        android:pathData="M 17,17 L 17,21"
+        android:strokeColor="@android:color/white"
+        android:strokeWidth="1.4"
+        android:strokeLineCap="round" />
+
+</vector>

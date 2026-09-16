@@ -35,6 +35,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import coil.compose.SubcomposeAsyncImage
+import coil.compose.SubcomposeAsyncImageContent
+import coil.compose.AsyncImagePainter
 import com.easeaudio.R
 import com.easeaudio.data.PodcastEpisode
 import com.easeaudio.data.RadioStation
@@ -148,7 +151,7 @@ fun PodcastEpisodesSheet(
                             .padding(bottom = 16.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        coil.compose.SubcomposeAsyncImage(
+                        SubcomposeAsyncImage(
                             model = show.imageUrl,
                             contentDescription = show.name,
                             contentScale = ContentScale.Crop,
@@ -157,8 +160,8 @@ fun PodcastEpisodesSheet(
                                 .clip(RoundedCornerShape(14.dp))
                         ) {
                             val state = painter.state
-                            if (state is coil.compose.AsyncImagePainter.State.Success) {
-                                coil.compose.SubcomposeAsyncImageContent()
+                            if (state is AsyncImagePainter.State.Success) {
+                                SubcomposeAsyncImageContent()
                             } else {
                                 StationMonogramAvatar(
                                     name = show.name,
@@ -480,7 +483,7 @@ fun PodcastEpisodeDetailView(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            coil.compose.SubcomposeAsyncImage(
+            SubcomposeAsyncImage(
                 model = episode.artworkUrl.ifBlank { show.imageUrl },
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
@@ -490,8 +493,8 @@ fun PodcastEpisodeDetailView(
                     .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(12.dp))
             ) {
                 val state = painter.state
-                if (state is coil.compose.AsyncImagePainter.State.Success) {
-                    coil.compose.SubcomposeAsyncImageContent()
+                if (state is AsyncImagePainter.State.Success) {
+                    SubcomposeAsyncImageContent()
                 } else {
                     StationMonogramAvatar(
                         name = show.name,
@@ -860,7 +863,7 @@ fun PodcastEpisodeDetailView(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    coil.compose.SubcomposeAsyncImage(
+                    SubcomposeAsyncImage(
                         model = episode.artworkUrl.ifBlank { show.imageUrl },
                         contentDescription = null,
                         contentScale = ContentScale.Crop,
@@ -869,8 +872,8 @@ fun PodcastEpisodeDetailView(
                             .clip(RoundedCornerShape(8.dp))
                     ) {
                         val state = painter.state
-                        if (state is coil.compose.AsyncImagePainter.State.Success) {
-                            coil.compose.SubcomposeAsyncImageContent()
+                        if (state is AsyncImagePainter.State.Success) {
+                            SubcomposeAsyncImageContent()
                         } else {
                             StationMonogramAvatar(
                                 name = show.name,

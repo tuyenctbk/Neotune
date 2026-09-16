@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    automotive_app_desc.xml
+    Declares Neotune capabilities to Android Auto and Android Automotive OS.
+    - "media"       → app appears in the car's media launcher / Now Playing card
+    - "notification" → allows the app's notification to show on the car's HMI
+-->
+<automotiveApp>
+    <uses name="media"/>
+    <uses name="notification"/>
+</automotiveApp>
