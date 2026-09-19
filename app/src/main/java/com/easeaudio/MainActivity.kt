@@ -92,7 +92,24 @@ class MainActivity : ComponentActivity() {
 
     @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
-        installSplashScreen()
+        val splashScreen = installSplashScreen()
+        splashScreen.setOnExitAnimationListener { splashScreenViewProvider ->
+            val fadeOut = android.animation.ObjectAnimator.ofFloat(
+                splashScreenViewProvider.view,
+                android.view.View.ALPHA,
+                1f,
+                0f
+            ).apply {
+                duration = 280L
+                interpolator = android.view.animation.AccelerateDecelerateInterpolator()
+                addListener(object : android.animation.AnimatorListenerAdapter() {
+                    override fun onAnimationEnd(animation: android.animation.Animator) {
+                        splashScreenViewProvider.remove()
+                    }
+                })
+            }
+            fadeOut.start()
+        }
         super.onCreate(savedInstanceState)
         AppThemeState.loadTheme(applicationContext)
         enableEdgeToEdge()
