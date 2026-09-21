@@ -201,13 +201,13 @@ fun StationCard(
                     }
                     Box(
                         modifier = Modifier
-                            .size(60.dp)
-                            .clip(RoundedCornerShape(14.dp))
+                            .size(68.dp)
+                            .clip(RoundedCornerShape(16.dp))
                             .background(MaterialTheme.colorScheme.surfaceVariant)
                             .border(
-                                width = if (isFocused) 2.dp else if (isSelected) 1.5.dp else 0.dp,
+                                width = if (isFocused) 2.5.dp else if (isSelected) 1.5.dp else 0.dp,
                                 color = if (isFocused) activeAccent else if (isSelected) activeAccent.copy(alpha = 0.5f) else Color.Transparent,
-                                shape = RoundedCornerShape(14.dp)
+                                shape = RoundedCornerShape(16.dp)
                             )
                     ) {
                         coil.compose.SubcomposeAsyncImage(
