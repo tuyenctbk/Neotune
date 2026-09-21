@@ -75,7 +75,7 @@ fun RateAppDialog(
                     ) {
                         Icon(
                             imageVector = Icons.Filled.Close,
-                            contentDescription = "Close",
+                            contentDescription = stringResource(R.string.close),
                             tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
                             modifier = Modifier.size(18.dp)
                         )
@@ -142,7 +142,7 @@ fun RateAppDialog(
                         ) {
                             Icon(
                                 imageVector = if (isSelected) Icons.Filled.Star else Icons.Outlined.Star,
-                                contentDescription = "Star $starIndex",
+                                contentDescription = stringResource(R.string.star_rating_desc, starIndex),
                                 tint = starColor,
                                 modifier = Modifier.size(36.dp)
                             )

@@ -267,7 +267,7 @@ fun MiniPlayer(
                     ) {
                         Icon(
                             imageVector = if (station.isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
-                            contentDescription = "Favorite",
+                            contentDescription = stringResource(R.string.favorites),
                             tint = if (isFavFocused) MaterialTheme.colorScheme.background else (if (station.isFavorite) FavoriteHeartColor else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)),
                             modifier = Modifier.size(20.dp)
                         )
@@ -289,7 +289,7 @@ fun MiniPlayer(
                     ) {
                         Icon(
                             imageVector = Icons.Filled.OpenInFull,
-                            contentDescription = "Fullscreen Player",
+                            contentDescription = stringResource(R.string.fullscreen_player),
                             tint = if (isExpandFocused) MaterialTheme.colorScheme.background else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
                             modifier = Modifier.size(18.dp)
                         )

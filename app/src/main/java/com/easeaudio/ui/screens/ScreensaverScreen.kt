@@ -199,7 +199,7 @@ fun ScreensaverScreen(
                 if (resolvedArt?.isNotEmpty() == true) {
                     AsyncImage(
                         model = resolvedArt,
-                        contentDescription = "Background Cover Art",
+                        contentDescription = stringResource(R.string.theme_station_cover),
                         contentScale = ContentScale.Crop,
                         modifier = Modifier
                             .fillMaxSize()
@@ -710,7 +710,7 @@ fun ScreensaverScreen(
                                 ) {
                                     Icon(
                                         imageVector = if (currentStation.isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
-                                        contentDescription = "Favorite",
+                                        contentDescription = stringResource(R.string.favorites),
                                         tint = if (currentStation.isFavorite) FavoriteHeartColor else if (isFavFocused) Color.White else MaterialTheme.colorScheme.onSurfaceVariant,
                                         modifier = Modifier.size(20.dp)
                                     )

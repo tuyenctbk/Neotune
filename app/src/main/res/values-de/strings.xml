@@ -462,4 +462,28 @@
     <string name="no_featured_yet">Derzeit keine empfohlenen Streams</string>
 
     <string name="quick_resume">Schnell fortsetzen</string>
+    <string name="previous_station">Vorheriger Sender</string>
+    <string name="more_options">Weitere Optionen</string>
+    <string name="rewind_10s">10s zurückspulen</string>
+    <string name="forward_30s">30s vorspulen</string>
+    <string name="share_episode">Episode teilen</string>
+    <string name="add_to_playlist">Zur Playlist hinzufügen</string>
+    <string name="download_file">Datei herunterladen</string>
+    <string name="mark_as_finished">Als gehört markieren</string>
+    <string name="add_to_queue">Zur Wiedergabewarteschlange hinzufügen</string>
+    <string name="saved_to_library">In deiner Mediathek gespeichert!</string>
+    <string name="removed_from_library">Aus Mediathek entfernt</string>
+    <string name="link_copied">Link zum Teilen kopiert!</string>
+    <string name="episode_downloaded">Episode erfolgreich heruntergeladen!</string>
+    <string name="removed_from_downloads">Aus Downloads entfernt</string>
+    <string name="share_link_copied">Freigabelink in Zwischenablage kopiert!</string>
+    <string name="seeking_to">Springe zu: %1$s</string>
+    <string name="remove">Entfernen</string>
+    <string name="selected">Ausgewählt</string>
+    <string name="global_country">Weltweit</string>
+    <string name="fullscreen_player">Vollbild-Player</string>
+    <string name="add_to_your_episodes">Zu deinen Episoden hinzufügen</string>
+    <string name="remove_from_your_episodes">Aus deinen Episoden entfernen</string>
+    <string name="star_rating_desc">Stern %1$d</string>
+    <string name="stream_link">Stream-Link</string>
 </resources>

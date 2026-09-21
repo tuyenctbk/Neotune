@@ -449,4 +449,28 @@
     <string name="no_featured_yet">현재 추천 스트림이 없습니다</string>
 
     <string name="quick_resume">빠른 이어듣기</string>
+    <string name="previous_station">이전 방송국</string>
+    <string name="more_options">추가 옵션</string>
+    <string name="rewind_10s">10초 되감기</string>
+    <string name="forward_30s">30초 앞으로</string>
+    <string name="share_episode">에피소드 공유</string>
+    <string name="add_to_playlist">재생목록에 추가</string>
+    <string name="download_file">파일 다운로드</string>
+    <string name="mark_as_finished">청취 완료로 표시</string>
+    <string name="add_to_queue">재생 대기열에 추가</string>
+    <string name="saved_to_library">보관함에 저장되었습니다!</string>
+    <string name="removed_from_library">보관함에서 삭제되었습니다</string>
+    <string name="link_copied">공유 링크가 복사되었습니다!</string>
+    <string name="episode_downloaded">에피소드가 성공적으로 다운로드되었습니다!</string>
+    <string name="removed_from_downloads">다운로드에서 삭제되었습니다</string>
+    <string name="share_link_copied">링크가 클립보드에 복사되었습니다!</string>
+    <string name="seeking_to">이동: %1$s</string>
+    <string name="remove">삭제</string>
+    <string name="selected">선택됨</string>
+    <string name="global_country">글로벌</string>
+    <string name="fullscreen_player">전체 화면 플레이어</string>
+    <string name="add_to_your_episodes">내 에피소드에 추가</string>
+    <string name="remove_from_your_episodes">내 에피소드에서 삭제</string>
+    <string name="star_rating_desc">별 %1$d개</string>
+    <string name="stream_link">스트림 링크</string>
 </resources>

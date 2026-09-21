@@ -462,4 +462,28 @@
     <string name="no_featured_yet">Hiện chưa có luồng nổi bật nào</string>
 
     <string name="quick_resume">Tiếp tục nhanh</string>
+    <string name="previous_station">Kênh trước</string>
+    <string name="more_options">Tùy chọn khác</string>
+    <string name="rewind_10s">Tua lại 10 giây</string>
+    <string name="forward_30s">Tua tới 30 giây</string>
+    <string name="share_episode">Chia sẻ tập</string>
+    <string name="add_to_playlist">Thêm vào danh sách phát</string>
+    <string name="download_file">Tải tệp xuống</string>
+    <string name="mark_as_finished">Đánh dấu đã nghe xong</string>
+    <string name="add_to_queue">Thêm vào hàng đợi phát</string>
+    <string name="saved_to_library">Đã lưu vào thư viện!</string>
+    <string name="removed_from_library">Đã xóa khỏi thư viện</string>
+    <string name="link_copied">Đã sao chép liên kết chia sẻ!</string>
+    <string name="episode_downloaded">Đã tải tập thành công!</string>
+    <string name="removed_from_downloads">Đã xóa khỏi danh sách tải</string>
+    <string name="share_link_copied">Đã sao chép liên kết vào khay nhớ tạm!</string>
+    <string name="seeking_to">Chuyển đến: %1$s</string>
+    <string name="remove">Xóa</string>
+    <string name="selected">Đã chọn</string>
+    <string name="global_country">Toàn cầu</string>
+    <string name="fullscreen_player">Trình phát toàn màn hình</string>
+    <string name="add_to_your_episodes">Thêm vào tập của bạn</string>
+    <string name="remove_from_your_episodes">Xóa khỏi tập của bạn</string>
+    <string name="star_rating_desc">%1$d sao</string>
+    <string name="stream_link">Liên kết phát trực tuyến</string>
 </resources>

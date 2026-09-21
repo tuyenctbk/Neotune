@@ -449,4 +449,28 @@
     <string name="no_featured_yet">Aucun flux en vedette pour le moment</string>
 
     <string name="quick_resume">Reprise rapide</string>
+    <string name="previous_station">Station précédente</string>
+    <string name="more_options">Plus d\'options</string>
+    <string name="rewind_10s">Reculer de 10 s</string>
+    <string name="forward_30s">Avancer de 30 s</string>
+    <string name="share_episode">Partager l\'épisode</string>
+    <string name="add_to_playlist">Ajouter à la playlist</string>
+    <string name="download_file">Télécharger le fichier</string>
+    <string name="mark_as_finished">Marquer comme terminé</string>
+    <string name="add_to_queue">Ajouter à la file d\'attente</string>
+    <string name="saved_to_library">Enregistré dans votre bibliothèque !</string>
+    <string name="removed_from_library">Supprimé de la bibliothèque</string>
+    <string name="link_copied">Lien copié pour partager !</string>
+    <string name="episode_downloaded">Épisode téléchargé avec succès !</string>
+    <string name="removed_from_downloads">Supprimé des téléchargements</string>
+    <string name="share_link_copied">Lien copié dans le presse-papiers !</string>
+    <string name="seeking_to">Position : %1$s</string>
+    <string name="remove">Supprimer</string>
+    <string name="selected">Sélectionné</string>
+    <string name="global_country">Mondial</string>
+    <string name="fullscreen_player">Lecteur plein écran</string>
+    <string name="add_to_your_episodes">Ajouter à vos épisodes</string>
+    <string name="remove_from_your_episodes">Supprimer de vos épisodes</string>
+    <string name="star_rating_desc">Étoile %1$d</string>
+    <string name="stream_link">Lien de streaming</string>
 </resources>

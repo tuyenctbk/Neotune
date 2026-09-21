@@ -449,4 +449,28 @@
     <string name="no_featured_yet">現在おすすめの配信はありません</string>
 
     <string name="quick_resume">クイック再開</string>
+    <string name="previous_station">前の放送局</string>
+    <string name="more_options">その他のオプション</string>
+    <string name="rewind_10s">10秒戻る</string>
+    <string name="forward_30s">30秒進む</string>
+    <string name="share_episode">エピソードを共有</string>
+    <string name="add_to_playlist">プレイリストに追加</string>
+    <string name="download_file">ファイルをダウンロード</string>
+    <string name="mark_as_finished">再生済みにする</string>
+    <string name="add_to_queue">再生キューに追加</string>
+    <string name="saved_to_library">ライブラリに保存しました！</string>
+    <string name="removed_from_library">ライブラリから削除しました</string>
+    <string name="link_copied">共有リンクをコピーしました！</string>
+    <string name="episode_downloaded">エピソードをダウンロードしました！</string>
+    <string name="removed_from_downloads">ダウンロードから削除しました</string>
+    <string name="share_link_copied">クリップボードにコピーしました！</string>
+    <string name="seeking_to">スキップ: %1$s</string>
+    <string name="remove">削除</string>
+    <string name="selected">選択中</string>
+    <string name="global_country">グローバル</string>
+    <string name="fullscreen_player">フルスクリーンプレイヤー</string>
+    <string name="add_to_your_episodes">マイエピソードに追加</string>
+    <string name="remove_from_your_episodes">マイエピソードから削除</string>
+    <string name="star_rating_desc">星 %1$d</string>
+    <string name="stream_link">ストリームリンク</string>
 </resources>

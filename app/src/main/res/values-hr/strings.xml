@@ -446,4 +446,28 @@
     <string name="no_featured_yet">Trenutačno nema istaknutih streamova</string>
 
     <string name="quick_resume">Brzi nastavak</string>
+    <string name="previous_station">Previous Station</string>
+    <string name="more_options">More Options</string>
+    <string name="rewind_10s">Rewind 10s</string>
+    <string name="forward_30s">Forward 30s</string>
+    <string name="share_episode">Share Episode</string>
+    <string name="add_to_playlist">Add to Playlist</string>
+    <string name="download_file">Download File</string>
+    <string name="mark_as_finished">Mark as Finished</string>
+    <string name="add_to_queue">Add to Playback Queue</string>
+    <string name="saved_to_library">Saved to your library!</string>
+    <string name="removed_from_library">Removed from library</string>
+    <string name="link_copied">Link copied to share!</string>
+    <string name="episode_downloaded">Episode downloaded successfully!</string>
+    <string name="removed_from_downloads">Removed from Downloads</string>
+    <string name="share_link_copied">Share link copied to clipboard!</string>
+    <string name="seeking_to">Seeking to: %1$s</string>
+    <string name="remove">Remove</string>
+    <string name="selected">Selected</string>
+    <string name="global_country">Global</string>
+    <string name="fullscreen_player">Fullscreen Player</string>
+    <string name="add_to_your_episodes">Add to Your Episodes</string>
+    <string name="remove_from_your_episodes">Remove from Your Episodes</string>
+    <string name="star_rating_desc">Zvijezda %1$d</string>
+    <string name="stream_link">Poveznica na stream</string>
 </resources>

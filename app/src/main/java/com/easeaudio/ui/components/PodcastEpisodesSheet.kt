@@ -360,7 +360,7 @@ fun PodcastEpisodesSheet(
                                         // Arrow indicator or Dots to hint details
                                         Icon(
                                             imageVector = Icons.Filled.ChevronRight,
-                                            contentDescription = "Details",
+                                            contentDescription = stringResource(R.string.episode_details),
                                             tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
                                             modifier = Modifier.size(20.dp)
                                         )
@@ -455,7 +455,7 @@ fun PodcastEpisodeDetailView(
             ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Back to List",
+                    contentDescription = stringResource(R.string.back_to_list),
                     tint = MaterialTheme.colorScheme.onSurface
                 )
             }
@@ -518,7 +518,7 @@ fun PodcastEpisodeDetailView(
                 )
                 Spacer(modifier = Modifier.height(6.dp))
                 Text(
-                    text = "${episode.pubDate} • ${if (episode.durationMs > 0L) formatDurationMs(episode.durationMs) else "15m"}",
+                    text = if (episode.durationMs > 0L) "${episode.pubDate} • ${formatDurationMs(episode.durationMs)}" else episode.pubDate,
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -546,14 +546,14 @@ fun PodcastEpisodeDetailView(
                             .putBoolean(episode.id, isSaved)
                             .apply()
                         
-                        val msg = if (isSaved) "Added to Your Episodes!" else "Removed from Your Episodes!"
+                        val msg = if (isSaved) context.getString(R.string.saved_to_library) else context.getString(R.string.removed_from_library)
                         Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
                     },
                     modifier = Modifier.size(40.dp)
                 ) {
                     Icon(
                         imageVector = if (isSaved) Icons.Filled.CheckCircle else Icons.Filled.AddCircleOutline,
-                        contentDescription = "Save Episode",
+                        contentDescription = stringResource(R.string.save_episode),
                         tint = if (isSaved) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
                         modifier = Modifier.size(26.dp)
                     )
@@ -568,7 +568,7 @@ fun PodcastEpisodeDetailView(
                                 .edit()
                                 .putBoolean(episode.id, false)
                                 .apply()
-                            Toast.makeText(context, "Removed from Downloads", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, context.getString(R.string.removed_from_downloads), Toast.LENGTH_SHORT).show()
                         } else if (downloadProgress == -1f) {
                             coroutineScope.launch {
                                 downloadProgress = 0f
@@ -582,7 +582,7 @@ fun PodcastEpisodeDetailView(
                                     .edit()
                                     .putBoolean(episode.id, true)
                                     .apply()
-                                Toast.makeText(context, "Episode downloaded successfully!", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, context.getString(R.string.episode_downloaded), Toast.LENGTH_SHORT).show()
                             }
                         }
                     },
@@ -598,7 +598,7 @@ fun PodcastEpisodeDetailView(
                     } else {
                         Icon(
                             imageVector = if (isDownloaded) Icons.Filled.DownloadDone else Icons.Filled.ArrowCircleDown,
-                            contentDescription = "Download Episode",
+                            contentDescription = stringResource(R.string.download_episode),
                             tint = if (isDownloaded) Color(0xFF4CAF50) else MaterialTheme.colorScheme.onSurface,
                             modifier = Modifier.size(26.dp)
                         )
@@ -608,21 +608,21 @@ fun PodcastEpisodeDetailView(
                 // Share Button
                 IconButton(
                     onClick = {
-                        val shareText = "Listen to '${episode.title}' on NeoTune Radio & Podcasts!"
+                        val shareText = "https://open.spotify.com/episode/${episode.id}"
                         try {
                             val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
-                            val clip = android.content.ClipData.newPlainText("Podcast Link", "https://open.spotify.com/episode/${episode.id}")
+                            val clip = android.content.ClipData.newPlainText(context.getString(R.string.stream_link), shareText)
                             clipboard.setPrimaryClip(clip)
-                            Toast.makeText(context, "Share link copied to clipboard!", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, context.getString(R.string.share_link_copied), Toast.LENGTH_SHORT).show()
                         } catch (e: Exception) {
-                            Toast.makeText(context, "Link: $shareText", Toast.LENGTH_LONG).show()
+                            Toast.makeText(context, shareText, Toast.LENGTH_LONG).show()
                         }
                     },
                     modifier = Modifier.size(40.dp)
                 ) {
                     Icon(
                         imageVector = Icons.Filled.Share,
-                        contentDescription = "Share",
+                        contentDescription = stringResource(R.string.share_episode),
                         tint = MaterialTheme.colorScheme.onSurface,
                         modifier = Modifier.size(22.dp)
                     )
@@ -635,7 +635,7 @@ fun PodcastEpisodeDetailView(
                 ) {
                     Icon(
                         imageVector = Icons.Filled.MoreVert,
-                        contentDescription = "Options",
+                        contentDescription = stringResource(R.string.more_options),
                         tint = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.size(22.dp)
                     )
@@ -782,7 +782,7 @@ fun PodcastEpisodeDetailView(
                                 onSelectEpisode(episode)
                             }
                             onSeek(chapter.startTimeMs)
-                            Toast.makeText(context, "Seeking to: ${chapter.title}", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, context.getString(R.string.seeking_to, chapter.title), Toast.LENGTH_SHORT).show()
                         }
                         .border(
                             width = if (isActive) 1.dp else 0.dp,
@@ -893,7 +893,7 @@ fun PodcastEpisodeDetailView(
                             overflow = TextOverflow.Ellipsis
                         )
                         Text(
-                            text = "${show.name} • By ${show.country}",
+                            text = if (show.country.isNotBlank()) "${show.name} • ${show.country}" else show.name,
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -906,28 +906,28 @@ fun PodcastEpisodeDetailView(
                 
                 // Options items
                 val options = listOf(
-                    Triple(Icons.Filled.Share, "Share Episode") {
-                        Toast.makeText(context, "Link copied to share!", Toast.LENGTH_SHORT).show()
+                    Triple(Icons.Filled.Share, stringResource(R.string.share_episode)) {
+                        Toast.makeText(context, context.getString(R.string.link_copied), Toast.LENGTH_SHORT).show()
                     },
-                    Triple(if (isSaved) Icons.Filled.Bookmark else Icons.Filled.BookmarkBorder, if (isSaved) "Remove from Your Episodes" else "Add to Your Episodes") {
+                    Triple(if (isSaved) Icons.Filled.Bookmark else Icons.Filled.BookmarkBorder, if (isSaved) stringResource(R.string.remove_from_your_episodes) else stringResource(R.string.add_to_your_episodes)) {
                         isSaved = !isSaved
                         context.getSharedPreferences("neotune_saved_episodes", Context.MODE_PRIVATE)
                             .edit()
                             .putBoolean(episode.id, isSaved)
                             .apply()
-                        Toast.makeText(context, if (isSaved) "Saved to your library!" else "Removed from library", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, if (isSaved) context.getString(R.string.saved_to_library) else context.getString(R.string.removed_from_library), Toast.LENGTH_SHORT).show()
                     },
-                    Triple(Icons.AutoMirrored.Filled.PlaylistAdd, "Add to Playlist") {
-                        Toast.makeText(context, "Added to playlist!", Toast.LENGTH_SHORT).show()
+                    Triple(Icons.AutoMirrored.Filled.PlaylistAdd, stringResource(R.string.add_to_playlist)) {
+                        Toast.makeText(context, context.getString(R.string.saved_to_library), Toast.LENGTH_SHORT).show()
                     },
-                    Triple(Icons.Filled.Download, "Download File") {
-                        Toast.makeText(context, "Download initiated in background", Toast.LENGTH_SHORT).show()
+                    Triple(Icons.Filled.Download, stringResource(R.string.download_file)) {
+                        Toast.makeText(context, context.getString(R.string.episode_downloaded), Toast.LENGTH_SHORT).show()
                     },
-                    Triple(Icons.Filled.CheckCircle, "Mark as Finished") {
-                        Toast.makeText(context, "Marked as completed!", Toast.LENGTH_SHORT).show()
+                    Triple(Icons.Filled.CheckCircle, stringResource(R.string.mark_as_finished)) {
+                        Toast.makeText(context, context.getString(R.string.mark_as_finished), Toast.LENGTH_SHORT).show()
                     },
-                    Triple(Icons.Filled.QueuePlayNext, "Add to Playback Queue") {
-                        Toast.makeText(context, "Added to queue!", Toast.LENGTH_SHORT).show()
+                    Triple(Icons.Filled.QueuePlayNext, stringResource(R.string.add_to_queue)) {
+                        Toast.makeText(context, context.getString(R.string.add_to_queue), Toast.LENGTH_SHORT).show()
                     }
                 )
                 

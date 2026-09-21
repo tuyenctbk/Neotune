@@ -119,7 +119,7 @@ fun OnboardingScreen(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_favicon),
-                    contentDescription = "Logo",
+                    contentDescription = stringResource(R.string.app_name),
                     tint = Color.Unspecified,
                     modifier = Modifier.size(32.dp)
                 )

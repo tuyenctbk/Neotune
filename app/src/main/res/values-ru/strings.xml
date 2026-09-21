@@ -449,4 +449,28 @@
     <string name="no_featured_yet">В данный момент нет рекомендуемых трансляций</string>
 
     <string name="quick_resume">Быстрое возобновление</string>
+    <string name="previous_station">Предыдущая станция</string>
+    <string name="more_options">Дополнительные параметры</string>
+    <string name="rewind_10s">Перемотка назад на 10 сек</string>
+    <string name="forward_30s">Перемотка вперед на 30 сек</string>
+    <string name="share_episode">Поделиться выпуском</string>
+    <string name="add_to_playlist">Добавить в плейлист</string>
+    <string name="download_file">Скачать файл</string>
+    <string name="mark_as_finished">Отметить как прослушанное</string>
+    <string name="add_to_queue">Добавить в очередь</string>
+    <string name="saved_to_library">Сохранено в библиотеку!</string>
+    <string name="removed_from_library">Удалено из библиотеки</string>
+    <string name="link_copied">Ссылка скопирована!</string>
+    <string name="episode_downloaded">Выпуск успешно загружен!</string>
+    <string name="removed_from_downloads">Удалено из загрузок</string>
+    <string name="share_link_copied">Ссылка скопирована в буфер обмена!</string>
+    <string name="seeking_to">Переход к: %1$s</string>
+    <string name="remove">Удалить</string>
+    <string name="selected">Выбрано</string>
+    <string name="global_country">Весь мир</string>
+    <string name="fullscreen_player">Полноэкранный плеер</string>
+    <string name="add_to_your_episodes">Добавить в мои выпуски</string>
+    <string name="remove_from_your_episodes">Удалить из моих выпусков</string>
+    <string name="star_rating_desc">Звезда %1$d</string>
+    <string name="stream_link">Ссылка на поток</string>
 </resources>

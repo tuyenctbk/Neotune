@@ -445,4 +445,28 @@
     <string name="no_featured_yet">Belum ada streaming unggulan saat ini</string>
 
     <string name="quick_resume">Lanjutkan Cepat</string>
+    <string name="previous_station">Stasiun Sebelumnya</string>
+    <string name="more_options">Opsi Lainnya</string>
+    <string name="rewind_10s">Mundur 10 dtk</string>
+    <string name="forward_30s">Maju 30 dtk</string>
+    <string name="share_episode">Bagikan Episode</string>
+    <string name="add_to_playlist">Tambahkan ke Daftar Putar</string>
+    <string name="download_file">Unduh Berkas</string>
+    <string name="mark_as_finished">Tandai Selesai</string>
+    <string name="add_to_queue">Tambahkan ke Antrean</string>
+    <string name="saved_to_library">Disimpan ke pustaka!</string>
+    <string name="removed_from_library">Dihapus dari pustaka</string>
+    <string name="link_copied">Tautan disalin!</string>
+    <string name="episode_downloaded">Episode berhasil diunduh!</string>
+    <string name="removed_from_downloads">Dihapus dari unduhan</string>
+    <string name="share_link_copied">Tautan disalin ke papan klip!</string>
+    <string name="seeking_to">Menuju ke: %1$s</string>
+    <string name="remove">Hapus</string>
+    <string name="selected">Dipilih</string>
+    <string name="global_country">Global</string>
+    <string name="fullscreen_player">Pemutar Layar Penuh</string>
+    <string name="add_to_your_episodes">Tambahkan ke Episode Anda</string>
+    <string name="remove_from_your_episodes">Hapus dari Episode Anda</string>
+    <string name="star_rating_desc">Bintang %1$d</string>
+    <string name="stream_link">Tautan Streaming</string>
 </resources>

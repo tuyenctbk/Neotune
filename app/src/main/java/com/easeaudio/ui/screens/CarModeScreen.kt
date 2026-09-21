@@ -548,7 +548,7 @@ private fun CarSideNav(
                     ) {
                         Icon(
                             imageVector = Icons.Filled.Radio,
-                            contentDescription = "NeoTune Radio",
+                            contentDescription = stringResource(R.string.app_name),
                             tint = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.size(22.dp)
                         )
@@ -642,7 +642,7 @@ private fun CarSideNav(
                 ) {
                     Icon(
                         imageVector = Icons.Filled.Language,
-                        contentDescription = "Select Country ($selectedCountry)",
+                        contentDescription = "${stringResource(R.string.select_country)} ($selectedCountry)",
                         tint = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.size(22.dp)
                     )
@@ -755,7 +755,7 @@ private fun CarTopNav(
         ) {
             Icon(
                 imageVector = Icons.Filled.Language,
-                contentDescription = "Country",
+                contentDescription = stringResource(R.string.country),
                 tint = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.size(18.dp)
             )
@@ -1201,7 +1201,7 @@ private fun AutomotiveHeroPlayer(
                         ) {
                             Icon(
                                 imageVector = Icons.Filled.SkipPrevious,
-                                contentDescription = "Previous",
+                                contentDescription = stringResource(R.string.previous_station),
                                 tint = MaterialTheme.colorScheme.onSurface,
                                 modifier = Modifier.size(30.dp)
                             )
@@ -1220,7 +1220,7 @@ private fun AutomotiveHeroPlayer(
                             ) {
                                 Icon(
                                     imageVector = Icons.Filled.Replay10,
-                                    contentDescription = "Rewind 10s",
+                                    contentDescription = stringResource(R.string.rewind_10s),
                                     tint = MaterialTheme.colorScheme.primary,
                                     modifier = Modifier.size(26.dp)
                                 )
@@ -1274,7 +1274,7 @@ private fun AutomotiveHeroPlayer(
                             ) {
                                 Icon(
                                     imageVector = Icons.Filled.Forward30,
-                                    contentDescription = "Forward 30s",
+                                    contentDescription = stringResource(R.string.forward_30s),
                                     tint = MaterialTheme.colorScheme.primary,
                                     modifier = Modifier.size(26.dp)
                                 )
@@ -1293,7 +1293,7 @@ private fun AutomotiveHeroPlayer(
                         ) {
                             Icon(
                                 imageVector = Icons.Filled.SkipNext,
-                                contentDescription = "Next",
+                                contentDescription = stringResource(R.string.next_station),
                                 tint = MaterialTheme.colorScheme.onSurface,
                                 modifier = Modifier.size(30.dp)
                             )
@@ -2610,7 +2610,7 @@ private fun CarMiniPlayer(
             ) {
                 Icon(
                     imageVector = Icons.Filled.SkipNext,
-                    contentDescription = "Next Station",
+                    contentDescription = stringResource(R.string.next_station),
                     tint = MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier.size(24.dp)
                 )

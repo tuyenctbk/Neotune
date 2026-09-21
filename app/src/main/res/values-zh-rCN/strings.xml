@@ -449,4 +449,28 @@
     <string name="no_featured_yet">暂无精选电台</string>
 
     <string name="quick_resume">快速继续</string>
+    <string name="previous_station">上一电台</string>
+    <string name="more_options">更多选项</string>
+    <string name="rewind_10s">快退10秒</string>
+    <string name="forward_30s">快进30秒</string>
+    <string name="share_episode">分享单集</string>
+    <string name="add_to_playlist">添加到播放列表</string>
+    <string name="download_file">下载文件</string>
+    <string name="mark_as_finished">标记为已听完</string>
+    <string name="add_to_queue">添加到播放队列</string>
+    <string name="saved_to_library">已保存到媒体库！</string>
+    <string name="removed_from_library">已从媒体库中移除</string>
+    <string name="link_copied">分享链接已复制！</string>
+    <string name="episode_downloaded">单集下载成功！</string>
+    <string name="removed_from_downloads">已从下载中移除</string>
+    <string name="share_link_copied">分享链接已复制到剪贴板！</string>
+    <string name="seeking_to">快进到: %1$s</string>
+    <string name="remove">移除</string>
+    <string name="selected">已选择</string>
+    <string name="global_country">全球</string>
+    <string name="fullscreen_player">全屏播放器</string>
+    <string name="add_to_your_episodes">添加到我的单集</string>
+    <string name="remove_from_your_episodes">从我的单集中移除</string>
+    <string name="star_rating_desc">%1$d 星</string>
+    <string name="stream_link">流媒体链接</string>
 </resources>

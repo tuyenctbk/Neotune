@@ -462,4 +462,28 @@
     <string name="no_featured_yet">No hay transmisiones destacadas por el momento</string>
 
     <string name="quick_resume">Reanudación rápida</string>
+    <string name="previous_station">Estación anterior</string>
+    <string name="more_options">Más opciones</string>
+    <string name="rewind_10s">Rebobinar 10 s</string>
+    <string name="forward_30s">Avanzar 30 s</string>
+    <string name="share_episode">Compartir episodio</string>
+    <string name="add_to_playlist">Añadir a la lista de reproducción</string>
+    <string name="download_file">Descargar archivo</string>
+    <string name="mark_as_finished">Marcar como terminado</string>
+    <string name="add_to_queue">Añadir a la cola de reproducción</string>
+    <string name="saved_to_library">¡Guardado en tu biblioteca!</string>
+    <string name="removed_from_library">Eliminado de la biblioteca</string>
+    <string name="link_copied">¡Enlace copiado para compartir!</string>
+    <string name="episode_downloaded">¡Episodio descargado con éxito!</string>
+    <string name="removed_from_downloads">Eliminado de descargas</string>
+    <string name="share_link_copied">¡Enlace copiado al portapapeles!</string>
+    <string name="seeking_to">Buscando a: %1$s</string>
+    <string name="remove">Eliminar</string>
+    <string name="selected">Seleccionado</string>
+    <string name="global_country">Global</string>
+    <string name="fullscreen_player">Reproductor a pantalla completa</string>
+    <string name="add_to_your_episodes">Añadir a tus episodios</string>
+    <string name="remove_from_your_episodes">Eliminar de tus episodios</string>
+    <string name="star_rating_desc">Estrella %1$d</string>
+    <string name="stream_link">Enlace de transmisión</string>
 </resources>

@@ -268,7 +268,7 @@ fun HomeScreen(
                         )
                         .testTag("fab_add_station")
                 ) {
-                    Icon(imageVector = Icons.Filled.Add, contentDescription = "Add Custom Station")
+                    Icon(imageVector = Icons.Filled.Add, contentDescription = stringResource(R.string.add_custom_station))
                 }
             }
         }
@@ -370,7 +370,7 @@ fun HomeScreen(
                                             ) {
                                                 Icon(
                                                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                                    contentDescription = "Collapse search",
+                                                    contentDescription = stringResource(R.string.search_collapse_hint),
                                                     tint = MaterialTheme.colorScheme.primary,
                                                     modifier = Modifier.size(22.dp)
                                                 )
@@ -381,7 +381,7 @@ fun HomeScreen(
                                                 IconButton(onClick = { onSearchQueryChange("") }) {
                                                     Icon(
                                                         imageVector = Icons.Filled.Close,
-                                                        contentDescription = "Clear search",
+                                                        contentDescription = stringResource(R.string.clear_search),
                                                         tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
                                                         modifier = Modifier.size(18.dp)
                                                     )
@@ -482,7 +482,7 @@ fun HomeScreen(
                                     if (isGlobal) {
                                         Icon(
                                             imageVector = Icons.Filled.Language,
-                                            contentDescription = "Global",
+                                            contentDescription = stringResource(R.string.global_country),
                                             tint = if (isFlagFocused) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
                                             modifier = Modifier.size(if (isTv) 28.dp else 24.dp)
                                         )
@@ -567,7 +567,7 @@ fun HomeScreen(
                                             Spacer(modifier = Modifier.width(6.dp))
                                             Icon(
                                                 imageVector = Icons.Filled.Close,
-                                                contentDescription = "Remove search suggestion",
+                                                contentDescription = stringResource(R.string.remove_search_suggestion),
                                                 tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
                                                 modifier = Modifier
                                                     .size(14.dp)
@@ -1387,7 +1387,7 @@ fun QuickResumeCard(
                     )
                     Spacer(modifier = Modifier.height(2.dp))
                     Text(
-                        text = "${station.genre} • ${if (station.bitrate.isNotBlank()) station.bitrate else "Live"}",
+                        text = "${station.genre} • ${if (station.bitrate.isNotBlank()) station.bitrate else stringResource(R.string.live_badge)}",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
                         maxLines = 1,

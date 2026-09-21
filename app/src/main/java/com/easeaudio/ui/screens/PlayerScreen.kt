@@ -220,7 +220,7 @@ fun PlayerScreen(
                     ) {
                         Icon(
                             imageVector = if (station.isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
-                            contentDescription = "Favorite",
+                            contentDescription = stringResource(R.string.favorites),
                             tint = if (isFavFocused) MaterialTheme.colorScheme.onPrimary else (if (station.isFavorite) FavoriteHeartColor else MaterialTheme.colorScheme.onSurfaceVariant)
                         )
                     }
@@ -264,7 +264,7 @@ fun PlayerScreen(
                     ) {
                         Icon(
                             imageVector = Icons.Filled.Share,
-                            contentDescription = "Share Station",
+                            contentDescription = stringResource(R.string.share_station),
                             tint = if (isShareFocused) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
@@ -283,7 +283,7 @@ fun PlayerScreen(
                     ) {
                         Icon(
                             imageVector = Icons.Filled.Bedtime,
-                            contentDescription = "Sleep Timer",
+                            contentDescription = stringResource(R.string.sleep_timer),
                             tint = if (isSleepFocused) MaterialTheme.colorScheme.onPrimary else (if (sleepTimerRemaining != null) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant)
                         )
                     }
@@ -300,7 +300,7 @@ fun PlayerScreen(
                         ) {
                             Icon(
                                 imageVector = Icons.Filled.MoreVert,
-                                contentDescription = "More Options",
+                                contentDescription = stringResource(R.string.more_options),
                                 tint = if (isMenuFocused) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface
                             )
                         }
@@ -585,7 +585,7 @@ private fun PlayerContent(
             ) {
                 Icon(
                     imageVector = Icons.Filled.Share,
-                    contentDescription = "Share Station",
+                    contentDescription = stringResource(R.string.share_station),
                     tint = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.size(20.dp)
                 )
@@ -723,7 +723,7 @@ private fun PlayerContent(
                     ) {
                         Icon(
                             imageVector = Icons.Filled.GraphicEq,
-                            contentDescription = "Audio Frequency Visualizer",
+                            contentDescription = stringResource(R.string.audio_frequency_visualizer),
                             tint = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.size(16.dp)
                         )
@@ -824,7 +824,7 @@ private fun PlayerContent(
             ) {
                 Icon(
                     imageVector = Icons.Filled.SkipPrevious,
-                    contentDescription = "Previous Station",
+                    contentDescription = stringResource(R.string.previous_station),
                     modifier = Modifier.size(32.dp),
                     tint = if (isPrevFocused) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
                 )
@@ -894,7 +894,7 @@ private fun PlayerContent(
             ) {
                 Icon(
                     imageVector = Icons.Filled.SkipNext,
-                    contentDescription = "Next Station",
+                    contentDescription = stringResource(R.string.next_station),
                     modifier = Modifier.size(32.dp),
                     tint = if (isNextFocused) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
                 )

@@ -449,4 +449,28 @@
     <string name="no_featured_yet">暫無精選電台</string>
 
     <string name="quick_resume">快速繼續</string>
+    <string name="previous_station">上一電台</string>
+    <string name="more_options">更多選項</string>
+    <string name="rewind_10s">倒退10秒</string>
+    <string name="forward_30s">快進30秒</string>
+    <string name="share_episode">分享單集</string>
+    <string name="add_to_playlist">加入播放清單</string>
+    <string name="download_file">下載檔案</string>
+    <string name="mark_as_finished">標記為已收聽</string>
+    <string name="add_to_queue">加入播放佇列</string>
+    <string name="saved_to_library">已儲存至資料庫！</string>
+    <string name="removed_from_library">已從資料庫中移除</string>
+    <string name="link_copied">分享連結已複製！</string>
+    <string name="episode_downloaded">單集下載成功！</string>
+    <string name="removed_from_downloads">已從下載中移除</string>
+    <string name="share_link_copied">分享連結已複製到剪貼簿！</string>
+    <string name="seeking_to">跳轉至: %1$s</string>
+    <string name="remove">移除</string>
+    <string name="selected">已選取</string>
+    <string name="global_country">全球</string>
+    <string name="fullscreen_player">全螢幕播放器</string>
+    <string name="add_to_your_episodes">加入我的單集</string>
+    <string name="remove_from_your_episodes">從我的單集中移除</string>
+    <string name="star_rating_desc">%1$d 星</string>
+    <string name="stream_link">串流連結</string>
 </resources>

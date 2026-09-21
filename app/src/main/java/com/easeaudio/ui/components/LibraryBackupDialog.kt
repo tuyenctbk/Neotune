@@ -150,7 +150,7 @@ fun LibraryBackupDialog(
                     ) {
                         Icon(
                             imageVector = Icons.Filled.Close,
-                            contentDescription = "Close",
+                            contentDescription = stringResource(R.string.close),
                             tint = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.size(18.dp)
                         )
@@ -234,7 +234,7 @@ fun LibraryBackupDialog(
                         Button(
                             onClick = {
                                 val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                                clipboard.setPrimaryClip(ClipData.newPlainText("NeoTune Library Backup", exportJson))
+                                clipboard.setPrimaryClip(ClipData.newPlainText(context.getString(R.string.backup_restore_title), exportJson))
                                 Toast.makeText(context, context.getString(R.string.backup_copied_success), Toast.LENGTH_SHORT).show()
                             },
                             shape = RoundedCornerShape(12.dp),

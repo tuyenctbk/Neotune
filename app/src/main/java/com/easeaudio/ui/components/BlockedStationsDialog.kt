@@ -102,7 +102,7 @@ fun BlockedStationsDialog(
                     ) {
                         Icon(
                             imageVector = Icons.Filled.Close,
-                            contentDescription = "Close",
+                            contentDescription = stringResource(R.string.close),
                             tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
                             modifier = Modifier.size(18.dp)
                         )
@@ -280,7 +280,7 @@ fun BlockedStationsDialog(
                                                     Spacer(modifier = Modifier.width(6.dp))
                                                     Icon(
                                                         imageVector = Icons.Filled.Close,
-                                                        contentDescription = "Remove",
+                                                        contentDescription = stringResource(R.string.remove),
                                                         tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
                                                         modifier = Modifier
                                                             .size(14.dp)

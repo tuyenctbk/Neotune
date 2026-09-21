@@ -111,7 +111,7 @@ fun CountrySelectionDialog(
                     ) {
                         Icon(
                             imageVector = Icons.Filled.Close,
-                            contentDescription = "Close",
+                            contentDescription = stringResource(R.string.close),
                             tint = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.size(18.dp)
                         )
@@ -143,7 +143,7 @@ fun CountrySelectionDialog(
                         trailingIcon = {
                             if (searchQuery.isNotEmpty()) {
                                 IconButton(onClick = { searchQuery = "" }) {
-                                    Icon(imageVector = Icons.Filled.Close, contentDescription = "Clear", tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f))
+                                    Icon(imageVector = Icons.Filled.Close, contentDescription = stringResource(R.string.clear_search), tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f))
                                 }
                             }
                         },
@@ -264,7 +264,7 @@ fun CountrySelectionDialog(
                                         if (isSelected) {
                                             Icon(
                                                 imageVector = Icons.Filled.Check,
-                                                contentDescription = "Selected",
+                                                contentDescription = stringResource(R.string.selected),
                                                 tint = MaterialTheme.colorScheme.primary,
                                                 modifier = Modifier.size(18.dp)
                                             )
