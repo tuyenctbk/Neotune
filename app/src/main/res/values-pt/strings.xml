@@ -473,4 +473,29 @@
     <string name="remove_from_your_episodes">Remover dos seus episódios</string>
     <string name="star_rating_desc">Estrela %1$d</string>
     <string name="stream_link">Link do stream</string>
+
+    <!-- Auto-localized additions -->
+    <string name="widget_description">Widget de rádio NeoTune</string>
+    <string name="widget_no_station">Toque para tocar rádio</string>
+    <string name="record_stream">Gravar transmissão</string>
+    <string name="record_stream_desc">Capturar áudio de rádio ao vivo</string>
+    <string name="recording_started">Gravação iniciada…</string>
+    <string name="recording_stopped">Gravação parada</string>
+    <string name="recording_saved">Gravação salva: %1$s (%2$s)</string>
+    <string name="recordings_title">Áudio gravado</string>
+    <string name="recordings_desc">Transmissões de rádio salvas offline</string>
+    <string name="recordings_empty">Nenhuma gravação ainda. Toque em Gravar enquanto ouve para capturar transmissões ao vivo.</string>
+    <string name="share_recording">Compartilhar gravação</string>
+    <string name="share_recording_text">Ouça esta gravação ao vivo de %1$s: %2$s</string>
+    <string name="audio_output_route">Saída de áudio / Cast</string>
+    <string name="audio_output_route_desc">Envie o áudio para fones Bluetooth, Google Cast ou caixas de som inteligentes.</string>
+    <string name="audio_output_current_device">Dispositivo de saída atual</string>
+    <string name="audio_output_switch_btn">Trocar dispositivo / Cast</string>
+    <string name="settings_section_recordings">Gravações de áudio</string>
+    <string name="settings_recordings_title">Gravações salvas</string>
+    <string name="settings_recordings_desc">Visualizar e gerenciar transmissões de rádio gravadas</string>
+    <string name="settings_rate_title">Avaliar o NeoTune</string>
+    <string name="settings_rate_desc">Apoie este reprodutor 100% gratuito e sem anúncios com uma avaliação</string>
+    <string name="settings_share_app_title">Compartilhar NeoTune</string>
+    <string name="settings_share_app_desc">Compartilhe músicas e podcasts gratuitos com amigos</string>
 </resources>

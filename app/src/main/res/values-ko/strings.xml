@@ -473,4 +473,29 @@
     <string name="remove_from_your_episodes">내 에피소드에서 삭제</string>
     <string name="star_rating_desc">별 %1$d개</string>
     <string name="stream_link">스트림 링크</string>
+
+    <!-- Auto-localized additions -->
+    <string name="widget_description">NeoTune 라디오 플레이어 위젯</string>
+    <string name="widget_no_station">탭하여 라디오 재생</string>
+    <string name="record_stream">스트림 녹음</string>
+    <string name="record_stream_desc">실시간 라디오 방송 녹음</string>
+    <string name="recording_started">녹음이 시작되었습니다…</string>
+    <string name="recording_stopped">녹음이 중지되었습니다</string>
+    <string name="recording_saved">녹음 저장됨: %1$s (%2$s)</string>
+    <string name="recordings_title">녹음된 오디오</string>
+    <string name="recordings_desc">저장된 오프라인 라디오 스트림</string>
+    <string name="recordings_empty">아직 녹음이 없습니다. 청취 중 녹음 버튼을 눌러 라이브 방송을 저장하세요.</string>
+    <string name="share_recording">녹음 공유</string>
+    <string name="share_recording_text">%1$s의 라이브 녹음 듣기: %2$s</string>
+    <string name="audio_output_route">오디오 출력 / 전송</string>
+    <string name="audio_output_route_desc">블루투스 헤드폰, Google Cast 또는 스마트 스피커로 오디오를 출력합니다.</string>
+    <string name="audio_output_current_device">현재 출력 장치</string>
+    <string name="audio_output_switch_btn">장치 전환 / Cast</string>
+    <string name="settings_section_recordings">오디오 녹음</string>
+    <string name="settings_recordings_title">저장된 녹음</string>
+    <string name="settings_recordings_desc">저장된 라디오 방송 확인 및 관리</string>
+    <string name="settings_rate_title">NeoTune 평가하기</string>
+    <string name="settings_rate_desc">100% 무료 무광고 플레이어에 리뷰를 남겨 응원해 주세요</string>
+    <string name="settings_share_app_title">NeoTune 공유하기</string>
+    <string name="settings_share_app_desc">친구들에게 무료 음악과 팟캐스트를 소개하세요</string>
 </resources>

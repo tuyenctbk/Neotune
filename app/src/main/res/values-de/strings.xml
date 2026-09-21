@@ -486,4 +486,29 @@
     <string name="remove_from_your_episodes">Aus deinen Episoden entfernen</string>
     <string name="star_rating_desc">Stern %1$d</string>
     <string name="stream_link">Stream-Link</string>
+
+    <!-- Auto-localized additions -->
+    <string name="widget_description">NeoTune Radio Player Widget</string>
+    <string name="widget_no_station">Tippen zum Abspielen</string>
+    <string name="record_stream">Stream aufnehmen</string>
+    <string name="record_stream_desc">Live-Radio-Audio aufnehmen</string>
+    <string name="recording_started">Aufnahme gestartet…</string>
+    <string name="recording_stopped">Aufnahme beendet</string>
+    <string name="recording_saved">Aufnahme gespeichert: %1$s (%2$s)</string>
+    <string name="recordings_title">Aufgenommenes Audio</string>
+    <string name="recordings_desc">Gespeicherte Offline-Radiostreams</string>
+    <string name="recordings_empty">Noch keine Aufnahmen. Tippe beim Hören auf Aufnehmen, um Live-Sendungen zu speichern.</string>
+    <string name="share_recording">Aufnahme teilen</string>
+    <string name="share_recording_text">Hör dir diese Live-Aufnahme von %1$s an: %2$s</string>
+    <string name="audio_output_route">Audioausgabe / Cast</string>
+    <string name="audio_output_route_desc">Wiedergabe auf Bluetooth-Kopfhörer, Google Cast oder Lautsprecher übertragen.</string>
+    <string name="audio_output_current_device">Aktuelles Ausgabegerät</string>
+    <string name="audio_output_switch_btn">Gerät wechseln / Cast</string>
+    <string name="settings_section_recordings">Audio-Aufnahmen</string>
+    <string name="settings_recordings_title">Gespeicherte Aufnahmen</string>
+    <string name="settings_recordings_desc">Aufgenommene Radiosendungen ansehen und verwalten</string>
+    <string name="settings_rate_title">NeoTune bewerten</string>
+    <string name="settings_rate_desc">Unterstütze diesen 100% kostenlosen werbefreien Player mit einer Bewertung</string>
+    <string name="settings_share_app_title">NeoTune teilen</string>
+    <string name="settings_share_app_desc">Erzähle Freunden von kostenloser Musik und Podcasts</string>
 </resources>

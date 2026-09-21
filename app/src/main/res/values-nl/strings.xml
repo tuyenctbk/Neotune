@@ -469,4 +469,29 @@
     <string name="remove_from_your_episodes">Remove from Your Episodes</string>
     <string name="star_rating_desc">Ster %1$d</string>
     <string name="stream_link">Streamlink</string>
+
+    <!-- Auto-localized additions -->
+    <string name="widget_description">NeoTune Radio Player Widget</string>
+    <string name="widget_no_station">Tik om radio af te spelen</string>
+    <string name="record_stream">Stream opnemen</string>
+    <string name="record_stream_desc">Live radio-audio opnemen</string>
+    <string name="recording_started">Opname gestart…</string>
+    <string name="recording_stopped">Opname gestopt</string>
+    <string name="recording_saved">Opname opgeslagen: %1$s (%2$s)</string>
+    <string name="recordings_title">Opgenomen audio</string>
+    <string name="recordings_desc">Opgeslagen offline radiostreams</string>
+    <string name="recordings_empty">Nog geen opnames. Tik tijdens het luisteren op Opnemen om live-uitzendingen op te slaan.</string>
+    <string name="share_recording">Opname delen</string>
+    <string name="share_recording_text">Luister naar deze live-opname van %1$s: %2$s</string>
+    <string name="audio_output_route">Audio-uitvoer / Cast</string>
+    <string name="audio_output_route_desc">Stuur audio naar Bluetooth-koptelefoons, Google Cast of slimme speakers.</string>
+    <string name="audio_output_current_device">Huidig uitvoerapparaat</string>
+    <string name="audio_output_switch_btn">Apparaat wisselen / Cast</string>
+    <string name="settings_section_recordings">Audio-opnames</string>
+    <string name="settings_recordings_title">Opgeslagen opnames</string>
+    <string name="settings_recordings_desc">Bekijk en beheer opgenomen radiouitzendingen</string>
+    <string name="settings_rate_title">Beoordeel NeoTune</string>
+    <string name="settings_rate_desc">Steun deze 100% gratis en advertentievrije speler met een review</string>
+    <string name="settings_share_app_title">NeoTune delen</string>
+    <string name="settings_share_app_desc">Deel gratis muziek en podcasts met vrienden</string>
 </resources>

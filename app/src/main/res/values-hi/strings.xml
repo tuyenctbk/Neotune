@@ -470,4 +470,29 @@
     <string name="remove_from_your_episodes">Remove from Your Episodes</string>
     <string name="star_rating_desc">सितारा %1$d</string>
     <string name="stream_link">स्ट्रीम लिंक</string>
+
+    <!-- Auto-localized additions -->
+    <string name="widget_description">NeoTune रेडियो प्लेयर विजेट</string>
+    <string name="widget_no_station">रेडियो चलाने के लिए टैप करें</string>
+    <string name="record_stream">स्ट्रीम रिकॉर्ड करें</string>
+    <string name="record_stream_desc">लाइव रेडियो ऑडियो रिकॉर्ड करें</string>
+    <string name="recording_started">रिकॉर्डिंग शुरू हुई…</string>
+    <string name="recording_stopped">रिकॉर्डिंग बंद हुई</string>
+    <string name="recording_saved">रिकॉर्डिंग सहेजी गई: %1$s (%2$s)</string>
+    <string name="recordings_title">रिकॉर्ड किया गया ऑडियो</string>
+    <string name="recordings_desc">ऑफ़लाइन सहेजी गई रेडियो स्ट्रीम</string>
+    <string name="recordings_empty">अभी कोई रिकॉर्डिंग नहीं है। लाइव प्रसारण सहेजने के लिए सुनते समय रिकॉर्ड पर टैप करें।</string>
+    <string name="share_recording">रिकॉर्डिंग साझा करें</string>
+    <string name="share_recording_text">%1$s से यह लाइव रिकॉर्डिंग सुनें: %2$s</string>
+    <string name="audio_output_route">ऑडियो आउटपुट / Cast</string>
+    <string name="audio_output_route_desc">ब्लूटूथ हेडफ़ोन, Google Cast या स्मार्ट स्पीकर पर चलाएं।</string>
+    <string name="audio_output_current_device">वर्तमान आउटपुट डिवाइस</string>
+    <string name="audio_output_switch_btn">डिवाइस बदलें / Cast</string>
+    <string name="settings_section_recordings">ऑडियो रिकॉर्डिंग</string>
+    <string name="settings_recordings_title">सहेजी गई रिकॉर्डिंग</string>
+    <string name="settings_recordings_desc">रिकॉर्ड की गई रेडियो स्ट्रीम देखें और प्रबंधित करें</string>
+    <string name="settings_rate_title">NeoTune को रेट करें</string>
+    <string name="settings_rate_desc">इस 100% मुफ़्त और बिना विज्ञापन वाले प्लेयर का समर्थन करें</string>
+    <string name="settings_share_app_title">NeoTune साझा करें</string>
+    <string name="settings_share_app_desc">दोस्तों को मुफ़्त संगीत और पॉडकास्ट के बारे में बताएं</string>
 </resources>

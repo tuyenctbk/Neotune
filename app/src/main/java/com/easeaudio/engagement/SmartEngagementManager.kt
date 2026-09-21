@@ -200,7 +200,7 @@ class SmartEngagementManager private constructor(private val context: Context) {
         }
     }
 
-    fun onRatingCompleted(stars: Int) {
+    fun onRatingCompleted(stars: Int, activity: android.app.Activity? = null) {
         prefs.edit()
             .putBoolean(KEY_HAS_RATED_APP, true)
             .putLong(KEY_LAST_RATE_PROMPT_TIMESTAMP, System.currentTimeMillis())
@@ -208,7 +208,29 @@ class SmartEngagementManager private constructor(private val context: Context) {
         _activePrompt.value = EngagementPromptType.NONE
 
         if (stars >= 4) {
-            openPlayStoreForRating()
+            if (activity != null) {
+                try {
+                    val reviewManager = com.google.android.play.core.review.ReviewManagerFactory.create(activity)
+                    val request = reviewManager.requestReviewFlow()
+                    request.addOnCompleteListener { task ->
+                        if (task.isSuccessful) {
+                            val reviewInfo = task.result
+                            val flow = reviewManager.launchReviewFlow(activity, reviewInfo)
+                            flow.addOnCompleteListener { _ ->
+                                Log.i(TAG, "Google Play in-app review flow finished")
+                            }
+                        } else {
+                            Log.w(TAG, "In-app review request not successful, falling back to Play Store URL")
+                            openPlayStoreForRating()
+                        }
+                    }
+                } catch (e: Exception) {
+                    Log.w(TAG, "Error initiating Google Play In-App Review: ${e.message}")
+                    openPlayStoreForRating()
+                }
+            } else {
+                openPlayStoreForRating()
+            }
         }
     }
 

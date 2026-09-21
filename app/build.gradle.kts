@@ -132,6 +132,9 @@ dependencies {
     implementation("com.google.firebase:firebase-perf-ktx")
     implementation(libs.firebase.crashlytics)
 
+    // Google Play In-App Review API
+    implementation("com.google.android.play:review-ktx:2.0.2")
+
     debugImplementation(libs.androidx.ui.tooling)
     testImplementation("junit:junit:4.13.2")
 }

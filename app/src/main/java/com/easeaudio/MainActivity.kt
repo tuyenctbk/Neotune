@@ -10,6 +10,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
@@ -93,6 +94,9 @@ class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         val splashScreen = installSplashScreen()
+        splashScreen.setKeepOnScreenCondition {
+            viewModel.stations.value.isEmpty() && viewModel.isLoading.value
+        }
         splashScreen.setOnExitAnimationListener { splashScreenViewProvider ->
             val view = splashScreenViewProvider.view
             val iconView = splashScreenViewProvider.iconView
@@ -452,7 +456,23 @@ fun MainAppContent(
                     Box(modifier = Modifier.weight(1f)) {
                         NavHost(
                             navController = navController,
-                            startDestination = startDestination
+                            startDestination = startDestination,
+                            enterTransition = {
+                                fadeIn(animationSpec = tween(220, easing = FastOutSlowInEasing)) +
+                                    slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.Start, animationSpec = tween(220, easing = FastOutSlowInEasing))
+                            },
+                            exitTransition = {
+                                fadeOut(animationSpec = tween(180, easing = FastOutSlowInEasing)) +
+                                    slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.Start, animationSpec = tween(180, easing = FastOutSlowInEasing))
+                            },
+                            popEnterTransition = {
+                                fadeIn(animationSpec = tween(220, easing = FastOutSlowInEasing)) +
+                                    slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.End, animationSpec = tween(220, easing = FastOutSlowInEasing))
+                            },
+                            popExitTransition = {
+                                fadeOut(animationSpec = tween(180, easing = FastOutSlowInEasing)) +
+                                    slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.End, animationSpec = tween(180, easing = FastOutSlowInEasing))
+                            }
                         ) {
                         composable(NavRoute.Onboarding.route) {
                             OnboardingScreen(
@@ -930,10 +950,11 @@ fun MainAppContent(
         // Smart Engagement Dialogs — suppressed entirely on AAOS to avoid
         // driver-distracting popups (AAOS UXR policy: no interruptive modals while driving)
         if (!isAutomotive) {
+            val activity = LocalContext.current as? android.app.Activity
             when (activePrompt) {
                 com.easeaudio.engagement.EngagementPromptType.RATE_5_STARS -> {
                     RateAppDialog(
-                        onRateSubmitted = { stars -> viewModel.smartEngagementManager.onRatingCompleted(stars) },
+                        onRateSubmitted = { stars -> viewModel.smartEngagementManager.onRatingCompleted(stars, activity) },
                         onDismiss = { viewModel.smartEngagementManager.onRatingDismissed() }
                     )
                 }

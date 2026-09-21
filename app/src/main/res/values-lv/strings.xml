@@ -469,4 +469,29 @@
     <string name="remove_from_your_episodes">Remove from Your Episodes</string>
     <string name="star_rating_desc">Zvaigzne %1$d</string>
     <string name="stream_link">Straumes saite</string>
+
+    <!-- Auto-localized additions -->
+    <string name="widget_description">NeoTune Radio Player Widget</string>
+    <string name="widget_no_station">Tap to play radio</string>
+    <string name="record_stream">Record Stream</string>
+    <string name="record_stream_desc">Capture live radio audio</string>
+    <string name="recording_started">Recording started…</string>
+    <string name="recording_stopped">Recording stopped</string>
+    <string name="recording_saved">Recording saved: %1$s (%2$s)</string>
+    <string name="recordings_title">Recorded Audio</string>
+    <string name="recordings_desc">Saved offline radio streams</string>
+    <string name="recordings_empty">No recordings yet. Tap Record while listening to save live radio broadcasts.</string>
+    <string name="share_recording">Share Recording</string>
+    <string name="share_recording_text">Listen to this live recording from %1$s: %2$s</string>
+    <string name="audio_output_route">Audio Output / Cast</string>
+    <string name="audio_output_route_desc">Route playback to Bluetooth headphones, Google Cast, smart speakers, or external display.</string>
+    <string name="audio_output_current_device">Current Output Device</string>
+    <string name="audio_output_switch_btn">Switch Device / Cast</string>
+    <string name="settings_section_recordings">Audio Recordings</string>
+    <string name="settings_recordings_title">Saved Recordings</string>
+    <string name="settings_recordings_desc">View and manage captured radio streams</string>
+    <string name="settings_rate_title">Rate NeoTune</string>
+    <string name="settings_rate_desc">Support this 100% free and open player with a review</string>
+    <string name="settings_share_app_title">Share NeoTune</string>
+    <string name="settings_share_app_desc">Tell friends about free music and podcasts</string>
 </resources>

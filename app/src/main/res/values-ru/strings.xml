@@ -473,4 +473,29 @@
     <string name="remove_from_your_episodes">Удалить из моих выпусков</string>
     <string name="star_rating_desc">Звезда %1$d</string>
     <string name="stream_link">Ссылка на поток</string>
+
+    <!-- Auto-localized additions -->
+    <string name="widget_description">Виджет радио NeoTune</string>
+    <string name="widget_no_station">Нажмите, чтобы включить радио</string>
+    <string name="record_stream">Записать поток</string>
+    <string name="record_stream_desc">Запись прямого эфира радио</string>
+    <string name="recording_started">Запись началась…</string>
+    <string name="recording_stopped">Запись остановлена</string>
+    <string name="recording_saved">Запись сохранена: %1$s (%2$s)</string>
+    <string name="recordings_title">Записанное аудио</string>
+    <string name="recordings_desc">Сохраненные офлайн радиозаписи</string>
+    <string name="recordings_empty">Записей пока нет. Нажмите «Запись» во время прослушивания, чтобы сохранить эфир.</string>
+    <string name="share_recording">Поделиться записью</string>
+    <string name="share_recording_text">Послушайте эту запись эфира станции %1$s: %2$s</string>
+    <string name="audio_output_route">Аудиовыход / Cast</string>
+    <string name="audio_output_route_desc">Перенаправление звука на Bluetooth-наушники, Google Cast или умные колонки.</string>
+    <string name="audio_output_current_device">Текущее устройство вывода</string>
+    <string name="audio_output_switch_btn">Сменить устройство / Cast</string>
+    <string name="settings_section_recordings">Аудиозаписи</string>
+    <string name="settings_recordings_title">Сохраненные записи</string>
+    <string name="settings_recordings_desc">Просмотр и управление записями радиопередач</string>
+    <string name="settings_rate_title">Оценить NeoTune</string>
+    <string name="settings_rate_desc">Поддержите этот на 100% бесплатный плеер без рекламы отзывом</string>
+    <string name="settings_share_app_title">Поделиться NeoTune</string>
+    <string name="settings_share_app_desc">Расскажите друзьям о бесплатной музыке и подкастах</string>
 </resources>

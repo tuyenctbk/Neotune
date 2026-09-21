@@ -473,4 +473,29 @@
     <string name="remove_from_your_episodes">マイエピソードから削除</string>
     <string name="star_rating_desc">星 %1$d</string>
     <string name="stream_link">ストリームリンク</string>
+
+    <!-- Auto-localized additions -->
+    <string name="widget_description">NeoTune ラジオプレーヤー ウィジェット</string>
+    <string name="widget_no_station">タップして再生</string>
+    <string name="record_stream">ストリーム録音</string>
+    <string name="record_stream_desc">ラジオ生放送を録音</string>
+    <string name="recording_started">録音を開始しました…</string>
+    <string name="recording_stopped">録音を停止しました</string>
+    <string name="recording_saved">録音を保存しました: %1$s (%2$s)</string>
+    <string name="recordings_title">録音済みオーディオ</string>
+    <string name="recordings_desc">保存されたオフラインラジオ放送</string>
+    <string name="recordings_empty">録音はまだありません。再生中に「録音」をタップして番組を保存できます。</string>
+    <string name="share_recording">録音を共有</string>
+    <string name="share_recording_text">%1$s のライブ録音を聴く: %2$s</string>
+    <string name="audio_output_route">オーディオ出力 / Cast</string>
+    <string name="audio_output_route_desc">Bluetoothヘッドフォン、Google Cast、スマートスピーカーに音声をルーティングします。</string>
+    <string name="audio_output_current_device">現在の出力デバイス</string>
+    <string name="audio_output_switch_btn">デバイス切り替え / Cast</string>
+    <string name="settings_section_recordings">オーディオ録音</string>
+    <string name="settings_recordings_title">保存済み録音</string>
+    <string name="settings_recordings_desc">保存したラジオ放送の確認と管理</string>
+    <string name="settings_rate_title">NeoTune を評価する</string>
+    <string name="settings_rate_desc">完全無料・広告なしの当アプリをレビューで応援してください</string>
+    <string name="settings_share_app_title">NeoTune を共有</string>
+    <string name="settings_share_app_desc">無料の音楽とポッドキャストを友達に教える</string>
 </resources>

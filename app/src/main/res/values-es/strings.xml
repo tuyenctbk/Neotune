@@ -486,4 +486,29 @@
     <string name="remove_from_your_episodes">Eliminar de tus episodios</string>
     <string name="star_rating_desc">Estrella %1$d</string>
     <string name="stream_link">Enlace de transmisión</string>
+
+    <!-- Auto-localized additions -->
+    <string name="widget_description">Widget de reproductor de radio NeoTune</string>
+    <string name="widget_no_station">Toca para reproducir radio</string>
+    <string name="record_stream">Grabar transmisión</string>
+    <string name="record_stream_desc">Captura audio de radio en vivo</string>
+    <string name="recording_started">Grabación iniciada…</string>
+    <string name="recording_stopped">Grabación detenida</string>
+    <string name="recording_saved">Grabación guardada: %1$s (%2$s)</string>
+    <string name="recordings_title">Audio grabado</string>
+    <string name="recordings_desc">Transmisiones de radio sin conexión guardadas</string>
+    <string name="recordings_empty">Sin grabaciones aún. Toca Grabar mientras escuchas para capturar transmisiones en vivo.</string>
+    <string name="share_recording">Compartir grabación</string>
+    <string name="share_recording_text">Escucha esta grabación en vivo de %1$s: %2$s</string>
+    <string name="audio_output_route">Salida de audio / Cast</string>
+    <string name="audio_output_route_desc">Envía la reproducción a auriculares Bluetooth, Google Cast o altavoces inteligentes.</string>
+    <string name="audio_output_current_device">Dispositivo de salida actual</string>
+    <string name="audio_output_switch_btn">Cambiar dispositivo / Cast</string>
+    <string name="settings_section_recordings">Grabaciones de audio</string>
+    <string name="settings_recordings_title">Grabaciones guardadas</string>
+    <string name="settings_recordings_desc">Ver y gestionar transmisiones de radio capturadas</string>
+    <string name="settings_rate_title">Calificar NeoTune</string>
+    <string name="settings_rate_desc">Apoya este reproductor 100% gratuito y sin anuncios con una reseña</string>
+    <string name="settings_share_app_title">Compartir NeoTune</string>
+    <string name="settings_share_app_desc">Comparte música y podcasts gratis con tus amigos</string>
 </resources>

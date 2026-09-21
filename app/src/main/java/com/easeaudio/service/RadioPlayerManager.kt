@@ -306,6 +306,55 @@ class RadioPlayerManager(private val context: Context) {
                 Log.w(TAG, "Background pre-warm error: ${e.message}")
             }
         }
+
+        // Auto-sync Home Screen widgets on playback and metadata changes
+        scope.launch {
+            kotlinx.coroutines.flow.combine(_isPlaying, _currentStation, _streamTitle) { _, _, _ -> }
+                .collect {
+                    com.easeaudio.widget.NeoTuneAppWidgetProvider.updateAllWidgets(context)
+                }
+        }
+    }
+
+    val streamRecorder: com.easeaudio.data.RadioStreamRecorder =
+        com.easeaudio.data.RadioStreamRecorder.getInstance(context)
+    val recordingState: StateFlow<com.easeaudio.data.RecordingState> = streamRecorder.recordingState
+
+    fun toggleStreamRecording(): Boolean {
+        return if (streamRecorder.recordingState.value.isRecording) {
+            val file = streamRecorder.stopRecording()
+            if (file != null) {
+                val mb = file.length().toDouble() / (1024 * 1024)
+                val sizeStr = if (mb >= 1.0) String.format(java.util.Locale.US, "%.1f MB", mb) else "${file.length() / 1024} KB"
+                val msg = context.getString(R.string.recording_saved, file.name, sizeStr)
+                android.os.Handler(android.os.Looper.getMainLooper()).post {
+                    android.widget.Toast.makeText(context, msg, android.widget.Toast.LENGTH_SHORT).show()
+                }
+            } else {
+                val msg = context.getString(R.string.recording_stopped)
+                android.os.Handler(android.os.Looper.getMainLooper()).post {
+                    android.widget.Toast.makeText(context, msg, android.widget.Toast.LENGTH_SHORT).show()
+                }
+            }
+            false
+        } else {
+            val current = _currentStation.value
+            if (current == null) {
+                val msg = context.getString(R.string.recordings_empty)
+                android.os.Handler(android.os.Looper.getMainLooper()).post {
+                    android.widget.Toast.makeText(context, msg, android.widget.Toast.LENGTH_SHORT).show()
+                }
+                return false
+            }
+            val started = streamRecorder.startRecording(current, _streamTitle.value)
+            if (started) {
+                val msg = context.getString(R.string.recording_started)
+                android.os.Handler(android.os.Looper.getMainLooper()).post {
+                    android.widget.Toast.makeText(context, msg, android.widget.Toast.LENGTH_SHORT).show()
+                }
+            }
+            started
+        }
     }
 
     // BUG-4 fix: flags are read/written from multiple threads (Main listener + IO coroutine);
@@ -1339,6 +1388,9 @@ class RadioPlayerManager(private val context: Context) {
     private suspend fun resolveDirectStreamUrl(rawUrl: String, station: RadioStation? = null): String = withContext(Dispatchers.IO) {
         if (rawUrl.isBlank()) return@withContext rawUrl
         var currentUrl = rawUrl.trim()
+        if (currentUrl.startsWith("file:", ignoreCase = true) || currentUrl.startsWith("content:", ignoreCase = true)) {
+            return@withContext currentUrl
+        }
         
         // Rewrite old/broken VOV (Voice of Vietnam) stream URLs on audio-lss.vov.vn to their working, live formats
         if (currentUrl.contains("audio-lss.vov.vn", ignoreCase = true)) {

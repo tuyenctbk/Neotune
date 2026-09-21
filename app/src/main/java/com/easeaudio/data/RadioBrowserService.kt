@@ -1,7 +1,9 @@
 package com.easeaudio.data
 
 import android.util.Log
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
@@ -14,60 +16,66 @@ object RadioBrowserService {
 
     private const val TAG = "RadioBrowserService"
     
-    private var cachedServers: List<String> = emptyList()
+    private val defaultMirrors = listOf(
+        "https://de1.api.radio-browser.info/json/stations",
+        "https://at1.api.radio-browser.info/json/stations",
+        "https://fr1.api.radio-browser.info/json/stations",
+        "https://all.api.radio-browser.info/json/stations"
+    )
+
+    @Volatile
+    private var preferredFastServer: String = defaultMirrors[0]
+
+    private var cachedServers: List<String> = defaultMirrors
     private val cacheMutex = Mutex()
+    private var isDnsRefreshing = false
+    private val backgroundScope = kotlinx.coroutines.CoroutineScope(Dispatchers.IO + kotlinx.coroutines.SupervisorJob())
 
     private suspend fun getActiveServers(): List<String> = withContext(Dispatchers.IO) {
-        // BUG-8 fix: check the cache BEFORE acquiring the mutex so the common case
-        // (cache already populated) returns immediately without blocking on the lock
-        // while another coroutine may be doing a slow DNS lookup.
-        if (cachedServers.isNotEmpty()) return@withContext cachedServers
+        // Return preferred fast server at the head followed by cached mirrors
+        val current = cachedServers
+        val sortedList = if (current.firstOrNull() == preferredFastServer) {
+            current
+        } else {
+            listOf(preferredFastServer) + current.filter { it != preferredFastServer }
+        }
 
-        cacheMutex.withLock {
-            // Double-check inside the lock in case another coroutine just populated it.
-            if (cachedServers.isNotEmpty()) return@withLock
-
-            val defaultMirrors = listOf(
-                "http://all.api.radio-browser.info/json/stations",
-                "https://de1.api.radio-browser.info/json/stations",
-                "https://nl1.api.radio-browser.info/json/stations",
-                "https://at1.api.radio-browser.info/json/stations",
-                "https://fr1.api.radio-browser.info/json/stations"
-            )
-
-            val servers = mutableListOf<String>()
-            try {
-                val addresses = java.net.InetAddress.getAllByName("all.api.radio-browser.info")
-                for (addr in addresses) {
-                    val host = addr.canonicalHostName
-                    val ip = addr.hostAddress
-                    if (host.isNotBlank() && host != ip && host.endsWith("radio-browser.info")) {
-                        val url = "https://$host/json/stations"
-                        if (!servers.contains(url)) {
-                            servers.add(url)
-                        }
-                    } else if (!ip.isNullOrBlank()) {
-                        // HTTP over direct IP address avoids SSL hostname mismatch completely
-                        val url = "http://$ip/json/stations"
-                        if (!servers.contains(url)) {
-                            servers.add(url)
+        // Asynchronously refresh DNS mirrors in the background without blocking the UI request
+        if (!isDnsRefreshing && current.size <= defaultMirrors.size) {
+            isDnsRefreshing = true
+            backgroundScope.launch {
+                try {
+                    val addresses = java.net.InetAddress.getAllByName("all.api.radio-browser.info")
+                    val resolved = mutableListOf<String>()
+                    resolved.add(preferredFastServer)
+                    for (addr in addresses) {
+                        val host = addr.canonicalHostName
+                        val ip = addr.hostAddress
+                        if (host.isNotBlank() && host != ip && host.endsWith("radio-browser.info")) {
+                            val url = "https://$host/json/stations"
+                            if (!resolved.contains(url)) resolved.add(url)
+                        } else if (!ip.isNullOrBlank()) {
+                            val url = "http://$ip/json/stations"
+                            if (!resolved.contains(url)) resolved.add(url)
                         }
                     }
+                    defaultMirrors.forEach { if (!resolved.contains(it)) resolved.add(it) }
+                    cacheMutex.withLock {
+                        cachedServers = resolved
+                    }
+                } catch (e: Exception) {
+                    Log.d(TAG, "Background DNS refresh notice: ${e.message}")
+                } finally {
+                    isDnsRefreshing = false
                 }
-            } catch (e: Exception) {
-                Log.e(TAG, "DNS resolution of all.api.radio-browser.info failed, using default mirrors: ${e.message}")
             }
-
-            // Always ensure valid fallback mirrors are in the server list
-            for (mirror in defaultMirrors) {
-                if (!servers.contains(mirror)) {
-                    servers.add(mirror)
-                }
-            }
-
-            cachedServers = servers
         }
-        return@withContext cachedServers
+
+        return@withContext sortedList
+    }
+
+    fun markServerSuccessful(url: String) {
+        preferredFastServer = url
     }
 
     private fun executeHttpRequest(urlString: String, redirectCount: Int = 0): String? {
@@ -110,7 +118,7 @@ object RadioBrowserService {
                 else -> null
             }
         } catch (e: Exception) {
-            Log.e(TAG, "HTTP Request error for $urlString: ${e.message}")
+            Log.w(TAG, "Mirror request failed for $urlString: ${e.message}")
             null
         } finally {
             connection?.disconnect()
@@ -242,6 +250,7 @@ object RadioBrowserService {
                         }
                     }
                     if (stations.isNotEmpty() || (searchQuery.isNotBlank() || mappedTag.isNotBlank())) {
+                        markServerSuccessful(baseUrl)
                         return@withContext stations
                     }
                 }
@@ -260,7 +269,7 @@ object RadioBrowserService {
             }
         }
         if (lastNetworkException != null) {
-            throw lastNetworkException
+            Log.w(TAG, "All radio-browser mirrors unreachable, returning fallback results: ${lastNetworkException.message}")
         }
         return@withContext emptyList()
     }

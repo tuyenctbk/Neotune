@@ -63,6 +63,11 @@ import coil.compose.AsyncImage
 import coil.compose.AsyncImagePainter
 import coil.compose.SubcomposeAsyncImageContent
 import androidx.compose.ui.res.stringResource
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.easeaudio.data.RadioStreamRecorder
+import com.easeaudio.service.RadioPlayerManager
+import com.easeaudio.ui.components.AudioOutputDialog
+import com.easeaudio.ui.components.RecordingsDialog
 import com.easeaudio.ui.components.NotificationPermissionReminder
 import android.os.Build
 import android.Manifest
@@ -143,6 +148,12 @@ fun PlayerScreen(
 
     var showLyricsSheet by remember { mutableStateOf(false) }
 
+    val context = LocalContext.current
+    val recorder = remember { RadioStreamRecorder.getInstance(context) }
+    val recState by recorder.recordingState.collectAsStateWithLifecycle()
+    var showRecordingsDialog by remember { mutableStateOf(false) }
+    var showAudioOutputDialog by remember { mutableStateOf(false) }
+
     if (showLyricsSheet) {
         LyricsBottomSheet(
             lyrics = currentLyrics,
@@ -150,6 +161,29 @@ fun PlayerScreen(
             streamTitle = streamTitle,
             currentPositionMs = currentPosition,
             onDismiss = { showLyricsSheet = false }
+        )
+    }
+
+    if (showRecordingsDialog) {
+        RecordingsDialog(
+            onDismiss = { showRecordingsDialog = false },
+            onPlayRecording = { item ->
+                val stationForRec = RadioStation(
+                    id = item.id,
+                    name = item.stationName,
+                    genre = "Local Recording",
+                    streamUrl = item.file.toURI().toString(),
+                    country = "Local",
+                    imageUrl = ""
+                )
+                RadioPlayerManager.getInstance(context).playStation(stationForRec)
+            }
+        )
+    }
+
+    if (showAudioOutputDialog) {
+        AudioOutputDialog(
+            onDismiss = { showAudioOutputDialog = false }
         )
     }
 
@@ -340,6 +374,33 @@ fun PlayerScreen(
                                     showPlayerMenu = false
                                     onFetchLyrics()
                                     showLyricsSheet = true
+                                }
+                            )
+                            HorizontalDivider(color = MaterialTheme.colorScheme.outline, thickness = 1.dp)
+                            DropdownMenuItem(
+                                text = { Text(if (recState.isRecording) stringResource(R.string.recording_stopped) else stringResource(R.string.record_stream), color = MaterialTheme.colorScheme.onSurface) },
+                                leadingIcon = { Icon(Icons.Filled.FiberManualRecord, contentDescription = null, tint = if (recState.isRecording) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary) },
+                                onClick = {
+                                    showPlayerMenu = false
+                                    RadioPlayerManager.getInstance(context).toggleStreamRecording()
+                                }
+                            )
+                            HorizontalDivider(color = MaterialTheme.colorScheme.outline, thickness = 1.dp)
+                            DropdownMenuItem(
+                                text = { Text(stringResource(R.string.recordings_title), color = MaterialTheme.colorScheme.onSurface) },
+                                leadingIcon = { Icon(Icons.Filled.LibraryMusic, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },
+                                onClick = {
+                                    showPlayerMenu = false
+                                    showRecordingsDialog = true
+                                }
+                            )
+                            HorizontalDivider(color = MaterialTheme.colorScheme.outline, thickness = 1.dp)
+                            DropdownMenuItem(
+                                text = { Text(stringResource(R.string.audio_output_route), color = MaterialTheme.colorScheme.onSurface) },
+                                leadingIcon = { Icon(Icons.Filled.Cast, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },
+                                onClick = {
+                                    showPlayerMenu = false
+                                    showAudioOutputDialog = true
                                 }
                             )
                             HorizontalDivider(color = MaterialTheme.colorScheme.outline, thickness = 1.dp)
@@ -540,6 +601,15 @@ private fun PlayerContent(
 ) {
     val isPodcast = station.isPodcast
     var visualizerStyle by remember { mutableStateOf(VisualizerStyle.ROUNDED_BARS) }
+
+    val contentContext = LocalContext.current
+    val recorder = remember { RadioStreamRecorder.getInstance(contentContext) }
+    val recState by recorder.recordingState.collectAsStateWithLifecycle()
+    var showAudioOutputDialog by remember { mutableStateOf(false) }
+
+    if (showAudioOutputDialog) {
+        AudioOutputDialog(onDismiss = { showAudioOutputDialog = false })
+    }
 
     val playPauseFocusRequester = remember { FocusRequester() }
 
@@ -969,6 +1039,38 @@ private fun PlayerContent(
                 onClick = onOpenLyrics,
                 label = { Text(stringResource(R.string.lyrics_label)) },
                 leadingIcon = { Icon(Icons.Filled.Mic, null, modifier = Modifier.size(16.dp), tint = MaterialTheme.colorScheme.primary) }
+            )
+            val isRec = recState.isRecording
+            AssistChip(
+                onClick = {
+                    RadioPlayerManager.getInstance(contentContext).toggleStreamRecording()
+                },
+                label = {
+                    Text(
+                        if (isRec) {
+                            val sec = recState.durationSeconds
+                            val m = sec / 60
+                            val s = sec % 60
+                            String.format(java.util.Locale.US, "REC %02d:%02d", m, s)
+                        } else {
+                            stringResource(R.string.record_stream)
+                        }
+                    )
+                },
+                leadingIcon = {
+                    Icon(
+                        Icons.Filled.FiberManualRecord,
+                        null,
+                        modifier = Modifier.size(14.dp),
+                        tint = if (isRec) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary
+                    )
+                },
+                colors = if (isRec) AssistChipDefaults.assistChipColors(containerColor = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.5f)) else AssistChipDefaults.assistChipColors()
+            )
+            AssistChip(
+                onClick = { showAudioOutputDialog = true },
+                label = { Text(stringResource(R.string.audio_output_route)) },
+                leadingIcon = { Icon(Icons.Filled.Cast, null, modifier = Modifier.size(16.dp), tint = MaterialTheme.colorScheme.primary) }
             )
         }
     }

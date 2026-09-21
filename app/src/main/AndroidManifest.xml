@@ -156,5 +156,32 @@
         <receiver
             android:name=".alarm.AlarmReceiver"
             android:exported="false" />
+
+        <!-- NeoTune Home Screen Audio Player Widget -->
+        <receiver
+            android:name=".widget.NeoTuneAppWidgetProvider"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="com.easeaudio.widget.ACTION_TOGGLE_PLAY" />
+                <action android:name="com.easeaudio.widget.ACTION_NEXT" />
+                <action android:name="com.easeaudio.widget.ACTION_PREV" />
+                <action android:name="com.easeaudio.widget.ACTION_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/neotune_widget_info" />
+        </receiver>
+
+        <!-- Secure FileProvider for sharing recorded live streams & library backups -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
     </application>
 </manifest>

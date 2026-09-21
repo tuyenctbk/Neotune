@@ -469,4 +469,29 @@
     <string name="remove_from_your_episodes">Hapus dari Episode Anda</string>
     <string name="star_rating_desc">Bintang %1$d</string>
     <string name="stream_link">Tautan Streaming</string>
+
+    <!-- Auto-localized additions -->
+    <string name="widget_description">Widget pemutar radio NeoTune</string>
+    <string name="widget_no_station">Ketuk untuk memutar radio</string>
+    <string name="record_stream">Rekam siaran</string>
+    <string name="record_stream_desc">Tangkap audio radio langsung</string>
+    <string name="recording_started">Perekaman dimulai…</string>
+    <string name="recording_stopped">Perekaman dihentikan</string>
+    <string name="recording_saved">Rekaman disimpan: %1$s (%2$s)</string>
+    <string name="recordings_title">Audio Terekam</string>
+    <string name="recordings_desc">Siaran radio offline tersimpan</string>
+    <string name="recordings_empty">Belum ada rekaman. Ketuk Rekam saat mendengarkan untuk menyimpan siaran langsung.</string>
+    <string name="share_recording">Bagikan rekaman</string>
+    <string name="share_recording_text">Dengarkan rekaman langsung dari %1$s: %2$s</string>
+    <string name="audio_output_route">Keluaran Audio / Cast</string>
+    <string name="audio_output_route_desc">Arahkan pemutaran ke headphone Bluetooth, Google Cast, atau speaker pintar.</string>
+    <string name="audio_output_current_device">Perangkat Output Saat Ini</string>
+    <string name="audio_output_switch_btn">Ganti Perangkat / Cast</string>
+    <string name="settings_section_recordings">Rekaman Audio</string>
+    <string name="settings_recordings_title">Rekaman Tersimpan</string>
+    <string name="settings_recordings_desc">Lihat dan kelola rekaman siaran radio</string>
+    <string name="settings_rate_title">Beri Nilai NeoTune</string>
+    <string name="settings_rate_desc">Dukung aplikasi 100% gratis tanpa iklan ini dengan ulasan Anda</string>
+    <string name="settings_share_app_title">Bagikan NeoTune</string>
+    <string name="settings_share_app_desc">Beri tahu teman tentang musik dan podcast gratis</string>
 </resources>

@@ -58,6 +58,25 @@ fun SettingsScreen(
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
+    var showRecordingsDialog by remember { mutableStateOf(false) }
+
+    if (showRecordingsDialog) {
+        com.easeaudio.ui.components.RecordingsDialog(
+            onDismiss = { showRecordingsDialog = false },
+            onPlayRecording = { item ->
+                val stationForRec = com.easeaudio.data.RadioStation(
+                    id = item.id,
+                    name = item.stationName,
+                    genre = "Local Recording",
+                    streamUrl = item.file.toURI().toString(),
+                    country = "Local",
+                    imageUrl = ""
+                )
+                com.easeaudio.service.RadioPlayerManager.getInstance(context).playStation(stationForRec)
+            }
+        )
+    }
+
     Scaffold(
         modifier = modifier.fillMaxSize(),
         containerColor = Color.Transparent
@@ -384,6 +403,57 @@ fun SettingsScreen(
                             subtitle = stringResource(R.string.settings_backup_desc),
                             onClick = onOpenBackup,
                             testTag = "setting_backup_restore"
+                        )
+                        HorizontalDivider(color = MaterialTheme.colorScheme.surfaceVariant, thickness = 1.dp)
+                        SettingsItem(
+                            icon = Icons.Filled.FiberManualRecord,
+                            iconTint = MaterialTheme.colorScheme.error,
+                            title = stringResource(R.string.settings_recordings_title),
+                            subtitle = stringResource(R.string.settings_recordings_desc),
+                            onClick = { showRecordingsDialog = true },
+                            testTag = "setting_recordings"
+                        )
+                    }
+                }
+
+                // Community & Support Section
+                item {
+                    SettingsSectionHeader(title = stringResource(R.string.support_development_header))
+                }
+
+                item {
+                    SettingsCard {
+                        val activity = context as? android.app.Activity
+                        SettingsItem(
+                            icon = Icons.Filled.Star,
+                            iconTint = MaterialTheme.colorScheme.primary,
+                            title = stringResource(R.string.settings_rate_title),
+                            subtitle = stringResource(R.string.settings_rate_desc),
+                            onClick = {
+                                com.easeaudio.engagement.SmartEngagementManager.getInstance(context).onRatingCompleted(5, activity)
+                            },
+                            testTag = "setting_rate_app"
+                        )
+                        HorizontalDivider(color = MaterialTheme.colorScheme.surfaceVariant, thickness = 1.dp)
+                        SettingsItem(
+                            icon = Icons.Filled.Share,
+                            iconTint = MaterialTheme.colorScheme.primary,
+                            title = stringResource(R.string.settings_share_app_title),
+                            subtitle = stringResource(R.string.settings_share_app_desc),
+                            onClick = {
+                                try {
+                                    val shareIntent = Intent(Intent.ACTION_SEND).apply {
+                                        type = "text/plain"
+                                        putExtra(Intent.EXTRA_SUBJECT, "NeoTune")
+                                        putExtra(Intent.EXTRA_TEXT, "Listen to live global radio and podcasts for free on NeoTune: https://play.google.com/store/apps/details?id=${context.packageName}")
+                                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                                    }
+                                    context.startActivity(Intent.createChooser(shareIntent, context.getString(R.string.settings_share_app_title)))
+                                } catch (e: Exception) {
+                                    Log.e("SettingsScreen", "Failed to share: ${e.message}")
+                                }
+                            },
+                            testTag = "setting_share_app"
                         )
                     }
                 }

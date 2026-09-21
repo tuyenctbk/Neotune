@@ -469,4 +469,29 @@
     <string name="remove_from_your_episodes">Remove from Your Episodes</string>
     <string name="star_rating_desc">نجمة %1$d</string>
     <string name="stream_link">رابط البث</string>
+
+    <!-- Auto-localized additions -->
+    <string name="widget_description">أداة مشغل راديو NeoTune</string>
+    <string name="widget_no_station">المس لتشغيل الراديو</string>
+    <string name="record_stream">تسجيل البث</string>
+    <string name="record_stream_desc">التقاط صوت الراديو المباشر</string>
+    <string name="recording_started">بدأ التسجيل…</string>
+    <string name="recording_stopped">تم إيقاف التسجيل</string>
+    <string name="recording_saved">تم حفظ التسجيل: %1$s (%2$s)</string>
+    <string name="recordings_title">الصوت المسجل</string>
+    <string name="recordings_desc">بثوث راديو محفوظة بدون إنترنت</string>
+    <string name="recordings_empty">لا توجد تسجيلات بعد. اضغط على تسجيل أثناء الاستماع لحفظ البث المباشر.</string>
+    <string name="share_recording">مشاركة التسجيل</string>
+    <string name="share_recording_text">استمع إلى هذا التسجيل المباشر من %1$s: %2$s</string>
+    <string name="audio_output_route">مخرج الصوت / البث</string>
+    <string name="audio_output_route_desc">توجيه التشغيل إلى سماعات البلوتوث أو Google Cast أو مكبرات الصوت الذكية.</string>
+    <string name="audio_output_current_device">جهاز الإخراج الحالي</string>
+    <string name="audio_output_switch_btn">تبديل الجهاز / Cast</string>
+    <string name="settings_section_recordings">التسجيلات الصوتية</string>
+    <string name="settings_recordings_title">التسجيلات المحفوظة</string>
+    <string name="settings_recordings_desc">عرض وإدارة تسجيلات الراديو الملتقطة</string>
+    <string name="settings_rate_title">تقييم NeoTune</string>
+    <string name="settings_rate_desc">ادعم هذا المشغل المجاني 100% والخالي من الإعلانات بتقييمك</string>
+    <string name="settings_share_app_title">مشاركة NeoTune</string>
+    <string name="settings_share_app_desc">أخبر أصدقاءك عن الموسيقى والبودكاست المجانية</string>
 </resources>
