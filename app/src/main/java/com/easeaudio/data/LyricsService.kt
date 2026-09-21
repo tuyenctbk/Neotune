@@ -206,19 +206,19 @@ object LyricsService {
         return when {
             clean.contains(" - ") -> {
                 val parts = clean.split(" - ", limit = 2)
-                Pair(parts[0].trim(), parts[1].trim())
+                Pair(parts.getOrElse(0) { "" }.trim(), parts.getOrElse(1) { "" }.trim())
             }
             clean.contains(" – ") -> { // En-dash
                 val parts = clean.split(" – ", limit = 2)
-                Pair(parts[0].trim(), parts[1].trim())
+                Pair(parts.getOrElse(0) { "" }.trim(), parts.getOrElse(1) { "" }.trim())
             }
             clean.contains(" — ") -> { // Em-dash
                 val parts = clean.split(" — ", limit = 2)
-                Pair(parts[0].trim(), parts[1].trim())
+                Pair(parts.getOrElse(0) { "" }.trim(), parts.getOrElse(1) { "" }.trim())
             }
             clean.contains(":") -> {
                 val parts = clean.split(":", limit = 2)
-                Pair(parts[0].trim(), parts[1].trim())
+                Pair(parts.getOrElse(0) { "" }.trim(), parts.getOrElse(1) { "" }.trim())
             }
             else -> Pair("", clean)
         }

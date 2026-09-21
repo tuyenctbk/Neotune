@@ -239,7 +239,7 @@ fun PlayerScreen(
                     ) {
                         Icon(
                             imageVector = if (isListenLater) Icons.Filled.Bookmark else Icons.Filled.BookmarkBorder,
-                            contentDescription = if (isListenLater) "Remove from Listen Later" else "Save to Listen Later",
+                            contentDescription = stringResource(if (isListenLater) R.string.remove_from_listen_later else R.string.add_to_listen_later),
                             tint = if (isBookmarkFocused) MaterialTheme.colorScheme.onPrimary else (if (isListenLater) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant)
                         )
                     }
@@ -248,13 +248,18 @@ fun PlayerScreen(
                     IconButton(
                         onClick = {
                             haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                            val shareText = "Listening to ${station.name} (${station.genre})\nStream: ${station.streamUrl}\nTune in live on NeoTune Radio!"
+                            val shareText = context.getString(
+                                R.string.share_station_format,
+                                station.name,
+                                station.genre,
+                                station.streamUrl
+                            )
                             val shareIntent = Intent(Intent.ACTION_SEND).apply {
                                 type = "text/plain"
-                                putExtra(Intent.EXTRA_SUBJECT, "Listen to ${station.name}")
+                                putExtra(Intent.EXTRA_SUBJECT, station.name)
                                 putExtra(Intent.EXTRA_TEXT, shareText)
                             }
-                            context.startActivity(Intent.createChooser(shareIntent, "Share Station"))
+                            context.startActivity(Intent.createChooser(shareIntent, context.getString(R.string.share_station)))
                         },
                         modifier = Modifier
                             .onFocusChanged { isShareFocused = it.isFocused }
@@ -571,13 +576,18 @@ private fun PlayerContent(
             IconButton(
                 onClick = {
                     detailHaptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                    val shareText = "Listening to ${station.name} (${station.genre})\nStream: ${station.streamUrl}\nTune in live on NeoTune Radio!"
+                    val shareText = detailContext.getString(
+                        R.string.share_station_format,
+                        station.name,
+                        station.genre,
+                        station.streamUrl
+                    )
                     val shareIntent = Intent(Intent.ACTION_SEND).apply {
                         type = "text/plain"
-                        putExtra(Intent.EXTRA_SUBJECT, "Listen to ${station.name}")
+                        putExtra(Intent.EXTRA_SUBJECT, station.name)
                         putExtra(Intent.EXTRA_TEXT, shareText)
                     }
-                    detailContext.startActivity(Intent.createChooser(shareIntent, "Share Station"))
+                    detailContext.startActivity(Intent.createChooser(shareIntent, detailContext.getString(R.string.share_station)))
                 },
                 modifier = Modifier
                     .size(32.dp)

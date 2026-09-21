@@ -87,20 +87,13 @@ fun TrackActionSheet(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Box(
-                        modifier = Modifier
-                            .size(36.dp)
-                            .clip(CircleShape)
-                            .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(
-                            imageVector = if (isPodcast) Icons.Filled.MusicNote else Icons.Filled.PlayArrow,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.size(20.dp)
-                        )
-                    }
+                    StationMonogramAvatar(
+                        name = stationName,
+                        genre = stationGenre,
+                        isPodcast = isPodcast,
+                        shape = RoundedCornerShape(10.dp),
+                        modifier = Modifier.size(40.dp)
+                    )
                     Spacer(modifier = Modifier.width(12.dp))
                     Column {
                         Text(
@@ -166,7 +159,7 @@ fun TrackActionSheet(
             if (onToggleListenLater != null) {
                 TrackActionItem(
                     icon = if (isListenLater) Icons.Filled.Bookmark else Icons.Filled.BookmarkBorder,
-                    label = if (isListenLater) "Remove from Listen Later" else "Save to Listen Later",
+                    label = stringResource(if (isListenLater) R.string.remove_from_listen_later else R.string.add_to_listen_later),
                     tint = if (isListenLater) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
                 ) {
                     onDismiss()

@@ -148,7 +148,7 @@ fun DiagnosticsDialog(
                         }
 
                         Text(
-                            text = if (station?.isPodcast == true) "VOD / Podcast" else "Live Audio Stream",
+                            text = if (station?.isPodcast == true) stringResource(R.string.on_demand_podcast) else stringResource(R.string.live_audio_stream),
                             style = MaterialTheme.typography.labelSmall,
                             fontFamily = FontFamily.Monospace,
                             color = MaterialTheme.colorScheme.primary

@@ -210,24 +210,15 @@ fun StationCard(
                                 shape = RoundedCornerShape(16.dp)
                             )
                     ) {
-                        coil.compose.SubcomposeAsyncImage(
-                            model = imageRequest,
-                            contentDescription = station.name,
-                            contentScale = ContentScale.Crop,
+                        StationArtLoader(
+                            imageUrl = resolvedImageUrl,
+                            stationName = station.name,
+                            genre = station.genre,
+                            isPodcast = station.isPodcast,
+                            isPlaying = isSelected && isPlaying,
+                            shape = RoundedCornerShape(16.dp),
                             modifier = Modifier.fillMaxSize()
-                        ) {
-                            val state = painter.state
-                            if (state is AsyncImagePainter.State.Success) {
-                                SubcomposeAsyncImageContent()
-                            } else {
-                                StationMonogramAvatar(
-                                    name = station.name,
-                                    genre = station.genre,
-                                    isPodcast = station.isPodcast,
-                                    modifier = Modifier.fillMaxSize()
-                                )
-                            }
-                        }
+                        )
                         if (isSelected) {
                             Box(
                                 modifier = Modifier

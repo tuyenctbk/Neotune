@@ -49,7 +49,6 @@ object StationLogoResolver {
         "bloomberg" to "https://www.bloomberg.com",
         "msnbc" to "https://www.msnbc.com",
         "cbs news" to "https://www.cbsnews.com",
-        "radio paradise" to "https://radioparadise.com",
         "somafm" to "https://somafm.com"
     )
 
@@ -93,6 +92,16 @@ object StationLogoResolver {
         val cleanHomepage = homepage.trim()
         val lowerName = name.trim().lowercase()
 
+        // 0. Dedicated Radio Paradise High-Res Audiophile Channels
+        if (lowerName.contains("radio paradise") || cleanFavicon.contains("radioparadise.com", ignoreCase = true)) {
+            return when {
+                lowerName.contains("mellow") -> "https://images.unsplash.com/photo-1518609878373-06d740f60d8b?auto=format&fit=crop&w=600&q=80"
+                lowerName.contains("rock") -> "https://images.unsplash.com/photo-1498038432885-c6f3f1b912ee?auto=format&fit=crop&w=600&q=80"
+                lowerName.contains("global") || lowerName.contains("world") -> "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=600&q=80"
+                else -> "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=600&q=80"
+            }
+        }
+
         // 1. Check known broadcaster mappings
         for ((key, domain) in KNOWN_STATION_DOMAINS) {
             if (lowerName == key || lowerName.startsWith("$key ") || lowerName.contains(key)) {
@@ -132,8 +141,8 @@ object StationLogoResolver {
             return getGoogleFaviconUrl(domainInName)
         }
 
-        // 5. Fallback: Curated genre image
-        return getRandomDefaultImage(tags)
+        // 5. Fallback to empty so StationMonogramAvatar renders custom monogram avatar
+        return ""
     }
 
     private fun extractDomain(url: String): String {

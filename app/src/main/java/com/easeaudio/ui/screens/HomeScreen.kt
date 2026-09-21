@@ -1008,6 +1008,7 @@ fun CuratedStationCard(
     var isFocused by remember { mutableStateOf(false) }
     var showMenu by remember { mutableStateOf(false) }
     val haptic = LocalHapticFeedback.current
+    val context = LocalContext.current
     val activeAccent = MaterialTheme.colorScheme.primary
     val focusScale by animateFloatAsState(
         targetValue = if (isFocused) 1.08f else 1.0f,
@@ -1091,32 +1092,14 @@ fun CuratedStationCard(
                         shape = RoundedCornerShape(16.dp)
                     )
             ) {
-                val resolvedArt = remember(station.name, station.imageUrl) {
-                    com.easeaudio.util.StationLogoResolver.resolveStationLogo(
-                        name = station.name,
-                        favicon = station.imageUrl,
-                        homepage = "",
-                        tags = station.genre
-                    )
-                }
-                coil.compose.SubcomposeAsyncImage(
-                    model = resolvedArt.ifBlank { null },
-                    contentDescription = station.name,
-                    contentScale = ContentScale.Crop,
+                com.easeaudio.ui.components.StationArtLoader(
+                    imageUrl = station.imageUrl,
+                    stationName = station.name,
+                    genre = station.genre,
+                    isPodcast = station.isPodcast,
+                    shape = RoundedCornerShape(16.dp),
                     modifier = Modifier.fillMaxSize()
-                ) {
-                    val state = painter.state
-                    if (state is AsyncImagePainter.State.Success) {
-                        SubcomposeAsyncImageContent()
-                    } else {
-                        com.easeaudio.ui.components.StationMonogramAvatar(
-                            name = station.name,
-                            genre = station.genre,
-                            isPodcast = station.isPodcast,
-                            modifier = Modifier.fillMaxSize()
-                        )
-                    }
-                }
+                )
                 // Gradient Overlay
                 Box(
                     modifier = Modifier
@@ -1239,6 +1222,7 @@ fun QuickResumeCard(
     var isFocused by remember { mutableStateOf(false) }
     var showMenu by remember { mutableStateOf(false) }
     val haptic = LocalHapticFeedback.current
+    val context = LocalContext.current
     val focusScale by animateFloatAsState(
         targetValue = if (isFocused) 1.02f else 1.0f,
         animationSpec = tween(durationMillis = 150, easing = FastOutSlowInEasing),
@@ -1316,32 +1300,15 @@ fun QuickResumeCard(
                         .clip(RoundedCornerShape(12.dp))
                         .background(MaterialTheme.colorScheme.surfaceVariant)
                 ) {
-                    val resolvedArt = remember(station.name, station.imageUrl) {
-                        com.easeaudio.util.StationLogoResolver.resolveStationLogo(
-                            name = station.name,
-                            favicon = station.imageUrl,
-                            homepage = "",
-                            tags = station.genre
-                        )
-                    }
-                    coil.compose.SubcomposeAsyncImage(
-                        model = resolvedArt.ifBlank { null },
-                        contentDescription = station.name,
-                        contentScale = ContentScale.Crop,
+                    com.easeaudio.ui.components.StationArtLoader(
+                        imageUrl = station.imageUrl,
+                        stationName = station.name,
+                        genre = station.genre,
+                        isPodcast = station.isPodcast,
+                        isPlaying = isPlaying,
+                        shape = RoundedCornerShape(12.dp),
                         modifier = Modifier.fillMaxSize()
-                    ) {
-                        val state = painter.state
-                        if (state is AsyncImagePainter.State.Success) {
-                            SubcomposeAsyncImageContent()
-                        } else {
-                            com.easeaudio.ui.components.StationMonogramAvatar(
-                                name = station.name,
-                                genre = station.genre,
-                                isPodcast = station.isPodcast,
-                                modifier = Modifier.fillMaxSize()
-                            )
-                        }
-                    }
+                    )
                 }
 
                 // Station Info Column
@@ -1647,32 +1614,15 @@ fun RecentStationCard(
                         shape = RoundedCornerShape(16.dp)
                     )
             ) {
-                val resolvedArt = remember(station.name, station.imageUrl) {
-                    com.easeaudio.util.StationLogoResolver.resolveStationLogo(
-                        name = station.name,
-                        favicon = station.imageUrl,
-                        homepage = "",
-                        tags = station.genre
-                    )
-                }
-                coil.compose.SubcomposeAsyncImage(
-                    model = resolvedArt.ifBlank { null },
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop,
+                com.easeaudio.ui.components.StationArtLoader(
+                    imageUrl = station.imageUrl,
+                    stationName = station.name,
+                    genre = station.genre,
+                    isPodcast = station.isPodcast,
+                    isPlaying = isPlaying,
+                    shape = RoundedCornerShape(16.dp),
                     modifier = Modifier.fillMaxSize()
-                ) {
-                    val state = painter.state
-                    if (state is AsyncImagePainter.State.Success) {
-                        SubcomposeAsyncImageContent()
-                    } else {
-                        com.easeaudio.ui.components.StationMonogramAvatar(
-                            name = station.name,
-                            genre = station.genre,
-                            isPodcast = station.isPodcast,
-                            modifier = Modifier.fillMaxSize()
-                        )
-                    }
-                }
+                )
                 if (isPlaying) {
                     Box(
                         modifier = Modifier

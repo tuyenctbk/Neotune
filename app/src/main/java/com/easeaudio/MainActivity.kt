@@ -94,21 +94,23 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         val splashScreen = installSplashScreen()
         splashScreen.setOnExitAnimationListener { splashScreenViewProvider ->
-            val fadeOut = android.animation.ObjectAnimator.ofFloat(
-                splashScreenViewProvider.view,
-                android.view.View.ALPHA,
-                1f,
-                0f
-            ).apply {
-                duration = 280L
-                interpolator = android.view.animation.AccelerateDecelerateInterpolator()
+            val view = splashScreenViewProvider.view
+            val iconView = splashScreenViewProvider.iconView
+            val fadeOut = android.animation.ObjectAnimator.ofFloat(view, android.view.View.ALPHA, 1f, 0f)
+            val scaleX = android.animation.ObjectAnimator.ofFloat(iconView, android.view.View.SCALE_X, 1f, 1.18f)
+            val scaleY = android.animation.ObjectAnimator.ofFloat(iconView, android.view.View.SCALE_Y, 1f, 1.18f)
+            
+            android.animation.AnimatorSet().apply {
+                duration = 320L
+                interpolator = android.view.animation.DecelerateInterpolator()
+                playTogether(fadeOut, scaleX, scaleY)
                 addListener(object : android.animation.AnimatorListenerAdapter() {
                     override fun onAnimationEnd(animation: android.animation.Animator) {
                         splashScreenViewProvider.remove()
                     }
                 })
+                start()
             }
-            fadeOut.start()
         }
         super.onCreate(savedInstanceState)
         AppThemeState.loadTheme(applicationContext)
@@ -717,7 +719,7 @@ fun MainAppContent(
                     if (showTrackActionSheet && !uiState.streamTitle.isNullOrBlank()) {
                         val context = androidx.compose.ui.platform.LocalContext.current
                         com.easeaudio.ui.components.TrackActionSheet(
-                            trackTitle = uiState.streamTitle!!,
+                            trackTitle = uiState.streamTitle.orEmpty(),
                             stationName = syncedCurrentStation?.name ?: "Radio",
                             stationGenre = syncedCurrentStation?.genre ?: "",
                             isFavorite = syncedCurrentStation?.isFavorite ?: false,

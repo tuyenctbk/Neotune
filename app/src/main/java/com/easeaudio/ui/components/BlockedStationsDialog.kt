@@ -392,6 +392,14 @@ fun BlockedStationsDialog(
                                     horizontalArrangement = Arrangement.SpaceBetween,
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
+                                    StationMonogramAvatar(
+                                        name = station.name,
+                                        genre = station.genre,
+                                        isPodcast = station.isPodcast,
+                                        shape = RoundedCornerShape(8.dp),
+                                        modifier = Modifier.size(36.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(10.dp))
                                     Column(modifier = Modifier.weight(1f)) {
                                         Text(
                                             text = station.name,

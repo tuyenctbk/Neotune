@@ -27,15 +27,23 @@ class AlarmReceiver : BroadcastReceiver() {
                 imageUrl = "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=600&q=80"
             )
 
-            // Start foreground service & play station
-            val serviceIntent = Intent(context, RadioPlaybackService::class.java)
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-                context.startForegroundService(serviceIntent)
-            } else {
-                context.startService(serviceIntent)
+            try {
+                // Start foreground service & play station
+                val serviceIntent = Intent(context, RadioPlaybackService::class.java)
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                    context.startForegroundService(serviceIntent)
+                } else {
+                    context.startService(serviceIntent)
+                }
+            } catch (e: Exception) {
+                Log.e("AlarmReceiver", "Could not start service directly: ${e.message}")
             }
 
-            RadioPlayerManager.getInstance(context).playStation(station)
+            try {
+                RadioPlayerManager.getInstance(context).playStation(station)
+            } catch (e: Exception) {
+                Log.e("AlarmReceiver", "Could not play alarm station: ${e.message}")
+            }
         }
     }
 }

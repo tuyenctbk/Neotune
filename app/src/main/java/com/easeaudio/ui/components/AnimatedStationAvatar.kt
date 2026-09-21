@@ -95,25 +95,17 @@ fun AnimatedStationAvatar(
             .border(width = borderWidth, color = borderColor, shape = shape),
         contentAlignment = Alignment.Center
     ) {
-        SubcomposeAsyncImage(
-            model = imageRequest,
+        StationArtLoader(
+            imageUrl = effectiveUrl,
+            stationName = effectiveName,
+            genre = genre,
+            isPodcast = isPodcast,
             contentDescription = contentDescription,
+            shape = shape,
             contentScale = ContentScale.Crop,
+            isPlaying = isPlaying,
             modifier = Modifier.fillMaxSize()
-        ) {
-            val state = painter.state
-            if (state is AsyncImagePainter.State.Success) {
-                SubcomposeAsyncImageContent()
-            } else {
-                StationMonogramAvatar(
-                    name = effectiveName,
-                    genre = genre,
-                    isPodcast = isPodcast,
-                    shape = shape,
-                    modifier = Modifier.fillMaxSize()
-                )
-            }
-        }
+        )
     }
 }
 

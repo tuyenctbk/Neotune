@@ -281,19 +281,19 @@ fun LibraryBackupDialog(
                         textStyle = MaterialTheme.typography.bodySmall.copy(fontFamily = FontFamily.Monospace, fontSize = 11.sp)
                     )
 
-                    if (importError != null) {
+                    importError?.let { err ->
                         Spacer(modifier = Modifier.height(6.dp))
                         Text(
-                            text = importError!!,
+                            text = err,
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.error
                         )
                     }
 
-                    if (importedCount != null) {
+                    importedCount?.let { count ->
                         Spacer(modifier = Modifier.height(6.dp))
                         Text(
-                            text = stringResource(R.string.backup_import_success_format, importedCount!!),
+                            text = stringResource(R.string.backup_import_success_format, count),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.primary
                         )

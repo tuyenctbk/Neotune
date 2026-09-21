@@ -163,7 +163,13 @@ fun AlarmDialog(
                             .padding(14.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Icon(imageVector = Icons.Filled.Radio, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
+                        StationMonogramAvatar(
+                            name = if (currentStation != null) currentStation.name else targetStationName,
+                            genre = currentStation?.genre ?: "",
+                            isPodcast = currentStation?.isPodcast == true,
+                            shape = RoundedCornerShape(8.dp),
+                            modifier = Modifier.size(36.dp)
+                        )
                         Spacer(modifier = Modifier.width(12.dp))
                         Column {
                             Text(text = stringResource(R.string.wake_station), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f))

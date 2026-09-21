@@ -89,7 +89,7 @@ fun LyricsBottomSheet(
                         )
                         if (!lyrics?.artistName.isNullOrBlank()) {
                             Text(
-                                text = lyrics!!.artistName,
+                                text = lyrics?.artistName.orEmpty(),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 maxLines = 1

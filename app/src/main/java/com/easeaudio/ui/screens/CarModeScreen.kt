@@ -115,18 +115,22 @@ object CarPresetsStore {
     }
 
     fun savePreset(context: Context, slotIndex: Int, station: RadioStation) {
-        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        val obj = org.json.JSONObject().apply {
-            put("id", station.id)
-            put("name", station.name)
-            put("genre", station.genre)
-            put("country", station.country)
-            put("streamUrl", station.streamUrl)
-            put("imageUrl", station.imageUrl)
-            put("bitrate", station.bitrate)
-            put("codec", station.codec)
+        try {
+            val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            val obj = org.json.JSONObject().apply {
+                put("id", station.id)
+                put("name", station.name)
+                put("genre", station.genre)
+                put("country", station.country)
+                put("streamUrl", station.streamUrl)
+                put("imageUrl", station.imageUrl)
+                put("bitrate", station.bitrate)
+                put("codec", station.codec)
+            }
+            prefs.edit().putString("$KEY_PRESET_PREFIX$slotIndex", obj.toString()).apply()
+        } catch (e: Exception) {
+            android.util.Log.e("CarPresets", "Failed to save preset: ${e.message}")
         }
-        prefs.edit().putString("$KEY_PRESET_PREFIX$slotIndex", obj.toString()).apply()
     }
 }
 
@@ -352,9 +356,10 @@ fun CarModeScreen(
                 }
 
                 // MINI PLAYER - Pinned to bottom when browsing lists
-                if (activeCarTab != CarTab.Player && uiState.currentStation != null) {
+                val carCurrentStation = uiState.currentStation
+                if (activeCarTab != CarTab.Player && carCurrentStation != null) {
                     CarMiniPlayer(
-                        station = uiState.currentStation!!,
+                        station = carCurrentStation,
                         isPlaying = uiState.isPlaying,
                         isLoading = uiState.isLoading,
                         streamTitle = uiState.streamTitle,
@@ -999,7 +1004,7 @@ private fun AutomotiveHeroPlayer(
 
                                 if (!currentStation?.bitrate.isNullOrBlank() && !isPodcast) {
                                     Text(
-                                        text = currentStation!!.bitrate,
+                                        text = currentStation?.bitrate.orEmpty(),
                                         style = MaterialTheme.typography.labelSmall.copy(fontSize = 10.sp),
                                         color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
                                     )

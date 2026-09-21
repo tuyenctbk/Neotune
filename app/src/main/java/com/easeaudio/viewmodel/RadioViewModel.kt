@@ -96,7 +96,10 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
         playerManager.fetchLyricsForCurrentTrack()
     }
 
-    val snackbarMessage = MutableSharedFlow<String>(extraBufferCapacity = 5)
+    val snackbarMessage = MutableSharedFlow<String>(
+        extraBufferCapacity = 10,
+        onBufferOverflow = kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
+    )
 
     private val _searchQuery = MutableStateFlow("")
     val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()
@@ -130,7 +133,7 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
                 val episodes = PodcastEpisodeService.fetchEpisodes(show, maxEpisodes = 1000)
                 _currentEpisodesList.value = episodes
                 if (_currentEpisode.value == null && episodes.isNotEmpty()) {
-                    _currentEpisode.value = episodes.first()
+                    _currentEpisode.value = episodes.firstOrNull()
                 }
             } catch (e: Exception) {
                 android.util.Log.e("RadioViewModel", "Failed to load episodes: ${e.message}")
@@ -621,13 +624,13 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
     fun autoResumeLastPlayedStation() {
         viewModelScope.launch {
             try {
-                val recent = repository.getRecentStations().first()
+                val recent = repository.getRecentStations().firstOrNull() ?: emptyList()
                 val lastPlayed = recent.firstOrNull()
                 if (lastPlayed != null && playerManager.currentStation.value == null) {
                     if (_isAutoPlayOnStartupEnabled.value) {
                         android.util.Log.i("RadioViewModel", "Auto-resuming last played station: ${lastPlayed.name}")
                         playerManager.playStation(lastPlayed)
-                        snackbarMessage.emit("Auto-resumed '${lastPlayed.name}'")
+                        snackbarMessage.tryEmit("Auto-resumed '${lastPlayed.name}'")
                     } else {
                         android.util.Log.i("RadioViewModel", "Preloading last played station: ${lastPlayed.name}")
                         playerManager.setPreloadedStation(lastPlayed)

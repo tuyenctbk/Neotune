@@ -95,8 +95,8 @@ object TrackArtworkService {
         // If query has "Artist - Title" format
         if (q.contains(" - ")) {
             val parts = q.split(" - ", limit = 2)
-            val qArtist = parts[0].trim()
-            val qTitle = parts[1].trim()
+            val qArtist = parts.getOrElse(0) { "" }.trim()
+            val qTitle = parts.getOrElse(1) { "" }.trim()
 
             val artistMatches = a.contains(qArtist) || qArtist.contains(a) ||
                     wordsOverlap(a, qArtist)

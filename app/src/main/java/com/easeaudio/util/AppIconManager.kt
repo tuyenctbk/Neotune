@@ -29,14 +29,15 @@ object AppIconManager {
         val pm = context.packageManager
         val packageName = context.packageName
 
+        val defaultComponent = ComponentName(packageName, "com.easeaudio.MainActivity")
         val aliases = mapOf(
-            "default" to ComponentName(packageName, "com.easeaudio.MainActivity"),
+            "default" to defaultComponent,
             "jazz" to ComponentName(packageName, "com.easeaudio.MainActivityAliasJazz"),
             "rock" to ComponentName(packageName, "com.easeaudio.MainActivityAliasRock"),
             "cyberpunk" to ComponentName(packageName, "com.easeaudio.MainActivityAliasCyberpunk")
         )
 
-        val targetComponent = aliases[iconKey] ?: aliases["default"]!!
+        val targetComponent = aliases[iconKey] ?: defaultComponent
 
         try {
             aliases.forEach { (key, component) ->

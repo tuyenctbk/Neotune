@@ -158,7 +158,7 @@ fun OnboardingScreen(
                         }
                     }
                     Text(
-                        text = "RADIO & PODCASTS",
+                        text = stringResource(R.string.radio_and_podcasts).uppercase(),
                         fontSize = 8.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color(0xFFC084FC),
