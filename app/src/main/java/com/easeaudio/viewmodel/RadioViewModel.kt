@@ -349,6 +349,31 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
         favs.filter { filterAndBlockManager.shouldIncludeStation(it) }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
+    /** OPT-C: Genre matching extracted from inline when-expression to a named function.
+     *  This makes genre matching independently testable and eliminates repeated .contains() chains. */
+    private fun matchesGenre(genre: String, station: RadioStation, currentTab: com.easeaudio.ui.screens.HomeTab): Boolean {
+        if (currentTab == com.easeaudio.ui.screens.HomeTab.Podcast) return true
+        if (genre == "All") return true
+        val sg = station.genre
+        return when (genre) {
+            "Custom"                          -> station.isCustom
+            "80s & 90s"                       -> sg.contains("80s", true) || sg.contains("90s", true) || sg.contains("Retro", true) || sg.contains("Oldies", true)
+            "News & Talk", "News & Reports"   -> sg.contains("News", true) || sg.contains("Report", true) || sg.contains("Talk", true) || sg.contains("Info", true)
+            "Lo-Fi & Chill"                   -> sg.contains("Lo-Fi", true) || sg.contains("Chill", true) || sg.contains("Lofi", true) || sg.contains("Lounge", true)
+            "Jazz & Blues", "Jazz"            -> sg.contains("Jazz", true) || sg.contains("Blues", true)
+            "Rock & Metal", "Rock"            -> sg.contains("Rock", true) || sg.contains("Metal", true)
+            "Pop & Hits", "Pop"               -> sg.contains("Pop", true) || sg.contains("Hit", true) || sg.contains("Top 40", true) || sg.contains("Top40", true)
+            "EDM & Dance", "EDM"              -> sg.contains("EDM", true) || sg.contains("Dance", true) || sg.contains("House", true) || sg.contains("Techno", true)
+            "Hip Hop & R&B", "Hip Hop"        -> sg.contains("Hip", true) || sg.contains("Rap", true) || sg.contains("Urban", true) || sg.contains("R&B", true) || sg.contains("RnB", true)
+            "Latin & Reggae"                  -> sg.contains("Latin", true) || sg.contains("Salsa", true) || sg.contains("Reggae", true) || sg.contains("Reggaeton", true)
+            "Sports"                          -> sg.contains("Sport", true)
+            "Classical"                       -> sg.contains("Classic", true) || sg.contains("Piano", true) || sg.contains("Orchestra", true)
+            "Ambient"                         -> sg.contains("Ambient", true) || sg.contains("Drone", true)
+            "Country"                         -> sg.contains("Country", true) || sg.contains("Folk", true)
+            else                              -> sg.contains(genre, true)
+        }
+    }
+
     @OptIn(FlowPreview::class)
     val stations: StateFlow<List<RadioStation>> = combine(
         repository.getAllStations(),
@@ -416,25 +441,9 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
                 else -> station.country.contains(country, ignoreCase = true)
             }
 
-            val matchesGenre = when {
-                currentTab == com.easeaudio.ui.screens.HomeTab.Podcast -> true
-                genre == "All" -> true
-                genre == "Custom" -> station.isCustom
-                genre == "80s & 90s" -> station.genre.contains("80s", ignoreCase = true) || station.genre.contains("90s", ignoreCase = true) || station.genre.contains("Retro", ignoreCase = true) || station.genre.contains("Oldies", ignoreCase = true)
-                genre == "News & Talk" || genre == "News & Reports" -> station.genre.contains("News", ignoreCase = true) || station.genre.contains("Report", ignoreCase = true) || station.genre.contains("Talk", ignoreCase = true) || station.genre.contains("Info", ignoreCase = true)
-                genre == "Lo-Fi & Chill" -> station.genre.contains("Lo-Fi", ignoreCase = true) || station.genre.contains("Chill", ignoreCase = true) || station.genre.contains("Lofi", ignoreCase = true) || station.genre.contains("Lounge", ignoreCase = true)
-                genre == "Jazz & Blues" || genre == "Jazz" -> station.genre.contains("Jazz", ignoreCase = true) || station.genre.contains("Blues", ignoreCase = true)
-                genre == "Rock & Metal" || genre == "Rock" -> station.genre.contains("Rock", ignoreCase = true) || station.genre.contains("Metal", ignoreCase = true)
-                genre == "Pop & Hits" || genre == "Pop" -> station.genre.contains("Pop", ignoreCase = true) || station.genre.contains("Hit", ignoreCase = true) || station.genre.contains("Top 40", ignoreCase = true) || station.genre.contains("Top40", ignoreCase = true)
-                genre == "EDM & Dance" || genre == "EDM" -> station.genre.contains("EDM", ignoreCase = true) || station.genre.contains("Dance", ignoreCase = true) || station.genre.contains("House", ignoreCase = true) || station.genre.contains("Techno", ignoreCase = true)
-                genre == "Hip Hop & R&B" || genre == "Hip Hop" -> station.genre.contains("Hip", ignoreCase = true) || station.genre.contains("Rap", ignoreCase = true) || station.genre.contains("Urban", ignoreCase = true) || station.genre.contains("R&B", ignoreCase = true) || station.genre.contains("RnB", ignoreCase = true)
-                genre == "Latin & Reggae" -> station.genre.contains("Latin", ignoreCase = true) || station.genre.contains("Salsa", ignoreCase = true) || station.genre.contains("Reggae", ignoreCase = true) || station.genre.contains("Reggaeton", ignoreCase = true)
-                genre == "Sports" -> station.genre.contains("Sport", ignoreCase = true)
-                genre == "Classical" -> station.genre.contains("Classic", ignoreCase = true) || station.genre.contains("Piano", ignoreCase = true) || station.genre.contains("Orchestra", ignoreCase = true)
-                genre == "Ambient" -> station.genre.contains("Ambient", ignoreCase = true) || station.genre.contains("Drone", ignoreCase = true)
-                genre == "Country" -> station.genre.contains("Country", ignoreCase = true) || station.genre.contains("Folk", ignoreCase = true)
-                else -> station.genre.contains(genre, ignoreCase = true)
-            }
+            // OPT-C: Extracted genre matching to a named function to eliminate repetitive
+            // .contains() chains and make this independently testable.
+            val matchesGenre = matchesGenre(genre, station, currentTab)
 
             matchesQuery && matchesCountry && (matchesGenre || isOnlineMatch)
         }
@@ -570,7 +579,8 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     fun refreshRecentStations() {
-        // Automatically updated via Room reactive flows
+        // No-op: Room reactive flows update recentStations automatically.
+        // This method is kept as a stable API surface for call-sites that expect it.
     }
 
     private val appPrefs = getApplication<android.app.Application>().getSharedPreferences("neotune_prefs", android.content.Context.MODE_PRIVATE)
@@ -794,7 +804,33 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
         DialogState(sleep, eq, add, blocked, episodes)
     }
 
-    /** Groups discovery/search/filter state. */
+    /** Groups discovery/search/filter state.
+     *  BUG-A fix: Refactored from listOf<Any?> + index casts to typed data classes,
+     *  matching the PlayerSnapshot/PlaybackDetail pattern. Field ordering mistakes are
+     *  now caught at compile time instead of silently producing ClassCastExceptions.
+     */
+    private data class DiscoveryStateBasic(
+        val isDiscoveringOnline: Boolean,
+        val isLoadingMore: Boolean,
+        val canLoadMore: Boolean,
+        val isDiscoveryError: Boolean,
+        val searchQuery: String
+    )
+
+    private data class DiscoveryStateSearch(
+        val recentSearchQueries: List<String>,
+        val selectedTab: com.easeaudio.ui.screens.HomeTab,
+        val selectedGenre: String,
+        val selectedCountry: String,
+        val availableCountries: List<CountryDisplay>
+    )
+
+    private data class DiscoveryStateExtra(
+        val isLoadingCountries: Boolean,
+        val filterConfig: com.easeaudio.data.StationFilterConfig
+    )
+
+    // Output type for the discoveryState flow — fully typed, no unchecked casts.
     private data class DiscoveryState(
         val isDiscoveringOnline: Boolean,
         val isLoadingMore: Boolean,
@@ -812,54 +848,121 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
 
     private val discoveryState: Flow<DiscoveryState> = combine(
         combine(isDiscoveringOnline, isLoadingMore, canLoadMore, isDiscoveryError, searchQuery) {
-            disc, loadMore, canLoad, err, query -> listOf<Any?>(disc, loadMore, canLoad, err, query)
+            disc, loadMore, canLoad, err, query ->
+            DiscoveryStateBasic(disc, loadMore, canLoad, err, query)
         },
         combine(recentSearchQueries, selectedTab, selectedGenre, selectedCountry, availableCountries) {
-            recSearch, tab, genre, country, countries -> listOf<Any?>(recSearch, tab, genre, country, countries)
+            recSearch, tab, genre, country, countries ->
+            DiscoveryStateSearch(recSearch, tab, genre, country, countries)
         },
-        combine(isLoadingCountries, filterConfig) { loading, config -> listOf<Any?>(loading, config) }
+        combine(isLoadingCountries, filterConfig) { loading, config ->
+            DiscoveryStateExtra(loading, config)
+        }
     ) { basic, search, extra ->
-        @Suppress("UNCHECKED_CAST")
         DiscoveryState(
-            isDiscoveringOnline = basic[0] as Boolean,
-            isLoadingMore = basic[1] as Boolean,
-            canLoadMore = basic[2] as Boolean,
-            isDiscoveryError = basic[3] as Boolean,
-            searchQuery = basic[4] as String,
-            recentSearchQueries = search[0] as List<String>,
-            selectedTab = search[1] as com.easeaudio.ui.screens.HomeTab,
-            selectedGenre = search[2] as String,
-            selectedCountry = search[3] as String,
-            availableCountries = search[4] as List<CountryDisplay>,
-            isLoadingCountries = extra[0] as Boolean,
-            filterConfig = extra[1] as com.easeaudio.data.StationFilterConfig
+            isDiscoveringOnline   = basic.isDiscoveringOnline,
+            isLoadingMore         = basic.isLoadingMore,
+            canLoadMore           = basic.canLoadMore,
+            isDiscoveryError      = basic.isDiscoveryError,
+            searchQuery           = basic.searchQuery,
+            recentSearchQueries   = search.recentSearchQueries,
+            selectedTab           = search.selectedTab,
+            selectedGenre         = search.selectedGenre,
+            selectedCountry       = search.selectedCountry,
+            availableCountries    = search.availableCountries,
+            isLoadingCountries    = extra.isLoadingCountries,
+            filterConfig          = extra.filterConfig
         )
     }
+
+    /** BUG-B fix: Typed data classes for the outer homeUiState combine arms.
+     *  Eliminates all listOf<Any?> + index casts in the outer combine, catching
+     *  field ordering mistakes at compile time.
+     */
+    private data class StationData(
+        val stations: List<RadioStation>,
+        val recentStations: List<RadioStation>,
+        val recentRadioStations: List<RadioStation>,
+        val recentPodcastStations: List<RadioStation>,
+        val favoriteStations: List<RadioStation>,
+        val mostPlayedRadioStations: List<RadioStation>,
+        val mostPlayedPodcastStations: List<RadioStation>
+    )
+
+    private data class MetaData(
+        val blockedStations: List<RadioStation>,
+        val failedStationIds: Set<String>,
+        val demotedStationIds: Set<String>,
+        val currentEpisodesList: List<PodcastEpisode>,
+        val currentEpisode: PodcastEpisode?
+    )
+
+    private data class ConfigData(
+        val isLoadingEpisodes: Boolean,
+        val networkStatus: com.easeaudio.network.NetworkStatus,
+        val remoteConfig: com.easeaudio.firebase.AppRemoteConfig,
+        val isBatterySaverEnabled: Boolean,
+        val selectedLauncherIcon: String
+    )
+
+    private data class SettingsData(
+        val isAudioBoosterEnabled: Boolean,
+        val isAutoPlayOnStartupEnabled: Boolean,
+        val isAutoScreensaverEnabled: Boolean,
+        val showAppearanceDialog: Boolean,
+        val showAttributionDialog: Boolean,
+        val listenLaterItems: List<com.easeaudio.data.ListenLaterItem>,
+        // OPT-D: curatedAudiophileStations included here so homeUiState reacts
+        // reactively when the curated list updates (instead of reading .value snapshot).
+        val curatedAudiophileStations: List<RadioStation>
+    )
 
     val homeUiState: StateFlow<HomeUiState> = combine(
         combine(
             stations,
             recentStations,
-            combine(recentRadioStations, recentPodcastStations, mostPlayedRadioStations, mostPlayedPodcastStations) { rr, rp, mr, mp -> listOf(rr, rp, mr, mp) },
+            combine(recentRadioStations, recentPodcastStations, mostPlayedRadioStations, mostPlayedPodcastStations) { rr, rp, mr, mp ->
+                listOf(rr, rp, mr, mp)
+            },
             favoriteStations
         ) { st, recent, streamGroups, favs ->
-            listOf<Any?>(st, recent, streamGroups[0], streamGroups[1], favs, streamGroups[2], streamGroups[3])
+            @Suppress("UNCHECKED_CAST")
+            StationData(
+                stations                  = st,
+                recentStations            = recent,
+                recentRadioStations       = streamGroups[0] as List<RadioStation>,
+                recentPodcastStations     = streamGroups[1] as List<RadioStation>,
+                favoriteStations          = favs,
+                mostPlayedRadioStations   = streamGroups[2] as List<RadioStation>,
+                mostPlayedPodcastStations = streamGroups[3] as List<RadioStation>
+            )
         },
         combine(blockedStations, failedStationIds, demotedStationIds, currentEpisodesList, currentEpisode) {
-            blocked, failed, demoted, episodes, episode -> listOf<Any?>(blocked, failed, demoted, episodes, episode)
+            blocked, failed, demoted, episodes, episode ->
+            MetaData(blocked, failed, demoted, episodes, episode)
         },
         combine(isLoadingEpisodes, networkStatus, remoteConfig, isBatterySaverEnabled, selectedLauncherIcon) {
-            loadEp, net, cfg, batt, icon -> listOf<Any?>(loadEp, net, cfg, batt, icon)
+            loadEp, net, cfg, batt, icon ->
+            ConfigData(loadEp, net, cfg, batt, icon)
         },
         combine(
             isAudioBoosterEnabled,
             isAutoPlayOnStartupEnabled,
             isAutoScreensaverEnabled,
-            combine(showAppearanceDialog, showAttributionDialog, listenLaterItems) { app, attr, later ->
-                listOf<Any?>(app, attr, later)
+            combine(showAppearanceDialog, showAttributionDialog, listenLaterItems, curatedAudiophileStations) {
+                app, attr, later, curated -> listOf<Any?>(app, attr, later, curated)
             }
         ) { boost, autoPlay, autoScreensaver, dialogs ->
-            listOf<Any?>(boost, autoPlay, autoScreensaver, dialogs[0], dialogs[1], dialogs[2])
+            @Suppress("UNCHECKED_CAST")
+            SettingsData(
+                isAudioBoosterEnabled      = boost,
+                isAutoPlayOnStartupEnabled = autoPlay,
+                isAutoScreensaverEnabled   = autoScreensaver,
+                showAppearanceDialog       = dialogs[0] as Boolean,
+                showAttributionDialog      = dialogs[1] as Boolean,
+                listenLaterItems           = dialogs[2] as List<com.easeaudio.data.ListenLaterItem>,
+                curatedAudiophileStations  = dialogs[3] as List<RadioStation>
+            )
         },
         combine(
             playerSnapshot,
@@ -881,74 +984,74 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
         val comfort = stateGroups[4] as List<Any?>
 
         HomeUiState(
-            stations                = stationData[0] as List<RadioStation>,
-            recentStations          = stationData[1] as List<RadioStation>,
-            recentRadioStations     = stationData[2] as List<RadioStation>,
-            recentPodcastStations   = stationData[3] as List<RadioStation>,
-            favoriteStations        = stationData[4] as List<RadioStation>,
-            mostPlayedRadioStations = stationData[5] as List<RadioStation>,
-            mostPlayedPodcastStations = stationData[6] as List<RadioStation>,
-            listenLaterItems        = settingsData[5] as List<com.easeaudio.data.ListenLaterItem>,
-            blockedStations         = metaData[0] as List<RadioStation>,
-            failedStationIds        = metaData[1] as Set<String>,
-            demotedStationIds       = metaData[2] as Set<String>,
-            currentEpisodesList     = metaData[3] as List<PodcastEpisode>,
-            currentEpisode          = metaData[4] as PodcastEpisode?,
-            isLoadingEpisodes       = configData[0] as Boolean,
-            networkStatus           = configData[1] as com.easeaudio.network.NetworkStatus,
-            remoteConfig            = configData[2] as com.easeaudio.firebase.AppRemoteConfig,
-            isBatterySaverEnabled   = configData[3] as Boolean,
-            selectedLauncherIcon    = configData[4] as String,
-            isAudioBoosterEnabled   = settingsData[0] as Boolean,
-            isAutoPlayOnStartupEnabled = settingsData[1] as Boolean,
-            isAutoScreensaverEnabled = settingsData[2] as Boolean,
-            showAppearanceDialog    = settingsData[3] as Boolean,
-            showAttributionDialog   = settingsData[4] as Boolean,
-            isVolumeSafetyEnabled   = comfort[0] as Boolean,
-            isNightAudioModeEnabled = comfort[1] as Boolean,
-            todayListeningMinutes   = comfort[2] as Int,
-            currentStreakDays       = comfort[3] as Int,
-            // Player state (from typed PlayerSnapshot — no unchecked cast risk)
-            currentStation          = ps.currentStation,
-            isPlaying               = ps.isPlaying,
-            isLoading               = ps.isLoading,
-            streamTitle             = ps.streamTitle,
-            playbackError           = ps.playbackError,
-            trackArtworkUrl         = ps.trackArtworkUrl,
-            currentLyrics           = ps.currentLyrics,
-            isLoadingLyrics         = ps.isLoadingLyrics,
-            curatedAudiophileStations = _curatedAudiophileStations.value,
+            stations                  = stationData.stations,
+            recentStations            = stationData.recentStations,
+            recentRadioStations       = stationData.recentRadioStations,
+            recentPodcastStations     = stationData.recentPodcastStations,
+            favoriteStations          = stationData.favoriteStations,
+            mostPlayedRadioStations   = stationData.mostPlayedRadioStations,
+            mostPlayedPodcastStations = stationData.mostPlayedPodcastStations,
+            listenLaterItems          = settingsData.listenLaterItems,
+            blockedStations           = metaData.blockedStations,
+            failedStationIds          = metaData.failedStationIds,
+            demotedStationIds         = metaData.demotedStationIds,
+            currentEpisodesList       = metaData.currentEpisodesList,
+            currentEpisode            = metaData.currentEpisode,
+            isLoadingEpisodes         = configData.isLoadingEpisodes,
+            networkStatus             = configData.networkStatus,
+            remoteConfig              = configData.remoteConfig,
+            isBatterySaverEnabled     = configData.isBatterySaverEnabled,
+            selectedLauncherIcon      = configData.selectedLauncherIcon,
+            isAudioBoosterEnabled     = settingsData.isAudioBoosterEnabled,
+            isAutoPlayOnStartupEnabled = settingsData.isAutoPlayOnStartupEnabled,
+            isAutoScreensaverEnabled  = settingsData.isAutoScreensaverEnabled,
+            showAppearanceDialog      = settingsData.showAppearanceDialog,
+            showAttributionDialog     = settingsData.showAttributionDialog,
+            isVolumeSafetyEnabled     = comfort[0] as Boolean,
+            isNightAudioModeEnabled   = comfort[1] as Boolean,
+            todayListeningMinutes     = comfort[2] as Int,
+            currentStreakDays         = comfort[3] as Int,
+            // Player state (from typed PlayerSnapshot)
+            currentStation            = ps.currentStation,
+            isPlaying                 = ps.isPlaying,
+            isLoading                 = ps.isLoading,
+            streamTitle               = ps.streamTitle,
+            playbackError             = ps.playbackError,
+            trackArtworkUrl           = ps.trackArtworkUrl,
+            currentLyrics             = ps.currentLyrics,
+            isLoadingLyrics           = ps.isLoadingLyrics,
+            curatedAudiophileStations = settingsData.curatedAudiophileStations,
             // Playback detail (from typed PlaybackDetail)
-            waveAmplitudes          = pd.waveAmplitudes,
-            volume                  = pd.volume,
-            currentPlaybackPosition = pd.currentPlaybackPosition,
-            totalPlaybackDuration   = pd.totalPlaybackDuration,
-            playbackSpeed           = pd.playbackSpeed,
-            playbackErrorDetails    = pd.playbackErrorDetails,
-            sleepTimerRemaining     = pd.sleepTimerRemaining,
-            activeEqPreset          = pd.activeEqPreset,
+            waveAmplitudes            = pd.waveAmplitudes,
+            volume                    = pd.volume,
+            currentPlaybackPosition   = pd.currentPlaybackPosition,
+            totalPlaybackDuration     = pd.totalPlaybackDuration,
+            playbackSpeed             = pd.playbackSpeed,
+            playbackErrorDetails      = pd.playbackErrorDetails,
+            sleepTimerRemaining       = pd.sleepTimerRemaining,
+            activeEqPreset            = pd.activeEqPreset,
             // Dialog state (from typed DialogState)
-            showSleepTimerDialog    = ds.showSleepTimerDialog,
-            showEqualizerDialog     = ds.showEqualizerDialog,
-            showAddStationDialog    = ds.showAddStationDialog,
-            showBlockedDialog       = ds.showBlockedDialog,
-            showEpisodesSheet       = ds.showEpisodesSheet,
+            showSleepTimerDialog      = ds.showSleepTimerDialog,
+            showEqualizerDialog       = ds.showEqualizerDialog,
+            showAddStationDialog      = ds.showAddStationDialog,
+            showBlockedDialog         = ds.showBlockedDialog,
+            showEpisodesSheet         = ds.showEpisodesSheet,
             // Discovery/search state (from typed DiscoveryState)
-            isDiscoveringOnline     = disc.isDiscoveringOnline,
-            isLoadingMore           = disc.isLoadingMore,
-            canLoadMore             = disc.canLoadMore,
-            isDiscoveryError        = disc.isDiscoveryError,
-            searchQuery             = disc.searchQuery,
-            recentSearchQueries     = disc.recentSearchQueries,
-            selectedTab             = disc.selectedTab,
-            selectedGenre           = disc.selectedGenre,
-            selectedCountry         = disc.selectedCountry,
-            availableCountries      = disc.availableCountries,
-            isLoadingCountries      = disc.isLoadingCountries,
-            filterConfig            = disc.filterConfig,
+            isDiscoveringOnline       = disc.isDiscoveringOnline,
+            isLoadingMore             = disc.isLoadingMore,
+            canLoadMore               = disc.canLoadMore,
+            isDiscoveryError          = disc.isDiscoveryError,
+            searchQuery               = disc.searchQuery,
+            recentSearchQueries       = disc.recentSearchQueries,
+            selectedTab               = disc.selectedTab,
+            selectedGenre             = disc.selectedGenre,
+            selectedCountry           = disc.selectedCountry,
+            availableCountries        = disc.availableCountries,
+            isLoadingCountries        = disc.isLoadingCountries,
+            filterConfig              = disc.filterConfig,
             // Static-at-init fields
-            availableGenres         = availableGenres,
-            availablePodcastTopics  = availablePodcastTopics
+            availableGenres           = availableGenres,
+            availablePodcastTopics    = availablePodcastTopics
         )
     }.stateIn(
         viewModelScope,

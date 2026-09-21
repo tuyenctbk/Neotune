@@ -216,14 +216,14 @@ fun MainAppContent(
     val uiState by viewModel.homeUiState.collectAsState()
     val hasActiveSession by viewModel.hasActiveSession.collectAsStateWithLifecycle()
 
-    // Detect AAOS (Android Automotive OS) hardware — auto-redirect to Car Mode UI
-    val isAutomotive = remember {
-        context.packageManager.hasSystemFeature("android.hardware.type.automotive")
-    }
+    // This app is Android Auto (phone-connected), NOT Android Automotive OS (AAOS).
+    // Keeping isAutomotive = false prevents Google Play's static analysis from flagging
+    // hasSystemFeature("android.hardware.type.automotive") as an AAOS support claim.
+    // The Car Mode UI is still accessible manually via the full player screen.
+    val isAutomotive = false
 
     val startDestination = rememberSaveable {
         when {
-            isAutomotive -> NavRoute.CarMode.route  // Always launch directly to Car Mode on AAOS
             !isOnboardingCompleted.value -> NavRoute.Onboarding.route
             else -> NavRoute.Home.route
         }
@@ -254,8 +254,9 @@ fun MainAppContent(
                         Manifest.permission.POST_NOTIFICATIONS
                     ) == PackageManager.PERMISSION_GRANTED
                 }
-                // Refresh recent streams when app comes to foreground
-                viewModel.refreshRecentStations()
+                // Room flows keep recent stations live — no manual refresh needed.
+                // Trigger smart engagement checks (e.g., rate prompt, share prompt) on resume.
+                viewModel.smartEngagementManager.checkSmartTriggers(eventSource = "app_resume")
             }
         }
         lifecycleOwner.lifecycle.addObserver(observer)
@@ -319,9 +320,19 @@ fun MainAppContent(
         }
     }
 
-    // Reset screensaver dismissed flag when the user starts a new station
+    // Reset screensaver dismissed flag when the user navigates TO the screensaver (manual entry).
+    LaunchedEffect(currentRoute) {
+        if (currentRoute == NavRoute.Screensaver.route) {
+            screensaverDismissedByUser = false
+        }
+    }
+
+    // Reset screensaver dismissed flag when user starts a new station (non-null guard prevents
+    // spurious reset during initial composition when station is null).
     LaunchedEffect(uiState.currentStation?.id) {
-        screensaverDismissedByUser = false
+        if (uiState.currentStation != null) {
+            screensaverDismissedByUser = false
+        }
     }
 
     LaunchedEffect(uiState.isPlaying, currentRoute, uiState.isAutoScreensaverEnabled, screensaverDismissedByUser) {
@@ -369,8 +380,13 @@ fun MainAppContent(
         }
     }
 
-    val showBottomBar = windowSizeClass.widthSizeClass == WindowWidthSizeClass.Compact && currentRoute != NavRoute.Onboarding.route && currentRoute != NavRoute.CarMode.route && currentRoute != NavRoute.Screensaver.route && !isFullPlayerVisible
-    val showNavigationRail = windowSizeClass.widthSizeClass != WindowWidthSizeClass.Compact && currentRoute != NavRoute.Onboarding.route && currentRoute != NavRoute.CarMode.route && currentRoute != NavRoute.Screensaver.route && !isFullPlayerVisible
+    val isCompactWidth = windowSizeClass.widthSizeClass == WindowWidthSizeClass.Compact
+    val isNavEligibleRoute = currentRoute != NavRoute.Onboarding.route &&
+        currentRoute != NavRoute.CarMode.route &&
+        currentRoute != NavRoute.Screensaver.route &&
+        !isFullPlayerVisible
+    val showBottomBar = isCompactWidth && isNavEligibleRoute
+    val showNavigationRail = !isCompactWidth && isNavEligibleRoute
 
     Box(
         modifier = Modifier
@@ -520,38 +536,17 @@ fun MainAppContent(
                             )
                         }
 
+                        // BUG-D fix: NavRoute.Radio was a copy-paste duplicate of NavRoute.Home.
+                        // Now redirects to Home and selects the Radio tab to avoid back-stack confusion
+                        // and ensure any future HomeScreen changes only need to be made once.
                         composable(NavRoute.Radio.route) {
-                            HomeScreen(
-                                uiState = uiState,
-                                windowSizeClass = windowSizeClass,
-                                onPlayPause = { viewModel.togglePlayPause() },
-                                onNextStation = { viewModel.playNextStation() },
-                                onPreviousStation = { viewModel.playPreviousStation() },
-                                onSearchQueryChange = { viewModel.setSearchQuery(it) },
-                                onSaveSearchQuery = { viewModel.saveSearchQuery(it) },
-                                onDeleteSearchQuery = { viewModel.deleteSearchQuery(it) },
-                                onClearSearchHistory = { viewModel.clearSearchHistory() },
-                                onGenreSelect = { viewModel.setSelectedGenre(it) },
-                                onCountrySelect = { viewModel.setSelectedCountry(it) },
-                                onStationSelect = { station -> 
-                                    FirebaseManager.logEvent("play_station", Bundle().apply { putString("station_name", station.name) })
-                                    viewModel.playStation(station) 
-                                },
-                                onToggleFavorite = { station -> 
-                                    FirebaseManager.logEvent("toggle_favorite", Bundle().apply { putString("station_name", station.name) })
-                                    viewModel.toggleFavorite(station) 
-                                },
-                                onToggleListenLater = { station ->
-                                    viewModel.toggleListenLater(station)
-                                },
-                                onBlockStation = { station -> viewModel.blockStation(station.id) },
-                                onDemoteStation = { station -> viewModel.demoteStation(station.id) },
-                                onUndemoteStation = { station -> viewModel.undemoteStation(station.id) },
-                                onOpenAddStation = { viewModel.setShowAddStationDialog(true) },
-                                onLoadMore = { viewModel.loadMoreStations() },
-                                onRefresh = { viewModel.refreshStations() },
-                                onRetryDiscovery = { viewModel.retryDiscovery() }
-                            )
+                            LaunchedEffect(Unit) {
+                                viewModel.setSelectedTab(com.easeaudio.ui.screens.HomeTab.Radio)
+                                navController.navigate(NavRoute.Home.route) {
+                                    popUpTo(NavRoute.Radio.route) { inclusive = true }
+                                    launchSingleTop = true
+                                }
+                            }
                         }
 
                         composable(NavRoute.Podcast.route) {

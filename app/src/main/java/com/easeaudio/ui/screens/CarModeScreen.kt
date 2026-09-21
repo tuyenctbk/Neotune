@@ -516,10 +516,9 @@ private fun CarSideNav(
     onToggleAntiGlare: () -> Unit,
     onExit: () -> Unit
 ) {
-    val context = LocalContext.current
-    val isAutomotive = remember {
-        context.packageManager.hasSystemFeature("android.hardware.type.automotive")
-    }
+    // This app is Android Auto (phone-connected), NOT AAOS. isAutomotive is always false
+    // so the Exit button is always shown, allowing users to leave Car Mode.
+    val isAutomotive = false
 
     NavigationRail(
         containerColor = if (isAntiGlare) Color(0xFF080C10) else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f),
@@ -766,10 +765,9 @@ private fun CarTopNav(
             )
         }
 
-        val navContext = LocalContext.current
-        val isAutomotive = remember {
-            navContext.packageManager.hasSystemFeature("android.hardware.type.automotive")
-        }
+        // This app is Android Auto (phone-connected), NOT AAOS. isAutomotive is always false
+        // so the Exit button is always shown.
+        val isAutomotive = false
 
         if (!isAutomotive) {
             Spacer(modifier = Modifier.width(4.dp))
