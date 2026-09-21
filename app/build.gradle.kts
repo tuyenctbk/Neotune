@@ -1,3 +1,4 @@
+import com.google.gms.googleservices.GoogleServicesPlugin.MissingGoogleServicesStrategy
 import java.util.Properties
 
 plugins {
@@ -8,6 +9,8 @@ plugins {
     alias(libs.plugins.gms.google.services)
     alias(libs.plugins.firebase.crashlytics)
 }
+
+googleServices { missingGoogleServicesStrategy = MissingGoogleServicesStrategy.WARN }
 
 android {
     lint {
