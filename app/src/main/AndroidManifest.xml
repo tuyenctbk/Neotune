@@ -124,16 +124,22 @@
             </intent-filter>
         </activity-alias>
 
+        <!--
+            Android Auto (phone-connected) media playback service.
+            This app supports Android Auto ONLY — NOT Android Automotive OS (AAOS).
+
+            android:permission="android.permission.MEDIA_CONTENT_CONTROL" restricts binding
+            to trusted system media controllers (Auto host, Bluetooth, lock screen).
+            This prevents AAOS CarMediaService from auto-binding to this service,
+            which would cause Google Play to incorrectly classify the app as AAOS.
+        -->
         <service
             android:name=".service.RadioPlaybackService"
             android:exported="true"
-            android:foregroundServiceType="mediaPlayback">
+            android:foregroundServiceType="mediaPlayback"
+            android:permission="android.permission.MEDIA_CONTENT_CONTROL">
             <intent-filter>
-                <!--
-                    android.media.browse.MediaBrowserService MUST be the first action listed.
-                    AAOS CarMediaService uses this to discover and connect to the media browser.
-                    Media3 MediaLibraryService implements this interface via its compat layer.
-                -->
+                <!-- Required by Android Auto to discover and connect the media browser. -->
                 <action android:name="android.media.browse.MediaBrowserService" />
                 <action android:name="androidx.media3.session.MediaLibraryService" />
                 <action android:name="androidx.media3.session.MediaSessionService" />
@@ -144,13 +150,11 @@
                 android:name="androidx.media3.session.MBS_COMPAT_MODE"
                 android:value="true" />
             <!--
-                Android Auto: declares the notification small-icon at the
-                service level so the Auto media notification panel can
-                display the correct icon without launching the full app.
+                android.media.SMALL_ICON is intentionally omitted here.
+                That meta-data is an AAOS-specific signal. For Android Auto, the notification
+                icon is correctly declared at application level via:
+                com.google.android.gms.car.notification.SmallIcon (see above).
             -->
-            <meta-data
-                android:name="android.media.SMALL_ICON"
-                android:resource="@drawable/ic_notification" />
         </service>
 
         <receiver
