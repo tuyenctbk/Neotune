@@ -24,10 +24,24 @@ android {
         applicationId = "com.neotune.radio"
         minSdk = 24
         targetSdk = 37
-        versionCode = 57
+        versionCode = 58
         versionName = "4.3.9"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    flavorDimensions += "platform"
+    productFlavors {
+        create("mobile") {
+            dimension = "platform"
+            versionCode = 58
+            versionName = "4.3.9"
+        }
+        create("automotive") {
+            dimension = "platform"
+            versionCode = 200058
+            versionName = "4.3.9"
+        }
     }
 
     val localProperties = Properties()

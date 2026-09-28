@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Declare Android Automotive OS hardware support -->
+    <uses-feature
+        android:name="android.hardware.type.automotive"
+        android:required="true" />
+
+    <uses-feature
+        android:name="android.hardware.wifi"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.screen.portrait"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.screen.landscape"
+        android:required="false" />
+
+    <application>
+        <!--
+            Declares this app's automotive capabilities to Android Automotive OS.
+            The vehicle's media center discovers this service and renders the
+            native media browsing and playback UI on the car's head unit.
+        -->
+        <meta-data
+            android:name="com.android.automotive"
+            android:resource="@xml/automotive_app_desc" />
+
+        <service
+            android:name=".service.RadioPlaybackService">
+            <meta-data
+                android:name="android.media.SMALL_ICON"
+                android:resource="@drawable/ic_notification" />
+        </service>
+    </application>
+
+</manifest>
