@@ -24,7 +24,7 @@ android {
         applicationId = "com.neotune.radio"
         minSdk = 24
         targetSdk = 37
-        versionCode = 58
+        versionCode = 59
         versionName = "4.3.9"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -34,12 +34,12 @@ android {
     productFlavors {
         create("mobile") {
             dimension = "platform"
-            versionCode = 58
+            versionCode = 59
             versionName = "4.3.9"
         }
         create("automotive") {
             dimension = "platform"
-            versionCode = 200058
+            versionCode = 200059
             versionName = "4.3.9"
         }
     }
