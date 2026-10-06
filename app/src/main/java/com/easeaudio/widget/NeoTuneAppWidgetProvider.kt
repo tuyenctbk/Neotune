@@ -36,6 +36,7 @@ class NeoTuneAppWidgetProvider : AppWidgetProvider() {
                     playerManager.togglePlayPause()
                     updateAllWidgets(context)
                 } else {
+                    val pendingResult = goAsync()
                     CoroutineScope(Dispatchers.IO).launch {
                         try {
                             val db = RadioDatabase.getDatabase(context.applicationContext)
@@ -67,6 +68,12 @@ class NeoTuneAppWidgetProvider : AppWidgetProvider() {
                             withContext(Dispatchers.Main) {
                                 playerManager.playNextStation()
                                 updateAllWidgets(context)
+                            }
+                        } finally {
+                            try {
+                                pendingResult.finish()
+                            } catch (e: Exception) {
+                                Log.w(TAG, "Error finishing pending result: ${e.message}")
                             }
                         }
                     }

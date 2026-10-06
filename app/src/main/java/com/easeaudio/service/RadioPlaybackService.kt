@@ -39,13 +39,16 @@ class RadioPlaybackService : MediaLibraryService() {
     }
 
     override fun onTaskRemoved(rootIntent: android.content.Intent?) {
-        try {
-            val playerManager = RadioPlayerManager.getInstance(applicationContext)
-            playerManager.stopPlayer()
-        } catch (e: Exception) {
-            Log.w("RadioPlaybackService", "Error stopping player on task removed: ${e.message}")
+        val player = RadioPlayerManager.sharedMediaLibrarySession?.player
+        if (player == null || !player.playWhenReady || player.mediaItemCount == 0) {
+            try {
+                val playerManager = RadioPlayerManager.getInstance(applicationContext)
+                playerManager.stopPlayer()
+            } catch (e: Exception) {
+                Log.w("RadioPlaybackService", "Error stopping player on task removed: ${e.message}")
+            }
+            stopSelf()
         }
-        stopSelf()
         super.onTaskRemoved(rootIntent)
     }
 

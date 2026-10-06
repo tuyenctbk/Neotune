@@ -45,8 +45,7 @@ fun RecordingsDialog(
     var recordings by remember { mutableStateOf(recorder.getRecordings()) }
     var itemToDelete by remember { mutableStateOf<RecordingItem?>(null) }
 
-    if (itemToDelete != null) {
-        val target = itemToDelete!!
+    itemToDelete?.let { target ->
         AlertDialog(
             onDismissRequest = { itemToDelete = null },
             title = { Text(stringResource(R.string.delete)) },

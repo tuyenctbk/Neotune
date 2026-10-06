@@ -346,7 +346,7 @@
     <string name="donate_buymeacoffee">Mua tặng ly cà phê</string>
     <string name="donate_buymeacoffee_desc">Ủng hộ qua Buy Me a Coffee (Thẻ, Google Pay)</string>
     <string name="donate_github_sponsors">GitHub Sponsors</string>
-    <string name="donate_github_sponsors_desc">Tài trợ phát triển trên GitHub (0% phí)</string>
+    <string name="donate_github_sponsors_desc" formatted="false">Tài trợ phát triển trên GitHub (0% phí)</string>
 
     <!-- Settings Screen, AAOS & PWA Resources -->
     <string name="aaos_title">Android Automotive OS</string>
@@ -424,9 +424,9 @@
 
     <!-- Volume Safety & Night Mode -->
     <string name="settings_section_audio_comfort">Bảo Vệ &amp; Thư Giãn Thính Giác</string>
-    <string name="settings_volume_safety_title">Khóa Âm Lượng An Toàn (Giới hạn 85%)</string>
+    <string name="settings_volume_safety_title" formatted="false">Khóa Âm Lượng An Toàn (Giới hạn 85%)</string>
     <string name="settings_volume_safety_desc">Ngăn ngừa sốc âm thanh bất ngờ bằng cách giới hạn âm lượng ở mức an toàn</string>
-    <string name="volume_safety_engaged">Âm lượng được giới hạn ở mức 85% bởi Khóa An Toàn</string>
+    <string name="volume_safety_engaged" formatted="false">Âm lượng được giới hạn ở mức 85% bởi Khóa An Toàn</string>
     <string name="settings_night_mode_title">Chế Độ Âm Thanh Ban Đêm</string>
     <string name="settings_night_mode_desc">Giảm bớt tần số cao chói tai và âm thanh giật mình để nghe êm ái hơn vào ban đêm</string>
 

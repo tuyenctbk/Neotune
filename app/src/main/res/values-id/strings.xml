@@ -341,7 +341,7 @@
     <string name="donate_buymeacoffee">Belikan Kopi (Buy Me a Coffee)</string>
     <string name="donate_buymeacoffee_desc">Dukung dengan secangkir kopi (Kartu, Google Pay)</string>
     <string name="donate_github_sponsors">GitHub Sponsors</string>
-    <string name="donate_github_sponsors_desc">Sponsori pengembangan di GitHub (0% biaya)</string>
+    <string name="donate_github_sponsors_desc" formatted="false">Sponsori pengembangan di GitHub (0% biaya)</string>
     <string name="back">Back</string>
     <string name="aaos_title">Android Automotive OS</string>
     <string name="aaos_desc">Station browsing and live playback are integrated directly into your car\'s Media Center dashboard.</string>
@@ -409,9 +409,9 @@
     <string name="remove_from_listen_later">Hapus dari Dengarkan Nanti</string>
     <string name="clear_listen_later">Bersihkan Antrean</string>
     <string name="settings_section_audio_comfort">Kenyamanan &amp; Perlindungan Pendengaran</string>
-    <string name="settings_volume_safety_title">Batas Volume Aman (Maks 85%)</string>
+    <string name="settings_volume_safety_title" formatted="false">Batas Volume Aman (Maks 85%)</string>
     <string name="settings_volume_safety_desc">Mencegah kejutan suara akustik dengan membatasi volume pada batas aman</string>
-    <string name="volume_safety_engaged">Volume dibatasi pada 85% oleh Pengunci Keamanan</string>
+    <string name="volume_safety_engaged" formatted="false">Volume dibatasi pada 85% oleh Pengunci Keamanan</string>
     <string name="settings_night_mode_title">Mode Audio Malam</string>
     <string name="settings_night_mode_desc">Meredam frekuensi tinggi yang menusuk untuk kenyamanan mendengarkan di malam hari</string>
     <string name="listening_stats_title">Kebiasaan Mendengarkan Harian</string>
@@ -419,7 +419,7 @@
     <string name="listening_stats_today">Waktu Mendengarkan Hari Ini</string>
     <string name="listening_stats_minutes">%1$d menit</string>
     <string name="listening_stats_hours_mins">%1$dj %2$dm</string>
-    <string name="listening_stats_desc">Statistik 100% lokal di perangkat untuk memantau aktivitas mendengarkan Anda</string>
+    <string name="listening_stats_desc" formatted="false">Statistik 100% lokal di perangkat untuk memantau aktivitas mendengarkan Anda</string>
     <string name="status_playing">MEMUTAR</string>
     <string name="status_tune_in">DENGARKAN</string>
     <string name="share_station_format">Listening to %1$s (%2$s)\nStream: %3$s\nTune in live on NeoTune Radio!</string>
@@ -491,7 +491,7 @@
     <string name="settings_recordings_title">Rekaman Tersimpan</string>
     <string name="settings_recordings_desc">Lihat dan kelola rekaman siaran radio</string>
     <string name="settings_rate_title">Beri Nilai NeoTune</string>
-    <string name="settings_rate_desc">Dukung aplikasi 100% gratis tanpa iklan ini dengan ulasan Anda</string>
+    <string name="settings_rate_desc" formatted="false">Dukung aplikasi 100% gratis tanpa iklan ini dengan ulasan Anda</string>
     <string name="settings_share_app_title">Bagikan NeoTune</string>
     <string name="settings_share_app_desc">Beri tahu teman tentang musik dan podcast gratis</string>
 </resources>

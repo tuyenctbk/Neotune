@@ -33,6 +33,7 @@ fun TuneveTheme(
 
     val view = LocalView.current
     if (!view.isInEditMode) {
+        @Suppress("DEPRECATION")
         SideEffect {
             val window = (view.context as? Activity)?.window
             if (window != null) {
@@ -55,6 +56,7 @@ fun TuneveTheme(
 @Composable
 fun EaseAudioTheme(content: @Composable () -> Unit) = TuneveTheme(content = content)
 
+@Suppress("DEPRECATION")
 @Composable
 fun rememberIsTv(): Boolean {
     val context = androidx.compose.ui.platform.LocalContext.current

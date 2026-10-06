@@ -1,7 +1,9 @@
 package com.easeaudio.data
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Environment
 import android.util.Log
 import androidx.core.content.FileProvider
@@ -47,7 +49,8 @@ data class RecordingItem(
         get() = SimpleDateFormat("MMM dd, yyyy HH:mm", Locale.getDefault()).format(Date(timestamp))
 }
 
-class RadioStreamRecorder private constructor(private val context: Context) {
+class RadioStreamRecorder private constructor(context: Context) {
+    private val context: Context = context.applicationContext
 
     private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
@@ -61,8 +64,11 @@ class RadioStreamRecorder private constructor(private val context: Context) {
     private var activeFile: File? = null
 
     private fun getRecordingsDirectory(): File {
-        val dir = context.getExternalFilesDir(Environment.DIRECTORY_RECORDINGS)
-            ?: File(context.filesDir, "recordings")
+        val dir = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            context.getExternalFilesDir(Environment.DIRECTORY_RECORDINGS)
+        } else {
+            context.getExternalFilesDir("Recordings")
+        } ?: File(context.filesDir, "recordings")
         if (!dir.exists()) {
             dir.mkdirs()
         }
@@ -280,6 +286,7 @@ class RadioStreamRecorder private constructor(private val context: Context) {
     companion object {
         private const val TAG = "RadioStreamRecorder"
 
+        @SuppressLint("StaticFieldLeak")
         @Volatile
         private var instance: RadioStreamRecorder? = null
 

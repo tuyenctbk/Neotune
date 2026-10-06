@@ -1,5 +1,6 @@
 package com.easeaudio.service
 
+import android.annotation.SuppressLint
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
@@ -96,7 +97,8 @@ data class PlaybackErrorDetails(
 }
 
 @OptIn(UnstableApi::class)
-class RadioPlayerManager(private val context: Context) {
+class RadioPlayerManager(context: Context) {
+    private val context: Context = context.applicationContext
 
     companion object {
         @Volatile
@@ -107,9 +109,12 @@ class RadioPlayerManager(private val context: Context) {
             set(value) {
                 if (value is MediaLibrarySession) {
                     sharedMediaLibrarySession = value
+                } else if (value == null) {
+                    sharedMediaLibrarySession = null
                 }
             }
 
+        @SuppressLint("StaticFieldLeak")
         @Volatile
         private var instance: RadioPlayerManager? = null
 

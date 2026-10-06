@@ -345,7 +345,7 @@
     <string name="donate_buymeacoffee">请开发者喝杯咖啡</string>
     <string name="donate_buymeacoffee_desc">通过 Buy Me a Coffee 赞助 (信用卡, Google Pay)</string>
     <string name="donate_github_sponsors">GitHub Sponsors</string>
-    <string name="donate_github_sponsors_desc">在 GitHub 上赞助支持开发者 (0%手续费)</string>
+    <string name="donate_github_sponsors_desc" formatted="false">在 GitHub 上赞助支持开发者 (0%手续费)</string>
     <string name="back">Back</string>
     <string name="aaos_title">Android Automotive OS</string>
     <string name="aaos_desc">Station browsing and live playback are integrated directly into your car\'s Media Center dashboard.</string>
@@ -413,9 +413,9 @@
     <string name="remove_from_listen_later">从稍后收听中移除</string>
     <string name="clear_listen_later">清空列表</string>
     <string name="settings_section_audio_comfort">听力健康与保护</string>
-    <string name="settings_volume_safety_title">安全音量限制 (上限85%)</string>
+    <string name="settings_volume_safety_title" formatted="false">安全音量限制 (上限85%)</string>
     <string name="settings_volume_safety_desc">将输出音量限制在安全范围内，避免突发声音冲击</string>
-    <string name="volume_safety_engaged">安全限制已开启，音量限制在85%</string>
+    <string name="volume_safety_engaged" formatted="false">安全限制已开启，音量限制在85%</string>
     <string name="settings_night_mode_title">夜间音频模式</string>
     <string name="settings_night_mode_desc">减弱尖锐的高频与瞬态突发音量，夜间聆听更柔和舒适</string>
     <string name="listening_stats_title">每日收听统计</string>
@@ -423,7 +423,7 @@
     <string name="listening_stats_today">今日收听时长</string>
     <string name="listening_stats_minutes">%1$d分钟</string>
     <string name="listening_stats_hours_mins">%1$d小时%2$d分钟</string>
-    <string name="listening_stats_desc">100%本地设备端统计，记录您的每日音频探索</string>
+    <string name="listening_stats_desc" formatted="false">100%本地设备端统计，记录您的每日音频探索</string>
     <string name="status_playing">正在播放</string>
     <string name="status_tune_in">立即收听</string>
     <string name="share_station_format">Listening to %1$s (%2$s)\nStream: %3$s\nTune in live on NeoTune Radio!</string>

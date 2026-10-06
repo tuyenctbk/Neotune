@@ -401,7 +401,7 @@
     <string name="donate_buymeacoffee">Buy Me a Coffee</string>
     <string name="donate_buymeacoffee_desc">Support with a coffee (Card, Google Pay)</string>
     <string name="donate_github_sponsors">GitHub Sponsors</string>
-    <string name="donate_github_sponsors_desc">Sponsor development on GitHub</string>
+    <string name="donate_github_sponsors_desc" formatted="false">Sponsor development on GitHub</string>
     <string name="donate_paypal">Donate via PayPal</string>
     <string name="donate_paypal_desc">Support ad-free development (paypal.me/tuyenphamvn)</string>
 
@@ -485,7 +485,7 @@
     <string name="settings_section_audio_comfort">Audio Comfort &amp; Protection</string>
     <string name="settings_volume_safety_title" formatted="false">Volume Safety Lock (85% Cap)</string>
     <string name="settings_volume_safety_desc">Prevents sudden acoustic shock by capping output volume at safe listening thresholds</string>
-    <string name="volume_safety_engaged">Volume limited to 85% by Safety Lock</string>
+    <string name="volume_safety_engaged" formatted="false">Volume limited to 85% by Safety Lock</string>
     <string name="settings_night_mode_title">Night Audio Mode</string>
     <string name="settings_night_mode_desc">Attenuates piercing high frequencies and loud transients for comfortable night listening</string>
 
@@ -563,7 +563,7 @@
     <string name="settings_recordings_title">Saved Recordings</string>
     <string name="settings_recordings_desc">View and manage captured radio streams</string>
     <string name="settings_rate_title">Rate NeoTune</string>
-    <string name="settings_rate_desc">Support this 100% free and open player with a review</string>
+    <string name="settings_rate_desc" formatted="false">Support this 100% free and open player with a review</string>
     <string name="settings_share_app_title">Share NeoTune</string>
     <string name="settings_share_app_desc">Tell friends about free music and podcasts</string>
     <string name="play">Play</string>

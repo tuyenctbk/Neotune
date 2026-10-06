@@ -1,5 +1,6 @@
 package com.easeaudio.engagement
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -26,7 +27,8 @@ data class UpdateInfo(
     val updateNotes: String = ""
 )
 
-class SmartEngagementManager private constructor(private val context: Context) {
+class SmartEngagementManager private constructor(context: Context) {
+    private val context: Context = context.applicationContext
 
     companion object {
         private const val TAG = "SmartEngagementManager"
@@ -45,6 +47,7 @@ class SmartEngagementManager private constructor(private val context: Context) {
 
         private const val KEY_LAST_UPDATE_PROMPT_TIMESTAMP = "last_update_prompt_timestamp"
 
+        @SuppressLint("StaticFieldLeak")
         @Volatile
         private var instance: SmartEngagementManager? = null
 

@@ -945,7 +945,7 @@ fun MainAppContent(
         // Smart Engagement Dialogs — suppressed entirely on AAOS to avoid
         // driver-distracting popups (AAOS UXR policy: no interruptive modals while driving)
         if (!isAutomotive) {
-            val activity = LocalContext.current as? android.app.Activity
+            val activity = androidx.activity.compose.LocalActivity.current
             when (activePrompt) {
                 com.easeaudio.engagement.EngagementPromptType.RATE_5_STARS -> {
                     RateAppDialog(

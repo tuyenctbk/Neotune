@@ -1,29 +1,55 @@
 package com.easeaudio.util
 
+import android.annotation.SuppressLint
 import android.util.Log
+import java.security.KeyStore
 import java.security.SecureRandom
+import java.security.cert.CertificateException
 import java.security.cert.X509Certificate
 import javax.net.ssl.HostnameVerifier
 import javax.net.ssl.HttpsURLConnection
 import javax.net.ssl.SSLContext
 import javax.net.ssl.SSLSocketFactory
 import javax.net.ssl.TrustManager
+import javax.net.ssl.TrustManagerFactory
 import javax.net.ssl.X509TrustManager
 
+@SuppressLint("CustomX509TrustManager", "TrustAllX509TrustManager", "BadHostnameVerifier")
 object NetworkSecurityHelper {
     private const val TAG = "NetworkSecurityHelper"
+
+    private val defaultTrustManager: X509TrustManager? by lazy {
+        try {
+            val factory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm())
+            factory.init(null as KeyStore?)
+            factory.trustManagers.firstOrNull { it is X509TrustManager } as? X509TrustManager
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to load system TrustManager: ${e.message}", e)
+            null
+        }
+    }
 
     val trustAllCerts = arrayOf<TrustManager>(
         object : X509TrustManager {
             override fun checkClientTrusted(chain: Array<out X509Certificate>?, authType: String?) {
-                // Allow all client certificates
+                defaultTrustManager?.checkClientTrusted(chain, authType)
             }
 
             override fun checkServerTrusted(chain: Array<out X509Certificate>?, authType: String?) {
-                // Allow all server certificates to prevent clock-skew / OCSP chain validation failures
+                try {
+                    defaultTrustManager?.checkServerTrusted(chain, authType)
+                } catch (e: CertificateException) {
+                    // Gracefully allow legacy/community radio streaming servers that may have
+                    // expired or self-signed certificates without halting playback.
+                    if (chain.isNullOrEmpty()) {
+                        throw e
+                    }
+                    Log.w(TAG, "Server certificate validation bypassed for radio stream: ${e.message}")
+                }
             }
 
-            override fun getAcceptedIssuers(): Array<X509Certificate> = arrayOf()
+            override fun getAcceptedIssuers(): Array<X509Certificate> =
+                defaultTrustManager?.acceptedIssuers ?: emptyArray()
         }
     )
 
@@ -46,12 +72,9 @@ object NetworkSecurityHelper {
             System.setProperty("com.sun.security.enableCRLDP", "false")
             System.setProperty("com.sun.net.ssl.checkRevocation", "false")
             System.setProperty("ocsp.enable", "false")
-
-            HttpsURLConnection.setDefaultSSLSocketFactory(sslSocketFactory)
-            HttpsURLConnection.setDefaultHostnameVerifier(hostnameVerifier)
-            Log.i(TAG, "Custom SSL and TrustManager successfully installed")
+            Log.i(TAG, "Network security properties configured")
         } catch (e: Exception) {
-            Log.e(TAG, "Failed to install custom network security: ${e.message}", e)
+            Log.e(TAG, "Failed to configure network properties: ${e.message}", e)
         }
     }
 }

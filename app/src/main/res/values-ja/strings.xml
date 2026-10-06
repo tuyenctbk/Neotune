@@ -345,7 +345,7 @@
     <string name="donate_buymeacoffee">Buy Me a Coffee</string>
     <string name="donate_buymeacoffee_desc">コーヒーを奢って開発を応援 (カード, Google Pay)</string>
     <string name="donate_github_sponsors">GitHub Sponsors</string>
-    <string name="donate_github_sponsors_desc">GitHubで開発者をスポンサーする (手数料0%)</string>
+    <string name="donate_github_sponsors_desc" formatted="false">GitHubで開発者をスポンサーする (手数料0%)</string>
     <string name="back">Back</string>
     <string name="aaos_title">Android Automotive OS</string>
     <string name="aaos_desc">Station browsing and live playback are integrated directly into your car\'s Media Center dashboard.</string>
@@ -413,9 +413,9 @@
     <string name="remove_from_listen_later">「後で聴く」から削除</string>
     <string name="clear_listen_later">キューを消去</string>
     <string name="settings_section_audio_comfort">聴覚保護と快適設定</string>
-    <string name="settings_volume_safety_title">安全音量制限（上限85%）</string>
+    <string name="settings_volume_safety_title" formatted="false">安全音量制限（上限85%）</string>
     <string name="settings_volume_safety_desc">突発的な大音量を防ぐため、出力を安全なレベルに制限します</string>
-    <string name="volume_safety_engaged">安全ロックにより音量を85%に制限中</string>
+    <string name="volume_safety_engaged" formatted="false">安全ロックにより音量を85%に制限中</string>
     <string name="settings_night_mode_title">ナイトオーディオモード</string>
     <string name="settings_night_mode_desc">耳障りな高音域や突発的な音を抑え、夜間のリスニングを快適にします</string>
     <string name="listening_stats_title">毎日のリスニング習慣</string>
@@ -423,7 +423,7 @@
     <string name="listening_stats_today">今日のリスニング</string>
     <string name="listening_stats_minutes">%1$d分</string>
     <string name="listening_stats_hours_mins">%1$d時間%2$d分</string>
-    <string name="listening_stats_desc">日々のラジオ発見を記録する完全デバイス内統計</string>
+    <string name="listening_stats_desc" formatted="false">日々のラジオ発見を記録する完全デバイス内統計</string>
     <string name="status_playing">再生中</string>
     <string name="status_tune_in">選局</string>
     <string name="share_station_format">Listening to %1$s (%2$s)\nStream: %3$s\nTune in live on NeoTune Radio!</string>
@@ -495,7 +495,7 @@
     <string name="settings_recordings_title">保存済み録音</string>
     <string name="settings_recordings_desc">保存したラジオ放送の確認と管理</string>
     <string name="settings_rate_title">NeoTune を評価する</string>
-    <string name="settings_rate_desc">完全無料・広告なしの当アプリをレビューで応援してください</string>
+    <string name="settings_rate_desc" formatted="false">完全無料・広告なしの当アプリをレビューで応援してください</string>
     <string name="settings_share_app_title">NeoTune を共有</string>
     <string name="settings_share_app_desc">無料の音楽とポッドキャストを友達に教える</string>
 </resources>

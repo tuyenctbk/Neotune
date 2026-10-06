@@ -345,7 +345,7 @@
     <string name="donate_buymeacoffee">Buy Me a Coffee</string>
     <string name="donate_buymeacoffee_desc">הזמן אותי לקפה (כרטיס אשראי, Google Pay)</string>
     <string name="donate_github_sponsors">GitHub Sponsors</string>
-    <string name="donate_github_sponsors_desc">מתן חסות לפיתוח ב-GitHub (ללא עמלות)</string>
+    <string name="donate_github_sponsors_desc" formatted="false">מתן חסות לפיתוח ב-GitHub (ללא עמלות)</string>
     <string name="back">Back</string>
     <string name="aaos_title">Android Automotive OS</string>
     <string name="aaos_desc">Station browsing and live playback are integrated directly into your car\'s Media Center dashboard.</string>
@@ -413,9 +413,9 @@
     <string name="remove_from_listen_later">Remove from Listen Later</string>
     <string name="clear_listen_later">Clear Queue</string>
     <string name="settings_section_audio_comfort">Audio Comfort &amp; Protection</string>
-    <string name="settings_volume_safety_title">Volume Safety Lock (85% Cap)</string>
+    <string name="settings_volume_safety_title" formatted="false">Volume Safety Lock (85% Cap)</string>
     <string name="settings_volume_safety_desc">Prevents sudden acoustic shock by capping output volume at safe listening thresholds</string>
-    <string name="volume_safety_engaged">Volume limited to 85% by Safety Lock</string>
+    <string name="volume_safety_engaged" formatted="false">Volume limited to 85% by Safety Lock</string>
     <string name="settings_night_mode_title">Night Audio Mode</string>
     <string name="settings_night_mode_desc">Attenuates piercing high frequencies and loud transients for comfortable night listening</string>
     <string name="listening_stats_title">Daily Listening Habits</string>
@@ -423,7 +423,7 @@
     <string name="listening_stats_today">Today\'s Listening</string>
     <string name="listening_stats_minutes">%1$d mins</string>
     <string name="listening_stats_hours_mins">%1$dh %2$dm</string>
-    <string name="listening_stats_desc">100% on-device statistics to keep track of your daily audio discovery</string>
+    <string name="listening_stats_desc" formatted="false">100% on-device statistics to keep track of your daily audio discovery</string>
     <string name="status_playing">PLAYING</string>
     <string name="status_tune_in">TUNE IN</string>
     <string name="share_station_format">Listening to %1$s (%2$s)\nStream: %3$s\nTune in live on NeoTune Radio!</string>
@@ -496,7 +496,7 @@
     <string name="settings_recordings_title">Saved Recordings</string>
     <string name="settings_recordings_desc">View and manage captured radio streams</string>
     <string name="settings_rate_title">Rate NeoTune</string>
-    <string name="settings_rate_desc">Support this 100% free and open player with a review</string>
+    <string name="settings_rate_desc" formatted="false">Support this 100% free and open player with a review</string>
     <string name="settings_share_app_title">Share NeoTune</string>
     <string name="settings_share_app_desc">Tell friends about free music and podcasts</string>
 </resources>

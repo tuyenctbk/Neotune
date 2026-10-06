@@ -1,5 +1,6 @@
 package com.easeaudio.alarm
 
+import android.annotation.SuppressLint
 import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
@@ -40,6 +41,7 @@ object RadioAlarmManager {
         )
     }
 
+    @SuppressLint("ScheduleExactAlarm", "MissingPermission")
     fun setAlarm(
         context: Context,
         enabled: Boolean,
@@ -90,14 +92,8 @@ object RadioAlarmManager {
                         calendar.timeInMillis,
                         pendingIntent
                     )
-                } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    alarmManager.setExactAndAllowWhileIdle(
-                        AlarmManager.RTC_WAKEUP,
-                        calendar.timeInMillis,
-                        pendingIntent
-                    )
                 } else {
-                    alarmManager.setExact(
+                    alarmManager.setExactAndAllowWhileIdle(
                         AlarmManager.RTC_WAKEUP,
                         calendar.timeInMillis,
                         pendingIntent

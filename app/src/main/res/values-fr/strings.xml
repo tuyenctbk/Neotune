@@ -345,7 +345,7 @@
     <string name="donate_buymeacoffee">Buy Me a Coffee</string>
     <string name="donate_buymeacoffee_desc">Offrez-moi un café (Carte, Google Pay)</string>
     <string name="donate_github_sponsors">GitHub Sponsors</string>
-    <string name="donate_github_sponsors_desc">Soutenez le développement sur GitHub (0% de frais)</string>
+    <string name="donate_github_sponsors_desc" formatted="false">Soutenez le développement sur GitHub (0% de frais)</string>
     <string name="back">Back</string>
     <string name="aaos_title">Android Automotive OS</string>
     <string name="aaos_desc">Station browsing and live playback are integrated directly into your car\'s Media Center dashboard.</string>
@@ -413,9 +413,9 @@
     <string name="remove_from_listen_later">Retirer d\'Écouter plus tard</string>
     <string name="clear_listen_later">Vider la file</string>
     <string name="settings_section_audio_comfort">Confort d\'écoute &amp; Protection</string>
-    <string name="settings_volume_safety_title">Protection du volume (Limite à 85%)</string>
+    <string name="settings_volume_safety_title" formatted="false">Protection du volume (Limite à 85%)</string>
     <string name="settings_volume_safety_desc">Prévient les chocs acoustiques en plafonnant le volume à un seuil sécurisé</string>
-    <string name="volume_safety_engaged">Volume limité à 85% par le verrou de sécurité</string>
+    <string name="volume_safety_engaged" formatted="false">Volume limité à 85% par le verrou de sécurité</string>
     <string name="settings_night_mode_title">Mode audio nocturne</string>
     <string name="settings_night_mode_desc">Atténue les hautes fréquences stridentes et les pics sonores pour une écoute nocturne reposante</string>
     <string name="listening_stats_title">Habitudes d\'écoute quotidiennes</string>
@@ -423,7 +423,7 @@
     <string name="listening_stats_today">Temps d\'écoute aujourd\'hui</string>
     <string name="listening_stats_minutes">%1$d min</string>
     <string name="listening_stats_hours_mins">%1$dh %2$dm</string>
-    <string name="listening_stats_desc">Statistiques 100% locales sur l\'appareil pour suivre vos découvertes audio</string>
+    <string name="listening_stats_desc" formatted="false">Statistiques 100% locales sur l\'appareil pour suivre vos découvertes audio</string>
     <string name="status_playing">EN LECTURE</string>
     <string name="status_tune_in">ÉCOUTER</string>
     <string name="share_station_format">Listening to %1$s (%2$s)\nStream: %3$s\nTune in live on NeoTune Radio!</string>
@@ -495,7 +495,7 @@
     <string name="settings_recordings_title">Enregistrements sauvegardés</string>
     <string name="settings_recordings_desc">Consultez et gérez les flux radio capturés</string>
     <string name="settings_rate_title">Évaluer NeoTune</string>
-    <string name="settings_rate_desc">Soutenez ce lecteur 100% gratuit et sans publicité avec un avis</string>
+    <string name="settings_rate_desc" formatted="false">Soutenez ce lecteur 100% gratuit et sans publicité avec un avis</string>
     <string name="settings_share_app_title">Partager NeoTune</string>
     <string name="settings_share_app_desc">Faites découvrir de la musique et des podcasts gratuits à vos proches</string>
 </resources>
