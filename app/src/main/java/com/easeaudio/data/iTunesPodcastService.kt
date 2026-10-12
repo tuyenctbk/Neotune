@@ -45,6 +45,7 @@ object iTunesPodcastService {
         val podcasts = mutableListOf<RadioStation>()
         val liveRadio = mutableListOf<RadioStation>()
 
+        var connection: HttpURLConnection? = null
         try {
             val searchTerm = when {
                 searchQuery.isNotBlank() -> searchQuery.trim()
@@ -57,7 +58,7 @@ object iTunesPodcastService {
             
             Log.d(TAG, "Fetching podcasts from iTunes API: $urlString")
 
-            val connection = (URL(urlString).openConnection() as HttpURLConnection).apply {
+            val conn = (URL(urlString).openConnection() as HttpURLConnection).apply {
                 (this as? javax.net.ssl.HttpsURLConnection)?.apply {
                     sslSocketFactory = com.easeaudio.util.NetworkSecurityHelper.sslSocketFactory
                     hostnameVerifier = com.easeaudio.util.NetworkSecurityHelper.hostnameVerifier
@@ -68,11 +69,11 @@ object iTunesPodcastService {
                 setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) NeoTune/1.0")
                 setRequestProperty("Accept", "application/json")
             }
+            connection = conn
 
-            val responseCode = connection.responseCode
+            val responseCode = conn.responseCode
             if (responseCode in 200..299) {
-                val jsonText = connection.inputStream.bufferedReader().use { it.readText() }
-                connection.disconnect()
+                val jsonText = conn.inputStream.bufferedReader().use { it.readText() }
 
                 val jsonObject = JSONObject(jsonText)
                 val resultsArray = jsonObject.optJSONArray("results")
@@ -143,11 +144,12 @@ object iTunesPodcastService {
                     PodcastCacheManager.put(cacheKey, podcasts, liveRadio)
                 }
             } else {
-                connection.disconnect()
                 Log.w(TAG, "iTunes API HTTP failure code $responseCode for URL: $urlString")
             }
         } catch (e: Exception) {
             Log.e(TAG, "Error querying iTunes Podcast API: ${e.message}", e)
+        } finally {
+            try { connection?.disconnect() } catch (_: Exception) {}
         }
 
         // If no podcasts fetched from network, provide rich curated fallback

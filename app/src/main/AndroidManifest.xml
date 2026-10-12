@@ -20,12 +20,10 @@
     <!-- Required by Leanback store rules: must declare microphone as not required -->
     <uses-feature android:name="android.hardware.microphone" android:required="false" />
 
-    <!-- Android Auto & display compatibility -->
+    <!-- Display & connectivity compatibility -->
     <uses-feature android:name="android.hardware.wifi" android:required="false" />
     <uses-feature android:name="android.hardware.screen.portrait" android:required="false" />
     <uses-feature android:name="android.hardware.screen.landscape" android:required="false" />
-
-
 
     <!-- Explicitly remove Advertising ID permission to ensure 100% Ad-Free Google Play compliance -->
     <uses-permission android:name="com.google.android.gms.permission.AD_ID" tools:node="remove" />
@@ -44,24 +42,6 @@
         android:theme="@style/Theme.EaseAudio"
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
-
-        <!--
-            Android Auto: declares this app as a media app.
-            The Android Auto host reads this to show the app in the
-            car's media launcher and route playback controls to RadioPlaybackService.
-        -->
-        <meta-data
-            android:name="com.google.android.gms.car.application"
-            android:resource="@xml/automotive_app_desc" />
-
-        <!--
-            Notification small icon used in the Android Auto notification panel,
-            lock screen controls, and car media notification bar.
-            Must be a single-color (monochrome) vector drawable.
-        -->
-        <meta-data
-            android:name="com.google.android.gms.car.notification.SmallIcon"
-            android:resource="@drawable/ic_notification" />
 
         <activity
             android:name=".MainActivity"
@@ -127,7 +107,7 @@
         </activity-alias>
 
         <!--
-            Media playback service supporting Android Auto.
+            Media playback service.
             Provides MediaLibraryService and MediaBrowserService compatibility.
         -->
         <service
@@ -136,7 +116,6 @@
             android:foregroundServiceType="mediaPlayback"
             tools:ignore="ExportedService">
             <intent-filter>
-                <!-- Required by Android Auto to discover and connect the media browser. -->
                 <action android:name="android.media.browse.MediaBrowserService" />
                 <action android:name="androidx.media3.session.MediaLibraryService" />
                 <action android:name="androidx.media3.session.MediaSessionService" />
@@ -146,12 +125,6 @@
             <meta-data
                 android:name="androidx.media3.session.MBS_COMPAT_MODE"
                 android:value="true" />
-            <!--
-                android.media.SMALL_ICON is intentionally omitted here.
-                That meta-data is an AAOS-specific signal. For Android Auto, the notification
-                icon is correctly declared at application level via:
-                com.google.android.gms.car.notification.SmallIcon (see above).
-            -->
         </service>
 
         <receiver

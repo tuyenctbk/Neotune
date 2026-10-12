@@ -516,10 +516,6 @@ private fun CarSideNav(
     onToggleAntiGlare: () -> Unit,
     onExit: () -> Unit
 ) {
-    // This app is Android Auto (phone-connected), NOT AAOS. isAutomotive is always false
-    // so the Exit button is always shown, allowing users to leave Car Mode.
-    val isAutomotive = false
-
     NavigationRail(
         containerColor = if (isAntiGlare) Color(0xFF080C10) else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f),
         header = {
@@ -527,36 +523,19 @@ private fun CarSideNav(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier.padding(top = 8.dp)
             ) {
-                if (!isAutomotive) {
-                    IconButton(
-                        onClick = onExit,
-                        modifier = Modifier
-                            .size(44.dp)
-                            .clip(CircleShape)
-                            .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f))
-                    ) {
-                        Icon(
-                            imageVector = Icons.Filled.Close,
-                            contentDescription = stringResource(R.string.exit_car_mode),
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.size(22.dp)
-                        )
-                    }
-                } else {
-                    Box(
-                        modifier = Modifier
-                            .size(42.dp)
-                            .clip(CircleShape)
-                            .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(
-                            imageVector = Icons.Filled.Radio,
-                            contentDescription = stringResource(R.string.app_name),
-                            tint = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.size(22.dp)
-                        )
-                    }
+                IconButton(
+                    onClick = onExit,
+                    modifier = Modifier
+                        .size(44.dp)
+                        .clip(CircleShape)
+                        .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f))
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Close,
+                        contentDescription = stringResource(R.string.exit_car_mode),
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.size(22.dp)
+                    )
                 }
             }
         },
@@ -765,27 +744,21 @@ private fun CarTopNav(
             )
         }
 
-        // This app is Android Auto (phone-connected), NOT AAOS. isAutomotive is always false
-        // so the Exit button is always shown.
-        val isAutomotive = false
+        Spacer(modifier = Modifier.width(4.dp))
 
-        if (!isAutomotive) {
-            Spacer(modifier = Modifier.width(4.dp))
-
-            IconButton(
-                onClick = onExit,
-                modifier = Modifier
-                    .size(38.dp)
-                    .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f))
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.Close,
-                    contentDescription = stringResource(R.string.exit_car_mode),
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.size(18.dp)
-                )
-            }
+        IconButton(
+            onClick = onExit,
+            modifier = Modifier
+                .size(38.dp)
+                .clip(CircleShape)
+                .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f))
+        ) {
+            Icon(
+                imageVector = Icons.Filled.Close,
+                contentDescription = stringResource(R.string.exit_car_mode),
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.size(18.dp)
+            )
         }
     }
 }

@@ -78,4 +78,29 @@ class RadioStreamTest {
         val rewritten = rewriteStreamUrl(oldVovUrl, "VOV1")
         assertEquals("https://audio-lss.vov.vn/live/vov1.m3u8", rewritten)
     }
+
+    @Test
+    fun testAutomotiveSupportIsDisabledInManifest() {
+        val manifestFile = java.io.File("src/main/AndroidManifest.xml")
+        if (manifestFile.exists()) {
+            val content = manifestFile.readText()
+            assertFalse(
+                "AndroidManifest must not declare com.google.android.gms.car.application",
+                content.contains("com.google.android.gms.car.application")
+            )
+            assertFalse(
+                "AndroidManifest must not declare automotive_app_desc",
+                content.contains("automotive_app_desc")
+            )
+            assertFalse(
+                "AndroidManifest must not declare android.hardware.type.automotive",
+                content.contains("android.hardware.type.automotive")
+            )
+        }
+        val automotiveDescFile = java.io.File("src/main/res/xml/automotive_app_desc.xml")
+        assertFalse(
+            "automotive_app_desc.xml must be deleted to disable automotive support",
+            automotiveDescFile.exists()
+        )
+    }
 }

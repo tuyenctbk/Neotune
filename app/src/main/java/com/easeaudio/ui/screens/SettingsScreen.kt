@@ -53,7 +53,6 @@ fun SettingsScreen(
     onOpenAttribution: () -> Unit,
     onOpenBackup: () -> Unit = {},
     onOpenDiagnostics: () -> Unit = {},
-    isAutomotive: Boolean = false,
     bottomPadding: androidx.compose.ui.unit.Dp = 108.dp,
     modifier: Modifier = Modifier
 ) {
@@ -94,45 +93,6 @@ fun SettingsScreen(
                 contentPadding = PaddingValues(start = 20.dp, top = 16.dp, end = 20.dp, bottom = bottomPadding),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                // Automotive OS Info Banner
-                if (isAutomotive) {
-                    item {
-                        Card(
-                            modifier = Modifier.fillMaxWidth(),
-                            shape = RoundedCornerShape(16.dp),
-                            colors = CardDefaults.cardColors(
-                                containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f)
-                            )
-                        ) {
-                            Column(modifier = Modifier.padding(16.dp)) {
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Filled.DirectionsCar,
-                                        contentDescription = null,
-                                        tint = MaterialTheme.colorScheme.primary,
-                                        modifier = Modifier.size(32.dp)
-                                    )
-                                    Spacer(modifier = Modifier.width(16.dp))
-                                    Column {
-                                        Text(
-                                            text = stringResource(R.string.aaos_title),
-                                            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-                                            color = MaterialTheme.colorScheme.onPrimaryContainer
-                                        )
-                                        Spacer(modifier = Modifier.height(4.dp))
-                                        Text(
-                                            text = stringResource(R.string.aaos_desc),
-                                            style = MaterialTheme.typography.bodySmall,
-                                            color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f)
-                                        )
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
 
                 // Daily Listening Habits & Streak Banner (100% on-device)
                 item {
