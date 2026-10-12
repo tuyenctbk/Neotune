@@ -23,9 +23,106 @@ enum class EngagementPromptType {
 data class UpdateInfo(
     val isUpdateAvailable: Boolean = false,
     val isForceUpdate: Boolean = false,
+    val latestVersionCode: Int = 0,
     val latestVersionName: String = "",
     val updateNotes: String = ""
 )
+
+object EngagementPolicy {
+    // Rating:
+    // - User must have used the app for at least 3 distinct days and 4 sessions
+    // - User must have engaged meaningfully (>= 30 min listening OR >= 2 favorites)
+    // - At least 21 days between rating prompt attempts
+    // - Never prompt again after 2 dismissals
+    const val RATE_MIN_INSTALL_DAYS = 3L
+    const val RATE_MIN_SESSIONS = 4
+    const val RATE_MIN_LISTENING_MINUTES = 30L
+    const val RATE_MIN_FAVORITES = 2
+    const val RATE_COOLDOWN_DAYS = 21L
+    const val RATE_MAX_DISMISS_COUNT = 2
+
+    // Sharing:
+    // - User must have used the app for at least 5 days and 6 sessions
+    // - High loyalty: >= 60 min listening OR >= 3 favorites
+    // - At least 21 days between share prompt attempts
+    // - Never prompt again after 2 dismissals
+    const val SHARE_MIN_INSTALL_DAYS = 5L
+    const val SHARE_MIN_SESSIONS = 6
+    const val SHARE_MIN_LISTENING_MINUTES = 60L
+    const val SHARE_MIN_FAVORITES = 3
+    const val SHARE_COOLDOWN_DAYS = 21L
+    const val SHARE_MAX_DISMISS_COUNT = 2
+
+    // Optional Update:
+    // - Cooldown: at least 7 days between optional update prompts
+    // - Max 2 dismissals for the exact same target version code
+    const val UPDATE_OPTIONAL_COOLDOWN_DAYS = 7L
+    const val UPDATE_MAX_DISMISS_COUNT_PER_VERSION = 2
+
+    // Global cooldown across all non-force engagement prompts:
+    // Must wait at least 7 days between ANY prompts (Rate, Share, Update)
+    const val GLOBAL_ENGAGEMENT_COOLDOWN_DAYS = 7L
+
+    fun shouldPromptRating(
+        hasRatedApp: Boolean,
+        rateDismissCount: Int,
+        daysSinceLastRate: Long?,
+        daysSinceAnyPrompt: Long?,
+        daysSinceFirstLaunch: Long,
+        sessionCount: Int,
+        listeningTimeMinutes: Long,
+        favoritesCount: Int
+    ): Boolean {
+        if (hasRatedApp) return false
+        if (rateDismissCount >= RATE_MAX_DISMISS_COUNT) return false
+        if (daysSinceAnyPrompt != null && daysSinceAnyPrompt < GLOBAL_ENGAGEMENT_COOLDOWN_DAYS) return false
+        if (daysSinceLastRate != null && daysSinceLastRate < RATE_COOLDOWN_DAYS) return false
+
+        val hasEnoughExperience = daysSinceFirstLaunch >= RATE_MIN_INSTALL_DAYS && sessionCount >= RATE_MIN_SESSIONS
+        val hasDemonstratedEnjoyment = listeningTimeMinutes >= RATE_MIN_LISTENING_MINUTES || favoritesCount >= RATE_MIN_FAVORITES
+
+        return hasEnoughExperience && hasDemonstratedEnjoyment
+    }
+
+    fun shouldPromptShare(
+        hasSharedApp: Boolean,
+        shareDismissCount: Int,
+        daysSinceLastShare: Long?,
+        daysSinceAnyPrompt: Long?,
+        daysSinceFirstLaunch: Long,
+        sessionCount: Int,
+        listeningTimeMinutes: Long,
+        favoritesCount: Int
+    ): Boolean {
+        if (hasSharedApp) return false
+        if (shareDismissCount >= SHARE_MAX_DISMISS_COUNT) return false
+        if (daysSinceAnyPrompt != null && daysSinceAnyPrompt < GLOBAL_ENGAGEMENT_COOLDOWN_DAYS) return false
+        if (daysSinceLastShare != null && daysSinceLastShare < SHARE_COOLDOWN_DAYS) return false
+
+        val hasSufficientLoyalty = daysSinceFirstLaunch >= SHARE_MIN_INSTALL_DAYS && sessionCount >= SHARE_MIN_SESSIONS
+        val hasHighEngagement = listeningTimeMinutes >= SHARE_MIN_LISTENING_MINUTES || favoritesCount >= SHARE_MIN_FAVORITES
+
+        return hasSufficientLoyalty && hasHighEngagement
+    }
+
+    fun shouldPromptOptionalUpdate(
+        isUpdateAvailable: Boolean,
+        isForceUpdate: Boolean,
+        isPromptShownThisSession: Boolean,
+        targetVersionCode: Int,
+        lastDismissedVersionCode: Int,
+        dismissCountForVersion: Int,
+        daysSinceLastUpdate: Long?,
+        daysSinceAnyPrompt: Long?
+    ): Boolean {
+        if (!isUpdateAvailable || isForceUpdate) return false
+        if (isPromptShownThisSession) return false
+        if (targetVersionCode == lastDismissedVersionCode && dismissCountForVersion >= UPDATE_MAX_DISMISS_COUNT_PER_VERSION) return false
+        if (daysSinceLastUpdate != null && daysSinceLastUpdate < UPDATE_OPTIONAL_COOLDOWN_DAYS) return false
+        if (daysSinceAnyPrompt != null && daysSinceAnyPrompt < GLOBAL_ENGAGEMENT_COOLDOWN_DAYS) return false
+        return true
+    }
+}
 
 class SmartEngagementManager private constructor(context: Context) {
     private val context: Context = context.applicationContext
@@ -39,13 +136,42 @@ class SmartEngagementManager private constructor(context: Context) {
         private const val KEY_FAVORITES_ADDED_COUNT = "favorites_added_count"
         private const val KEY_FIRST_LAUNCH_TIMESTAMP = "first_launch_timestamp"
 
+        // Global engagement tracking
+        private const val KEY_LAST_ANY_PROMPT_TIMESTAMP = "last_any_engagement_timestamp"
+
+        // Rate tracking
         private const val KEY_LAST_RATE_PROMPT_TIMESTAMP = "last_rate_prompt_timestamp"
         private const val KEY_HAS_RATED_APP = "has_rated_app"
+        private const val KEY_RATE_DISMISS_COUNT = "rate_dismiss_count"
 
+        // Share tracking
         private const val KEY_LAST_SHARE_PROMPT_TIMESTAMP = "last_share_prompt_timestamp"
         private const val KEY_HAS_SHARED_APP = "has_shared_app"
+        private const val KEY_SHARE_DISMISS_COUNT = "share_dismiss_count"
 
+        // Update tracking
         private const val KEY_LAST_UPDATE_PROMPT_TIMESTAMP = "last_update_prompt_timestamp"
+        private const val KEY_UPDATE_DISMISSED_VERSION_CODE = "update_dismissed_version_code"
+        private const val KEY_UPDATE_DISMISS_COUNT_FOR_VERSION = "update_dismiss_count_for_version"
+
+        // Re-export constants for compatibility
+        const val RATE_MIN_INSTALL_DAYS = EngagementPolicy.RATE_MIN_INSTALL_DAYS
+        const val RATE_MIN_SESSIONS = EngagementPolicy.RATE_MIN_SESSIONS
+        const val RATE_MIN_LISTENING_MINUTES = EngagementPolicy.RATE_MIN_LISTENING_MINUTES
+        const val RATE_MIN_FAVORITES = EngagementPolicy.RATE_MIN_FAVORITES
+        const val RATE_COOLDOWN_DAYS = EngagementPolicy.RATE_COOLDOWN_DAYS
+        const val RATE_MAX_DISMISS_COUNT = EngagementPolicy.RATE_MAX_DISMISS_COUNT
+
+        const val SHARE_MIN_INSTALL_DAYS = EngagementPolicy.SHARE_MIN_INSTALL_DAYS
+        const val SHARE_MIN_SESSIONS = EngagementPolicy.SHARE_MIN_SESSIONS
+        const val SHARE_MIN_LISTENING_MINUTES = EngagementPolicy.SHARE_MIN_LISTENING_MINUTES
+        const val SHARE_MIN_FAVORITES = EngagementPolicy.SHARE_MIN_FAVORITES
+        const val SHARE_COOLDOWN_DAYS = EngagementPolicy.SHARE_COOLDOWN_DAYS
+        const val SHARE_MAX_DISMISS_COUNT = EngagementPolicy.SHARE_MAX_DISMISS_COUNT
+
+        const val UPDATE_OPTIONAL_COOLDOWN_DAYS = EngagementPolicy.UPDATE_OPTIONAL_COOLDOWN_DAYS
+        const val UPDATE_MAX_DISMISS_COUNT_PER_VERSION = EngagementPolicy.UPDATE_MAX_DISMISS_COUNT_PER_VERSION
+        const val GLOBAL_ENGAGEMENT_COOLDOWN_DAYS = EngagementPolicy.GLOBAL_ENGAGEMENT_COOLDOWN_DAYS
 
         @SuppressLint("StaticFieldLeak")
         @Volatile
@@ -59,6 +185,10 @@ class SmartEngagementManager private constructor(context: Context) {
     }
 
     private val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+
+    // In-memory guard to ensure AT MOST ONE engagement prompt per app session
+    @Volatile
+    private var isPromptShownThisSession: Boolean = false
 
     private val _activePrompt = MutableStateFlow(EngagementPromptType.NONE)
     val activePrompt: StateFlow<EngagementPromptType> = _activePrompt.asStateFlow()
@@ -88,16 +218,28 @@ class SmartEngagementManager private constructor(context: Context) {
     fun recordFavoriteAdded() {
         val count = prefs.getInt(KEY_FAVORITES_ADDED_COUNT, 0) + 1
         prefs.edit().putInt(KEY_FAVORITES_ADDED_COUNT, count).apply()
-        checkSmartTriggers(eventSource = "favorite_added")
+        // Note: Do not interrupt active user interactions with immediate popups.
+        // Engagement triggers are evaluated at natural pause points (e.g., app resume).
     }
 
     /**
      * Smart calculation to check whether to present Rate, Share, or Update prompts.
      * Evaluates happiness score, session duration, user loyalty & cool-down windows.
+     * Guarantees non-intrusive presentation with strict frequency limits.
      */
     fun checkSmartTriggers(eventSource: String = "general") {
+        // If a prompt is currently active on screen, do not disrupt it
+        if (_activePrompt.value != EngagementPromptType.NONE) {
+            return
+        }
+
         // Priority 1: Check for App Updates (highest priority)
         if (checkUpdatePromptAvailable()) {
+            return
+        }
+
+        // Strict Session Rule: Never show more than ONE engagement prompt in a single session
+        if (isPromptShownThisSession) {
             return
         }
 
@@ -105,6 +247,7 @@ class SmartEngagementManager private constructor(context: Context) {
         if (shouldPromptRating()) {
             Log.i(TAG, "Smart Trigger: Presenting Rate 5 Stars Prompt (Source: $eventSource)")
             _activePrompt.value = EngagementPromptType.RATE_5_STARS
+            markPromptDisplayed(EngagementPromptType.RATE_5_STARS)
             return
         }
 
@@ -112,60 +255,97 @@ class SmartEngagementManager private constructor(context: Context) {
         if (shouldPromptShare()) {
             Log.i(TAG, "Smart Trigger: Presenting Share App Prompt (Source: $eventSource)")
             _activePrompt.value = EngagementPromptType.SHARE_APP
+            markPromptDisplayed(EngagementPromptType.SHARE_APP)
             return
         }
     }
 
-    private fun shouldPromptRating(): Boolean {
-        if (prefs.getBoolean(KEY_HAS_RATED_APP, false)) return false
-
-        val sessions = prefs.getInt(KEY_SESSION_COUNT, 0)
-        val listeningTimeMinutes = prefs.getLong(KEY_LISTENING_TIME_SEC, 0L) / 60
-        val favoritesCount = prefs.getInt(KEY_FAVORITES_ADDED_COUNT, 0)
-        val firstLaunchTime = prefs.getLong(KEY_FIRST_LAUNCH_TIMESTAMP, System.currentTimeMillis())
-        val daysSinceFirstLaunch = TimeUnit.MILLISECONDS.toDays(System.currentTimeMillis() - firstLaunchTime)
-        val lastPromptTime = prefs.getLong(KEY_LAST_RATE_PROMPT_TIMESTAMP, 0L)
-        val daysSinceLastPrompt = TimeUnit.MILLISECONDS.toDays(System.currentTimeMillis() - lastPromptTime)
-
-        // Cool-down check: don't re-prompt within 14 days
-        if (lastPromptTime > 0 && daysSinceLastPrompt < 14) {
-            return false
+    private fun markPromptDisplayed(type: EngagementPromptType) {
+        isPromptShownThisSession = true
+        val now = System.currentTimeMillis()
+        val editor = prefs.edit().putLong(KEY_LAST_ANY_PROMPT_TIMESTAMP, now)
+        when (type) {
+            EngagementPromptType.RATE_5_STARS -> editor.putLong(KEY_LAST_RATE_PROMPT_TIMESTAMP, now)
+            EngagementPromptType.SHARE_APP -> editor.putLong(KEY_LAST_SHARE_PROMPT_TIMESTAMP, now)
+            EngagementPromptType.UPDATE_APP -> editor.putLong(KEY_LAST_UPDATE_PROMPT_TIMESTAMP, now)
+            EngagementPromptType.NONE -> {}
         }
+        editor.apply()
+    }
 
-        // Smart Happiness Score Calculation:
-        // User is happy if:
-        // 1. Session count >= 3 OR Listening time >= 15 min OR Favorites count >= 1
-        // AND 2. App has been installed for at least 1 day
-        val isHappyUser = (sessions >= 3 || listeningTimeMinutes >= 15 || favoritesCount >= 1) && daysSinceFirstLaunch >= 1
+    private fun shouldPromptRating(): Boolean {
+        val now = System.currentTimeMillis()
+        val lastAnyPromptTime = prefs.getLong(KEY_LAST_ANY_PROMPT_TIMESTAMP, 0L)
+        val daysSinceAnyPrompt = if (lastAnyPromptTime > 0) TimeUnit.MILLISECONDS.toDays(now - lastAnyPromptTime) else null
+        val lastRatePromptTime = prefs.getLong(KEY_LAST_RATE_PROMPT_TIMESTAMP, 0L)
+        val daysSinceLastRate = if (lastRatePromptTime > 0) TimeUnit.MILLISECONDS.toDays(now - lastRatePromptTime) else null
+        val firstLaunchTime = prefs.getLong(KEY_FIRST_LAUNCH_TIMESTAMP, now)
+        val daysSinceFirstLaunch = TimeUnit.MILLISECONDS.toDays(now - firstLaunchTime)
 
-        return isHappyUser
+        return EngagementPolicy.shouldPromptRating(
+            hasRatedApp = prefs.getBoolean(KEY_HAS_RATED_APP, false),
+            rateDismissCount = prefs.getInt(KEY_RATE_DISMISS_COUNT, 0),
+            daysSinceLastRate = daysSinceLastRate,
+            daysSinceAnyPrompt = daysSinceAnyPrompt,
+            daysSinceFirstLaunch = daysSinceFirstLaunch,
+            sessionCount = prefs.getInt(KEY_SESSION_COUNT, 0),
+            listeningTimeMinutes = prefs.getLong(KEY_LISTENING_TIME_SEC, 0L) / 60,
+            favoritesCount = prefs.getInt(KEY_FAVORITES_ADDED_COUNT, 0)
+        )
     }
 
     private fun shouldPromptShare(): Boolean {
-        if (prefs.getBoolean(KEY_HAS_SHARED_APP, false)) return false
+        val now = System.currentTimeMillis()
+        val lastAnyPromptTime = prefs.getLong(KEY_LAST_ANY_PROMPT_TIMESTAMP, 0L)
+        val daysSinceAnyPrompt = if (lastAnyPromptTime > 0) TimeUnit.MILLISECONDS.toDays(now - lastAnyPromptTime) else null
+        val lastSharePromptTime = prefs.getLong(KEY_LAST_SHARE_PROMPT_TIMESTAMP, 0L)
+        val daysSinceLastShare = if (lastSharePromptTime > 0) TimeUnit.MILLISECONDS.toDays(now - lastSharePromptTime) else null
+        val firstLaunchTime = prefs.getLong(KEY_FIRST_LAUNCH_TIMESTAMP, now)
+        val daysSinceFirstLaunch = TimeUnit.MILLISECONDS.toDays(now - firstLaunchTime)
 
-        val listeningTimeMinutes = prefs.getLong(KEY_LISTENING_TIME_SEC, 0L) / 60
-        val favoritesCount = prefs.getInt(KEY_FAVORITES_ADDED_COUNT, 0)
-        val lastPromptTime = prefs.getLong(KEY_LAST_SHARE_PROMPT_TIMESTAMP, 0L)
-        val daysSinceLastPrompt = TimeUnit.MILLISECONDS.toDays(System.currentTimeMillis() - lastPromptTime)
-
-        if (lastPromptTime > 0 && daysSinceLastPrompt < 7) {
-            return false
-        }
-
-        // Smart Share Trigger: User loves the content (listening > 20 min or added 2+ favorites)
-        return (listeningTimeMinutes >= 20 || favoritesCount >= 2)
+        return EngagementPolicy.shouldPromptShare(
+            hasSharedApp = prefs.getBoolean(KEY_HAS_SHARED_APP, false),
+            shareDismissCount = prefs.getInt(KEY_SHARE_DISMISS_COUNT, 0),
+            daysSinceLastShare = daysSinceLastShare,
+            daysSinceAnyPrompt = daysSinceAnyPrompt,
+            daysSinceFirstLaunch = daysSinceFirstLaunch,
+            sessionCount = prefs.getInt(KEY_SESSION_COUNT, 0),
+            listeningTimeMinutes = prefs.getLong(KEY_LISTENING_TIME_SEC, 0L) / 60,
+            favoritesCount = prefs.getInt(KEY_FAVORITES_ADDED_COUNT, 0)
+        )
     }
 
     private fun checkUpdatePromptAvailable(): Boolean {
         val info = _updateInfo.value
         if (!info.isUpdateAvailable) return false
 
-        val lastPromptTime = prefs.getLong(KEY_LAST_UPDATE_PROMPT_TIMESTAMP, 0L)
-        val daysSinceLastPrompt = TimeUnit.MILLISECONDS.toDays(System.currentTimeMillis() - lastPromptTime)
-
-        if (info.isForceUpdate || lastPromptTime == 0L || daysSinceLastPrompt >= 3) {
+        // Priority Critical / Force Update: Always shown so the app remains usable
+        if (info.isForceUpdate) {
             _activePrompt.value = EngagementPromptType.UPDATE_APP
+            markPromptDisplayed(EngagementPromptType.UPDATE_APP)
+            return true
+        }
+
+        val now = System.currentTimeMillis()
+        val lastAnyPromptTime = prefs.getLong(KEY_LAST_ANY_PROMPT_TIMESTAMP, 0L)
+        val daysSinceAnyPrompt = if (lastAnyPromptTime > 0) TimeUnit.MILLISECONDS.toDays(now - lastAnyPromptTime) else null
+        val lastUpdatePromptTime = prefs.getLong(KEY_LAST_UPDATE_PROMPT_TIMESTAMP, 0L)
+        val daysSinceLastUpdate = if (lastUpdatePromptTime > 0) TimeUnit.MILLISECONDS.toDays(now - lastUpdatePromptTime) else null
+
+        val shouldPrompt = EngagementPolicy.shouldPromptOptionalUpdate(
+            isUpdateAvailable = info.isUpdateAvailable,
+            isForceUpdate = info.isForceUpdate,
+            isPromptShownThisSession = isPromptShownThisSession,
+            targetVersionCode = info.latestVersionCode,
+            lastDismissedVersionCode = prefs.getInt(KEY_UPDATE_DISMISSED_VERSION_CODE, 0),
+            dismissCountForVersion = prefs.getInt(KEY_UPDATE_DISMISS_COUNT_FOR_VERSION, 0),
+            daysSinceLastUpdate = daysSinceLastUpdate,
+            daysSinceAnyPrompt = daysSinceAnyPrompt
+        )
+
+        if (shouldPrompt) {
+            _activePrompt.value = EngagementPromptType.UPDATE_APP
+            markPromptDisplayed(EngagementPromptType.UPDATE_APP)
             return true
         }
         return false
@@ -185,7 +365,7 @@ class SmartEngagementManager private constructor(context: Context) {
                 context.packageManager.getPackageInfo(context.packageName, 0).versionCode
             }
         } catch (e: Exception) {
-            1
+            BuildConfig.VERSION_CODE
         }
 
         val isAvailable = latestVersionCode > currentVersionCode
@@ -194,6 +374,7 @@ class SmartEngagementManager private constructor(context: Context) {
         _updateInfo.value = UpdateInfo(
             isUpdateAvailable = isAvailable,
             isForceUpdate = isForce,
+            latestVersionCode = latestVersionCode,
             latestVersionName = latestVersionName.ifBlank { "v$latestVersionCode" },
             updateNotes = updateNotes
         )
@@ -204,9 +385,11 @@ class SmartEngagementManager private constructor(context: Context) {
     }
 
     fun onRatingCompleted(stars: Int, activity: android.app.Activity? = null) {
+        val now = System.currentTimeMillis()
         prefs.edit()
             .putBoolean(KEY_HAS_RATED_APP, true)
-            .putLong(KEY_LAST_RATE_PROMPT_TIMESTAMP, System.currentTimeMillis())
+            .putLong(KEY_LAST_RATE_PROMPT_TIMESTAMP, now)
+            .putLong(KEY_LAST_ANY_PROMPT_TIMESTAMP, now)
             .apply()
         _activePrompt.value = EngagementPromptType.NONE
 
@@ -238,39 +421,62 @@ class SmartEngagementManager private constructor(context: Context) {
     }
 
     fun onRatingDismissed() {
+        val dismissCount = prefs.getInt(KEY_RATE_DISMISS_COUNT, 0) + 1
+        val now = System.currentTimeMillis()
         prefs.edit()
-            .putLong(KEY_LAST_RATE_PROMPT_TIMESTAMP, System.currentTimeMillis())
+            .putInt(KEY_RATE_DISMISS_COUNT, dismissCount)
+            .putLong(KEY_LAST_RATE_PROMPT_TIMESTAMP, now)
+            .putLong(KEY_LAST_ANY_PROMPT_TIMESTAMP, now)
             .apply()
         _activePrompt.value = EngagementPromptType.NONE
     }
 
     fun onShareCompleted() {
+        val now = System.currentTimeMillis()
         prefs.edit()
             .putBoolean(KEY_HAS_SHARED_APP, true)
-            .putLong(KEY_LAST_SHARE_PROMPT_TIMESTAMP, System.currentTimeMillis())
+            .putLong(KEY_LAST_SHARE_PROMPT_TIMESTAMP, now)
+            .putLong(KEY_LAST_ANY_PROMPT_TIMESTAMP, now)
             .apply()
         _activePrompt.value = EngagementPromptType.NONE
         launchShareIntent()
     }
 
     fun onShareDismissed() {
+        val dismissCount = prefs.getInt(KEY_SHARE_DISMISS_COUNT, 0) + 1
+        val now = System.currentTimeMillis()
         prefs.edit()
-            .putLong(KEY_LAST_SHARE_PROMPT_TIMESTAMP, System.currentTimeMillis())
+            .putInt(KEY_SHARE_DISMISS_COUNT, dismissCount)
+            .putLong(KEY_LAST_SHARE_PROMPT_TIMESTAMP, now)
+            .putLong(KEY_LAST_ANY_PROMPT_TIMESTAMP, now)
             .apply()
         _activePrompt.value = EngagementPromptType.NONE
     }
 
     fun onUpdateConfirmed() {
+        val now = System.currentTimeMillis()
         prefs.edit()
-            .putLong(KEY_LAST_UPDATE_PROMPT_TIMESTAMP, System.currentTimeMillis())
+            .putLong(KEY_LAST_UPDATE_PROMPT_TIMESTAMP, now)
+            .putLong(KEY_LAST_ANY_PROMPT_TIMESTAMP, now)
             .apply()
         _activePrompt.value = EngagementPromptType.NONE
         openPlayStoreForRating()
     }
 
     fun onUpdateDismissed() {
+        val currentTargetVersion = _updateInfo.value.latestVersionCode
+        val lastDismissedVersion = prefs.getInt(KEY_UPDATE_DISMISSED_VERSION_CODE, 0)
+        val dismissCount = if (currentTargetVersion == lastDismissedVersion) {
+            prefs.getInt(KEY_UPDATE_DISMISS_COUNT_FOR_VERSION, 0) + 1
+        } else {
+            1
+        }
+        val now = System.currentTimeMillis()
         prefs.edit()
-            .putLong(KEY_LAST_UPDATE_PROMPT_TIMESTAMP, System.currentTimeMillis())
+            .putInt(KEY_UPDATE_DISMISSED_VERSION_CODE, currentTargetVersion)
+            .putInt(KEY_UPDATE_DISMISS_COUNT_FOR_VERSION, dismissCount)
+            .putLong(KEY_LAST_UPDATE_PROMPT_TIMESTAMP, now)
+            .putLong(KEY_LAST_ANY_PROMPT_TIMESTAMP, now)
             .apply()
         _activePrompt.value = EngagementPromptType.NONE
     }

@@ -401,17 +401,7 @@ fun SettingsScreen(
                             title = stringResource(R.string.settings_share_app_title),
                             subtitle = stringResource(R.string.settings_share_app_desc),
                             onClick = {
-                                try {
-                                    val shareIntent = Intent(Intent.ACTION_SEND).apply {
-                                        type = "text/plain"
-                                        putExtra(Intent.EXTRA_SUBJECT, "NeoTune")
-                                        putExtra(Intent.EXTRA_TEXT, "Listen to live global radio and podcasts for free on NeoTune: https://play.google.com/store/apps/details?id=${context.packageName}")
-                                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                                    }
-                                    context.startActivity(Intent.createChooser(shareIntent, context.getString(R.string.settings_share_app_title)))
-                                } catch (e: Exception) {
-                                    Log.e("SettingsScreen", "Failed to share: ${e.message}")
-                                }
+                                com.easeaudio.engagement.SmartEngagementManager.getInstance(context).onShareCompleted()
                             },
                             testTag = "setting_share_app"
                         )

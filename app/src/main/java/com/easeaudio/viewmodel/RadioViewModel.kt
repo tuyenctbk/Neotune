@@ -540,7 +540,6 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
                         while (isActive) {
                             kotlinx.coroutines.delay(60_000L)
                             smartEngagementManager.recordListeningTime(60L)
-                            smartEngagementManager.checkSmartTriggers(eventSource = "playback_timer")
                         }
                     }
                 }

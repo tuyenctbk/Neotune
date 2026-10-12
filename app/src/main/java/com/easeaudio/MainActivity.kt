@@ -938,27 +938,39 @@ fun MainAppContent(
 
         // Smart Engagement Dialogs
         val activity = androidx.activity.compose.LocalActivity.current
-        when (activePrompt) {
-            com.easeaudio.engagement.EngagementPromptType.RATE_5_STARS -> {
-                RateAppDialog(
-                    onRateSubmitted = { stars -> viewModel.smartEngagementManager.onRatingCompleted(stars, activity) },
-                    onDismiss = { viewModel.smartEngagementManager.onRatingDismissed() }
-                )
+        val hasOtherActiveDialog = uiState.showSleepTimerDialog ||
+                uiState.showEqualizerDialog ||
+                uiState.showAddStationDialog ||
+                uiState.showBlockedDialog ||
+                uiState.showAppearanceDialog ||
+                uiState.showEpisodesSheet ||
+                showBackupDialog ||
+                showDiagnosticsDialog ||
+                showQrCodeDialog
+
+        if (!hasOtherActiveDialog || updateInfo.isForceUpdate) {
+            when (activePrompt) {
+                com.easeaudio.engagement.EngagementPromptType.RATE_5_STARS -> {
+                    RateAppDialog(
+                        onRateSubmitted = { stars -> viewModel.smartEngagementManager.onRatingCompleted(stars, activity) },
+                        onDismiss = { viewModel.smartEngagementManager.onRatingDismissed() }
+                    )
+                }
+                com.easeaudio.engagement.EngagementPromptType.SHARE_APP -> {
+                    ShareAppDialog(
+                        onShareConfirmed = { viewModel.smartEngagementManager.onShareCompleted() },
+                        onDismiss = { viewModel.smartEngagementManager.onShareDismissed() }
+                    )
+                }
+                com.easeaudio.engagement.EngagementPromptType.UPDATE_APP -> {
+                    UpdateAppDialog(
+                        updateInfo = updateInfo,
+                        onUpdateConfirmed = { viewModel.smartEngagementManager.onUpdateConfirmed() },
+                        onDismiss = { viewModel.smartEngagementManager.onUpdateDismissed() }
+                    )
+                }
+                com.easeaudio.engagement.EngagementPromptType.NONE -> {}
             }
-            com.easeaudio.engagement.EngagementPromptType.SHARE_APP -> {
-                ShareAppDialog(
-                    onShareConfirmed = { viewModel.smartEngagementManager.onShareCompleted() },
-                    onDismiss = { viewModel.smartEngagementManager.onShareDismissed() }
-                )
-            }
-            com.easeaudio.engagement.EngagementPromptType.UPDATE_APP -> {
-                UpdateAppDialog(
-                    updateInfo = updateInfo,
-                    onUpdateConfirmed = { viewModel.smartEngagementManager.onUpdateConfirmed() },
-                    onDismiss = { viewModel.smartEngagementManager.onUpdateDismissed() }
-                )
-            }
-            com.easeaudio.engagement.EngagementPromptType.NONE -> {}
         }
     }
 }
