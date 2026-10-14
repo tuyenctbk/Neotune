@@ -494,4 +494,31 @@
     <string name="settings_rate_desc" formatted="false">Steun deze 100% gratis en advertentievrije speler met een review</string>
     <string name="settings_share_app_title">NeoTune delen</string>
     <string name="settings_share_app_desc">Deel gratis muziek en podcasts met vrienden</string>
+
+    <!-- Localized additions -->
+    <string name="playing_episode_format">\'%1$s\' wordt afgespeeld</string>
+    <string name="audio_booster_enabled">Audiobooster ingeschakeld (+6dB)</string>
+    <string name="audio_booster_disabled">Audiobooster uitgeschakeld</string>
+    <string name="auto_resumed_station_format">Automatisch hervat: \'%1$s\'</string>
+    <string name="auto_play_enabled">Automatisch afspelen bij opstarten ingeschakeld</string>
+    <string name="auto_play_disabled">Automatisch afspelen bij opstarten uitgeschakeld</string>
+    <string name="ambient_screensaver_enabled">Sfeer-schermbeveiliging ingeschakeld</string>
+    <string name="ambient_screensaver_disabled">Sfeer-schermbeveiliging uitgeschakeld</string>
+    <string name="added_station_to_favorites_format">❤️ \'%1$s\' toegevoegd aan Favorieten</string>
+    <string name="removed_station_from_favorites_format">\'%1$s\' verwijderd uit Favorieten</string>
+    <string name="imported_stations_format">%1$d stations geïmporteerd in bibliotheek</string>
+    <string name="media_folder_top_title">Top &amp; Trending</string>
+    <string name="media_folder_top_desc">Uitgelichte wereldwijde streams</string>
+    <string name="media_folder_recent_title">Onlangs afgespeeld</string>
+    <string name="media_folder_recent_desc">Je recente zenders</string>
+    <string name="media_folder_genres_title">Genres &amp; Categorieën</string>
+    <string name="media_folder_genres_desc">Bladeren op muziekgenre</string>
+    <string name="media_folder_podcasts_title">Podcasts</string>
+    <string name="media_folder_podcasts_desc">Populaire podcastshows</string>
+    <string name="media_root_subtitle">Internetradio &amp; Podcasts</string>
+    <string name="media_root_recent_subtitle">Verdergaan waar je was gebleven</string>
+    <string name="skip_station">Zender overslaan</string>
+    <string name="unknown_station">Onbekende zender</string>
+    <string name="play">Afspelen</string>
+    <string name="pause">Pauzeren</string>
 </resources>

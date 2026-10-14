@@ -498,4 +498,31 @@
     <string name="settings_rate_desc" formatted="false">100% 무료 무광고 플레이어에 리뷰를 남겨 응원해 주세요</string>
     <string name="settings_share_app_title">NeoTune 공유하기</string>
     <string name="settings_share_app_desc">친구들에게 무료 음악과 팟캐스트를 소개하세요</string>
+
+    <!-- Localized additions -->
+    <string name="playing_episode_format">\'%1$s\' 재생 중</string>
+    <string name="audio_booster_enabled">오디오 부스터 켜짐 (+6dB)</string>
+    <string name="audio_booster_disabled">오디오 부스터 꺼짐</string>
+    <string name="auto_resumed_station_format">\'%1$s\' 자동 이어듣기</string>
+    <string name="auto_play_enabled">시작 시 자동 재생 켜짐</string>
+    <string name="auto_play_disabled">시작 시 자동 재생 꺼짐</string>
+    <string name="ambient_screensaver_enabled">앰비언트 화면보호기 켜짐</string>
+    <string name="ambient_screensaver_disabled">앰비언트 화면보호기 꺼짐</string>
+    <string name="added_station_to_favorites_format">❤️ \'%1$s\' 즐겨찾기에 추가됨</string>
+    <string name="removed_station_from_favorites_format">\'%1$s\' 즐겨찾기에서 삭제됨</string>
+    <string name="imported_stations_format">%1$d개 방송국 라이브러리로 가져옴</string>
+    <string name="media_folder_top_title">인기 &amp; 트렌드</string>
+    <string name="media_folder_top_desc">전 세계 추천 스트림</string>
+    <string name="media_folder_recent_title">최근 청취</string>
+    <string name="media_folder_recent_desc">최근 청취한 방송국 목록</string>
+    <string name="media_folder_genres_title">장르 &amp; 카테고리</string>
+    <string name="media_folder_genres_desc">음악 장르별 탐색</string>
+    <string name="media_folder_podcasts_title">팟캐스트</string>
+    <string name="media_folder_podcasts_desc">인기 팟캐스트 프로그램</string>
+    <string name="media_root_subtitle">인터넷 라디오 &amp; 팟캐스트</string>
+    <string name="media_root_recent_subtitle">이어서 듣기</string>
+    <string name="skip_station">방송국 건너뛰기</string>
+    <string name="unknown_station">알 수 없는 방송국</string>
+    <string name="play">재생</string>
+    <string name="pause">일시중지</string>
 </resources>

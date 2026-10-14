@@ -494,4 +494,31 @@
     <string name="settings_rate_desc" formatted="false">ادعم هذا المشغل المجاني 100% والخالي من الإعلانات بتقييمك</string>
     <string name="settings_share_app_title">مشاركة NeoTune</string>
     <string name="settings_share_app_desc">أخبر أصدقاءك عن الموسيقى والبودكاست المجانية</string>
+
+    <!-- Localized additions -->
+    <string name="playing_episode_format">جاري تشغيل \'%1$s\'</string>
+    <string name="audio_booster_enabled">تم تفعيل مضخم الصوت (+6dB)</string>
+    <string name="audio_booster_disabled">تم تعطيل مضخم الصوت</string>
+    <string name="auto_resumed_station_format">استئناف تلقائي لـ \'%1$s\'</string>
+    <string name="auto_play_enabled">تم تفعيل التشغيل التلقائي عند البدء</string>
+    <string name="auto_play_disabled">تم تعطيل التشغيل التلقائي عند البدء</string>
+    <string name="ambient_screensaver_enabled">تم تفعيل شاشة التوقف المحيطية</string>
+    <string name="ambient_screensaver_disabled">تم تعطيل شاشة التوقف المحيطية</string>
+    <string name="added_station_to_favorites_format">❤️ تم إضافة \'%1$s\' إلى المفضلة</string>
+    <string name="removed_station_from_favorites_format">تمت إزالة \'%1$s\' من المفضلة</string>
+    <string name="imported_stations_format">تم استيراد %1$d محطة إلى المكتبة</string>
+    <string name="media_folder_top_title">الأفضل والاتجاهات</string>
+    <string name="media_folder_top_desc">بثوث عالمية مميزة</string>
+    <string name="media_folder_recent_title">المشغلة حديثاً</string>
+    <string name="media_folder_recent_desc">محطاتك الأخيرة</string>
+    <string name="media_folder_genres_title">الأنواع والتصنيفات</string>
+    <string name="media_folder_genres_desc">تصفح حسب نوع الموسيقى</string>
+    <string name="media_folder_podcasts_title">بودكاست</string>
+    <string name="media_folder_podcasts_desc">برامج البودكاست الشائعة</string>
+    <string name="media_root_subtitle">راديو الإنترنت والبودكاست</string>
+    <string name="media_root_recent_subtitle">تابع من حيث توقفت</string>
+    <string name="skip_station">تخطي المحطة</string>
+    <string name="unknown_station">محطة غير معروفة</string>
+    <string name="play">تشغيل</string>
+    <string name="pause">إيقاف مؤقت</string>
 </resources>

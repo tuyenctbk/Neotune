@@ -148,7 +148,7 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
         playerManager.playPodcastEpisode(show, episode)
         viewModelScope.launch {
             repository.recordStationListened(show)
-            snackbarMessage.emit("Playing '${episode.title}'")
+            snackbarMessage.emit(getApplication<Application>().getString(R.string.playing_episode_format, episode.title))
         }
     }
 
@@ -600,7 +600,10 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
     fun setAudioBoosterEnabled(enabled: Boolean) {
         playerManager.setAudioBoosterEnabled(enabled)
         viewModelScope.launch {
-            snackbarMessage.emit(if (enabled) "Audio Booster Enabled (+6dB)" else "Audio Booster Disabled")
+            snackbarMessage.emit(
+                if (enabled) getApplication<Application>().getString(R.string.audio_booster_enabled)
+                else getApplication<Application>().getString(R.string.audio_booster_disabled)
+            )
         }
     }
 
@@ -639,7 +642,7 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
                     if (_isAutoPlayOnStartupEnabled.value) {
                         android.util.Log.i("RadioViewModel", "Auto-resuming last played station: ${lastPlayed.name}")
                         playerManager.playStation(lastPlayed)
-                        snackbarMessage.tryEmit("Auto-resumed '${lastPlayed.name}'")
+                        snackbarMessage.tryEmit(getApplication<Application>().getString(R.string.auto_resumed_station_format, lastPlayed.name))
                     } else {
                         android.util.Log.i("RadioViewModel", "Preloading last played station: ${lastPlayed.name}")
                         playerManager.setPreloadedStation(lastPlayed)
@@ -657,7 +660,10 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
         _isAutoPlayOnStartupEnabled.value = newValue
         appPrefs.edit().putBoolean("is_auto_play_on_startup_enabled", newValue).apply()
         viewModelScope.launch {
-            snackbarMessage.emit(if (newValue) "Auto-Play on Startup Enabled" else "Auto-Play on Startup Disabled")
+            snackbarMessage.emit(
+                if (newValue) getApplication<Application>().getString(R.string.auto_play_enabled)
+                else getApplication<Application>().getString(R.string.auto_play_disabled)
+            )
         }
     }
 
@@ -666,7 +672,10 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
         _isAutoScreensaverEnabled.value = newValue
         appPrefs.edit().putBoolean("is_auto_screensaver_enabled", newValue).apply()
         viewModelScope.launch {
-            snackbarMessage.emit(if (newValue) "Ambient Screensaver Enabled" else "Ambient Screensaver Disabled")
+            snackbarMessage.emit(
+                if (newValue) getApplication<Application>().getString(R.string.ambient_screensaver_enabled)
+                else getApplication<Application>().getString(R.string.ambient_screensaver_disabled)
+            )
         }
     }
 
@@ -1285,9 +1294,9 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
             repository.toggleFavorite(station)
             if (!wasFav) {
                 smartEngagementManager.recordFavoriteAdded()
-                snackbarMessage.emit("❤️ Added '${station.name}' to Favorites")
+                snackbarMessage.emit(getApplication<Application>().getString(R.string.added_station_to_favorites_format, station.name))
             } else {
-                snackbarMessage.emit("Removed '${station.name}' from Favorites")
+                snackbarMessage.emit(getApplication<Application>().getString(R.string.removed_station_from_favorites_format, station.name))
             }
         }
     }
@@ -1448,7 +1457,7 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
                 }
             }
             refreshStations()
-            snackbarMessage.emit("Imported ${stations.size} stations into library")
+            snackbarMessage.emit(getApplication<Application>().getString(R.string.imported_stations_format, stations.size))
         }
     }
 

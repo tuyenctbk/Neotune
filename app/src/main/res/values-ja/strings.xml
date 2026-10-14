@@ -498,4 +498,31 @@
     <string name="settings_rate_desc" formatted="false">完全無料・広告なしの当アプリをレビューで応援してください</string>
     <string name="settings_share_app_title">NeoTune を共有</string>
     <string name="settings_share_app_desc">無料の音楽とポッドキャストを友達に教える</string>
+
+    <!-- Localized additions -->
+    <string name="playing_episode_format">\'%1$s\' を再生中</string>
+    <string name="audio_booster_enabled">オーディオブースター有効 (+6dB)</string>
+    <string name="audio_booster_disabled">オーディオブースター無効</string>
+    <string name="auto_resumed_station_format">\'%1$s\' を自動再開しました</string>
+    <string name="auto_play_enabled">起動時の自動再生が有効です</string>
+    <string name="auto_play_disabled">起動時の自動再生が無効です</string>
+    <string name="ambient_screensaver_enabled">アンビエントスクリーンセーバー有効</string>
+    <string name="ambient_screensaver_disabled">アンビエントスクリーンセーバー無効</string>
+    <string name="added_station_to_favorites_format">❤️ \'%1$s\' をお気に入りに追加しました</string>
+    <string name="removed_station_from_favorites_format">\'%1$s\' をお気に入りから削除しました</string>
+    <string name="imported_stations_format">%1$d 件のステーションをインポートしました</string>
+    <string name="media_folder_top_title">トップ＆トレンド</string>
+    <string name="media_folder_top_desc">世界の注目配信</string>
+    <string name="media_folder_recent_title">最近再生したステーション</string>
+    <string name="media_folder_recent_desc">最近聴いたステーション一覧</string>
+    <string name="media_folder_genres_title">ジャンル＆カテゴリ</string>
+    <string name="media_folder_genres_desc">音楽ジャンルから探す</string>
+    <string name="media_folder_podcasts_title">ポッドキャスト</string>
+    <string name="media_folder_podcasts_desc">人気のポッドキャスト番組</string>
+    <string name="media_root_subtitle">インターネットラジオ＆ポッドキャスト</string>
+    <string name="media_root_recent_subtitle">前回の続きから再生</string>
+    <string name="skip_station">次のステーションへスキップ</string>
+    <string name="unknown_station">不明なステーション</string>
+    <string name="play">再生</string>
+    <string name="pause">一時停止</string>
 </resources>

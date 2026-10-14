@@ -469,4 +469,54 @@
     <string name="remove_from_your_episodes">Remove from Your Episodes</string>
     <string name="star_rating_desc">ستارہ %1$d</string>
     <string name="stream_link">سٹریم لنک</string>
+
+    <!-- Localized additions -->
+    <string name="widget_description">NeoTune ریڈیو پلیئر ویجیٹ</string>
+    <string name="widget_no_station">ریڈیو چلانے کے لیے تھپتھپائیں</string>
+    <string name="record_stream">نشریات ریکارڈ کریں</string>
+    <string name="record_stream_desc">براہ راست ریڈیو آڈیو ریکارڈ کریں</string>
+    <string name="recording_started">ریکارڈنگ شروع ہو گئی…</string>
+    <string name="recording_stopped">ریکارڈنگ روک دی گئی</string>
+    <string name="recording_saved">ریکارڈنگ محفوظ ہوگئی: %1$s (%2$s)</string>
+    <string name="recordings_title">ریکارڈ شدہ آڈیو</string>
+    <string name="recordings_desc">محفوظ کردہ آف لائن ریڈیو اسٹریمز</string>
+    <string name="recordings_empty">ابھی تک کوئی ریکارڈنگ نہیں ہے۔ سنتے وقت ریکارڈ پر ٹیپ کریں۔</string>
+    <string name="share_recording">ریکارڈنگ شیئر کریں</string>
+    <string name="share_recording_text">%1$s سے یہ لائیو ریکارڈنگ سنیں: %2$s</string>
+    <string name="audio_output_route">آڈیو آؤٹ پٹ / کاسٹ</string>
+    <string name="audio_output_route_desc">بلوٹوتھ ہیڈ فون، گوگل کاسٹ یا اسپیکر پر پلے بیک روٹ کریں۔</string>
+    <string name="audio_output_current_device">موجودہ آؤٹ پٹ ڈیوائس</string>
+    <string name="audio_output_switch_btn">ڈیوائس تبدیل کریں / کاسٹ</string>
+    <string name="settings_section_recordings">آڈیو ریکارڈنگز</string>
+    <string name="settings_recordings_title">محفوظ کردہ ریکارڈنگز</string>
+    <string name="settings_recordings_desc">محفوظ شدہ نشریات دیکھیں اور ان کا نظم کریں</string>
+    <string name="settings_rate_title">NeoTune کی درجہ بندی کریں</string>
+    <string name="settings_rate_desc" formatted="false">ایک جائزے کے ساتھ اس مفت اور اوپن پلیئر کی حمایت کریں</string>
+    <string name="settings_share_app_title">NeoTune شیئر کریں</string>
+    <string name="settings_share_app_desc">دوستوں کو مفت موسیقی اور پوڈکاسٹ کے بارے میں بتائیں</string>
+    <string name="playing_episode_format">\'%1$s\' چل رہا ہے</string>
+    <string name="audio_booster_enabled">آڈیو بوسٹر فعال (+6dB)</string>
+    <string name="audio_booster_disabled">آڈیو بوسٹر غیر فعال</string>
+    <string name="auto_resumed_station_format">\'%1$s\' خود بخود دوبارہ شروع ہوا</string>
+    <string name="auto_play_enabled">اسٹارٹ اپ پر خودکار پلے فعال ہے</string>
+    <string name="auto_play_disabled">اسٹارٹ اپ پر خودکار پلے غیر فعال ہے</string>
+    <string name="ambient_screensaver_enabled">ایمبینٹ اسکرین سیور فعال</string>
+    <string name="ambient_screensaver_disabled">ایمبینٹ اسکرین سیور غیر فعال</string>
+    <string name="added_station_to_favorites_format">❤️ \'%1$s\' پسندیدہ میں شامل کر دیا گیا</string>
+    <string name="removed_station_from_favorites_format">\'%1$s\' کو پسندیدہ سے ہٹا دیا گیا</string>
+    <string name="imported_stations_format">%1$d اسٹیشنز لائبریری میں امپورٹ کیے گئے</string>
+    <string name="media_folder_top_title">ٹاپ اور ٹرینڈنگ</string>
+    <string name="media_folder_top_desc">نمایاں عالمی اسٹریمز</string>
+    <string name="media_folder_recent_title">حالیہ چلائے گئے</string>
+    <string name="media_folder_recent_desc">آپ کے حالیہ اسٹیشنز</string>
+    <string name="media_folder_genres_title">اصناف اور زمرے</string>
+    <string name="media_folder_genres_desc">موسیقی کی صنف کے لحاظ سے تلاش کریں</string>
+    <string name="media_folder_podcasts_title">پوڈکاسٹ</string>
+    <string name="media_folder_podcasts_desc">مقبول پوڈکاسٹ شوز</string>
+    <string name="media_root_subtitle">انٹرنیٹ ریڈیو اور پوڈکاسٹ</string>
+    <string name="media_root_recent_subtitle">جہاں سے چھوڑا تھا وہیں سے سنیں</string>
+    <string name="skip_station">اسٹیشن چھوڑیں</string>
+    <string name="unknown_station">نامعلوم اسٹیشن</string>
+    <string name="play">چلائیں</string>
+    <string name="pause">وقفہ</string>
 </resources>

@@ -469,4 +469,54 @@
     <string name="remove_from_your_episodes">Remove from Your Episodes</string>
     <string name="star_rating_desc">Yulduz %1$d</string>
     <string name="stream_link">Oqim havolasi</string>
+
+    <!-- Localized additions -->
+    <string name="widget_description">NeoTune radio pleyeri vidjeti</string>
+    <string name="widget_no_station">Radioni ijro etish uchun bosing</string>
+    <string name="record_stream">Efirni yozib olish</string>
+    <string name="record_stream_desc">Jonli radio audiosini yozib olish</string>
+    <string name="recording_started">Yozib olish boshlandi…</string>
+    <string name="recording_stopped">Yozib olish to\'xtatildi</string>
+    <string name="recording_saved">Yozuv saqlandi: %1$s (%2$s)</string>
+    <string name="recordings_title">Yozib olingan audio</string>
+    <string name="recordings_desc">Saqlangan oflayn radio oqimlari</string>
+    <string name="recordings_empty">Hali yozuvlar yo\'q. Jonli efirni saqlash uchun tinglash paytida «Yozish» tugmasini bosing.</string>
+    <string name="share_recording">Yozuvni ulashish</string>
+    <string name="share_recording_text">%1$s dan ushbu jonli yozuvni tinglang: %2$s</string>
+    <string name="audio_output_route">Audio chiqishi / Cast</string>
+    <string name="audio_output_route_desc">Ijroni Bluetooth quloqchinlariga, Google Cast-ga yoki dinamiklarga yo\'naltiring.</string>
+    <string name="audio_output_current_device">Joriy chiqish qurilmasi</string>
+    <string name="audio_output_switch_btn">Qurilmani almashtirish / Cast</string>
+    <string name="settings_section_recordings">Audio yozuvlar</string>
+    <string name="settings_recordings_title">Saqlangan yozuvlar</string>
+    <string name="settings_recordings_desc">Yozib olingan radio oqimlarini boshqarish</string>
+    <string name="settings_rate_title">NeoTune-ni baholang</string>
+    <string name="settings_rate_desc" formatted="false">Ushbu 100% bepul pleyerni sharh bilan qo\'llab-quvvatlang</string>
+    <string name="settings_share_app_title">NeoTune-ni ulashish</string>
+    <string name="settings_share_app_desc">Do\'stlaringizga bepul musiqa va podkastlar haqida ayting</string>
+    <string name="playing_episode_format">\'%1$s\' ijro etilmoqda</string>
+    <string name="audio_booster_enabled">Audio kuchaytirgich yoqildi (+6dB)</string>
+    <string name="audio_booster_disabled">Audio kuchaytirgich o\'chirildi</string>
+    <string name="auto_resumed_station_format">Avtomatik davom ettirildi: \'%1$s\'</string>
+    <string name="auto_play_enabled">Ishga tushganda avto-ijro yoqilgan</string>
+    <string name="auto_play_disabled">Ishga tushganda avto-ijro o\'chirilgan</string>
+    <string name="ambient_screensaver_enabled">Ambiance ekran pardasi yoqildi</string>
+    <string name="ambient_screensaver_disabled">Ambiance ekran pardasi o\'chirildi</string>
+    <string name="added_station_to_favorites_format">❤️ \'%1$s\' Sevimlilarga qo\'shildi</string>
+    <string name="removed_station_from_favorites_format">\'%1$s\' Sevimlilardan olib tashlandi</string>
+    <string name="imported_stations_format">Kutubxonaga %1$d stansiya import qilindi</string>
+    <string name="media_folder_top_title">Top &amp; Trendlar</string>
+    <string name="media_folder_top_desc">Tavsiya etilgan global oqimlar</string>
+    <string name="media_folder_recent_title">Yaqinda tinglanganlar</string>
+    <string name="media_folder_recent_desc">Oxirgi stansiyalaringiz</string>
+    <string name="media_folder_genres_title">Janrlar &amp; Toifalar</string>
+    <string name="media_folder_genres_desc">Musiqa janri bo\'yicha ko\'rish</string>
+    <string name="media_folder_podcasts_title">Podkastlar</string>
+    <string name="media_folder_podcasts_desc">Ommabop podkast shoulari</string>
+    <string name="media_root_subtitle">Internet radio &amp; Podkastlar</string>
+    <string name="media_root_recent_subtitle">Qolgan joyidan davom eting</string>
+    <string name="skip_station">Stansiyani o\'tkazib yuborish</string>
+    <string name="unknown_station">Noma\'lum stansiya</string>
+    <string name="play">Ijro etish</string>
+    <string name="pause">Pauza</string>
 </resources>

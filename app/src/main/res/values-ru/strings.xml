@@ -498,4 +498,31 @@
     <string name="settings_rate_desc" formatted="false">Поддержите этот на 100% бесплатный плеер без рекламы отзывом</string>
     <string name="settings_share_app_title">Поделиться NeoTune</string>
     <string name="settings_share_app_desc">Расскажите друзьям о бесплатной музыке и подкастах</string>
+
+    <!-- Localized additions -->
+    <string name="playing_episode_format">Воспроизведение: \'%1$s\'</string>
+    <string name="audio_booster_enabled">Усилитель звука включен (+6 дБ)</string>
+    <string name="audio_booster_disabled">Усилитель звука выключен</string>
+    <string name="auto_resumed_station_format">Автовозобновление: \'%1$s\'</string>
+    <string name="auto_play_enabled">Автозапуск при старте включен</string>
+    <string name="auto_play_disabled">Автозапуск при старте выключен</string>
+    <string name="ambient_screensaver_enabled">Фоновая заставка включена</string>
+    <string name="ambient_screensaver_disabled">Фоновая заставка выключена</string>
+    <string name="added_station_to_favorites_format">❤️ Станция \'%1$s\' добавлена в Избранное</string>
+    <string name="removed_station_from_favorites_format">Станция \'%1$s\' удалена из Избранного</string>
+    <string name="imported_stations_format">Импортировано станций: %1$d</string>
+    <string name="media_folder_top_title">Топ и Тренды</string>
+    <string name="media_folder_top_desc">Популярные мировые трансляции</string>
+    <string name="media_folder_recent_title">Недавно прослушанные</string>
+    <string name="media_folder_recent_desc">Ваши недавние станции</string>
+    <string name="media_folder_genres_title">Жанры и категории</string>
+    <string name="media_folder_genres_desc">Поиск по музыкальным жанрам</string>
+    <string name="media_folder_podcasts_title">Подкасты</string>
+    <string name="media_folder_podcasts_desc">Популярные подкаст-шоу</string>
+    <string name="media_root_subtitle">Интернет-радио и подкасты</string>
+    <string name="media_root_recent_subtitle">Продолжайте с того места, где остановились</string>
+    <string name="skip_station">Пропустить станцию</string>
+    <string name="unknown_station">Неизвестная станция</string>
+    <string name="play">Воспроизвести</string>
+    <string name="pause">Пауза</string>
 </resources>

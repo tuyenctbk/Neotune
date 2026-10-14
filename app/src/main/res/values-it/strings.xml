@@ -494,4 +494,31 @@
     <string name="settings_rate_desc" formatted="false">Supporta questo lettore 100% gratuito e senza pubblicità con una recensione</string>
     <string name="settings_share_app_title">Condividi NeoTune</string>
     <string name="settings_share_app_desc">Fai conoscere musica e podcast gratuiti ai tuoi amici</string>
+
+    <!-- Localized additions -->
+    <string name="playing_episode_format">Riproduzione di \'%1$s\'</string>
+    <string name="audio_booster_enabled">Booster audio attivato (+6dB)</string>
+    <string name="audio_booster_disabled">Booster audio disattivato</string>
+    <string name="auto_resumed_station_format">Ripresa automatica di \'%1$s\'</string>
+    <string name="auto_play_enabled">Riproduzione automatica all\'avvio attivata</string>
+    <string name="auto_play_disabled">Riproduzione automatica all\'avvio disattivata</string>
+    <string name="ambient_screensaver_enabled">Salvaschermo ambientale attivato</string>
+    <string name="ambient_screensaver_disabled">Salvaschermo ambientale disattivato</string>
+    <string name="added_station_to_favorites_format">❤️ \'%1$s\' aggiunto ai Preferiti</string>
+    <string name="removed_station_from_favorites_format">\'%1$s\' rimosso dai Preferiti</string>
+    <string name="imported_stations_format">%1$d stazioni importate nella libreria</string>
+    <string name="media_folder_top_title">Top &amp; Tendenze</string>
+    <string name="media_folder_top_desc">Stream globali in evidenza</string>
+    <string name="media_folder_recent_title">Ascoltati di recente</string>
+    <string name="media_folder_recent_desc">Le tue stazioni recenti</string>
+    <string name="media_folder_genres_title">Generi &amp; Categorie</string>
+    <string name="media_folder_genres_desc">Sfoglia per genere musicale</string>
+    <string name="media_folder_podcasts_title">Podcast</string>
+    <string name="media_folder_podcasts_desc">I programmi podcast più popolari</string>
+    <string name="media_root_subtitle">Radio Internet &amp; Podcast</string>
+    <string name="media_root_recent_subtitle">Riprendi da dove eri rimasto</string>
+    <string name="skip_station">Salta stazione</string>
+    <string name="unknown_station">Stazione sconosciuta</string>
+    <string name="play">Riproduci</string>
+    <string name="pause">Pausa</string>
 </resources>

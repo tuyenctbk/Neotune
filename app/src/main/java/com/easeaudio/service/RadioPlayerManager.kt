@@ -623,7 +623,7 @@ class RadioPlayerManager(context: Context) {
                         appendToDebugLog(errorLog)
 
                         val details = PlaybackErrorDetails(
-                            stationName = current?.name ?: "Unknown Station",
+                            stationName = current?.name ?: context.getString(R.string.unknown_station),
                             stationId = current?.id ?: "",
                             streamUrl = current?.streamUrl ?: "",
                             resolvedUrl = currentUrl,
@@ -814,15 +814,15 @@ class RadioPlayerManager(context: Context) {
                 // CommandButtons shown in Android Auto / AAOS media controls bar.
                 // Declared before the callback so onConnect() can reference them when setting the custom layout.
                 val thumbUpButton = CommandButton.Builder(CommandButton.ICON_HEART_UNFILLED)
-                    .setDisplayName("Favorite")
+                    .setDisplayName(context.getString(R.string.favorites))
                     .setSessionCommand(SessionCommand(CMD_THUMB_UP, Bundle.EMPTY))
                     .build()
                 val skipNextButton = CommandButton.Builder(CommandButton.ICON_NEXT)
-                    .setDisplayName("Next Station")
+                    .setDisplayName(context.getString(R.string.next_station))
                     .setSessionCommand(SessionCommand(CMD_SKIP_NEXT, Bundle.EMPTY))
                     .build()
                 val thumbDownButton = CommandButton.Builder(CommandButton.ICON_SKIP_FORWARD_5)
-                    .setDisplayName("Skip Station")
+                    .setDisplayName(context.getString(R.string.skip_station))
                     .setSessionCommand(SessionCommand(CMD_THUMB_DOWN, Bundle.EMPTY))
                     .build()
 
@@ -862,12 +862,12 @@ class RadioPlayerManager(context: Context) {
                         // return the same root and let onGetChildren serve recently played items from "folder_recent".
                         // Returning an error here would cause the car HMI to show a blank / not-available state.
                         val rootId = if (params?.isRecent == true) "folder_recent" else "root_neotune"
-                        val rootTitle = if (params?.isRecent == true) "Recently Played" else "Neotune"
+                        val rootTitle = if (params?.isRecent == true) context.getString(R.string.media_folder_recent_title) else context.getString(R.string.app_name)
                         val rootItem = createFolderItem(
                             id = rootId,
                             title = rootTitle,
                             mediaType = MediaMetadata.MEDIA_TYPE_FOLDER_MIXED,
-                            subtitle = if (params?.isRecent == true) "Pick up where you left off" else "Internet Radio & Podcasts"
+                            subtitle = if (params?.isRecent == true) context.getString(R.string.media_root_recent_subtitle) else context.getString(R.string.media_root_subtitle)
                         )
                         return Futures.immediateFuture(LibraryResult.ofItem(rootItem, params))
                     }
@@ -890,11 +890,11 @@ class RadioPlayerManager(context: Context) {
                                     // dedicated "folder_recent" branch below. The standard root still provides
                                     // the full folder hierarchy.
                                     "root_neotune", "root", "/" -> {
-                                        items.add(createFolderItem("folder_favorites", "Favorites", MediaMetadata.MEDIA_TYPE_FOLDER_RADIO_STATIONS, "Starred stations & podcasts"))
-                                        items.add(createFolderItem("folder_top", "Top & Trending", MediaMetadata.MEDIA_TYPE_FOLDER_RADIO_STATIONS, "Featured global streams"))
-                                        items.add(createFolderItem("folder_recent", "Recently Played", MediaMetadata.MEDIA_TYPE_FOLDER_RADIO_STATIONS, "Your recent stations"))
-                                        items.add(createFolderItem("folder_genres", "Genres & Categories", MediaMetadata.MEDIA_TYPE_FOLDER_GENRES, "Browse by musical genre"))
-                                        items.add(createFolderItem("folder_podcasts", "Podcasts", MediaMetadata.MEDIA_TYPE_FOLDER_PODCASTS, "Popular podcast shows"))
+                                        items.add(createFolderItem("folder_favorites", context.getString(R.string.favorites), MediaMetadata.MEDIA_TYPE_FOLDER_RADIO_STATIONS, context.getString(R.string.favorites_subtitle)))
+                                        items.add(createFolderItem("folder_top", context.getString(R.string.media_folder_top_title), MediaMetadata.MEDIA_TYPE_FOLDER_RADIO_STATIONS, context.getString(R.string.media_folder_top_desc)))
+                                        items.add(createFolderItem("folder_recent", context.getString(R.string.media_folder_recent_title), MediaMetadata.MEDIA_TYPE_FOLDER_RADIO_STATIONS, context.getString(R.string.media_folder_recent_desc)))
+                                        items.add(createFolderItem("folder_genres", context.getString(R.string.media_folder_genres_title), MediaMetadata.MEDIA_TYPE_FOLDER_GENRES, context.getString(R.string.media_folder_genres_desc)))
+                                        items.add(createFolderItem("folder_podcasts", context.getString(R.string.media_folder_podcasts_title), MediaMetadata.MEDIA_TYPE_FOLDER_PODCASTS, context.getString(R.string.media_folder_podcasts_desc)))
                                     }
                                     "folder_favorites" -> {
                                         val favs = RadioDatabase.getDatabase(context).favoriteDao().getAllFavoritesDirect()

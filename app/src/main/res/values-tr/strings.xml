@@ -469,4 +469,54 @@
     <string name="remove_from_your_episodes">Remove from Your Episodes</string>
     <string name="star_rating_desc">Yıldız %1$d</string>
     <string name="stream_link">Yayın bağlantısı</string>
+
+    <!-- Localized additions -->
+    <string name="widget_description">NeoTune Radyo Çalar Widget\'ı</string>
+    <string name="widget_no_station">Radyo dinlemek için dokunun</string>
+    <string name="record_stream">Yayını Kaydet</string>
+    <string name="record_stream_desc">Canlı radyo sesini kaydet</string>
+    <string name="recording_started">Kayıt başladı…</string>
+    <string name="recording_stopped">Kayıt durduruldu</string>
+    <string name="recording_saved">Kayıt kaydedildi: %1$s (%2$s)</string>
+    <string name="recordings_title">Kaydedilen Sesler</string>
+    <string name="recordings_desc">Kaydedilen çevrimdışı radyo yayınları</string>
+    <string name="recordings_empty">Henüz kayıt yok. Canlı yayınları kaydetmek için dinlerken Kaydet\'e dokunun.</string>
+    <string name="share_recording">Kaydı Paylaş</string>
+    <string name="share_recording_text">%1$s canlı kaydını dinleyin: %2$s</string>
+    <string name="audio_output_route">Ses Çıkışı / Yayınlama</string>
+    <string name="audio_output_route_desc">Oynatmayı Bluetooth kulaklıklara, Google Cast\'e veya hoparlörlere yönlendirin.</string>
+    <string name="audio_output_current_device">Mevcut Çıkış Cihazı</string>
+    <string name="audio_output_switch_btn">Cihaz Değiştir / Yayınla</string>
+    <string name="settings_section_recordings">Ses Kayıtları</string>
+    <string name="settings_recordings_title">Kayıtlı Sesler</string>
+    <string name="settings_recordings_desc">Kaydedilen radyo yayınlarını yönetin</string>
+    <string name="settings_rate_title">NeoTune\'u Değerlendirin</string>
+    <string name="settings_rate_desc" formatted="false">Bu %100 ücretsiz oynatıcıyı bir incelemeyle destekleyin</string>
+    <string name="settings_share_app_title">NeoTune\'u Paylaşın</string>
+    <string name="settings_share_app_desc">Arkadaşlarınıza ücretsiz müzik ve podcast\'lerden bahsedin</string>
+    <string name="playing_episode_format">\'%1$s\' oynatılıyor</string>
+    <string name="audio_booster_enabled">Ses Yükseltici Etkin (+6dB)</string>
+    <string name="audio_booster_disabled">Ses Yükseltici Devre Dışı</string>
+    <string name="auto_resumed_station_format">Otomatik devam ettirildi: \'%1$s\'</string>
+    <string name="auto_play_enabled">Başlangıçta Otomatik Oynatma Etkin</string>
+    <string name="auto_play_disabled">Başlangıçta Otomatik Oynatma Devre Dışı</string>
+    <string name="ambient_screensaver_enabled">Ambiyans Ekran Koruyucu Etkin</string>
+    <string name="ambient_screensaver_disabled">Ambiyans Ekran Koruyucu Devre Dışı</string>
+    <string name="added_station_to_favorites_format">❤️ \'%1$s\' Favorilere Eklendi</string>
+    <string name="removed_station_from_favorites_format">\'%1$s\' Favorilerden Kaldırıldı</string>
+    <string name="imported_stations_format">%1$d istasyon kütüphaneye aktarıldı</string>
+    <string name="media_folder_top_title">Popüler &amp; Trend</string>
+    <string name="media_folder_top_desc">Öne çıkan küresel yayınlar</string>
+    <string name="media_folder_recent_title">Son Çalınanlar</string>
+    <string name="media_folder_recent_desc">Son dinlediğiniz istasyonlar</string>
+    <string name="media_folder_genres_title">Türler &amp; Kategoriler</string>
+    <string name="media_folder_genres_desc">Müzik türüne göre göz atın</string>
+    <string name="media_folder_podcasts_title">Podcast\'ler</string>
+    <string name="media_folder_podcasts_desc">Popüler podcast programları</string>
+    <string name="media_root_subtitle">İnternet Radyosu &amp; Podcast\'ler</string>
+    <string name="media_root_recent_subtitle">Kaldığınız yerden devam edin</string>
+    <string name="skip_station">İstasyonu Atla</string>
+    <string name="unknown_station">Bilinmeyen İstasyon</string>
+    <string name="play">Oynat</string>
+    <string name="pause">Duraklat</string>
 </resources>

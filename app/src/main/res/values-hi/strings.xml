@@ -495,4 +495,31 @@
     <string name="settings_rate_desc" formatted="false">इस 100% मुफ़्त और बिना विज्ञापन वाले प्लेयर का समर्थन करें</string>
     <string name="settings_share_app_title">NeoTune साझा करें</string>
     <string name="settings_share_app_desc">दोस्तों को मुफ़्त संगीत और पॉडकास्ट के बारे में बताएं</string>
+
+    <!-- Localized additions -->
+    <string name="playing_episode_format">\'%1$s\' चल रहा है</string>
+    <string name="audio_booster_enabled">ऑडियो बूस्टर सक्षम (+6dB)</string>
+    <string name="audio_booster_disabled">ऑडियो बूस्टर अक्षम</string>
+    <string name="auto_resumed_station_format">\'%1$s\' स्वतः फिर से शुरू हुआ</string>
+    <string name="auto_play_enabled">स्टार्टअप पर स्वतः प्ले सक्षम</string>
+    <string name="auto_play_disabled">स्टार्टअप पर स्वतः प्ले अक्षम</string>
+    <string name="ambient_screensaver_enabled">एम्बिएंट स्क्रीनसेवर सक्षम</string>
+    <string name="ambient_screensaver_disabled">एम्बिएंट स्क्रीनसेवर अक्षम</string>
+    <string name="added_station_to_favorites_format">❤️ \'%1$s\' पसंदीदा में जोड़ा गया</string>
+    <string name="removed_station_from_favorites_format">\'%1$s\' पसंदीदा से हटाया गया</string>
+    <string name="imported_stations_format">%1$d स्टेशन लाइब्रेरी में आयात किए गए</string>
+    <string name="media_folder_top_title">शीर्ष और ट्रेंडिंग</string>
+    <string name="media_folder_top_desc">विशेष वैश्विक स्ट्रीम</string>
+    <string name="media_folder_recent_title">हाल ही में चलाए गए</string>
+    <string name="media_folder_recent_desc">आपके हाल के स्टेशन</string>
+    <string name="media_folder_genres_title">शैलियां और श्रेणियां</string>
+    <string name="media_folder_genres_desc">संगीत शैली के आधार पर ब्राउज़ करें</string>
+    <string name="media_folder_podcasts_title">पॉडकास्ट</string>
+    <string name="media_folder_podcasts_desc">लोकप्रिय पॉडकास्ट शो</string>
+    <string name="media_root_subtitle">इंटरनेट रेडियो और पॉडकास्ट</string>
+    <string name="media_root_recent_subtitle">जहां छोड़ा था वहीं से शुरू करें</string>
+    <string name="skip_station">स्टेशन छोड़ें</string>
+    <string name="unknown_station">अज्ञात स्टेशन</string>
+    <string name="play">चलाएं</string>
+    <string name="pause">रोकें</string>
 </resources>

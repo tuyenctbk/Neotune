@@ -494,4 +494,31 @@
     <string name="settings_rate_desc" formatted="false">Dukung aplikasi 100% gratis tanpa iklan ini dengan ulasan Anda</string>
     <string name="settings_share_app_title">Bagikan NeoTune</string>
     <string name="settings_share_app_desc">Beri tahu teman tentang musik dan podcast gratis</string>
+
+    <!-- Localized additions -->
+    <string name="playing_episode_format">Memutar \'%1$s\'</string>
+    <string name="audio_booster_enabled">Peningkat Audio Diaktifkan (+6dB)</string>
+    <string name="audio_booster_disabled">Peningkat Audio Dinonaktifkan</string>
+    <string name="auto_resumed_station_format">Melanjutkan otomatis \'%1$s\'</string>
+    <string name="auto_play_enabled">Putar Otomatis saat Mulai Diaktifkan</string>
+    <string name="auto_play_disabled">Putar Otomatis saat Mulai Dinonaktifkan</string>
+    <string name="ambient_screensaver_enabled">Screensaver Ambien Diaktifkan</string>
+    <string name="ambient_screensaver_disabled">Screensaver Ambien Dinonaktifkan</string>
+    <string name="added_station_to_favorites_format">❤️ \'%1$s\' Ditambahkan ke Favorit</string>
+    <string name="removed_station_from_favorites_format">\'%1$s\' Dihapus dari Favorit</string>
+    <string name="imported_stations_format">%1$d stasiun diimpor ke perpustakaan</string>
+    <string name="media_folder_top_title">Teratas &amp; Tren</string>
+    <string name="media_folder_top_desc">Streaming global unggulan</string>
+    <string name="media_folder_recent_title">Baru Diputar</string>
+    <string name="media_folder_recent_desc">Stasiun radio terakhir Anda</string>
+    <string name="media_folder_genres_title">Genre &amp; Kategori</string>
+    <string name="media_folder_genres_desc">Jelajahi berdasarkan genre musik</string>
+    <string name="media_folder_podcasts_title">Podcast</string>
+    <string name="media_folder_podcasts_desc">Acara podcast populer</string>
+    <string name="media_root_subtitle">Radio Internet &amp; Podcast</string>
+    <string name="media_root_recent_subtitle">Lanjutkan dari yang terakhir diputar</string>
+    <string name="skip_station">Lewati Stasiun</string>
+    <string name="unknown_station">Stasiun Tidak Dikenal</string>
+    <string name="play">Putar</string>
+    <string name="pause">Jeda</string>
 </resources>

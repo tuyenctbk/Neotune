@@ -469,4 +469,54 @@
     <string name="remove_from_your_episodes">Remove from Your Episodes</string>
     <string name="star_rating_desc">Зірка %1$d</string>
     <string name="stream_link">Посилання на потік</string>
+
+    <!-- Localized additions -->
+    <string name="widget_description">Віджет радіоплеєра NeoTune</string>
+    <string name="widget_no_station">Торкніться, щоб увімкнути радіо</string>
+    <string name="record_stream">Записати ефір</string>
+    <string name="record_stream_desc">Запис прямого ефіру радіо</string>
+    <string name="recording_started">Запис розпочато…</string>
+    <string name="recording_stopped">Запис зупинено</string>
+    <string name="recording_saved">Запис збережено: %1$s (%2$s)</string>
+    <string name="recordings_title">Записане аудіо</string>
+    <string name="recordings_desc">Збережені офлайн-записи радіо</string>
+    <string name="recordings_empty">Записів ще немає. Торкніться «Запис» під час прослуховування.</string>
+    <string name="share_recording">Поділитися записом</string>
+    <string name="share_recording_text">Слухайте запис ефіру з %1$s: %2$s</string>
+    <string name="audio_output_route">Аудіовихід / Трансляція</string>
+    <string name="audio_output_route_desc">Передавайте звук на Bluetooth-навушники, Google Cast або колонки.</string>
+    <string name="audio_output_current_device">Поточний пристрій виводу</string>
+    <string name="audio_output_switch_btn">Змінити пристрій / Трансляція</string>
+    <string name="settings_section_recordings">Аудіозаписи</string>
+    <string name="settings_recordings_title">Збережені записи</string>
+    <string name="settings_recordings_desc">Перегляд та керування записами ефіру</string>
+    <string name="settings_rate_title">Оцініть NeoTune</string>
+    <string name="settings_rate_desc" formatted="false">Підтримайте цей 100% безкоштовний плеєр відгуком</string>
+    <string name="settings_share_app_title">Поділитися NeoTune</string>
+    <string name="settings_share_app_desc">Розкажіть друзям про безкоштовну музику та подкасти</string>
+    <string name="playing_episode_format">Відтворення \'%1$s\'</string>
+    <string name="audio_booster_enabled">Підсилювач звуку увімкнено (+6 дБ)</string>
+    <string name="audio_booster_disabled">Підсилювач звуку вимкнено</string>
+    <string name="auto_resumed_station_format">Автоматично відновлено: \'%1$s\'</string>
+    <string name="auto_play_enabled">Автозапуск під час старту увімкнено</string>
+    <string name="auto_play_disabled">Автозапуск під час старту вимкнено</string>
+    <string name="ambient_screensaver_enabled">Фонова заставка увімкнена</string>
+    <string name="ambient_screensaver_disabled">Фонова заставка вимкнена</string>
+    <string name="added_station_to_favorites_format">❤️ Станцію \'%1$s\' додано до Обраного</string>
+    <string name="removed_station_from_favorites_format">Станцію \'%1$s\' вилучено з Обраного</string>
+    <string name="imported_stations_format">Імпортовано %1$d станцій у бібліотеку</string>
+    <string name="media_folder_top_title">Топ і Тренди</string>
+    <string name="media_folder_top_desc">Популярні світові трансляції</string>
+    <string name="media_folder_recent_title">Нещодавно прослухані</string>
+    <string name="media_folder_recent_desc">Ваші останні станції</string>
+    <string name="media_folder_genres_title">Жанри та категорії</string>
+    <string name="media_folder_genres_desc">Огляд за музичним жанром</string>
+    <string name="media_folder_podcasts_title">Подкасти</string>
+    <string name="media_folder_podcasts_desc">Популярні подкаст-шоу</string>
+    <string name="media_root_subtitle">Інтернет-радіо та подкасти</string>
+    <string name="media_root_recent_subtitle">Продовжуйте з місця зупинки</string>
+    <string name="skip_station">Пропустити станцію</string>
+    <string name="unknown_station">Невідома станція</string>
+    <string name="play">Відтворити</string>
+    <string name="pause">Пауза</string>
 </resources>

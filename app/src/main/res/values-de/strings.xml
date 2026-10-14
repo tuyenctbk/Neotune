@@ -511,4 +511,31 @@
     <string name="settings_rate_desc" formatted="false">Unterstütze diesen 100% kostenlosen werbefreien Player mit einer Bewertung</string>
     <string name="settings_share_app_title">NeoTune teilen</string>
     <string name="settings_share_app_desc">Erzähle Freunden von kostenloser Musik und Podcasts</string>
+
+    <!-- Localized additions -->
+    <string name="playing_episode_format">Wiedergabe von \'%1$s\'</string>
+    <string name="audio_booster_enabled">Audio-Booster aktiviert (+6dB)</string>
+    <string name="audio_booster_disabled">Audio-Booster deaktiviert</string>
+    <string name="auto_resumed_station_format">Automatisch fortgesetzt: \'%1$s\'</string>
+    <string name="auto_play_enabled">Autoplay beim Start aktiviert</string>
+    <string name="auto_play_disabled">Autoplay beim Start deaktiviert</string>
+    <string name="ambient_screensaver_enabled">Ambient-Bildschirmschoner aktiviert</string>
+    <string name="ambient_screensaver_disabled">Ambient-Bildschirmschoner deaktiviert</string>
+    <string name="added_station_to_favorites_format">❤️ \'%1$s\' zu Favoriten hinzugefügt</string>
+    <string name="removed_station_from_favorites_format">\'%1$s\' aus Favoriten entfernt</string>
+    <string name="imported_stations_format">%1$d Sender in Bibliothek importiert</string>
+    <string name="media_folder_top_title">Top &amp; Trends</string>
+    <string name="media_folder_top_desc">Beliebte globale Streams</string>
+    <string name="media_folder_recent_title">Zuletzt gehört</string>
+    <string name="media_folder_recent_desc">Deine zuletzt gehörten Sender</string>
+    <string name="media_folder_genres_title">Genres &amp; Kategorien</string>
+    <string name="media_folder_genres_desc">Nach Musikgenre durchsuchen</string>
+    <string name="media_folder_podcasts_title">Podcasts</string>
+    <string name="media_folder_podcasts_desc">Beliebte Podcast-Sendungen</string>
+    <string name="media_root_subtitle">Internetradio &amp; Podcasts</string>
+    <string name="media_root_recent_subtitle">Da weitermachen, wo du aufgehört hast</string>
+    <string name="skip_station">Sender überspringen</string>
+    <string name="unknown_station">Unbekannter Sender</string>
+    <string name="play">Wiedergabe</string>
+    <string name="pause">Pause</string>
 </resources>

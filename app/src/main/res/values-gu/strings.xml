@@ -495,4 +495,31 @@
     <string name="settings_rate_desc" formatted="false">Support this 100% free and open player with a review</string>
     <string name="settings_share_app_title">Share NeoTune</string>
     <string name="settings_share_app_desc">Tell friends about free music and podcasts</string>
+
+    <!-- Localized additions -->
+    <string name="playing_episode_format">Playing \'%1$s\'</string>
+    <string name="audio_booster_enabled">Audio Booster Enabled (+6dB)</string>
+    <string name="audio_booster_disabled">Audio Booster Disabled</string>
+    <string name="auto_resumed_station_format">Auto-resumed \'%1$s\'</string>
+    <string name="auto_play_enabled">Auto-Play on Startup Enabled</string>
+    <string name="auto_play_disabled">Auto-Play on Startup Disabled</string>
+    <string name="ambient_screensaver_enabled">Ambient Screensaver Enabled</string>
+    <string name="ambient_screensaver_disabled">Ambient Screensaver Disabled</string>
+    <string name="added_station_to_favorites_format">❤️ Added \'%1$s\' to Favorites</string>
+    <string name="removed_station_from_favorites_format">Removed \'%1$s\' from Favorites</string>
+    <string name="imported_stations_format">Imported %1$d stations into library</string>
+    <string name="media_folder_top_title">Top &amp; Trending</string>
+    <string name="media_folder_top_desc">Featured global streams</string>
+    <string name="media_folder_recent_title">Recently Played</string>
+    <string name="media_folder_recent_desc">Your recent stations</string>
+    <string name="media_folder_genres_title">Genres &amp; Categories</string>
+    <string name="media_folder_genres_desc">Browse by musical genre</string>
+    <string name="media_folder_podcasts_title">Podcasts</string>
+    <string name="media_folder_podcasts_desc">Popular podcast shows</string>
+    <string name="media_root_subtitle">Internet Radio &amp; Podcasts</string>
+    <string name="media_root_recent_subtitle">Pick up where you left off</string>
+    <string name="skip_station">Skip Station</string>
+    <string name="unknown_station">Unknown Station</string>
+    <string name="play">Play</string>
+    <string name="pause">Pause</string>
 </resources>

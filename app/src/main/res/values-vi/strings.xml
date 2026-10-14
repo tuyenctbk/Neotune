@@ -486,4 +486,54 @@
     <string name="remove_from_your_episodes">Xóa khỏi tập của bạn</string>
     <string name="star_rating_desc">%1$d sao</string>
     <string name="stream_link">Liên kết phát trực tuyến</string>
+
+    <!-- Localized additions -->
+    <string name="widget_description">Tiện ích trình phát radio NeoTune</string>
+    <string name="widget_no_station">Nhấn để phát radio</string>
+    <string name="record_stream">Ghi âm đài</string>
+    <string name="record_stream_desc">Thu âm radio trực tiếp</string>
+    <string name="recording_started">Bắt đầu ghi âm…</string>
+    <string name="recording_stopped">Đã dừng ghi âm</string>
+    <string name="recording_saved">Đã lưu bản ghi: %1$s (%2$s)</string>
+    <string name="recordings_title">Âm thanh đã ghi</string>
+    <string name="recordings_desc">Các luồng đài phát thanh ngoại tuyến đã lưu</string>
+    <string name="recordings_empty">Chưa có bản ghi nào. Nhấn Ghi âm khi đang nghe để lưu chương trình phát sóng.</string>
+    <string name="share_recording">Chia sẻ bản ghi</string>
+    <string name="share_recording_text">Nghe bản ghi trực tiếp này từ %1$s: %2$s</string>
+    <string name="audio_output_route">Đầu ra âm thanh / Cast</string>
+    <string name="audio_output_route_desc">Chuyển phát lại sang tai nghe Bluetooth, Google Cast hoặc loa thông minh.</string>
+    <string name="audio_output_current_device">Thiết bị đầu ra hiện tại</string>
+    <string name="audio_output_switch_btn">Đổi thiết bị / Cast</string>
+    <string name="settings_section_recordings">Bản ghi âm thanh</string>
+    <string name="settings_recordings_title">Bản ghi đã lưu</string>
+    <string name="settings_recordings_desc">Xem và quản lý các luồng radio đã lưu</string>
+    <string name="settings_rate_title">Đánh giá NeoTune</string>
+    <string name="settings_rate_desc" formatted="false">Ủng hộ ứng dụng 100% miễn phí này bằng một đánh giá</string>
+    <string name="settings_share_app_title">Chia sẻ NeoTune</string>
+    <string name="settings_share_app_desc">Giới thiệu nhạc và podcast miễn phí cho bạn bè</string>
+    <string name="playing_episode_format">Đang phát \'%1$s\'</string>
+    <string name="audio_booster_enabled">Tăng cường âm thanh đã bật (+6dB)</string>
+    <string name="audio_booster_disabled">Tăng cường âm thanh đã tắt</string>
+    <string name="auto_resumed_station_format">Tự động phát tiếp \'%1$s\'</string>
+    <string name="auto_play_enabled">Tự động phát khi khởi động đã bật</string>
+    <string name="auto_play_disabled">Tự động phát khi khởi động đã tắt</string>
+    <string name="ambient_screensaver_enabled">Bảo vệ màn hình thư giãn đã bật</string>
+    <string name="ambient_screensaver_disabled">Bảo vệ màn hình thư giãn đã tắt</string>
+    <string name="added_station_to_favorites_format">❤️ Đã thêm \'%1$s\' vào Mục yêu thích</string>
+    <string name="removed_station_from_favorites_format">Đã xóa \'%1$s\' khỏi Mục yêu thích</string>
+    <string name="imported_stations_format">Đã nhập %1$d đài vào thư viện</string>
+    <string name="media_folder_top_title">Hàng đầu &amp; Thịnh hành</string>
+    <string name="media_folder_top_desc">Các kênh trực tuyến toàn cầu nổi bật</string>
+    <string name="media_folder_recent_title">Đã phát gần đây</string>
+    <string name="media_folder_recent_desc">Các đài bạn đã nghe gần đây</string>
+    <string name="media_folder_genres_title">Thể loại &amp; Danh mục</string>
+    <string name="media_folder_genres_desc">Khám phá theo thể loại âm nhạc</string>
+    <string name="media_folder_podcasts_title">Podcast</string>
+    <string name="media_folder_podcasts_desc">Các chương trình podcast phổ biến</string>
+    <string name="media_root_subtitle">Radio trực tuyến &amp; Podcast</string>
+    <string name="media_root_recent_subtitle">Tiếp tục từ đoạn trước</string>
+    <string name="skip_station">Bỏ qua đài</string>
+    <string name="unknown_station">Đài không xác định</string>
+    <string name="play">Phát</string>
+    <string name="pause">Tạm dừng</string>
 </resources>

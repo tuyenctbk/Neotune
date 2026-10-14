@@ -473,4 +473,54 @@
     <string name="remove_from_your_episodes">從我的單集中移除</string>
     <string name="star_rating_desc">%1$d 星</string>
     <string name="stream_link">串流連結</string>
+
+    <!-- Localized additions -->
+    <string name="widget_description">NeoTune 收音機微型小工具</string>
+    <string name="widget_no_station">點擊播放廣播</string>
+    <string name="record_stream">錄製電台</string>
+    <string name="record_stream_desc">錄製即時廣播音訊</string>
+    <string name="recording_started">開始錄製…</string>
+    <string name="recording_stopped">錄製已停止</string>
+    <string name="recording_saved">錄音已儲存：%1$s (%2$s)</string>
+    <string name="recordings_title">已錄製音訊</string>
+    <string name="recordings_desc">離線儲存的電台錄音</string>
+    <string name="recordings_empty">尚無錄音。收聽時點擊錄製即可保存即時電台節目。</string>
+    <string name="share_recording">分享錄音</string>
+    <string name="share_recording_text">收聽來自 %1$s 的即時錄音：%2$s</string>
+    <string name="audio_output_route">音訊輸出 / 投放</string>
+    <string name="audio_output_route_desc">將播放輸出至藍牙耳機、Google Cast、智慧音箱或外接顯示裝置。</string>
+    <string name="audio_output_current_device">目前輸出裝置</string>
+    <string name="audio_output_switch_btn">切換裝置 / 投放</string>
+    <string name="settings_section_recordings">音訊錄製</string>
+    <string name="settings_recordings_title">已儲存的錄音</string>
+    <string name="settings_recordings_desc">檢視與管理錄製的電台節目</string>
+    <string name="settings_rate_title">評分 NeoTune</string>
+    <string name="settings_rate_desc" formatted="false">給予好評以支持這款 100% 免費且開源的播放器</string>
+    <string name="settings_share_app_title">分享 NeoTune</string>
+    <string name="settings_share_app_desc">推薦免費音樂與 Podcast 給好友</string>
+    <string name="playing_episode_format">正在播放 \'%1$s\'</string>
+    <string name="audio_booster_enabled">音訊增強已開啟 (+6dB)</string>
+    <string name="audio_booster_disabled">音訊增強已關閉</string>
+    <string name="auto_resumed_station_format">已自動接續播放 \'%1$s\'</string>
+    <string name="auto_play_enabled">啟動時自動播放已啟用</string>
+    <string name="auto_play_disabled">啟動時自動播放已停用</string>
+    <string name="ambient_screensaver_enabled">氛圍螢幕保護程式已啟用</string>
+    <string name="ambient_screensaver_disabled">氛圍螢幕保護程式已停用</string>
+    <string name="added_station_to_favorites_format">❤️ 已將 \'%1$s\' 加入我的最愛</string>
+    <string name="removed_station_from_favorites_format">已從我的最愛移除 \'%1$s\'</string>
+    <string name="imported_stations_format">已匯入 %1$d 個電台至媒體庫</string>
+    <string name="media_folder_top_title">熱門精選</string>
+    <string name="media_folder_top_desc">全球熱門推薦串流</string>
+    <string name="media_folder_recent_title">最近收聽</string>
+    <string name="media_folder_recent_desc">您最近收聽的電台</string>
+    <string name="media_folder_genres_title">曲風與分類</string>
+    <string name="media_folder_genres_desc">按音樂曲風探索</string>
+    <string name="media_folder_podcasts_title">Podcast</string>
+    <string name="media_folder_podcasts_desc">熱門 Podcast 節目</string>
+    <string name="media_root_subtitle">網路廣播與 Podcast</string>
+    <string name="media_root_recent_subtitle">接續上次收聽進度</string>
+    <string name="skip_station">跳過電台</string>
+    <string name="unknown_station">未知電台</string>
+    <string name="play">播放</string>
+    <string name="pause">暫停</string>
 </resources>

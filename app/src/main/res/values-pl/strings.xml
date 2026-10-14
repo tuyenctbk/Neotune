@@ -494,4 +494,31 @@
     <string name="settings_rate_desc" formatted="false">Wesprzyj ten w 100% darmowy odtwarzacz bez reklam swoją opinią</string>
     <string name="settings_share_app_title">Udostępnij NeoTune</string>
     <string name="settings_share_app_desc">Podziel się darmową muzyką i podcastami ze znajomymi</string>
+
+    <!-- Localized additions -->
+    <string name="playing_episode_format">Odtwarzanie: \'%1$s\'</string>
+    <string name="audio_booster_enabled">Wzmacniacz dźwięku włączony (+6dB)</string>
+    <string name="audio_booster_disabled">Wzmacniacz dźwięku wyłączony</string>
+    <string name="auto_resumed_station_format">Automatycznie wznowiono: \'%1$s\'</string>
+    <string name="auto_play_enabled">Autoodtwarzanie przy starcie włączone</string>
+    <string name="auto_play_disabled">Autoodtwarzanie przy starcie wyłączone</string>
+    <string name="ambient_screensaver_enabled">Wygaszacz otoczenia włączony</string>
+    <string name="ambient_screensaver_disabled">Wygaszacz otoczenia wyłączony</string>
+    <string name="added_station_to_favorites_format">❤️ Dodano \'%1$s\' do Ulubionych</string>
+    <string name="removed_station_from_favorites_format">Usunięto \'%1$s\' z Ulubionych</string>
+    <string name="imported_stations_format">Zaimportowano %1$d stacji do biblioteki</string>
+    <string name="media_folder_top_title">Najpopularniejsze &amp; Trendy</string>
+    <string name="media_folder_top_desc">Wyróżnione transmisje ze świata</string>
+    <string name="media_folder_recent_title">Ostatnio odtwarzane</string>
+    <string name="media_folder_recent_desc">Twoje ostatnie stacje</string>
+    <string name="media_folder_genres_title">Gatunki &amp; Kategorie</string>
+    <string name="media_folder_genres_desc">Przeglądaj wg gatunku muzycznego</string>
+    <string name="media_folder_podcasts_title">Podcasty</string>
+    <string name="media_folder_podcasts_desc">Popularne audycje podcastowe</string>
+    <string name="media_root_subtitle">Radio internetowe &amp; Podcasty</string>
+    <string name="media_root_recent_subtitle">Kontynuuj słuchanie</string>
+    <string name="skip_station">Pomiń stację</string>
+    <string name="unknown_station">Nieznana stacja</string>
+    <string name="play">Odtwarzaj</string>
+    <string name="pause">Wstrzymaj</string>
 </resources>
