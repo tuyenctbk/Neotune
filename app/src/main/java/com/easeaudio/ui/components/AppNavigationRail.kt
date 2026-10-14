@@ -8,7 +8,6 @@ import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.focusable
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
@@ -113,14 +112,6 @@ fun AppNavigationRail(
                                 shape = RoundedCornerShape(14.dp)
                             )
                             .onFocusChanged { isFocused = it.isFocused }
-                            .focusable()
-                            .clickable(
-                                interactionSource = remember { MutableInteractionSource() },
-                                indication = null
-                            ) {
-                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                                onNavigate(item.route)
-                            }
                             .onKeyEvent { keyEvent ->
                                 if (keyEvent.type == KeyEventType.KeyUp) {
                                     when (keyEvent.key) {
@@ -134,6 +125,13 @@ fun AppNavigationRail(
                                 } else {
                                     false
                                 }
+                            }
+                            .clickable(
+                                interactionSource = remember { MutableInteractionSource() },
+                                indication = null
+                            ) {
+                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                onNavigate(item.route)
                             }
                             .padding(vertical = 10.dp, horizontal = 4.dp)
                             .testTag("nav_rail_item_${item.route}"),

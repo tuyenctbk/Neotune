@@ -88,16 +88,21 @@ fun MiniPlayer(
             val effectiveArtworkUrl = trackArtworkUrl?.ifBlank { null } ?: resolvedStationUrl.ifBlank { null }
 
             // Avatar Animations: breathing shimmer when loading, subtle scale when playing
-            val infiniteTransition = rememberInfiniteTransition(label = "miniAvatarAnim")
-            val loadingAlpha by infiniteTransition.animateFloat(
-                initialValue = 0.5f,
-                targetValue = 1.0f,
-                animationSpec = infiniteRepeatable(
-                    animation = tween(durationMillis = 800, easing = FastOutSlowInEasing),
-                    repeatMode = RepeatMode.Reverse
-                ),
-                label = "miniAvatarLoadingAlpha"
-            )
+            val loadingAlpha = if (isLoading) {
+                val infiniteTransition = rememberInfiniteTransition(label = "miniAvatarAnim")
+                val anim by infiniteTransition.animateFloat(
+                    initialValue = 0.5f,
+                    targetValue = 1.0f,
+                    animationSpec = infiniteRepeatable(
+                        animation = tween(durationMillis = 800, easing = FastOutSlowInEasing),
+                        repeatMode = RepeatMode.Reverse
+                    ),
+                    label = "miniAvatarLoadingAlpha"
+                )
+                anim
+            } else {
+                1.0f
+            }
             val playingScale by animateFloatAsState(
                 targetValue = if (isPlaying) 1.04f else 1.0f,
                 animationSpec = spring(stiffness = Spring.StiffnessLow),

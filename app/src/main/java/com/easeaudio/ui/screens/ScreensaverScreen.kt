@@ -155,7 +155,6 @@ fun ScreensaverScreen(
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
             .focusRequester(containerFocusRequester)
-            .focusable()
             .onKeyEvent { keyEvent ->
                 lastInteractionTime = System.currentTimeMillis()
                 if (keyEvent.type == KeyEventType.KeyDown) {

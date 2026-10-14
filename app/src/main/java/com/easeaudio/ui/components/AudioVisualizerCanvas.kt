@@ -65,65 +65,43 @@ fun AudioVisualizerCanvas(
     accentColor: Color = MaterialTheme.colorScheme.tertiary,
     barCount: Int = if (waveAmplitudes.isNotEmpty() && waveAmplitudes.size <= 8) waveAmplitudes.size else 16
 ) {
-    val infiniteTransition = rememberInfiniteTransition(label = "viz_breathing")
-    val idlePhase by infiniteTransition.animateFloat(
-        initialValue = 0f,
-        targetValue = (2 * Math.PI).toFloat(),
-        animationSpec = infiniteRepeatable(
-            animation = tween(2800, easing = LinearEasing),
-            repeatMode = RepeatMode.Restart
-        ),
-        label = "idle_phase"
-    )
-
     val actualBars = barCount.coerceIn(3, 32)
-    val animatables = remember(actualBars) { List(actualBars) { Animatable(0.1f) } }
-    val peakAmplitudes = remember(actualBars) { FloatArray(actualBars) { 0.1f } }
+    val animatables = remember(actualBars) { List(actualBars) { Animatable(0.08f) } }
+    val peakAmplitudes = remember(actualBars) { FloatArray(actualBars) { 0.08f } }
 
     LaunchedEffect(waveAmplitudes, isPlaying, actualBars) {
-        val targets = if (waveAmplitudes.isNotEmpty()) {
+        val targets = if (isPlaying && waveAmplitudes.isNotEmpty()) {
             List(actualBars) { i ->
                 val sourceIndex = (i * waveAmplitudes.size / actualBars).coerceIn(0, waveAmplitudes.size - 1)
                 waveAmplitudes[sourceIndex].coerceIn(0.08f, 1.0f)
             }
         } else {
-            List(actualBars) { 0.1f }
+            List(actualBars) { 0.08f }
         }
 
-        if (isPlaying) {
-            coroutineScope {
-                val scope = this
-                animatables.forEachIndexed { index, animatable ->
-                    val target = targets[index]
-                    if (target > peakAmplitudes[index]) {
-                        peakAmplitudes[index] = target
-                    } else {
-                        peakAmplitudes[index] = (peakAmplitudes[index] - 0.025f).coerceAtLeast(target)
-                    }
-                    scope.launch {
-                        animatable.animateTo(
-                            targetValue = target,
-                            animationSpec = spring(
-                                dampingRatio = Spring.DampingRatioLowBouncy,
-                                stiffness = Spring.StiffnessMedium
-                            )
+        coroutineScope {
+            val scope = this
+            animatables.forEachIndexed { index, animatable ->
+                val target = targets[index]
+                if (target > peakAmplitudes[index]) {
+                    peakAmplitudes[index] = target
+                } else {
+                    peakAmplitudes[index] = (peakAmplitudes[index] - 0.025f).coerceAtLeast(target)
+                }
+                scope.launch {
+                    animatable.animateTo(
+                        targetValue = target,
+                        animationSpec = spring(
+                            dampingRatio = Spring.DampingRatioLowBouncy,
+                            stiffness = Spring.StiffnessMedium
                         )
-                    }
+                    )
                 }
             }
         }
     }
 
-    val animatedAmplitudes = remember(animatables.map { it.value }, isPlaying, idlePhase, actualBars) {
-        List(actualBars) { index ->
-            if (isPlaying) {
-                animatables[index].value
-            } else {
-                val sineWave = (sin(idlePhase + index * 0.45f) * 0.5f + 0.5f) * 0.14f + 0.04f
-                sineWave.coerceIn(0.04f, 0.22f)
-            }
-        }
-    }
+    val animatedAmplitudes = animatables.map { it.value }
 
     val isMiniMode = actualBars <= 6
 
@@ -333,7 +311,7 @@ fun AudioVisualizerCanvas(
                 val ribbonCount = 3
                 for (r in 0 until ribbonCount) {
                     val path = Path()
-                    val phaseOffset = r * 1.2f + idlePhase
+                    val phaseOffset = r * 1.2f
                     val alpha = if (r == 0) 0.95f else if (r == 1) 0.6f else 0.35f
                     val strokeWidth = if (r == 0) 3.5.dp.toPx() else 2.dp.toPx()
                     val ribbonColor = if (r == 0) primaryColor else if (r == 1) accentColor else secondaryColor

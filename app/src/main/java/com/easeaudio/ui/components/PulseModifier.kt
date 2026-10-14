@@ -20,6 +20,7 @@ fun Modifier.pulseOnPlaying(
     pulseTargetScale: Float = 1.06f,
     durationMillis: Int = 1200
 ): Modifier {
+    if (!isPlaying) return this
     val infiniteTransition = rememberInfiniteTransition(label = "PulseOnPlayingTransition")
     val animatedPulseScale by infiniteTransition.animateFloat(
         initialValue = 1.0f,
@@ -31,6 +32,5 @@ fun Modifier.pulseOnPlaying(
         label = "PulseOnPlayingScale"
     )
 
-    val scaleFactor = if (isPlaying) animatedPulseScale else 1.0f
-    return this.then(Modifier.scale(scaleFactor))
+    return this.then(Modifier.scale(animatedPulseScale))
 }

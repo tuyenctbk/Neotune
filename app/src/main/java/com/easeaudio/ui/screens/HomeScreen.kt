@@ -53,7 +53,6 @@ import androidx.compose.material.icons.filled.ArrowUpward
 import androidx.compose.material.icons.outlined.History
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.focusable
 import androidx.compose.ui.input.key.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
@@ -154,7 +153,6 @@ fun HomeScreen(
 
     var continueListeningTab by rememberSaveable { mutableStateOf(ContinueListeningTab.Recent) }
     var userExplicitlySelectedTab by rememberSaveable { mutableStateOf(false) }
-    val continueChipFocusRequester = remember { FocusRequester() }
 
     val featuredList = remember(uiState.selectedTab, uiState.curatedAudiophileStations, uiState.stations) {
         if (uiState.selectedTab == HomeTab.Radio) {
@@ -669,7 +667,6 @@ fun HomeScreen(
                                         label = stringResource(R.string.tab_recent),
                                         icon = Icons.Outlined.History,
                                         isSelected = continueListeningTab == ContinueListeningTab.Recent,
-                                        modifier = if (continueListeningTab == ContinueListeningTab.Recent) Modifier.focusRequester(continueChipFocusRequester) else Modifier,
                                         onClick = {
                                             userExplicitlySelectedTab = true
                                             continueListeningTab = ContinueListeningTab.Recent
@@ -679,7 +676,6 @@ fun HomeScreen(
                                         label = stringResource(R.string.tab_most_played),
                                         icon = Icons.AutoMirrored.Filled.TrendingUp,
                                         isSelected = continueListeningTab == ContinueListeningTab.MostPlayed,
-                                        modifier = if (continueListeningTab == ContinueListeningTab.MostPlayed) Modifier.focusRequester(continueChipFocusRequester) else Modifier,
                                         onClick = {
                                             userExplicitlySelectedTab = true
                                             continueListeningTab = ContinueListeningTab.MostPlayed
@@ -689,7 +685,6 @@ fun HomeScreen(
                                         label = stringResource(R.string.tab_featured),
                                         icon = Icons.Filled.Star,
                                         isSelected = continueListeningTab == ContinueListeningTab.Featured,
-                                        modifier = if (continueListeningTab == ContinueListeningTab.Featured) Modifier.focusRequester(continueChipFocusRequester) else Modifier,
                                         onClick = {
                                             userExplicitlySelectedTab = true
                                             continueListeningTab = ContinueListeningTab.Featured
@@ -725,7 +720,6 @@ fun HomeScreen(
                                         label = stringResource(R.string.tab_recent),
                                         icon = Icons.Outlined.History,
                                         isSelected = continueListeningTab == ContinueListeningTab.Recent,
-                                        modifier = if (continueListeningTab == ContinueListeningTab.Recent) Modifier.focusRequester(continueChipFocusRequester) else Modifier,
                                         onClick = {
                                             userExplicitlySelectedTab = true
                                             continueListeningTab = ContinueListeningTab.Recent
@@ -735,7 +729,6 @@ fun HomeScreen(
                                         label = stringResource(R.string.tab_most_played),
                                         icon = Icons.AutoMirrored.Filled.TrendingUp,
                                         isSelected = continueListeningTab == ContinueListeningTab.MostPlayed,
-                                        modifier = if (continueListeningTab == ContinueListeningTab.MostPlayed) Modifier.focusRequester(continueChipFocusRequester) else Modifier,
                                         onClick = {
                                             userExplicitlySelectedTab = true
                                             continueListeningTab = ContinueListeningTab.MostPlayed
@@ -745,7 +738,6 @@ fun HomeScreen(
                                         label = stringResource(R.string.tab_featured),
                                         icon = Icons.Filled.Star,
                                         isSelected = continueListeningTab == ContinueListeningTab.Featured,
-                                        modifier = if (continueListeningTab == ContinueListeningTab.Featured) Modifier.focusRequester(continueChipFocusRequester) else Modifier,
                                         onClick = {
                                             userExplicitlySelectedTab = true
                                             continueListeningTab = ContinueListeningTab.Featured
@@ -788,9 +780,6 @@ fun HomeScreen(
                                 isPlaying = uiState.currentStation?.id == resumeStation.id && uiState.isPlaying,
                                 isLoading = uiState.currentStation?.id == resumeStation.id && uiState.isLoading,
                                 isDemoted = uiState.demotedStationIds.contains(resumeStation.id),
-                                modifier = Modifier.focusProperties {
-                                    up = continueChipFocusRequester
-                                },
                                 onClick = { onStationSelect(resumeStation) },
                                 onToggleFavorite = { onToggleFavorite(resumeStation) },
                                 onDemoteStation = { onDemoteStation(resumeStation) },
@@ -1021,7 +1010,6 @@ fun CuratedStationCard(
             modifier = Modifier
                 .width(140.dp)
                 .onFocusChanged { isFocused = it.isFocused }
-                .focusable()
                 .onKeyEvent { keyEvent ->
                     if (keyEvent.type == KeyEventType.KeyUp) {
                         when (keyEvent.key) {
@@ -1238,7 +1226,6 @@ fun QuickResumeCard(
             modifier = modifier
                 .fillMaxWidth()
                 .onFocusChanged { isFocused = it.isFocused }
-                .focusable()
                 .onKeyEvent { keyEvent ->
                     if (keyEvent.type == KeyEventType.KeyUp) {
                         when (keyEvent.key) {
@@ -1552,7 +1539,6 @@ fun RecentStationCard(
             modifier = Modifier
                 .width(100.dp)
                 .onFocusChanged { isFocused = it.isFocused }
-                .focusable()
                 .onKeyEvent { keyEvent ->
                     if (keyEvent.type == KeyEventType.KeyUp) {
                         when (keyEvent.key) {

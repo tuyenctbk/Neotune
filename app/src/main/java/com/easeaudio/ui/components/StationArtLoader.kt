@@ -153,34 +153,40 @@ fun StationGradientPlaceholder(
 
     val isActuallyPodcast = isPodcast || genre.contains("podcast", ignoreCase = true) || safeName.contains("podcast", ignoreCase = true)
 
-    // Shimmer sweep animation when in loading state
-    val infiniteTransition = rememberInfiniteTransition(label = "GradientPlaceholderAnim")
-    val shimmerOffset by infiniteTransition.animateFloat(
-        initialValue = -1f,
-        targetValue = 2f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = 1400, easing = LinearEasing),
-            repeatMode = RepeatMode.Restart
-        ),
-        label = "shimmerSweep"
-    )
+    // Shimmer sweep animation only when actively in loading state
+    val shimmerOffset = if (isLoading) {
+        val shimmerTransition = rememberInfiniteTransition(label = "shimmerTransition")
+        val anim by shimmerTransition.animateFloat(
+            initialValue = -1f,
+            targetValue = 2f,
+            animationSpec = infiniteRepeatable(
+                animation = tween(durationMillis = 1400, easing = LinearEasing),
+                repeatMode = RepeatMode.Restart
+            ),
+            label = "shimmerSweep"
+        )
+        anim
+    } else {
+        0f
+    }
 
-    // Mini equalizer bounce when playing
-    val eq1 by infiniteTransition.animateFloat(
+    // Mini equalizer bounce only when actively playing
+    val eqTransition = if (isPlaying) rememberInfiniteTransition(label = "eqAnim") else null
+    val eq1 = eqTransition?.animateFloat(
         initialValue = 0.3f, targetValue = 0.95f,
         animationSpec = infiniteRepeatable(tween(420, easing = FastOutSlowInEasing), RepeatMode.Reverse),
         label = "eq1"
-    )
-    val eq2 by infiniteTransition.animateFloat(
+    )?.value ?: 0.5f
+    val eq2 = eqTransition?.animateFloat(
         initialValue = 0.8f, targetValue = 0.25f,
         animationSpec = infiniteRepeatable(tween(510, easing = FastOutSlowInEasing), RepeatMode.Reverse),
         label = "eq2"
-    )
-    val eq3 by infiniteTransition.animateFloat(
+    )?.value ?: 0.5f
+    val eq3 = eqTransition?.animateFloat(
         initialValue = 0.4f, targetValue = 1.0f,
         animationSpec = infiniteRepeatable(tween(370, easing = FastOutSlowInEasing), RepeatMode.Reverse),
         label = "eq3"
-    )
+    )?.value ?: 0.5f
 
     BoxWithConstraints(
         modifier = modifier

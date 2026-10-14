@@ -6,7 +6,6 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.*
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -935,7 +934,6 @@ private fun PlayerContent(
                     )
                     .clip(CircleShape)
                     .background(if (isPlayFocused) MaterialTheme.colorScheme.primary else PlayButtonContainer)
-                    .focusable()
                     .clickable {
                         haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                         onTogglePlay()
@@ -1117,17 +1115,6 @@ private fun StationArtworkCard(
             .crossfade(true)
             .build()
     }
-
-    val infiniteTransition = rememberInfiniteTransition(label = "playerArtAnim")
-    val rotationAngle by infiniteTransition.animateFloat(
-        initialValue = 0f,
-        targetValue = 360f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = 24000, easing = LinearEasing),
-            repeatMode = RepeatMode.Restart
-        ),
-        label = "playerArtRotation"
-    )
 
     Box(
         modifier = modifier

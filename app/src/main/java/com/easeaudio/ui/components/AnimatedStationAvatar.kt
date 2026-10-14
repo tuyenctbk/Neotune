@@ -73,20 +73,21 @@ fun AnimatedStationAvatar(
             .build()
     }
 
-    val infiniteTransition = rememberInfiniteTransition(label = "SimpleStationAvatarTransition")
-
-    // Simple gentle breathing effect (1.0f -> 1.03f)
-    val breatheScale by infiniteTransition.animateFloat(
-        initialValue = 1.0f,
-        targetValue = 1.03f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = 1800, easing = FastOutSlowInEasing),
-            repeatMode = RepeatMode.Reverse
-        ),
-        label = "SimpleStationAvatarBreathe"
-    )
-
-    val activeScale = if (isPlaying) breatheScale else 1.0f
+    val activeScale = if (isPlaying) {
+        val infiniteTransition = rememberInfiniteTransition(label = "SimpleStationAvatarTransition")
+        val breatheScale by infiniteTransition.animateFloat(
+            initialValue = 1.0f,
+            targetValue = 1.03f,
+            animationSpec = infiniteRepeatable(
+                animation = tween(durationMillis = 1800, easing = FastOutSlowInEasing),
+                repeatMode = RepeatMode.Reverse
+            ),
+            label = "SimpleStationAvatarBreathe"
+        )
+        breatheScale
+    } else {
+        1.0f
+    }
 
     Box(
         modifier = modifier
