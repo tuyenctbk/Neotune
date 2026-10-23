@@ -187,7 +187,7 @@ class NeoTuneAppWidgetProvider : AppWidgetProvider() {
                 views.setOnClickPendingIntent(R.id.widget_btn_prev, prevPendingIntent)
 
                 // 5. Open App when tapping the body / info container
-                val launchAppIntent = Intent(context, MainActivity::class.java).apply {
+                val launchAppIntent = com.easeaudio.util.AppIconManager.getLaunchIntent(context).apply {
                     flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
                 }
                 val launchAppPendingIntent = PendingIntent.getActivity(

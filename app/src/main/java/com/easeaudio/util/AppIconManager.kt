@@ -22,6 +22,13 @@ object AppIconManager {
         return prefs.getString(KEY_CURRENT_ICON, "default") ?: "default"
     }
 
+    fun getLaunchIntent(context: Context): android.content.Intent {
+        return context.packageManager.getLaunchIntentForPackage(context.packageName)
+            ?: android.content.Intent(context, com.easeaudio.MainActivity::class.java).apply {
+                action = android.content.Intent.ACTION_MAIN
+            }
+    }
+
     fun setAppIcon(context: Context, iconKey: String) {
         val current = getCurrentIconTheme(context)
         if (current == iconKey) return
@@ -29,18 +36,27 @@ object AppIconManager {
         val pm = context.packageManager
         val packageName = context.packageName
 
-        val defaultComponent = ComponentName(packageName, "com.easeaudio.MainActivity")
+        val mainActivityComponent = ComponentName(packageName, "com.easeaudio.MainActivity")
+        val defaultAlias = ComponentName(packageName, "com.easeaudio.MainActivityAliasDefault")
         val aliases = mapOf(
-            "default" to defaultComponent,
+            "default" to defaultAlias,
             "jazz" to ComponentName(packageName, "com.easeaudio.MainActivityAliasJazz"),
             "rock" to ComponentName(packageName, "com.easeaudio.MainActivityAliasRock"),
             "cyberpunk" to ComponentName(packageName, "com.easeaudio.MainActivityAliasCyberpunk")
         )
 
-        val targetComponent = aliases[iconKey] ?: defaultComponent
+        val targetComponent = aliases[iconKey] ?: defaultAlias
 
         try {
-            aliases.forEach { (key, component) ->
+            // Keep MainActivity permanently enabled so explicit intents (notifications, widgets,
+            // shortcuts) and Android TV LEANBACK_LAUNCHER are never broken.
+            pm.setComponentEnabledSetting(
+                mainActivityComponent,
+                PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
+                PackageManager.DONT_KILL_APP
+            )
+
+            aliases.forEach { (_, component) ->
                 val state = if (component == targetComponent) {
                     PackageManager.COMPONENT_ENABLED_STATE_ENABLED
                 } else {

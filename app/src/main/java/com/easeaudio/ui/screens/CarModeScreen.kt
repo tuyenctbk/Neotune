@@ -155,9 +155,15 @@ fun CarModeScreen(
     onOpenEqualizer: (() -> Unit)? = null,
     onOpenEpisodes: (() -> Unit)? = null,
     eqPresets: List<EqPresetDisplay> = emptyList(),
+    waveAmplitudes: List<Float> = emptyList(),
     onExitCarMode: () -> Unit
 ) {
+    androidx.activity.compose.BackHandler(onBack = onExitCarMode)
+
     val context = LocalContext.current
+    val activeWaveAmplitudes = remember(waveAmplitudes, uiState.waveAmplitudes) {
+        if (waveAmplitudes.isNotEmpty()) waveAmplitudes else uiState.waveAmplitudes
+    }
     val hasLastPlayed = remember {
         uiState.isPlaying || (uiState.currentStation != null && uiState.currentStation.lastListenedTimestamp > 0)
     }
@@ -317,6 +323,7 @@ fun CarModeScreen(
                                             isWide = isWide,
                                             availableHeight = availableHeight,
                                             isAntiGlare = isAntiGlare,
+                                            waveAmplitudes = activeWaveAmplitudes,
                                             modifier = Modifier.fillMaxSize()
                                         )
                                     }
@@ -363,7 +370,7 @@ fun CarModeScreen(
                         isPlaying = uiState.isPlaying,
                         isLoading = uiState.isLoading,
                         streamTitle = uiState.streamTitle,
-                        waveAmplitudes = uiState.waveAmplitudes,
+                        waveAmplitudes = activeWaveAmplitudes,
                         currentPosition = uiState.currentPlaybackPosition,
                         totalDuration = uiState.totalPlaybackDuration,
                         onTogglePlay = onPlayPause,
@@ -789,6 +796,7 @@ private fun AutomotiveHeroPlayer(
     isWide: Boolean,
     availableHeight: androidx.compose.ui.unit.Dp,
     isAntiGlare: Boolean,
+    waveAmplitudes: List<Float> = emptyList(),
     modifier: Modifier = Modifier
 ) {
     val currentStation = uiState.currentStation
@@ -1134,7 +1142,7 @@ private fun AutomotiveHeroPlayer(
                                     contentAlignment = Alignment.Center
                                 ) {
                                     AudioVisualizerCanvas(
-                                        waveAmplitudes = uiState.waveAmplitudes.ifEmpty { List(28) { 0.15f } },
+                                        waveAmplitudes = waveAmplitudes.ifEmpty { List(28) { 0.15f } },
                                         isPlaying = isPlaying,
                                         modifier = Modifier.fillMaxSize(),
                                         style = carVisualizerStyle,
@@ -1764,7 +1772,7 @@ private fun AutomotiveHeroPlayer(
                             contentAlignment = Alignment.Center
                         ) {
                             AudioVisualizerCanvas(
-                                waveAmplitudes = uiState.waveAmplitudes.ifEmpty { List(24) { 0.15f } },
+                                waveAmplitudes = waveAmplitudes.ifEmpty { List(24) { 0.15f } },
                                 isPlaying = isPlaying,
                                 modifier = Modifier.fillMaxSize(),
                                 style = carVisualizerStyle,

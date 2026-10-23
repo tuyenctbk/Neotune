@@ -424,7 +424,7 @@ fun PlayerScreen(
         ) {
             val isExpanded = windowSizeClass.widthSizeClass == WindowWidthSizeClass.Expanded
             val isMedium = windowSizeClass.widthSizeClass == WindowWidthSizeClass.Medium
-            val useHorizontalLayout = isExpanded || (isMedium && maxWidth > maxHeight)
+            val useHorizontalLayout = isExpanded || (maxWidth > maxHeight)
             
             AnimatedContent(
                 targetState = station,
@@ -438,9 +438,9 @@ fun PlayerScreen(
                     Row(
                         modifier = Modifier
                             .fillMaxSize()
-                            .padding(horizontal = 40.dp, vertical = 20.dp),
+                            .padding(horizontal = if (maxWidth > 700.dp) 40.dp else 20.dp, vertical = 12.dp),
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(40.dp)
+                        horizontalArrangement = Arrangement.spacedBy(if (maxWidth > 700.dp) 32.dp else 16.dp)
                     ) {
                         StationArtworkCard(
                             station = station,
@@ -448,7 +448,7 @@ fun PlayerScreen(
                             trackArtworkUrl = trackArtworkUrl,
                             isLoading = isLoading,
                             artScale = artScale,
-                            cornerRadius = 32.dp,
+                            cornerRadius = 28.dp,
                             paletteVibrant = artworkPalette.vibrantColor,
                             modifier = Modifier
                                 .weight(1f)
@@ -458,7 +458,8 @@ fun PlayerScreen(
                         Column(
                             modifier = Modifier
                                 .weight(1.2f)
-                                .fillMaxHeight(),
+                                .fillMaxHeight()
+                                .verticalScroll(rememberScrollState()),
                             verticalArrangement = Arrangement.Center
                         ) {
                             PlayerContent(

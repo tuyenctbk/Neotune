@@ -75,15 +75,10 @@ fun FavoritesScreen(
     var selectedFilter by remember { mutableStateOf(LibraryFilter.ALL) }
     val keyboardController = LocalSoftwareKeyboardController.current
 
-    // Determine grid column count at composable scope (cannot be called inside non-composable lambda)
-    val context = LocalContext.current
-    val favColumns = remember(context) {
-        val metrics = context.resources.displayMetrics
-        val widthDp = metrics.widthPixels / metrics.density
-        when {
-            widthDp >= 840f -> 2  // Landscape tablet / Android TV: 2 columns
-            else -> 1             // Phone or portrait tablet: single-column list
-        }
+    // Determine grid column count reactively across all screen sizes & orientations
+    val configuration = androidx.compose.ui.platform.LocalConfiguration.current
+    val favColumns = remember(configuration.screenWidthDp) {
+        if (configuration.screenWidthDp >= 840) 2 else 1
     }
 
     val listenLaterAsStations = remember(listenLaterItems) {

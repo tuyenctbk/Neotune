@@ -28,18 +28,9 @@ class AlarmReceiver : BroadcastReceiver() {
             )
 
             try {
-                // Start foreground service & play station
-                val serviceIntent = Intent(context, RadioPlaybackService::class.java)
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-                    context.startForegroundService(serviceIntent)
-                } else {
-                    context.startService(serviceIntent)
-                }
-            } catch (e: Exception) {
-                Log.e("AlarmReceiver", "Could not start service directly: ${e.message}")
-            }
-
-            try {
+                // Play station directly via singleton RadioPlayerManager.
+                // RadioPlayerManager manages player preparation and service attachment safely,
+                // avoiding ForegroundServiceDidNotStartInTimeException on Android 8.0+.
                 RadioPlayerManager.getInstance(context).playStation(station)
             } catch (e: Exception) {
                 Log.e("AlarmReceiver", "Could not play alarm station: ${e.message}")

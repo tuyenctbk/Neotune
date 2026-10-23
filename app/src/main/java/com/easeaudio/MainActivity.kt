@@ -59,6 +59,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.key.onPreviewKeyEvent
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import com.easeaudio.viewmodel.RadioViewModel
 import com.easeaudio.network.QualityLevel
 import com.easeaudio.service.FirebaseManager
@@ -215,6 +216,8 @@ fun MainAppContent(
 
     val uiState by viewModel.homeUiState.collectAsState()
     val hasActiveSession by viewModel.hasActiveSession.collectAsStateWithLifecycle()
+    val waveAmplitudes by viewModel.waveAmplitudes.collectAsStateWithLifecycle()
+    val activity = context as? MainActivity
 
     val startDestination = rememberSaveable {
         when {
@@ -285,7 +288,6 @@ fun MainAppContent(
     var isFullPlayerVisible by remember { mutableStateOf(value = false) }
 
     // Keep screen awake while radio is playing (perfect for background TV listening)
-    val activity = context as? android.app.Activity
     DisposableEffect(uiState.isPlaying) {
         if (uiState.isPlaying) {
             activity?.window?.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
@@ -336,12 +338,21 @@ fun MainAppContent(
             currentRoute != NavRoute.Screensaver.route &&
             currentRoute != NavRoute.Onboarding.route
         ) {
-            delay(300_000L) // 5 minutes of idle time (NOT 15 seconds!)
-            if (uiState.isPlaying && !screensaverDismissedByUser && currentRoute != NavRoute.Screensaver.route) {
-                isFullPlayerVisible = false
-                navController.navigate(NavRoute.Screensaver.route) {
-                    launchSingleTop = true
+            val idleTimeoutMs = 300_000L // 5 minutes of verified idle time
+            while (isActive) {
+                val lastInteraction = activity?.lastInteractionTimeMs ?: System.currentTimeMillis()
+                val idleElapsed = System.currentTimeMillis() - lastInteraction
+                if (idleElapsed >= idleTimeoutMs) {
+                    if (uiState.isPlaying && !screensaverDismissedByUser && currentRoute != NavRoute.Screensaver.route) {
+                        isFullPlayerVisible = false
+                        navController.navigate(NavRoute.Screensaver.route) {
+                            launchSingleTop = true
+                        }
+                    }
+                    break
                 }
+                val waitTime = (idleTimeoutMs - idleElapsed).coerceIn(1_000L, 10_000L)
+                delay(waitTime)
             }
         }
     }
@@ -648,7 +659,7 @@ fun MainAppContent(
                                 currentStation = syncedCurrentStation,
                                 isPlaying = uiState.isPlaying,
                                 streamTitle = uiState.streamTitle,
-                                waveAmplitudes = uiState.waveAmplitudes,
+                                waveAmplitudes = waveAmplitudes,
                                 sleepTimerRemaining = uiState.sleepTimerRemaining,
                                 trackArtworkUrl = uiState.trackArtworkUrl,
                                 onTogglePlay = { viewModel.togglePlayPause() },
@@ -660,6 +671,7 @@ fun MainAppContent(
                         composable(NavRoute.CarMode.route) {
                             CarModeScreen(
                                 uiState = uiState,
+                                waveAmplitudes = waveAmplitudes,
                                 onPlayPause = { viewModel.togglePlayPause() },
                                 onNextStation = { viewModel.playNextStation() },
                                 onPreviousStation = { viewModel.playPreviousStation() },
@@ -713,7 +725,7 @@ fun MainAppContent(
                                 isPlaying = uiState.isPlaying,
                                 isLoading = uiState.isLoading,
                                 streamTitle = uiState.streamTitle,
-                                waveAmplitudes = uiState.waveAmplitudes,
+                                waveAmplitudes = waveAmplitudes,
                                 currentPosition = uiState.currentPlaybackPosition,
                                 totalDuration = uiState.totalPlaybackDuration,
                                 trackArtworkUrl = uiState.trackArtworkUrl,
@@ -780,7 +792,7 @@ fun MainAppContent(
                     isPlaying = uiState.isPlaying,
                     isLoading = uiState.isLoading,
                     streamTitle = uiState.streamTitle,
-                    waveAmplitudes = uiState.waveAmplitudes,
+                    waveAmplitudes = waveAmplitudes,
                     volume = uiState.volume,
                     sleepTimerRemaining = uiState.sleepTimerRemaining,
                     activeEqPreset = uiState.activeEqPreset,

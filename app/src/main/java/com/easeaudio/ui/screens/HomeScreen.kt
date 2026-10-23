@@ -1,5 +1,6 @@
 package com.easeaudio.ui.screens
 
+import android.content.Context
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.expandHorizontally
@@ -151,8 +152,19 @@ fun HomeScreen(
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusManager = LocalFocusManager.current
 
-    var continueListeningTab by rememberSaveable { mutableStateOf(ContinueListeningTab.Recent) }
-    var userExplicitlySelectedTab by rememberSaveable { mutableStateOf(false) }
+    val context = LocalContext.current
+    val homePrefs = remember { context.getSharedPreferences("neotune_home_prefs", Context.MODE_PRIVATE) }
+    val savedContinueTabName = remember {
+        homePrefs.getString("saved_continue_tab", ContinueListeningTab.Featured.name)
+    }
+    val initialContinueTab = remember(savedContinueTabName) {
+        try {
+            ContinueListeningTab.valueOf(savedContinueTabName ?: ContinueListeningTab.Featured.name)
+        } catch (_: Exception) {
+            ContinueListeningTab.Featured
+        }
+    }
+    var continueListeningTab by rememberSaveable { mutableStateOf(initialContinueTab) }
 
     val featuredList = remember(uiState.selectedTab, uiState.curatedAudiophileStations, uiState.stations) {
         if (uiState.selectedTab == HomeTab.Radio) {
@@ -210,15 +222,7 @@ fun HomeScreen(
         }
     }
 
-    LaunchedEffect(latestRecentList, featuredList) {
-        if (!userExplicitlySelectedTab) {
-            if (latestRecentList.isNotEmpty()) {
-                continueListeningTab = ContinueListeningTab.Recent
-            } else if (featuredList.isNotEmpty() && continueListeningTab == ContinueListeningTab.Recent && latestMostPlayedList.isEmpty()) {
-                continueListeningTab = ContinueListeningTab.Featured
-            }
-        }
-    }
+
     
     val isFabVisible by remember(uiState.searchQuery, uiState.stations) {
         derivedStateOf {
@@ -668,8 +672,8 @@ fun HomeScreen(
                                         icon = Icons.Outlined.History,
                                         isSelected = continueListeningTab == ContinueListeningTab.Recent,
                                         onClick = {
-                                            userExplicitlySelectedTab = true
                                             continueListeningTab = ContinueListeningTab.Recent
+                                            homePrefs.edit().putString("saved_continue_tab", ContinueListeningTab.Recent.name).apply()
                                         }
                                     )
                                     ContinueTabChip(
@@ -677,8 +681,8 @@ fun HomeScreen(
                                         icon = Icons.AutoMirrored.Filled.TrendingUp,
                                         isSelected = continueListeningTab == ContinueListeningTab.MostPlayed,
                                         onClick = {
-                                            userExplicitlySelectedTab = true
                                             continueListeningTab = ContinueListeningTab.MostPlayed
+                                            homePrefs.edit().putString("saved_continue_tab", ContinueListeningTab.MostPlayed.name).apply()
                                         }
                                     )
                                     ContinueTabChip(
@@ -686,8 +690,8 @@ fun HomeScreen(
                                         icon = Icons.Filled.Star,
                                         isSelected = continueListeningTab == ContinueListeningTab.Featured,
                                         onClick = {
-                                            userExplicitlySelectedTab = true
                                             continueListeningTab = ContinueListeningTab.Featured
+                                            homePrefs.edit().putString("saved_continue_tab", ContinueListeningTab.Featured.name).apply()
                                         }
                                     )
                                 }
@@ -721,8 +725,8 @@ fun HomeScreen(
                                         icon = Icons.Outlined.History,
                                         isSelected = continueListeningTab == ContinueListeningTab.Recent,
                                         onClick = {
-                                            userExplicitlySelectedTab = true
                                             continueListeningTab = ContinueListeningTab.Recent
+                                            homePrefs.edit().putString("saved_continue_tab", ContinueListeningTab.Recent.name).apply()
                                         }
                                     )
                                     ContinueTabChip(
@@ -730,8 +734,8 @@ fun HomeScreen(
                                         icon = Icons.AutoMirrored.Filled.TrendingUp,
                                         isSelected = continueListeningTab == ContinueListeningTab.MostPlayed,
                                         onClick = {
-                                            userExplicitlySelectedTab = true
                                             continueListeningTab = ContinueListeningTab.MostPlayed
+                                            homePrefs.edit().putString("saved_continue_tab", ContinueListeningTab.MostPlayed.name).apply()
                                         }
                                     )
                                     ContinueTabChip(
@@ -739,8 +743,8 @@ fun HomeScreen(
                                         icon = Icons.Filled.Star,
                                         isSelected = continueListeningTab == ContinueListeningTab.Featured,
                                         onClick = {
-                                            userExplicitlySelectedTab = true
                                             continueListeningTab = ContinueListeningTab.Featured
+                                            homePrefs.edit().putString("saved_continue_tab", ContinueListeningTab.Featured.name).apply()
                                         }
                                     )
                                 }

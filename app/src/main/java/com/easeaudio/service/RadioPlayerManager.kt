@@ -712,8 +712,8 @@ class RadioPlayerManager(context: Context) {
 
         exoPlayer?.let { player ->
             try {
-                val intent = Intent(context, com.easeaudio.MainActivity::class.java).apply {
-                    flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
+                val intent = com.easeaudio.util.AppIconManager.getLaunchIntent(context).apply {
+                    flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP
                 }
                 val pendingIntent = PendingIntent.getActivity(
                     context,
@@ -1314,47 +1314,133 @@ class RadioPlayerManager(context: Context) {
 
     @Volatile private var isHealingAttempt = false
 
-    private fun tryAutoHealStream(station: RadioStation, failedUrl: String?) {
-        if (station.isPodcast || isHealingAttempt) return
-        isHealingAttempt = true
-        scope.launch(Dispatchers.IO) {
-            try {
-                Log.i(TAG, "Attempting automated online stream healing for station '${station.name}'...")
-                val queryName = station.name.split("-").firstOrNull()?.trim() ?: station.name
+    suspend fun attemptStreamHealing(station: RadioStation, failedUrl: String?): RadioStation? = withContext(Dispatchers.IO) {
+        if (station.isPodcast) return@withContext null
+        try {
+            Log.i(TAG, "Attempting automated online stream healing for station '${station.name}'...")
+
+            // 1. Try UUID lookup first if station.id is a RadioBrowser UUID
+            if (station.id.length in 32..38 && station.id.contains("-")) {
+                val uuidStation = com.easeaudio.data.RadioBrowserService.fetchStationByUuid(station.id)
+                if (uuidStation != null &&
+                    uuidStation.streamUrl.isNotBlank() &&
+                    uuidStation.streamUrl != station.streamUrl &&
+                    uuidStation.streamUrl != failedUrl
+                ) {
+                    Log.i(TAG, "Found fresh stream via UUID lookup for '${station.name}': ${uuidStation.streamUrl}")
+                    return@withContext station.copy(streamUrl = uuidStation.streamUrl)
+                }
+            }
+
+            // 2. Candidate names generation (cleaning leading '#', numbers, brackets, etc.)
+            val rawName = station.name
+            val candidates = mutableListOf<String>()
+
+            val beforeHyphen = rawName.split("-").firstOrNull()?.trim() ?: rawName
+            candidates.add(beforeHyphen)
+
+            val cleanNoSymbols = beforeHyphen
+                .replace(Regex("""^[\s#!*0-9._/]+"""), "")
+                .replace(Regex("""[\(\[].*?[\)\]]"""), "")
+                .trim()
+            if (cleanNoSymbols.isNotBlank() && !candidates.contains(cleanNoSymbols)) {
+                candidates.add(cleanNoSymbols)
+            }
+
+            val cleanNoLeadingHash = beforeHyphen
+                .replace(Regex("""^[\s#*!]+"""), "")
+                .replace(Regex("""[\(\[].*?[\)\]]"""), "")
+                .trim()
+            if (cleanNoLeadingHash.isNotBlank() && !candidates.contains(cleanNoLeadingHash)) {
+                candidates.add(cleanNoLeadingHash)
+            }
+
+            for (queryName in candidates) {
                 val results = com.easeaudio.data.RadioBrowserService.fetchTopStations(
                     limit = 10,
                     searchQuery = queryName,
                     country = if (station.country != "Global") station.country else ""
                 )
-
-                var freshStream = results.firstOrNull { candidate ->
+                val freshStream = results.firstOrNull { candidate ->
                     candidate.streamUrl.isNotBlank() &&
                             candidate.streamUrl != station.streamUrl &&
                             candidate.streamUrl != failedUrl
                 }
+                if (freshStream != null) {
+                    return@withContext station.copy(streamUrl = freshStream.streamUrl)
+                }
 
-                // If country-filtered search didn't yield alternative stream, search globally without country filter
-                if (freshStream == null && station.country.isNotBlank() && station.country != "Global") {
+                if (station.country.isNotBlank() && station.country != "Global") {
                     val globalResults = com.easeaudio.data.RadioBrowserService.fetchTopStations(
                         limit = 10,
                         searchQuery = queryName,
                         country = ""
                     )
-                    freshStream = globalResults.firstOrNull { candidate ->
+                    val globalFresh = globalResults.firstOrNull { candidate ->
                         candidate.streamUrl.isNotBlank() &&
                                 candidate.streamUrl != station.streamUrl &&
                                 candidate.streamUrl != failedUrl
                     }
-                }
-
-                // Known reliable fallback for XONE FM if not resolved by directory search
-                if (freshStream == null && station.name.contains("xone", ignoreCase = true)) {
-                    val xoneBackup = "https://stream.zeno.fm/dnukwf7q3a0uv"
-                    if (xoneBackup != failedUrl && xoneBackup != station.streamUrl) {
-                        freshStream = station.copy(streamUrl = xoneBackup)
+                    if (globalFresh != null) {
+                        return@withContext station.copy(streamUrl = globalFresh.streamUrl)
                     }
                 }
+            }
 
+            // 3. Known reliable network backups
+            val lowerName = station.name.lowercase()
+            if (lowerName.contains("xone")) {
+                val xoneBackup = "https://stream.zeno.fm/dnukwf7q3a0uv"
+                if (xoneBackup != failedUrl && xoneBackup != station.streamUrl) {
+                    return@withContext station.copy(streamUrl = xoneBackup)
+                }
+            }
+
+            if ((lowerName.contains("100 greatest") || lowerName.contains("greatest classical")) &&
+                (lowerName.contains("classical") || lowerName.contains("classic") || station.genre.contains("Classical", ignoreCase = true))
+            ) {
+                val classicalBackups = listOf(
+                    "https://stream.radioparadise.com/mellow-128.mp3",
+                    "https://strm112.1.fm/classical_mobile_mp3",
+                    "https://icecast.walmradio.com:8443/classical"
+                )
+                val activeBackup = classicalBackups.firstOrNull { it != failedUrl && it != station.streamUrl }
+                if (activeBackup != null) {
+                    Log.i(TAG, "Selected verified classical mirror for '${station.name}': $activeBackup")
+                    return@withContext station.copy(streamUrl = activeBackup)
+                }
+            }
+
+            // 4. Genre fallback: If specific station is down, find a working top station in the same genre
+            if (station.genre.isNotBlank() && station.genre != "General") {
+                val genreResults = com.easeaudio.data.RadioBrowserService.fetchTopStations(
+                    limit = 5,
+                    searchQuery = "",
+                    genreTag = station.genre,
+                    country = ""
+                )
+                val genreFresh = genreResults.firstOrNull { candidate ->
+                    candidate.streamUrl.isNotBlank() &&
+                            candidate.streamUrl != station.streamUrl &&
+                            candidate.streamUrl != failedUrl
+                }
+                if (genreFresh != null) {
+                    Log.i(TAG, "Selected top genre mirror (${station.genre}) for '${station.name}': ${genreFresh.streamUrl}")
+                    return@withContext station.copy(streamUrl = genreFresh.streamUrl)
+                }
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "attemptStreamHealing failed for ${station.name}: ${e.message}")
+        }
+        null
+    }
+
+    private fun tryAutoHealStream(station: RadioStation, failedUrl: String?) {
+        if (station.isPodcast || isHealingAttempt) return
+        isHealingAttempt = true
+        scope.launch(Dispatchers.IO) {
+            try {
+                val freshStream = attemptStreamHealing(station, failedUrl)
                 if (freshStream != null) {
                     Log.i(TAG, "Stream Auto-Healed! Switched '${station.name}' to fresh mirror: ${freshStream.streamUrl}")
                     withContext(Dispatchers.Main) {
@@ -1390,7 +1476,7 @@ class RadioPlayerManager(context: Context) {
         }
     }
 
-    private suspend fun resolveDirectStreamUrl(rawUrl: String, station: RadioStation? = null): String = withContext(Dispatchers.IO) {
+    internal suspend fun resolveDirectStreamUrl(rawUrl: String, station: RadioStation? = null): String = withContext(Dispatchers.IO) {
         if (rawUrl.isBlank()) return@withContext rawUrl
         var currentUrl = rawUrl.trim()
         if (currentUrl.startsWith("file:", ignoreCase = true) || currentUrl.startsWith("content:", ignoreCase = true)) {
@@ -1524,7 +1610,26 @@ class RadioPlayerManager(context: Context) {
     private var playbackJob: Job? = null
 
     fun playStation(station: RadioStation) {
-        playStationWithUrl(station, station.streamUrl, isFallback = false)
+        if (_failedStationIds.value.contains(station.id)) {
+            _currentStation.value = station
+            _isLoading.value = true
+            _playbackError.value = null
+            _streamTitle.value = station.name
+            scope.launch(Dispatchers.IO) {
+                val healed = attemptStreamHealing(station, station.streamUrl)
+                withContext(Dispatchers.Main) {
+                    if (healed != null) {
+                        Log.i(TAG, "Proactively healed previously failing station '${station.name}' -> ${healed.streamUrl}")
+                        _failedStationIds.value = _failedStationIds.value - station.id
+                        playStationWithUrl(healed, healed.streamUrl, isFallback = false)
+                    } else {
+                        playStationWithUrl(station, station.streamUrl, isFallback = false)
+                    }
+                }
+            }
+        } else {
+            playStationWithUrl(station, station.streamUrl, isFallback = false)
+        }
     }
 
     fun playPodcastEpisode(show: RadioStation, episode: com.easeaudio.data.PodcastEpisode) {

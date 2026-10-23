@@ -328,6 +328,7 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
         val preferredGenres: Set<String>,
         val blockedIds: Set<String>,
         val demotedIds: Set<String>,
+        val failedIds: Set<String>,
         val filterConfig: com.easeaudio.data.StationFilterConfig
     )
 
@@ -336,9 +337,10 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
     private val filterStateFlow = combine(
         combine(_searchQuery, _selectedGenre, _selectedCountry) { q, g, c -> Triple(q, g, c) },
         combine(_preferredGenres, filterAndBlockManager.blockedStationIds, filterAndBlockManager.demotedStationIds) { p, b, d -> Triple(p, b, d) },
+        playerManager.failedStationIds,
         filterAndBlockManager.filterConfig
-    ) { (query, genre, country), (preferred, blocked, demoted), config ->
-        FilterState(query, genre, country, preferred, blocked, demoted, config)
+    ) { (query, genre, country), (preferred, blocked, demoted), failed, config ->
+        FilterState(query, genre, country, preferred, blocked, demoted, failed, config)
     }.distinctUntilChanged() // PERF-3: skip re-emission when filter state is identical
 
     val favoriteStations: StateFlow<List<RadioStation>> = combine(
@@ -449,9 +451,21 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
         }
 
         val demotedIds = filter.demotedIds
+        val failedIds = filter.failedIds
+
+        // Station display tiers:
+        // Tier 0: Healthy, working stations
+        // Tier 1: Failed / unreachable stations (included with warning badge and retry capability)
+        // Tier 2: Demoted stations (placed at bottom)
+        fun getStationTier(station: RadioStation): Int = when {
+            demotedIds.contains(station.id) -> 2
+            failedIds.contains(station.id) -> 1
+            else -> 0
+        }
+
         if (genre == "All" && preferredGenres.isNotEmpty()) {
             filteredList.sortedWith(
-                compareBy<RadioStation> { if (demotedIds.contains(it.id)) 1 else 0 }
+                compareBy<RadioStation> { getStationTier(it) }
                     .thenByDescending { station ->
                         val matchesPref = preferredGenres.any { pref ->
                             station.genre.contains(pref, ignoreCase = true) ||
@@ -462,7 +476,7 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
                     }
             )
         } else {
-            filteredList.sortedBy { if (demotedIds.contains(it.id)) 1 else 0 }
+            filteredList.sortedBy { getStationTier(it) }
         }
     }.flowOn(kotlinx.coroutines.Dispatchers.Default).stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
@@ -777,8 +791,11 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
     )
 
     private val playbackDetail: Flow<PlaybackDetail> = combine(
-        combine(waveAmplitudes, volume, currentPlaybackPosition, totalPlaybackDuration, playbackSpeed) {
-            wav, vol, pos, dur, spd -> PlaybackDetailBasic(wav, vol, pos, dur, spd)
+        // High-frequency visualizer data (waveAmplitudes) is decoupled from homeUiState
+        // and collected independently by visualizer components to prevent continuous 8.3 Hz
+        // recomposition of the root screen.
+        combine(volume, currentPlaybackPosition, totalPlaybackDuration, playbackSpeed) {
+            vol, pos, dur, spd -> PlaybackDetailBasic(emptyList(), vol, pos, dur, spd)
         },
         combine(playbackErrorDetails, sleepTimerRemaining, activeEqPreset) {
             errDtl, sleep, eq -> PlaybackDetailExtra(errDtl, sleep, eq)

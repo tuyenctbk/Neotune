@@ -83,6 +83,10 @@ fun ScreensaverScreen(
     var showOverlayControls by remember { mutableStateOf(false) }
     var lastInteractionTime by remember { mutableLongStateOf(System.currentTimeMillis()) }
 
+    androidx.activity.compose.BackHandler(enabled = showOverlayControls) {
+        showOverlayControls = false
+    }
+
     val containerFocusRequester = remember { FocusRequester() }
     val playPauseFocusRequester = remember { FocusRequester() }
 

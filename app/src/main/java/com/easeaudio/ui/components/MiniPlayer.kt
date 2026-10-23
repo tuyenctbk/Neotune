@@ -112,6 +112,7 @@ fun MiniPlayer(
             Surface(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .widthIn(max = 680.dp)
                     .padding(horizontal = 12.dp, vertical = 6.dp)
                     .onFocusChanged { isFocused = it.isFocused }
                     .clip(RoundedCornerShape(16.dp))

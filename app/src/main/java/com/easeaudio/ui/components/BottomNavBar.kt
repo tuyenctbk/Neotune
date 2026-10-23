@@ -55,8 +55,7 @@ fun BottomNavBar(
 
     NavigationBar(
         modifier = Modifier
-            .background(MaterialTheme.colorScheme.background)
-            .windowInsetsPadding(WindowInsets.navigationBars),
+            .background(MaterialTheme.colorScheme.background),
         containerColor = MaterialTheme.colorScheme.background,
         tonalElevation = NavigationBarDefaults.Elevation
     ) {

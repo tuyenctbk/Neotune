@@ -116,7 +116,18 @@ class RadioStreamRecorder private constructor(context: Context) {
             var startTime = System.currentTimeMillis()
 
             try {
-                val url = URL(station.streamUrl)
+                // Resolve playlists (.pls, .m3u), redirects, and podcast RSS enclosures before connecting
+                val resolvedStreamUrl = com.easeaudio.service.RadioPlayerManager.getInstance(context)
+                    .resolveDirectStreamUrl(station.streamUrl, station)
+
+                if (resolvedStreamUrl.contains(".m3u8", ignoreCase = true)) {
+                    Log.w(TAG, "HLS (.m3u8) streams cannot be recorded via direct byte capture")
+                    if (targetFile.exists()) targetFile.delete()
+                    _recordingState.value = RecordingState(isRecording = false)
+                    return@launch
+                }
+
+                val url = URL(resolvedStreamUrl)
                 val connection = (url.openConnection() as HttpURLConnection).apply {
                     (this as? javax.net.ssl.HttpsURLConnection)?.apply {
                         sslSocketFactory = com.easeaudio.util.NetworkSecurityHelper.sslSocketFactory

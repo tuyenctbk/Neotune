@@ -195,6 +195,17 @@ object RadioBrowserService {
                     responseText = executeHttpRequest(fallbackUrlBuilder.toString())
                 }
 
+                // Fallback 5: If query contains symbols like '#', numbers, or brackets (e.g. '# 100 GREATEST CLASSICAL HITS'), try sanitized name
+                val cleanQuery = searchQuery
+                    .replace(Regex("""^[\s#!\*0-9\.\-_/]+"""), "")
+                    .replace(Regex("""[\(\[].*?[\)\]]"""), "")
+                    .trim()
+                if ((responseText.isNullOrBlank() || responseText.trim() == "[]") && cleanQuery.isNotBlank() && cleanQuery != searchQuery.trim()) {
+                    val fallbackUrlBuilder = StringBuilder("$baseUrl/search?offset=$offset&limit=$limit&order=clickcount&reverse=true&hidebroken=true")
+                    fallbackUrlBuilder.append("&name=").append(URLEncoder.encode(cleanQuery, "UTF-8"))
+                    responseText = executeHttpRequest(fallbackUrlBuilder.toString())
+                }
+
                 if (!responseText.isNullOrBlank()) {
                     val jsonArray = JSONArray(responseText)
 
@@ -334,6 +345,68 @@ object RadioBrowserService {
         }
         Log.w(TAG, "fetchCountries: all servers failed, returning empty list.")
         return@withContext emptyList()
+    }
+
+    /**
+     * Queries Radio-Browser API by station UUID to fetch the freshest verified url_resolved stream.
+     */
+    suspend fun fetchStationByUuid(uuid: String): RadioStation? = withContext(Dispatchers.IO) {
+        if (uuid.isBlank()) return@withContext null
+        val activeUrls = getActiveServers()
+        for (baseUrl in activeUrls) {
+            try {
+                val encodedUuid = URLEncoder.encode(uuid.trim(), "UTF-8")
+                val responseText = executeHttpRequest("$baseUrl/byuuid/$encodedUuid")
+                if (!responseText.isNullOrBlank()) {
+                    val jsonArray = JSONArray(responseText)
+                    if (jsonArray.length() > 0) {
+                        val item = jsonArray.getJSONObject(0)
+                        val id = item.optString("stationuuid", uuid)
+                        val name = item.optString("name", "Unknown Radio").trim()
+                        val rawUrlResolved = item.optString("url_resolved", "").trim()
+                        val rawUrl = item.optString("url", "").trim()
+                        val streamUrl = when {
+                            rawUrlResolved.isNotBlank() -> rawUrlResolved
+                            rawUrl.isNotBlank() -> rawUrl
+                            else -> ""
+                        }
+                        if (streamUrl.isNotBlank() && (streamUrl.startsWith("http://") || streamUrl.startsWith("https://"))) {
+                            val favicon = item.optString("favicon", "").trim()
+                            val homepage = item.optString("homepage", "").trim()
+                            val country = item.optString("country", "Global")
+                            val tags = item.optString("tags", "General")
+                            val bitrateVal = item.optInt("bitrate", 128)
+                            val codec = item.optString("codec", "MP3").uppercase()
+
+                            val imageUrl = com.easeaudio.util.StationLogoResolver.resolveStationLogo(
+                                name = name,
+                                favicon = favicon,
+                                homepage = homepage,
+                                tags = tags
+                            )
+                            val rawGenre = tags.split(",").firstOrNull { t ->
+                                val lower = t.trim().lowercase()
+                                lower != "radio" && lower != "live" && lower != "online" && lower != "stream"
+                            }?.trim()?.replaceFirstChar { it.uppercase() } ?: "Music"
+
+                            return@withContext RadioStation(
+                                id = id,
+                                name = name,
+                                genre = if (rawGenre.length > 20) "Music" else rawGenre,
+                                country = if (country.isBlank()) "Global" else country,
+                                streamUrl = streamUrl,
+                                imageUrl = imageUrl,
+                                bitrate = "$bitrateVal kbps",
+                                codec = codec
+                            )
+                        }
+                    }
+                }
+            } catch (e: Exception) {
+                Log.w(TAG, "UUID lookup failed on $baseUrl for $uuid: ${e.message}")
+            }
+        }
+        return@withContext null
     }
 
     /**

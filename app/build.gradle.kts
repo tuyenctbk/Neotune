@@ -23,9 +23,9 @@ android {
     defaultConfig {
         applicationId = "com.neotune.radio"
         minSdk = 24
-        targetSdk = 37
-        versionCode = 200064
-        versionName = "4.4.3"
+        targetSdk = 35
+        versionCode = 200065
+        versionName = "4.4.4"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -118,7 +118,6 @@ dependencies {
     implementation(libs.androidx.media3.ui)
 
     // Coil Image Loading
-    implementation(libs.androidx.core.ktx)
     implementation(libs.coil.compose)
     implementation(libs.androidx.palette.ktx)
 
