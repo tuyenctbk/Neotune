@@ -18,14 +18,14 @@ android {
     }
 
     namespace = "com.easeaudio"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.neotune.radio"
         minSdk = 24
-        targetSdk = 35
-        versionCode = 200065
-        versionName = "4.4.4"
+        targetSdk = 36
+        versionCode = 200066
+        versionName = "4.4.5"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
