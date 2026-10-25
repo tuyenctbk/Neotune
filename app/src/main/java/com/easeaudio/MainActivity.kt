@@ -100,18 +100,29 @@ class MainActivity : ComponentActivity() {
         }
         splashScreen.setOnExitAnimationListener { splashScreenViewProvider ->
             val view = splashScreenViewProvider.view
-            val iconView = splashScreenViewProvider.iconView
+            val iconView = try {
+                splashScreenViewProvider.iconView
+            } catch (e: Throwable) {
+                null
+            }
             val fadeOut = android.animation.ObjectAnimator.ofFloat(view, android.view.View.ALPHA, 1f, 0f)
-            val scaleX = android.animation.ObjectAnimator.ofFloat(iconView, android.view.View.SCALE_X, 1f, 1.18f)
-            val scaleY = android.animation.ObjectAnimator.ofFloat(iconView, android.view.View.SCALE_Y, 1f, 1.18f)
+            val animators = mutableListOf<android.animation.Animator>(fadeOut)
+            if (iconView != null) {
+                animators.add(android.animation.ObjectAnimator.ofFloat(iconView, android.view.View.SCALE_X, 1f, 1.18f))
+                animators.add(android.animation.ObjectAnimator.ofFloat(iconView, android.view.View.SCALE_Y, 1f, 1.18f))
+            }
             
             android.animation.AnimatorSet().apply {
                 duration = 320L
                 interpolator = android.view.animation.DecelerateInterpolator()
-                playTogether(fadeOut, scaleX, scaleY)
+                playTogether(animators)
                 addListener(object : android.animation.AnimatorListenerAdapter() {
                     override fun onAnimationEnd(animation: android.animation.Animator) {
-                        splashScreenViewProvider.remove()
+                        try {
+                            splashScreenViewProvider.remove()
+                        } catch (e: Throwable) {
+                            Log.w("MainActivity", "Error removing splash screen: ${e.message}")
+                        }
                     }
                 })
                 start()
