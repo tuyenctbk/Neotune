@@ -85,11 +85,21 @@ class RadioRepository(
                 genre = genre,
                 country = country
             )
-            val allItems = result.podcasts + result.liveRadioStations
+            val openShows = if (offset == 0) {
+                if (query.isBlank()) {
+                    PodcastIndexService.openPodcasting20Shows
+                } else {
+                    PodcastIndexService.searchOpenPodcasts(query, limit = 10)
+                }
+            } else {
+                emptyList()
+            }
+            val mergedPodcasts = (openShows + result.podcasts).distinctBy { it.id }
+            val allItems = mergedPodcasts + result.liveRadioStations
             if (allItems.isNotEmpty()) {
                 dao.saveStationsToCache(allItems)
             }
-            result.podcasts
+            mergedPodcasts
         } catch (e: Exception) {
             // Offline fallback: retrieve cached podcasts from Room database
             dao.getCachedStations(

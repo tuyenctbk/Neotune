@@ -101,6 +101,9 @@ object PodcastEpisodeService {
                     var currentAudioUrl = ""
                     var currentDurationMs = 0L
                     var currentArtwork = show.imageUrl
+                    var currentChaptersUrl = ""
+                    var currentTranscriptUrl = ""
+                    val currentEmbeddedChapters = mutableListOf<EpisodeChapter>()
 
                     while (eventType != XmlPullParser.END_DOCUMENT && episodes.size < maxEpisodes) {
                         val tagName = parser.name ?: ""
@@ -114,6 +117,9 @@ object PodcastEpisodeService {
                                     currentAudioUrl = ""
                                     currentDurationMs = 0L
                                     currentArtwork = show.imageUrl
+                                    currentChaptersUrl = ""
+                                    currentTranscriptUrl = ""
+                                    currentEmbeddedChapters.clear()
                                 } else if (insideItem) {
                                     val cleanTag = tagName.substringAfter(":").lowercase()
                                     when {
@@ -130,6 +136,49 @@ object PodcastEpisodeService {
                                         }
                                         cleanTag == "duration" -> {
                                             currentDurationMs = parseDurationToMs(safeReadText(parser).trim())
+                                        }
+                                        cleanTag == "chapters" -> {
+                                            // Podcasting 2.0 <podcast:chapters url="..." type="application/json"/>
+                                            for (i in 0 until parser.attributeCount) {
+                                                val attrName = parser.getAttributeName(i) ?: ""
+                                                if (attrName.equals("url", ignoreCase = true)) {
+                                                    currentChaptersUrl = parser.getAttributeValue(i) ?: ""
+                                                }
+                                            }
+                                        }
+                                        cleanTag == "transcript" -> {
+                                            // Podcasting 2.0 <podcast:transcript url="..." type="..."/>
+                                            for (i in 0 until parser.attributeCount) {
+                                                val attrName = parser.getAttributeName(i) ?: ""
+                                                if (attrName.equals("url", ignoreCase = true)) {
+                                                    currentTranscriptUrl = parser.getAttributeValue(i) ?: ""
+                                                }
+                                            }
+                                        }
+                                        cleanTag == "chapter" -> {
+                                            // Podlove Simple Chapters <psc:chapter start="..." title="..."/>
+                                            var startVal = ""
+                                            var titleVal = ""
+                                            var imgVal: String? = null
+                                            for (i in 0 until parser.attributeCount) {
+                                                val attrName = parser.getAttributeName(i) ?: ""
+                                                when {
+                                                    attrName.equals("start", ignoreCase = true) -> startVal = parser.getAttributeValue(i) ?: ""
+                                                    attrName.equals("title", ignoreCase = true) -> titleVal = parser.getAttributeValue(i) ?: ""
+                                                    attrName.equals("image", ignoreCase = true) || attrName.equals("href", ignoreCase = true) -> imgVal = parser.getAttributeValue(i)
+                                                }
+                                            }
+                                            if (titleVal.isNotBlank()) {
+                                                val startMs = parseDurationToMs(startVal)
+                                                currentEmbeddedChapters.add(
+                                                    EpisodeChapter(
+                                                        title = titleVal,
+                                                        startTimeMs = startMs,
+                                                        durationText = formatMins(startMs),
+                                                        imageUrl = imgVal
+                                                    )
+                                                )
+                                            }
                                         }
                                         cleanTag == "enclosure" || cleanTag == "content" -> {
                                             var urlAttr = ""
@@ -170,6 +219,11 @@ object PodcastEpisodeService {
                                     insideItem = false
                                     if (currentTitle.isNotBlank() && currentAudioUrl.isNotBlank()) {
                                         val episodeId = "ep_${show.id}_${episodes.size}_${currentAudioUrl.hashCode()}"
+                                        val initialChapters = if (currentEmbeddedChapters.isNotEmpty()) {
+                                            currentEmbeddedChapters
+                                        } else {
+                                            parseChaptersFromDescription(currentDesc)
+                                        }
                                         episodes.add(
                                             PodcastEpisode(
                                                 id = episodeId,
@@ -179,7 +233,10 @@ object PodcastEpisodeService {
                                                 audioUrl = currentAudioUrl,
                                                 pubDate = currentPubDate,
                                                 durationMs = currentDurationMs,
-                                                artworkUrl = currentArtwork.ifBlank { show.imageUrl }
+                                                artworkUrl = currentArtwork.ifBlank { show.imageUrl },
+                                                chaptersUrl = currentChaptersUrl.ifBlank { null },
+                                                transcriptUrl = currentTranscriptUrl.ifBlank { null },
+                                                chapters = initialChapters
                                             )
                                         )
                                     }
@@ -267,5 +324,107 @@ object PodcastEpisodeService {
         } catch (e: Exception) {
             0L
         }
+    }
+
+    fun parseChaptersFromDescription(description: String): List<EpisodeChapter> {
+        val pattern = Regex("""(?:(?:(\d{1,2}):)?(\d{2}):(\d{2}))\s*[-–:]?\s*(.+)""")
+        val chapters = mutableListOf<EpisodeChapter>()
+        description.lines().forEach { line ->
+            val match = pattern.find(line.trim())
+            if (match != null) {
+                val p1 = match.groupValues[1]
+                val p2 = match.groupValues[2]
+                val p3 = match.groupValues[3]
+                val title = match.groupValues[4].trim()
+                val startMs = if (p1.isNotBlank()) {
+                    (p1.toLong() * 3600 + p2.toLong() * 60 + p3.toLong()) * 1000L
+                } else {
+                    (p2.toLong() * 60 + p3.toLong()) * 1000L
+                }
+                if (title.isNotBlank()) {
+                    chapters.add(
+                        EpisodeChapter(
+                            title = title,
+                            startTimeMs = startMs,
+                            durationText = formatMins(startMs)
+                        )
+                    )
+                }
+            }
+        }
+        return chapters
+    }
+
+    private fun formatMins(ms: Long): String {
+        val totalSecs = ms / 1000L
+        val mins = totalSecs / 60
+        val secs = totalSecs % 60
+        return String.format(Locale.getDefault(), "%02d:%02d", mins, secs)
+    }
+
+    suspend fun fetchChaptersForEpisode(episode: PodcastEpisode): List<EpisodeChapter> = withContext(Dispatchers.IO) {
+        if (episode.chapters.isNotEmpty()) return@withContext episode.chapters
+        val urlStr = episode.chaptersUrl
+        if (!urlStr.isNullOrBlank()) {
+            try {
+                val conn = (URL(urlStr).openConnection() as HttpURLConnection).apply {
+                    connectTimeout = 6000
+                    readTimeout = 6000
+                    setRequestProperty("User-Agent", "NeoTune/4.4.3")
+                    setRequestProperty("Accept", "application/json")
+                }
+                if (conn.responseCode == 200) {
+                    val text = conn.inputStream.bufferedReader().use { it.readText() }
+                    val json = org.json.JSONObject(text)
+                    val chaptersArray = json.optJSONArray("chapters")
+                    if (chaptersArray != null && chaptersArray.length() > 0) {
+                        val parsed = mutableListOf<EpisodeChapter>()
+                        for (i in 0 until chaptersArray.length()) {
+                            val ch = chaptersArray.getJSONObject(i)
+                            val startTimeSec = ch.optDouble("startTime", 0.0)
+                            val title = ch.optString("title", "Chapter ${i + 1}")
+                            val img = ch.optString("img", "").ifBlank { null }
+                            val linkUrl = ch.optString("url", "").ifBlank { null }
+                            val startMs = (startTimeSec * 1000.0).toLong()
+                            parsed.add(
+                                EpisodeChapter(
+                                    title = title,
+                                    startTimeMs = startMs,
+                                    durationText = formatMins(startMs),
+                                    imageUrl = img,
+                                    url = linkUrl
+                                )
+                            )
+                        }
+                        return@withContext parsed
+                    }
+                }
+            } catch (e: Exception) {
+                Log.w(TAG, "Failed to load Podcasting 2.0 chapters JSON from $urlStr: ${e.message}")
+            }
+        }
+        parseChaptersFromDescription(episode.description)
+    }
+
+    suspend fun fetchTranscriptForEpisode(episode: PodcastEpisode): String? = withContext(Dispatchers.IO) {
+        val urlStr = episode.transcriptUrl ?: return@withContext null
+        try {
+            val conn = (URL(urlStr).openConnection() as HttpURLConnection).apply {
+                connectTimeout = 6000
+                readTimeout = 6000
+                setRequestProperty("User-Agent", "NeoTune/4.4.3")
+            }
+            if (conn.responseCode == 200) {
+                val raw = conn.inputStream.bufferedReader().use { it.readText() }
+                val cleaned = raw.lines()
+                    .filterNot { it.startsWith("WEBVTT") || it.contains("-->") || it.trim().matches(Regex("^\\d+$")) }
+                    .joinToString("\n")
+                    .trim()
+                return@withContext cleaned.ifBlank { raw }
+            }
+        } catch (e: Exception) {
+            Log.w(TAG, "Failed to load Podcasting 2.0 transcript from $urlStr: ${e.message}")
+        }
+        null
     }
 }

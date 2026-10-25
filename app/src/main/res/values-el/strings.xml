@@ -521,4 +521,15 @@
     <string name="unknown_station">Unknown Station</string>
     <string name="play">Play</string>
     <string name="pause">Pause</string>
+
+    <string name="theme_artist_backdrop">Φόντο καλλιτέχνη 4K</string>
+    <string name="podcast_index_source">Ανοιχτός κατάλογος PodcastIndex</string>
+    <string name="tab_chapters">Κεφάλαια</string>
+    <string name="tab_transcripts">Απομαγνητοφωνήσεις</string>
+    <string name="no_chapters_available">Δεν υπάρχουν διαθέσιμα κεφάλαια για αυτό το επεισόδιο</string>
+    <string name="no_transcripts_available">Δεν υπάρχει διαθέσιμο κείμενο για αυτό το επεισόδιο</string>
+    <string name="chapter_number_format">Κεφάλαιο %1$d</string>
+    <string name="seek_to_chapter">Μετάβαση σε %1$s</string>
+    <string name="tv_leanback_mode">Λειτουργία TV Leanback</string>
+    <string name="tv_remote_hint">Χρησιμοποιήστε τα βέλη για πλοήγηση • Πατήστε OK για Αναπαραγωγή/Παύση</string>
 </resources>

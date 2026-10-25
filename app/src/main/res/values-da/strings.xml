@@ -521,4 +521,15 @@
     <string name="unknown_station">Unknown Station</string>
     <string name="play">Play</string>
     <string name="pause">Pause</string>
+
+    <string name="theme_artist_backdrop">4K-kunstnerbaggrund</string>
+    <string name="podcast_index_source">PodcastIndex åbent katalog</string>
+    <string name="tab_chapters">Kapitler</string>
+    <string name="tab_transcripts">Transskriptioner</string>
+    <string name="no_chapters_available">Ingen kapitler tilgængelige for dette afsnit</string>
+    <string name="no_transcripts_available">Ingen transskription tilgængelig for dette afsnit</string>
+    <string name="chapter_number_format">Kapitel %1$d</string>
+    <string name="seek_to_chapter">Gå til %1$s</string>
+    <string name="tv_leanback_mode">TV Leanback-tilstand</string>
+    <string name="tv_remote_hint">Brug navigationsknapperne • Tryk OK for Afspil/Pause</string>
 </resources>

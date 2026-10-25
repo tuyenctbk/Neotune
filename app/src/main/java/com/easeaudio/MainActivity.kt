@@ -300,10 +300,7 @@ fun MainAppContent(
     }
 
     // Android TV detection and auto screensaver activation
-    val isTv = remember {
-        val uiModeManager = context.getSystemService(Context.UI_MODE_SERVICE) as? android.app.UiModeManager
-        uiModeManager?.currentModeType == android.content.res.Configuration.UI_MODE_TYPE_TELEVISION
-    }
+    val isTv = com.easeaudio.ui.theme.rememberIsTv()
     var screensaverDismissedByUser by remember { mutableStateOf(false) }
 
     // When navigating away from Screensaver (e.g. back to home/player/settings),

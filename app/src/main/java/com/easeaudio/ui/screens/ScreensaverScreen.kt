@@ -56,6 +56,7 @@ import java.util.*
 import kotlin.math.sin
 
 enum class AmbientTheme(@StringRes val nameRes: Int) {
+    ARTIST_BACKDROP(R.string.theme_artist_backdrop),
     STATION_ART(R.string.theme_station_cover),
     AURORA(R.string.theme_aurora),
     COSMIC_NIGHT(R.string.theme_cosmic),
@@ -76,12 +77,21 @@ fun ScreensaverScreen(
     onToggleFavorite: (() -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
+    val isTv = rememberIsTv()
     var currentTime by remember { mutableStateOf(getFormattedTime()) }
     var currentDate by remember { mutableStateOf(getFormattedDate()) }
-    var selectedTheme by remember { mutableStateOf(AmbientTheme.STATION_ART) }
+    var selectedTheme by remember { mutableStateOf(if (isTv) AmbientTheme.ARTIST_BACKDROP else AmbientTheme.STATION_ART) }
     var isDimmed by remember { mutableStateOf(false) }
     var showOverlayControls by remember { mutableStateOf(false) }
     var lastInteractionTime by remember { mutableLongStateOf(System.currentTimeMillis()) }
+    var artistBackdropUrl by remember(streamTitle, currentStation?.name) { mutableStateOf<String?>(null) }
+
+    LaunchedEffect(streamTitle, currentStation?.name) {
+        val query = streamTitle?.ifBlank { null } ?: currentStation?.name ?: ""
+        if (query.isNotBlank()) {
+            artistBackdropUrl = com.easeaudio.data.TrackArtworkService.fetch4KArtistBackdrop(query, currentStation?.name ?: "")
+        }
+    }
 
     androidx.activity.compose.BackHandler(enabled = showOverlayControls) {
         showOverlayControls = false
@@ -187,6 +197,21 @@ fun ScreensaverScreen(
 
         // LAYER 1: Full Screen Background Image / Ambient Theme
         when (selectedTheme) {
+            AmbientTheme.ARTIST_BACKDROP -> {
+                val backdrop = artistBackdropUrl ?: trackArtworkUrl ?: currentStation?.imageUrl
+                if (!backdrop.isNullOrBlank()) {
+                    AsyncImage(
+                        model = backdrop,
+                        contentDescription = stringResource(R.string.theme_artist_backdrop),
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .blur(if (isDimmed) 18.dp else 5.dp)
+                    )
+                } else {
+                    AuroraGradientCanvas(particlePhase)
+                }
+            }
             AmbientTheme.STATION_ART -> {
                 val resolvedArt = remember(trackArtworkUrl, currentStation?.name, currentStation?.imageUrl, currentStation?.genre) {
                     trackArtworkUrl?.ifBlank { null }

@@ -62,7 +62,7 @@ object TrackArtworkService {
                         if (isResultValidMatch(cleanQuery, artistName, trackName, collectionName)) {
                             val rawArtwork = item.optString("artworkUrl100", item.optString("artworkUrl60", ""))
                             if (rawArtwork.isNotBlank()) {
-                                val highResArtwork = rawArtwork.replace(Regex("/\\d+x\\d+bb"), "/600x600bb")
+                                val highResArtwork = rawArtwork.replace(Regex("/\\d+x\\d+bb"), "/1400x1400bb")
                                 artworkCache.put(cacheKey, highResArtwork)
                                 Log.d(TAG, "Resolved artwork for '$cleanQuery' -> $highResArtwork (matched: $artistName - $trackName)")
                                 return@withContext highResArtwork
@@ -71,14 +71,91 @@ object TrackArtworkService {
                     }
                 }
             }
+            
+            // Fallback: Query open MusicBrainz + Cover Art Archive
+            val mbArtwork = queryMusicBrainzArtwork(cleanQuery)
+            if (mbArtwork != null) {
+                artworkCache.put(cacheKey, mbArtwork)
+                return@withContext mbArtwork
+            }
+
             nullCache.put(cacheKey, true)
             null
         } catch (e: Exception) {
             Log.w(TAG, "Failed to resolve track artwork for '$cleanQuery': ${e.message}")
+            // Fallback on exception: check MusicBrainz
+            val mbArtwork = queryMusicBrainzArtwork(cleanQuery)
+            if (mbArtwork != null) {
+                artworkCache.put(cacheKey, mbArtwork)
+                return@withContext mbArtwork
+            }
             null
         } finally {
             try { connection?.disconnect() } catch (_: Exception) {}
         }
+    }
+
+    /**
+     * Resolves 4K/high-res artist backdrop images for Android TV Leanback
+     * and live visualizer backgrounds using MusicBrainz & Fanart / Cover Art Archive.
+     */
+    suspend fun fetch4KArtistBackdrop(rawTrackTitle: String, stationName: String = ""): String? = withContext(Dispatchers.IO) {
+        if (rawTrackTitle.isBlank()) return@withContext null
+        val cleanQuery = cleanTrackTitle(rawTrackTitle, stationName)
+        if (cleanQuery.isBlank() || isGenericOrInvalid(cleanQuery, stationName)) return@withContext null
+
+        val cacheKey = "backdrop_${cleanQuery.lowercase()}"
+        artworkCache.get(cacheKey)?.let { return@withContext it }
+
+        // Step 1: Check MusicBrainz for recording and release group
+        val mbArt = queryMusicBrainzArtwork(cleanQuery)
+        if (mbArt != null) {
+            artworkCache.put(cacheKey, mbArt)
+            return@withContext mbArt
+        }
+
+        // Step 2: Use Ultra-HD (1400x1400) track artwork as backdrop
+        val itunesArt = fetchTrackArtwork(rawTrackTitle, stationName)
+        if (itunesArt != null) {
+            artworkCache.put(cacheKey, itunesArt)
+            return@withContext itunesArt
+        }
+        null
+    }
+
+    private fun queryMusicBrainzArtwork(query: String): String? {
+        var conn: HttpURLConnection? = null
+        try {
+            val encoded = URLEncoder.encode(query, "UTF-8")
+            val url = URL("https://musicbrainz.org/ws/2/recording/?query=$encoded&fmt=json&limit=3")
+            conn = (url.openConnection() as HttpURLConnection).apply {
+                connectTimeout = 3000
+                readTimeout = 3000
+                setRequestProperty("User-Agent", "NeoTune/4.4.3 (contact@neotune.app)")
+                setRequestProperty("Accept", "application/json")
+            }
+            if (conn.responseCode == 200) {
+                val text = conn.inputStream.bufferedReader().use { it.readText() }
+                val json = JSONObject(text)
+                val recordings = json.optJSONArray("recordings")
+                if (recordings != null && recordings.length() > 0) {
+                    for (i in 0 until recordings.length()) {
+                        val rec = recordings.getJSONObject(i)
+                        val releases = rec.optJSONArray("releases")
+                        if (releases != null && releases.length() > 0) {
+                            val releaseId = releases.getJSONObject(0).optString("id", "")
+                            if (releaseId.isNotBlank()) {
+                                return "https://coverartarchive.org/release/$releaseId/front-1200"
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (_: Exception) {
+        } finally {
+            try { conn?.disconnect() } catch (_: Exception) {}
+        }
+        return null
     }
 
     private fun isResultValidMatch(

@@ -591,5 +591,17 @@
     <string name="unknown_station">Unknown Station</string>
     <string name="play">Play</string>
     <string name="pause">Pause</string>
+
+    <!-- Podcasting 2.0 & Leanback TV Strings -->
+    <string name="theme_artist_backdrop">4K Artist Backdrop</string>
+    <string name="podcast_index_source">PodcastIndex Open Directory</string>
+    <string name="tab_chapters">Chapters</string>
+    <string name="tab_transcripts">Transcripts</string>
+    <string name="no_chapters_available">No chapters available for this episode</string>
+    <string name="no_transcripts_available">No transcript available for this episode</string>
+    <string name="chapter_number_format">Chapter %1$d</string>
+    <string name="seek_to_chapter">Jump to %1$s</string>
+    <string name="tv_leanback_mode">TV Leanback Mode</string>
+    <string name="tv_remote_hint">Use D-Pad to navigate • Press OK to Play/Pause</string>
 </resources>
 

@@ -521,4 +521,15 @@
     <string name="unknown_station">محطة غير معروفة</string>
     <string name="play">تشغيل</string>
     <string name="pause">إيقاف مؤقت</string>
+
+    <string name="theme_artist_backdrop">خلفية الفنان بدقة 4K</string>
+    <string name="podcast_index_source">دليل PodcastIndex المفتوح</string>
+    <string name="tab_chapters">الفصول</string>
+    <string name="tab_transcripts">النصوص المكتوبة</string>
+    <string name="no_chapters_available">لا توجد فصول متاحة لهذه الحلقة</string>
+    <string name="no_transcripts_available">لا يوجد نص مكتوب متاح لهذه الحلقة</string>
+    <string name="chapter_number_format">الفصل %1$d</string>
+    <string name="seek_to_chapter">الانتقال إلى %1$s</string>
+    <string name="tv_leanback_mode">وضع التلفزيون Leanback</string>
+    <string name="tv_remote_hint">استخدم لوحة الاتجاهات للتنقل • اضغط OK للتشغيل/الإيقاف المؤقت</string>
 </resources>

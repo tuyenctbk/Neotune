@@ -39,56 +39,28 @@ import coil.compose.SubcomposeAsyncImage
 import coil.compose.SubcomposeAsyncImageContent
 import coil.compose.AsyncImagePainter
 import com.easeaudio.R
+import com.easeaudio.data.EpisodeChapter
 import com.easeaudio.data.PodcastEpisode
 import com.easeaudio.data.RadioStation
 import com.easeaudio.ui.theme.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-data class EpisodeChapter(
-    val title: String,
-    val startTimeMs: Long,
-    val durationText: String
-)
+fun resolveChaptersForEpisode(episode: PodcastEpisode): List<EpisodeChapter> {
+    if (episode.chapters.isNotEmpty()) return episode.chapters
+    val parsed = com.easeaudio.data.PodcastEpisodeService.parseChaptersFromDescription(episode.description)
+    if (parsed.isNotEmpty()) return parsed
 
-fun generateChaptersForEpisode(episode: PodcastEpisode): List<EpisodeChapter> {
-    val durationMs = if (episode.durationMs > 0L) episode.durationMs else 15 * 60 * 1000L // default 15 mins
-    
-    val titles = when (episode.id.hashCode() % 4) {
-        0 -> listOf(
-            "Introduction & Episode Preview",
-            "Deep Dive: Analyzing the Messy Middle",
-            "Case Study: Real-World Business Transformations",
-            "Audience Q&A & Expert Insights",
-            "Outro & Actionable Takeaways"
-        )
-        1 -> listOf(
-            "Episode Welcome & Key Ideas",
-            "The Psychology Behind Habits & Routines",
-            "Practical Strategies for High Performance",
-            "Exclusive Interview with Industry Leaders",
-            "Summary & This Week's Challenge"
-        )
-        2 -> listOf(
-            "Segment 1: Understanding the Concept",
-            "Segment 2: Historical Context & Evolutionary Science",
-            "Segment 3: Modern Applications & Techniques",
-            "Interactive Host Discussion & Commentary",
-            "Wrap Up & Audience Recommendations"
-        )
-        else -> listOf(
-            "Opening Theme & Show Overview",
-            "Core Problem Identification",
-            "Step-by-Step Implementation Guide",
-            "Top Pitfalls & Mistakes to Avoid",
-            "Closing Thoughts & Final Advice"
-        )
-    }
-    
-    val count = titles.size
+    val durationMs = if (episode.durationMs > 0L) episode.durationMs else 15 * 60 * 1000L
+    val count = 4
     val chapterDurationMs = durationMs / count
-    
-    return titles.mapIndexed { index, title ->
+    val defaultTitles = listOf(
+        "Introduction & Episode Preview",
+        "Key Topic & Deep Dive",
+        "Host Discussion & Insights",
+        "Summary & Takeaways"
+    )
+    return defaultTitles.mapIndexed { index, title ->
         val startMs = index * chapterDurationMs
         val durMins = chapterDurationMs / 1000L / 60L
         EpisodeChapter(
@@ -724,9 +696,26 @@ fun PodcastEpisodeDetailView(
         
         Spacer(modifier = Modifier.height(22.dp))
         
-        // Chapters Section (THE HERO FEATURE!)
-        val chapters = remember(episode) { generateChaptersForEpisode(episode) }
-        val activeChapterIndex = remember(currentPlaybackPosition, isSelected, isEpisodePlaying) {
+        // Chapters Section (Podcasting 2.0 & Auto-Generated)
+        var chapters by remember(episode) { mutableStateOf(resolveChaptersForEpisode(episode)) }
+        var transcriptText by remember(episode) { mutableStateOf<String?>(null) }
+        var isTranscriptLoading by remember(episode) { mutableStateOf(false) }
+
+        LaunchedEffect(episode) {
+            if (!episode.chaptersUrl.isNullOrBlank()) {
+                val fetched = com.easeaudio.data.PodcastEpisodeService.fetchChaptersForEpisode(episode)
+                if (fetched.isNotEmpty()) {
+                    chapters = fetched
+                }
+            }
+            if (!episode.transcriptUrl.isNullOrBlank()) {
+                isTranscriptLoading = true
+                transcriptText = com.easeaudio.data.PodcastEpisodeService.fetchTranscriptForEpisode(episode)
+                isTranscriptLoading = false
+            }
+        }
+
+        val activeChapterIndex = remember(currentPlaybackPosition, isSelected, isEpisodePlaying, chapters) {
             if (isSelected) {
                 chapters.indexOfLast { currentPlaybackPosition >= it.startTimeMs }
             } else {
@@ -840,6 +829,41 @@ fun PodcastEpisodeDetailView(
                         )
                     }
                 }
+            }
+        }
+
+        if (!transcriptText.isNullOrBlank()) {
+            Spacer(modifier = Modifier.height(20.dp))
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f))
+                    .padding(16.dp)
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Notes,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(18.dp)
+                    )
+                    Text(
+                        text = stringResource(R.string.tab_transcripts),
+                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                }
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = transcriptText!!,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    lineHeight = 22.sp
+                )
             }
         }
         

@@ -20,6 +20,8 @@ data class RadioStation(
 ) {
     val isPodcast: Boolean
         get() = id.startsWith("itunes_", ignoreCase = true) ||
+                id.startsWith("pi_", ignoreCase = true) ||
+                codec.equals("RSS", ignoreCase = true) ||
                 bitrate.equals("Podcast", ignoreCase = true) ||
                 genre.contains("Podcast", ignoreCase = true) ||
                 genre.contains("Audiobook", ignoreCase = true) ||

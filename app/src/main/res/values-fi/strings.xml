@@ -521,4 +521,15 @@
     <string name="unknown_station">Unknown Station</string>
     <string name="play">Play</string>
     <string name="pause">Pause</string>
+
+    <string name="theme_artist_backdrop">4K-artistitausta</string>
+    <string name="podcast_index_source">PodcastIndex-avoin hakemisto</string>
+    <string name="tab_chapters">Luvut</string>
+    <string name="tab_transcripts">Tekstitykset</string>
+    <string name="no_chapters_available">Tälle jaksolle ei ole lukuja</string>
+    <string name="no_transcripts_available">Tälle jaksolle ei ole transkriptiota</string>
+    <string name="chapter_number_format">Luku %1$d</string>
+    <string name="seek_to_chapter">Siirry kohtaan %1$s</string>
+    <string name="tv_leanback_mode">TV Leanback -tila</string>
+    <string name="tv_remote_hint">Käytä suuntapainikkeita • Paina OK toistaaksesi/keskeyttääksesi</string>
 </resources>

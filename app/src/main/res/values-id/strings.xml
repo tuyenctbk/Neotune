@@ -521,4 +521,15 @@
     <string name="unknown_station">Stasiun Tidak Dikenal</string>
     <string name="play">Putar</string>
     <string name="pause">Jeda</string>
+
+    <string name="theme_artist_backdrop">Latar belakang artis 4K</string>
+    <string name="podcast_index_source">Direktori terbuka PodcastIndex</string>
+    <string name="tab_chapters">Bab</string>
+    <string name="tab_transcripts">Transkrip</string>
+    <string name="no_chapters_available">Tidak ada bab untuk episode ini</string>
+    <string name="no_transcripts_available">Tidak ada transkrip untuk episode ini</string>
+    <string name="chapter_number_format">Bab %1$d</string>
+    <string name="seek_to_chapter">Lompat ke %1$s</string>
+    <string name="tv_leanback_mode">Mode TV Leanback</string>
+    <string name="tv_remote_hint">Gunakan D-Pad untuk navigasi • Tekan OK untuk Putar/Jeda</string>
 </resources>
