@@ -104,6 +104,12 @@ import com.easeaudio.viewmodel.HomeUiState
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.Lifecycle
+import androidx.compose.material.icons.outlined.Coffee
+import com.easeaudio.engagement.SmartEngagementManager
+import com.easeaudio.engagement.EngagementPromptType
+import com.easeaudio.ui.components.DonationDialog
+import com.easeaudio.ui.components.HomeDonationBanner
+import com.easeaudio.ui.components.MilestoneDialog
 
 enum class HomeTab {
     Radio, Podcast
@@ -153,6 +159,31 @@ fun HomeScreen(
     val focusManager = LocalFocusManager.current
 
     val context = LocalContext.current
+    val engagementManager = remember { SmartEngagementManager.getInstance(context) }
+    val isSupporter by engagementManager.isSupporter.collectAsState()
+    val showHomeDonationBanner by engagementManager.showHomeDonationBanner.collectAsState()
+    val activePrompt by engagementManager.activePrompt.collectAsState()
+    val milestoneToCelebrate by engagementManager.milestoneToCelebrate.collectAsState()
+
+    var showDirectDonationDialog by remember { mutableStateOf(false) }
+
+    if (activePrompt == EngagementPromptType.DONATION_PROMPT || showDirectDonationDialog) {
+        DonationDialog(
+            onDismiss = {
+                showDirectDonationDialog = false
+                engagementManager.dismissDonationDialog()
+            }
+        )
+    }
+
+    milestoneToCelebrate?.let { milestone ->
+        MilestoneDialog(
+            milestoneCount = milestone,
+            onOpenDonation = { showDirectDonationDialog = true },
+            onDismiss = { engagementManager.dismissMilestone() }
+        )
+    }
+
     val homePrefs = remember { context.getSharedPreferences("neotune_home_prefs", Context.MODE_PRIVATE) }
     val savedContinueTabName = remember {
         homePrefs.getString("saved_continue_tab", ContinueListeningTab.Featured.name)
@@ -580,6 +611,17 @@ fun HomeScreen(
                                 }
                             }
                         }
+                    }
+                }
+
+                // Home Screen Compact Banner (Smart Trigger)
+                if (showHomeDonationBanner && !isSupporter) {
+                    item(span = { GridItemSpan(maxLineSpan) }) {
+                        HomeDonationBanner(
+                            isVisible = true,
+                            onOpenDonation = { showDirectDonationDialog = true },
+                            onDismiss = { engagementManager.dismissHomeDonationBanner() }
+                        )
                     }
                 }
 

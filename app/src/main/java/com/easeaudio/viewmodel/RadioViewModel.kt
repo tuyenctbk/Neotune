@@ -1251,6 +1251,7 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
     private var podcastLoadMoreOffset = 0
 
     fun playStation(station: RadioStation) {
+        smartEngagementManager.recordCoreOperation("play_station")
         val now = System.currentTimeMillis()
         val isSameStation = playerManager.currentStation.value?.id == station.id || lastPlaybackClickStationId == station.id
         

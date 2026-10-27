@@ -989,6 +989,11 @@ fun MainAppContent(
                         onDismiss = { viewModel.smartEngagementManager.onUpdateDismissed() }
                     )
                 }
+                com.easeaudio.engagement.EngagementPromptType.DONATION_PROMPT -> {
+                    com.easeaudio.ui.components.DonationDialog(
+                        onDismiss = { viewModel.smartEngagementManager.dismissDonationDialog() }
+                    )
+                }
                 com.easeaudio.engagement.EngagementPromptType.NONE -> {}
             }
         }

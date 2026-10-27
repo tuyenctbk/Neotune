@@ -17,7 +17,8 @@ enum class EngagementPromptType {
     NONE,
     RATE_5_STARS,
     SHARE_APP,
-    UPDATE_APP
+    UPDATE_APP,
+    DONATION_PROMPT
 }
 
 data class UpdateInfo(
@@ -154,6 +155,13 @@ class SmartEngagementManager private constructor(context: Context) {
         private const val KEY_UPDATE_DISMISSED_VERSION_CODE = "update_dismissed_version_code"
         private const val KEY_UPDATE_DISMISS_COUNT_FOR_VERSION = "update_dismiss_count_for_version"
 
+        // Donation & Milestone tracking
+        private const val KEY_OPERATIONS_COUNT = "operations_count"
+        private const val KEY_IS_SUPPORTER = "is_supporter"
+        private const val KEY_LAST_DONATION_BANNER_DISMISS = "last_donation_banner_dismiss"
+        private const val KEY_LAST_AUTO_DONATION_PROMPT = "last_auto_donation_prompt"
+        private const val KEY_LAST_MILESTONE_SHOWN = "last_milestone_shown"
+
         // Re-export constants for compatibility
         const val RATE_MIN_INSTALL_DAYS = EngagementPolicy.RATE_MIN_INSTALL_DAYS
         const val RATE_MIN_SESSIONS = EngagementPolicy.RATE_MIN_SESSIONS
@@ -195,6 +203,18 @@ class SmartEngagementManager private constructor(context: Context) {
 
     private val _updateInfo = MutableStateFlow(UpdateInfo())
     val updateInfo: StateFlow<UpdateInfo> = _updateInfo.asStateFlow()
+
+    private val _isSupporter = MutableStateFlow(prefs.getBoolean(KEY_IS_SUPPORTER, false))
+    val isSupporter: StateFlow<Boolean> = _isSupporter.asStateFlow()
+
+    private val _operationsCount = MutableStateFlow(prefs.getInt(KEY_OPERATIONS_COUNT, 0))
+    val operationsCount: StateFlow<Int> = _operationsCount.asStateFlow()
+
+    private val _showHomeDonationBanner = MutableStateFlow(false)
+    val showHomeDonationBanner: StateFlow<Boolean> = _showHomeDonationBanner.asStateFlow()
+
+    private val _milestoneToCelebrate = MutableStateFlow<Int?>(null)
+    val milestoneToCelebrate: StateFlow<Int?> = _milestoneToCelebrate.asStateFlow()
 
     init {
         trackSessionStart()
@@ -268,6 +288,7 @@ class SmartEngagementManager private constructor(context: Context) {
             EngagementPromptType.RATE_5_STARS -> editor.putLong(KEY_LAST_RATE_PROMPT_TIMESTAMP, now)
             EngagementPromptType.SHARE_APP -> editor.putLong(KEY_LAST_SHARE_PROMPT_TIMESTAMP, now)
             EngagementPromptType.UPDATE_APP -> editor.putLong(KEY_LAST_UPDATE_PROMPT_TIMESTAMP, now)
+            EngagementPromptType.DONATION_PROMPT -> editor.putLong(KEY_LAST_AUTO_DONATION_PROMPT, now)
             EngagementPromptType.NONE -> {}
         }
         editor.apply()
@@ -508,5 +529,91 @@ class SmartEngagementManager private constructor(context: Context) {
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         }
         context.startActivity(chooser)
+    }
+
+    fun evaluateHomeDonationBanner() {
+        if (_isSupporter.value) {
+            _showHomeDonationBanner.value = false
+            return
+        }
+        val ops = prefs.getInt(KEY_OPERATIONS_COUNT, 0)
+        val sessions = prefs.getInt(KEY_SESSION_COUNT, 0)
+        val firstLaunch = prefs.getLong(KEY_FIRST_LAUNCH_TIMESTAMP, System.currentTimeMillis())
+        val daysSinceFirstLaunch = TimeUnit.MILLISECONDS.toDays(System.currentTimeMillis() - firstLaunch)
+        val lastDismiss = prefs.getLong(KEY_LAST_DONATION_BANNER_DISMISS, 0L)
+        val daysSinceLastDismiss = if (lastDismiss > 0) TimeUnit.MILLISECONDS.toDays(System.currentTimeMillis() - lastDismiss) else 100L
+
+        val meetsCriteria = ops >= 3 && sessions >= 3 && daysSinceFirstLaunch >= 2 && daysSinceLastDismiss >= 14
+        _showHomeDonationBanner.value = meetsCriteria
+    }
+
+    fun recordCoreOperation(opType: String = "general") {
+        val newCount = prefs.getInt(KEY_OPERATIONS_COUNT, 0) + 1
+        prefs.edit().putInt(KEY_OPERATIONS_COUNT, newCount).apply()
+        _operationsCount.value = newCount
+        Log.i(TAG, "Core operation recorded ($opType), total: $newCount")
+
+        if (_isSupporter.value) return
+
+        // Check Milestones (10, 25, 50)
+        val lastMilestone = prefs.getInt(KEY_LAST_MILESTONE_SHOWN, 0)
+        val targetMilestone = when {
+            newCount >= 50 && lastMilestone < 50 -> 50
+            newCount >= 25 && lastMilestone < 25 -> 25
+            newCount >= 10 && lastMilestone < 10 -> 10
+            else -> null
+        }
+
+        if (targetMilestone != null) {
+            prefs.edit().putInt(KEY_LAST_MILESTONE_SHOWN, targetMilestone).apply()
+            _milestoneToCelebrate.value = targetMilestone
+            return
+        }
+
+        // Check Auto Donation Prompt (7+ ops, 30 days cooldown)
+        if (newCount >= 7 && !isPromptShownThisSession) {
+            val now = System.currentTimeMillis()
+            val lastAuto = prefs.getLong(KEY_LAST_AUTO_DONATION_PROMPT, 0L)
+            val daysSinceLastAuto = if (lastAuto > 0) TimeUnit.MILLISECONDS.toDays(now - lastAuto) else 100L
+            if (daysSinceLastAuto >= 30) {
+                prefs.edit().putLong(KEY_LAST_AUTO_DONATION_PROMPT, now).apply()
+                _activePrompt.value = EngagementPromptType.DONATION_PROMPT
+                isPromptShownThisSession = true
+                return
+            }
+        }
+
+        evaluateHomeDonationBanner()
+    }
+
+    fun dismissHomeDonationBanner() {
+        prefs.edit().putLong(KEY_LAST_DONATION_BANNER_DISMISS, System.currentTimeMillis()).apply()
+        _showHomeDonationBanner.value = false
+    }
+
+    fun dismissMilestone() {
+        _milestoneToCelebrate.value = null
+    }
+
+    fun showDonationDialogDirectly() {
+        _activePrompt.value = EngagementPromptType.DONATION_PROMPT
+    }
+
+    fun dismissDonationDialog() {
+        if (_activePrompt.value == EngagementPromptType.DONATION_PROMPT) {
+            _activePrompt.value = EngagementPromptType.NONE
+        }
+    }
+
+    fun setSupporterStatus(supporter: Boolean) {
+        prefs.edit().putBoolean(KEY_IS_SUPPORTER, supporter).apply()
+        _isSupporter.value = supporter
+        if (supporter) {
+            _showHomeDonationBanner.value = false
+            _milestoneToCelebrate.value = null
+            if (_activePrompt.value == EngagementPromptType.DONATION_PROMPT) {
+                _activePrompt.value = EngagementPromptType.NONE
+            }
+        }
     }
 }

@@ -221,10 +221,11 @@ class RadioStreamRecorder private constructor(context: Context) {
         } catch (_: Exception) {}
 
         _recordingState.value = RecordingState(isRecording = false)
-        if (file != null && file.exists() && file.length() == 0L) {
-            try { file.delete() } catch (_: Exception) {}
+        if (file != null && file.exists() && file.length() > 0L) {
+            com.easeaudio.engagement.SmartEngagementManager.getInstance(context).recordCoreOperation("record_stream")
+            return file
         }
-        return if (file != null && file.exists() && file.length() > 0L) file else null
+        return null
     }
 
     fun getRecordings(): List<RecordingItem> {

@@ -7,6 +7,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.outlined.Coffee
+import com.easeaudio.ui.components.DonationDialog
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -60,6 +62,11 @@ fun SettingsScreen(
 ) {
     val context = LocalContext.current
     var showRecordingsDialog by remember { mutableStateOf(false) }
+    var showDonationDialog by remember { mutableStateOf(false) }
+
+    if (showDonationDialog) {
+        DonationDialog(onDismiss = { showDonationDialog = false })
+    }
 
     if (showRecordingsDialog) {
         com.easeaudio.ui.components.RecordingsDialog(
@@ -398,6 +405,15 @@ fun SettingsScreen(
                 item {
                     SettingsCard {
                         val activity = context as? android.app.Activity
+                        SettingsItem(
+                            icon = Icons.Outlined.Coffee,
+                            iconTint = MaterialTheme.colorScheme.primary,
+                            title = stringResource(R.string.support_development_btn),
+                            subtitle = stringResource(R.string.settings_support_dev_desc),
+                            onClick = { showDonationDialog = true },
+                            testTag = "setting_support_dev"
+                        )
+                        HorizontalDivider(color = MaterialTheme.colorScheme.surfaceVariant, thickness = 1.dp)
                         SettingsItem(
                             icon = Icons.Filled.Star,
                             iconTint = MaterialTheme.colorScheme.primary,
