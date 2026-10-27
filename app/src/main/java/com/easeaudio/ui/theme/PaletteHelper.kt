@@ -30,7 +30,7 @@ fun rememberArtworkPalette(imageUrl: String?): ArtworkPaletteState {
         }
         withContext(Dispatchers.IO) {
             try {
-                val imageLoader = ImageLoader(context)
+                val imageLoader = coil.Coil.imageLoader(context)
                 val request = ImageRequest.Builder(context)
                     .data(imageUrl)
                     .allowHardware(false)

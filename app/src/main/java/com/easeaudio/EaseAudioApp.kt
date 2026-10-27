@@ -25,7 +25,7 @@ class EaseAudioApp : Application(), ImageLoaderFactory {
                 val original = chain.request()
                 val request = original.newBuilder()
                     .header("User-Agent", "Mozilla/5.0 (Linux; Android 14; Mobile) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Mobile Safari/537.36")
-                    .header("Accept", "image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8")
+                    .header("Accept", "image/webp,image/png,image/jpeg,image/svg+xml,image/*;q=0.8")
                     .build()
                 chain.proceed(request)
             }
@@ -40,7 +40,7 @@ class EaseAudioApp : Application(), ImageLoaderFactory {
             }
             .diskCache {
                 DiskCache.Builder()
-                    .directory(cacheDir.resolve("station_image_cache"))
+                    .directory(cacheDir.resolve("station_image_cache_v2"))
                     .maxSizeBytes(100L * 1024 * 1024)
                     .build()
             }
