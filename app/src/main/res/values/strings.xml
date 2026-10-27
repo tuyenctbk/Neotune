@@ -612,7 +612,6 @@
     <string name="tab_google_play">Google Play</string>
     <string name="tab_paypal">PayPal &amp; QR</string>
     <string name="tab_kofi">Ko-fi Tip Jar</string>
-    <string name="tab_crypto">Crypto</string>
     <string name="iap_section_desc">Support directly via official Google Play Billing with 1-tap Google Pay:</string>
     <string name="tier_espresso">☕ Espresso Supporter</string>
     <string name="tier_lunch">🥪 Dev Lunch Supporter</string>
@@ -627,9 +626,6 @@
     <string name="kofi_tip_jar_title">Buy Me a Coffee on Ko-fi</string>
     <string name="kofi_tip_jar_desc">Familiar tip jar for open-source &amp; indie app supporters.</string>
     <string name="open_kofi">Open Ko-fi</string>
-    <string name="crypto_section_desc">Decentralized crypto support (Zero fees, privacy-focused):</string>
-    <string name="crypto_address_copied_toast">%1$s wallet address copied to clipboard!</string>
-    <string name="copy_wallet_address">Copy Wallet Address</string>
     <string name="milestone_dialog_title">🎉 Milestone Reached!</string>
     <string name="milestone_dialog_desc">You\'ve completed %1$d audio playback &amp; recording tasks! Thank you for listening with NeoTune.</string>
     <string name="support_development_btn">Support Development ☕</string>

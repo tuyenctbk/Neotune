@@ -58,16 +58,8 @@ fun DonationDialog(
     val engagementManager = remember { SmartEngagementManager.getInstance(context) }
     val isSupporter by engagementManager.isSupporter.collectAsState()
 
-    var selectedTab by remember { mutableStateOf(0) } // 0: Google Play IAP, 1: PayPal, 2: Ko-fi, 3: Crypto
+    var selectedTab by remember { mutableStateOf(0) } // 0: Google Play IAP, 1: PayPal, 2: Ko-fi
     var customPaypalAmount by remember { mutableStateOf("5") }
-    var selectedCryptoCurrency by remember { mutableStateOf(0) } // 0: USDT (TRC20), 1: BTC
-
-    val cryptoAddresses = remember {
-        listOf(
-            "USDT (TRC20)" to "TX9aR8P2xK1v4m9L3q7N5w2Y0z8B1v3C4",
-            "Bitcoin (BTC)" to "bc1q9v8k7m6n5p4q3r2s1t0u9v8w7x6y5z4a3b2c1"
-        )
-    }
 
     Dialog(
         onDismissRequest = onDismiss,
@@ -210,11 +202,6 @@ fun DonationDialog(
                         selected = selectedTab == 2,
                         onClick = { selectedTab = 2 },
                         text = { Text(stringResource(R.string.tab_kofi), maxLines = 1, overflow = TextOverflow.Ellipsis, fontSize = 12.sp) }
-                    )
-                    Tab(
-                        selected = selectedTab == 3,
-                        onClick = { selectedTab = 3 },
-                        text = { Text(stringResource(R.string.tab_crypto), maxLines = 1, overflow = TextOverflow.Ellipsis, fontSize = 12.sp) }
                     )
                 }
 
@@ -498,103 +485,6 @@ fun DonationDialog(
                                     Spacer(modifier = Modifier.width(6.dp))
                                     Text(stringResource(R.string.open_kofi), maxLines = 1)
                                 }
-                            }
-                        }
-
-                        3 -> {
-                            // Decentralized Crypto
-                            Text(
-                                text = stringResource(R.string.crypto_section_desc),
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.spacedBy(8.dp)
-                            ) {
-                                cryptoAddresses.forEachIndexed { idx, (label, _) ->
-                                    FilterChip(
-                                        selected = selectedCryptoCurrency == idx,
-                                        onClick = { selectedCryptoCurrency = idx },
-                                        label = { Text(label) },
-                                        modifier = Modifier.weight(1f)
-                                    )
-                                }
-                            }
-
-                            val (label, address) = cryptoAddresses[selectedCryptoCurrency]
-
-                            val qrMatrix = remember(address) {
-                                try { QrCodeGenerator.encode(address) } catch (e: Exception) { QrCodeGenerator.encode("crypto_fallback") }
-                            }
-
-                            Card(
-                                modifier = Modifier.fillMaxWidth(),
-                                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f)),
-                                shape = RoundedCornerShape(18.dp)
-                            ) {
-                                Column(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(16.dp),
-                                    horizontalAlignment = Alignment.CenterHorizontally
-                                ) {
-                                    Box(
-                                        modifier = Modifier
-                                            .size(160.dp)
-                                            .clip(RoundedCornerShape(12.dp))
-                                            .background(Color.White)
-                                            .padding(10.dp)
-                                    ) {
-                                        Canvas(modifier = Modifier.fillMaxSize()) {
-                                            val matrixSize = qrMatrix.size
-                                            val cellSize = size.width / matrixSize
-                                            for (r in 0 until matrixSize) {
-                                                for (c in 0 until matrixSize) {
-                                                    if (qrMatrix[r][c]) {
-                                                        drawRect(
-                                                            color = Color.Black,
-                                                            topLeft = Offset(c * cellSize, r * cellSize),
-                                                            size = Size(cellSize + 0.5f, cellSize + 0.5f)
-                                                        )
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-
-                                    Spacer(modifier = Modifier.height(10.dp))
-
-                                    Text(
-                                        text = "$label Address",
-                                        style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold),
-                                        color = MaterialTheme.colorScheme.onSurface
-                                    )
-
-                                    Text(
-                                        text = address,
-                                        style = MaterialTheme.typography.bodySmall.copy(fontSize = 11.sp),
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                        textAlign = TextAlign.Center,
-                                        maxLines = 2,
-                                        overflow = TextOverflow.Ellipsis
-                                    )
-                                }
-                            }
-
-                            Button(
-                                onClick = {
-                                    val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                                    clipboard.setPrimaryClip(ClipData.newPlainText("$label Address", address))
-                                    Toast.makeText(context, context.getString(R.string.crypto_address_copied_toast, label), Toast.LENGTH_SHORT).show()
-                                },
-                                modifier = Modifier.fillMaxWidth(),
-                                shape = RoundedCornerShape(12.dp)
-                            ) {
-                                Icon(Icons.Outlined.ContentCopy, contentDescription = null, modifier = Modifier.size(16.dp))
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Text(stringResource(R.string.copy_wallet_address))
                             }
                         }
                     }
