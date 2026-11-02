@@ -394,6 +394,8 @@
     <string name="car_volume_mute">Mute</string>
     <string name="car_volume_down">Vol -</string>
     <string name="car_volume_up">Vol +</string>
+    <string name="volume_down">Volume Down</string>
+    <string name="volume_up">Volume Up</string>
     <string name="car_curated_master_title">Audiophile &amp; Master Presets</string>
 
     <!-- Developer Donation -->

@@ -846,7 +846,7 @@ fun PodcastEpisodeDetailView(
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     Icon(
-                        imageVector = Icons.Filled.Notes,
+                        imageVector = Icons.AutoMirrored.Filled.Notes,
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.size(18.dp)

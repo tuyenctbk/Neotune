@@ -557,7 +557,6 @@
     <string name="tab_google_play">Google Play</string>
     <string name="tab_paypal">PayPal &amp; QR</string>
     <string name="tab_kofi">Ko-fi Spendenbox</string>
-    <string name="tab_crypto">Krypto</string>
     <string name="iap_section_desc">Direkt unterstützen über Google Play mit 1-Klick Google Pay:</string>
     <string name="tier_espresso">☕ Espresso Unterstützer</string>
     <string name="tier_lunch">🥪 Entwickler-Mittagessen</string>
@@ -572,9 +571,6 @@
     <string name="kofi_tip_jar_title">Kaffee auf Ko-fi ausgeben</string>
     <string name="kofi_tip_jar_desc">Trinkgeldbox für Open-Source-Unterstützer.</string>
     <string name="open_kofi">Ko-fi öffnen</string>
-    <string name="crypto_section_desc">Dezentrale Krypto-Unterstützung (Ohne Gebühren):</string>
-    <string name="crypto_address_copied_toast">%1$s-Wallet-Adresse in Zwischenablage kopiert!</string>
-    <string name="copy_wallet_address">Wallet-Adresse kopieren</string>
     <string name="milestone_dialog_title">🎉 Meilenstein erreicht!</string>
     <string name="milestone_dialog_desc">Sie haben %1$d Audio-Wiedergaben und Aufnahmen abgeschlossen! Danke für die Nutzung von NeoTune.</string>
     <string name="support_development_btn">Entwicklung unterstützen ☕</string>

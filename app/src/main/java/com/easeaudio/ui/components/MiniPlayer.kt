@@ -34,10 +34,16 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onKeyEvent
+import androidx.compose.ui.input.key.type
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
@@ -109,11 +115,25 @@ fun MiniPlayer(
                 label = "miniAvatarScale"
             )
 
+            val miniPlayerScale by animateFloatAsState(
+                targetValue = if (showFocus) 1.025f else 1.0f,
+                animationSpec = spring(stiffness = Spring.StiffnessMediumLow),
+                label = "miniPlayerScale"
+            )
+
+            val haptic = LocalHapticFeedback.current
+
             Surface(
                 modifier = Modifier
                     .fillMaxWidth()
                     .widthIn(max = 680.dp)
                     .padding(horizontal = 12.dp, vertical = 6.dp)
+                    .scale(miniPlayerScale)
+                    .shadow(
+                        elevation = if (showFocus) 16.dp else 8.dp,
+                        shape = RoundedCornerShape(16.dp),
+                        spotColor = if (showFocus) MaterialTheme.colorScheme.primary else Color.Black
+                    )
                     .onFocusChanged { isFocused = it.isFocused }
                     .clip(RoundedCornerShape(16.dp))
                     .pointerInput(Unit) {
@@ -122,6 +142,18 @@ fun MiniPlayer(
                                 onOpenFullPlayer()
                             }
                         }
+                    }
+                    .onKeyEvent { keyEvent ->
+                        if (keyEvent.type == KeyEventType.KeyUp) {
+                            when (keyEvent.key) {
+                                Key.DirectionCenter, Key.Enter, Key.NumPadEnter -> {
+                                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                    onOpenFullPlayer()
+                                    true
+                                }
+                                else -> false
+                            }
+                        } else false
                     }
                     .combinedClickable(
                         onClick = { onOpenFullPlayer() },
@@ -166,11 +198,7 @@ fun MiniPlayer(
                         isPodcast = station.isPodcast,
                         modifier = Modifier
                             .size(48.dp)
-                            .alpha(if (isLoading) loadingAlpha else 1.0f)
-                            .combinedClickable(
-                                onClick = { onOpenFullPlayer() },
-                                onDoubleClick = { onOpenFullPlayer() }
-                            ),
+                            .alpha(if (isLoading) loadingAlpha else 1.0f),
                         shape = CircleShape,
                         borderWidth = 1.5.dp,
                         borderColor = if (isPlaying) MaterialTheme.colorScheme.primary.copy(alpha = 0.6f) else MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f),
@@ -257,8 +285,12 @@ fun MiniPlayer(
                     }
 
                     // Favorite Button
-                    val haptic = LocalHapticFeedback.current
                     var isFavFocused by remember { mutableStateOf(false) }
+                    val favScale by animateFloatAsState(
+                        targetValue = if (isFavFocused) 1.15f else 1.0f,
+                        animationSpec = spring(stiffness = Spring.StiffnessMediumLow),
+                        label = "favScale"
+                    )
                     IconButton(
                         onClick = {
                             haptic.performHapticFeedback(HapticFeedbackType.LongPress)
@@ -266,21 +298,44 @@ fun MiniPlayer(
                         },
                         modifier = Modifier
                             .size(36.dp)
+                            .scale(favScale)
                             .onFocusChanged { isFavFocused = it.isFocused }
                             .clip(CircleShape)
-                            .background(if (isFavFocused) FavoriteHeartColor else Color.Transparent)
+                            .background(if (isFavFocused) FavoriteHeartColor.copy(alpha = 0.25f) else Color.Transparent)
+                            .border(
+                                width = if (isFavFocused) 2.dp else 0.dp,
+                                color = if (isFavFocused) FavoriteHeartColor else Color.Transparent,
+                                shape = CircleShape
+                            )
+                            .onKeyEvent { keyEvent ->
+                                if (keyEvent.type == KeyEventType.KeyUp) {
+                                    when (keyEvent.key) {
+                                        Key.DirectionCenter, Key.Enter, Key.NumPadEnter -> {
+                                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                            onToggleFavorite()
+                                            true
+                                        }
+                                        else -> false
+                                    }
+                                } else false
+                            }
                             .testTag("mini_player_favorite")
                     ) {
                         Icon(
                             imageVector = if (station.isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
                             contentDescription = stringResource(R.string.favorites),
-                            tint = if (isFavFocused) MaterialTheme.colorScheme.background else (if (station.isFavorite) FavoriteHeartColor else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)),
+                            tint = if (isFavFocused) FavoriteHeartColor else (if (station.isFavorite) FavoriteHeartColor else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)),
                             modifier = Modifier.size(20.dp)
                         )
                     }
 
                     // Expand to Fullscreen Button
                     var isExpandFocused by remember { mutableStateOf(false) }
+                    val expandScale by animateFloatAsState(
+                        targetValue = if (isExpandFocused) 1.15f else 1.0f,
+                        animationSpec = spring(stiffness = Spring.StiffnessMediumLow),
+                        label = "expandScale"
+                    )
                     IconButton(
                         onClick = {
                             haptic.performHapticFeedback(HapticFeedbackType.LongPress)
@@ -288,25 +343,48 @@ fun MiniPlayer(
                         },
                         modifier = Modifier
                             .size(36.dp)
+                            .scale(expandScale)
                             .onFocusChanged { isExpandFocused = it.isFocused }
                             .clip(CircleShape)
-                            .background(if (isExpandFocused) MaterialTheme.colorScheme.primary else Color.Transparent)
+                            .background(if (isExpandFocused) MaterialTheme.colorScheme.primary.copy(alpha = 0.25f) else Color.Transparent)
+                            .border(
+                                width = if (isExpandFocused) 2.dp else 0.dp,
+                                color = if (isExpandFocused) MaterialTheme.colorScheme.primary else Color.Transparent,
+                                shape = CircleShape
+                            )
+                            .onKeyEvent { keyEvent ->
+                                if (keyEvent.type == KeyEventType.KeyUp) {
+                                    when (keyEvent.key) {
+                                        Key.DirectionCenter, Key.Enter, Key.NumPadEnter -> {
+                                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                            onOpenFullPlayer()
+                                            true
+                                        }
+                                        else -> false
+                                    }
+                                } else false
+                            }
                             .testTag("mini_player_expand_fullscreen")
                     ) {
                         Icon(
                             imageVector = Icons.Filled.OpenInFull,
                             contentDescription = stringResource(R.string.fullscreen_player),
-                            tint = if (isExpandFocused) MaterialTheme.colorScheme.background else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                            tint = if (isExpandFocused) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
                             modifier = Modifier.size(18.dp)
                         )
                     }
 
-                    Spacer(modifier = Modifier.width(2.dp))
+                    Spacer(modifier = Modifier.width(4.dp))
 
                     // Play/Pause Button
                     var isPlayFocused by remember { mutableStateOf(false) }
-                    val playBtnContainerColor = if (isPlayFocused) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.primary
-                    val playBtnContentColor = if (isPlayFocused) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onPrimary
+                    val playScale by animateFloatAsState(
+                        targetValue = if (isPlayFocused) 1.15f else 1.0f,
+                        animationSpec = spring(stiffness = Spring.StiffnessMediumLow),
+                        label = "playScale"
+                    )
+                    val playBtnContainerColor = if (isPlayFocused) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.primary
+                    val playBtnContentColor = MaterialTheme.colorScheme.onPrimary
 
                     IconButton(
                         onClick = {
@@ -314,10 +392,28 @@ fun MiniPlayer(
                             onTogglePlay()
                         },
                         modifier = Modifier
-                            .size(40.dp)
+                            .size(42.dp)
+                            .scale(playScale)
                             .onFocusChanged { isPlayFocused = it.isFocused }
                             .clip(CircleShape)
                             .background(playBtnContainerColor)
+                            .border(
+                                width = if (isPlayFocused) 2.5.dp else 0.dp,
+                                color = if (isPlayFocused) Color.White else Color.Transparent,
+                                shape = CircleShape
+                            )
+                            .onKeyEvent { keyEvent ->
+                                if (keyEvent.type == KeyEventType.KeyUp) {
+                                    when (keyEvent.key) {
+                                        Key.DirectionCenter, Key.Enter, Key.NumPadEnter -> {
+                                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                            onTogglePlay()
+                                            true
+                                        }
+                                        else -> false
+                                    }
+                                } else false
+                            }
                             .testTag("mini_player_play_pause")
                     ) {
                         if (isLoading) {

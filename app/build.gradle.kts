@@ -24,8 +24,8 @@ android {
         applicationId = "com.neotune.radio"
         minSdk = 24
         targetSdk = 36
-        versionCode = 200069
-        versionName = "4.4.7"
+        versionCode = 200070
+        versionName = "4.4.8"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }

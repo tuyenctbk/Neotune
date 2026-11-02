@@ -1,5 +1,6 @@
 package com.easeaudio.ui.screens
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.BorderStroke
@@ -34,6 +35,11 @@ import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onKeyEvent
+import androidx.compose.ui.input.key.type
 import coil.request.ImageRequest
 import com.easeaudio.ui.components.AnimatedStationAvatar
 import com.easeaudio.ui.components.AudioVisualizer
@@ -112,6 +118,8 @@ fun PlayerScreen(
     onOpenEpisodes: (() -> Unit)? = null,
     onBack: () -> Unit
 ) {
+    BackHandler(onBack = onBack)
+
     if (station == null) {
         Box(
             modifier = Modifier
@@ -621,9 +629,7 @@ private fun PlayerContent(
     }
 
     Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .then(if (isHorizontal) Modifier.verticalScroll(rememberScrollState()) else Modifier),
+        modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = if (isHorizontal) Alignment.Start else Alignment.CenterHorizontally
     ) {
         Row(
@@ -983,14 +989,44 @@ private fun PlayerContent(
         Spacer(modifier = Modifier.height(24.dp))
 
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(Icons.AutoMirrored.Filled.VolumeDown, null, tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(20.dp))
+            var isVolDownFocused by remember { mutableStateOf(false) }
+            IconButton(
+                onClick = { onVolumeChange((volume - 0.1f).coerceIn(0f, 1f)) },
+                modifier = Modifier
+                    .onFocusChanged { isVolDownFocused = it.isFocused }
+                    .scale(if (isVolDownFocused) 1.2f else 1.0f)
+                    .clip(CircleShape)
+                    .background(if (isVolDownFocused) MaterialTheme.colorScheme.primary else Color.Transparent)
+            ) {
+                Icon(
+                    Icons.AutoMirrored.Filled.VolumeDown,
+                    contentDescription = stringResource(R.string.volume_down),
+                    tint = if (isVolDownFocused) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.size(20.dp)
+                )
+            }
             Slider(
                 value = volume,
                 onValueChange = onVolumeChange,
-                modifier = Modifier.weight(1f).padding(horizontal = 12.dp),
+                modifier = Modifier.weight(1f).padding(horizontal = 8.dp),
                 colors = SliderDefaults.colors(thumbColor = MaterialTheme.colorScheme.primary, activeTrackColor = MaterialTheme.colorScheme.primary)
             )
-            Icon(Icons.AutoMirrored.Filled.VolumeUp, null, tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(20.dp))
+            var isVolUpFocused by remember { mutableStateOf(false) }
+            IconButton(
+                onClick = { onVolumeChange((volume + 0.1f).coerceIn(0f, 1f)) },
+                modifier = Modifier
+                    .onFocusChanged { isVolUpFocused = it.isFocused }
+                    .scale(if (isVolUpFocused) 1.2f else 1.0f)
+                    .clip(CircleShape)
+                    .background(if (isVolUpFocused) MaterialTheme.colorScheme.primary else Color.Transparent)
+            ) {
+                Icon(
+                    Icons.AutoMirrored.Filled.VolumeUp,
+                    contentDescription = stringResource(R.string.volume_up),
+                    tint = if (isVolUpFocused) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.size(20.dp)
+                )
+            }
         }
 
         Spacer(modifier = Modifier.height(24.dp))
@@ -1000,13 +1036,19 @@ private fun PlayerContent(
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             if (isPodcast && onOpenEpisodes != null) {
+                var isEpFocused by remember { mutableStateOf(false) }
                 AssistChip(
                     onClick = onOpenEpisodes,
                     label = { Text(stringResource(R.string.episodes_label)) },
-                    leadingIcon = { Icon(Icons.AutoMirrored.Filled.QueueMusic, null, modifier = Modifier.size(16.dp), tint = MaterialTheme.colorScheme.primary) }
+                    leadingIcon = { Icon(Icons.AutoMirrored.Filled.QueueMusic, null, modifier = Modifier.size(16.dp), tint = MaterialTheme.colorScheme.primary) },
+                    border = if (isEpFocused) BorderStroke(2.dp, MaterialTheme.colorScheme.primary) else null,
+                    modifier = Modifier
+                        .onFocusChanged { isEpFocused = it.isFocused }
+                        .scale(if (isEpFocused) 1.08f else 1.0f)
                 )
             }
             if (isPodcast && onPlaybackSpeedChange != null) {
+                var isSpeedFocused by remember { mutableStateOf(false) }
                 AssistChip(
                     onClick = {
                         val nextSpeed = when (playbackSpeed) {
@@ -1019,27 +1061,47 @@ private fun PlayerContent(
                         onPlaybackSpeedChange(nextSpeed)
                     },
                     label = { Text(stringResource(R.string.speed_format, playbackSpeed.toString())) },
-                    leadingIcon = { Icon(Icons.Filled.Speed, null, modifier = Modifier.size(16.dp), tint = MaterialTheme.colorScheme.primary) }
+                    leadingIcon = { Icon(Icons.Filled.Speed, null, modifier = Modifier.size(16.dp), tint = MaterialTheme.colorScheme.primary) },
+                    border = if (isSpeedFocused) BorderStroke(2.dp, MaterialTheme.colorScheme.primary) else null,
+                    modifier = Modifier
+                        .onFocusChanged { isSpeedFocused = it.isFocused }
+                        .scale(if (isSpeedFocused) 1.08f else 1.0f)
                 )
             }
             val activePresetLabel = eqPresets.find { it.key == activeEqPreset }?.labelResId?.let { stringResource(it) } ?: activeEqPreset
+            var isEqFocused by remember { mutableStateOf(false) }
             AssistChip(
                 onClick = onOpenEqualizer,
                 label = { Text(stringResource(R.string.eq_label, activePresetLabel)) },
-                leadingIcon = { Icon(Icons.Filled.Tune, null, modifier = Modifier.size(16.dp), tint = MaterialTheme.colorScheme.primary) }
+                leadingIcon = { Icon(Icons.Filled.Tune, null, modifier = Modifier.size(16.dp), tint = MaterialTheme.colorScheme.primary) },
+                border = if (isEqFocused) BorderStroke(2.dp, MaterialTheme.colorScheme.primary) else null,
+                modifier = Modifier
+                    .onFocusChanged { isEqFocused = it.isFocused }
+                    .scale(if (isEqFocused) 1.08f else 1.0f)
             )
+            var isTimerFocused by remember { mutableStateOf(false) }
             AssistChip(
                 onClick = onOpenSleepTimer,
                 label = { Text(if (sleepTimerRemaining != null) "${sleepTimerRemaining}m" else stringResource(R.string.timer_label)) },
                 leadingIcon = { Icon(Icons.Filled.Bedtime, null, modifier = Modifier.size(16.dp), tint = if (sleepTimerRemaining != null) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.primary) },
-                colors = if (sleepTimerRemaining != null) AssistChipDefaults.assistChipColors(containerColor = MaterialTheme.colorScheme.primaryContainer) else AssistChipDefaults.assistChipColors()
+                colors = if (sleepTimerRemaining != null) AssistChipDefaults.assistChipColors(containerColor = MaterialTheme.colorScheme.primaryContainer) else AssistChipDefaults.assistChipColors(),
+                border = if (isTimerFocused) BorderStroke(2.dp, MaterialTheme.colorScheme.primary) else null,
+                modifier = Modifier
+                    .onFocusChanged { isTimerFocused = it.isFocused }
+                    .scale(if (isTimerFocused) 1.08f else 1.0f)
             )
+            var isLyricsFocused by remember { mutableStateOf(false) }
             AssistChip(
                 onClick = onOpenLyrics,
                 label = { Text(stringResource(R.string.lyrics_label)) },
-                leadingIcon = { Icon(Icons.Filled.Mic, null, modifier = Modifier.size(16.dp), tint = MaterialTheme.colorScheme.primary) }
+                leadingIcon = { Icon(Icons.Filled.Mic, null, modifier = Modifier.size(16.dp), tint = MaterialTheme.colorScheme.primary) },
+                border = if (isLyricsFocused) BorderStroke(2.dp, MaterialTheme.colorScheme.primary) else null,
+                modifier = Modifier
+                    .onFocusChanged { isLyricsFocused = it.isFocused }
+                    .scale(if (isLyricsFocused) 1.08f else 1.0f)
             )
             val isRec = recState.isRecording
+            var isRecFocused by remember { mutableStateOf(false) }
             AssistChip(
                 onClick = {
                     RadioPlayerManager.getInstance(contentContext).toggleStreamRecording()
@@ -1064,12 +1126,21 @@ private fun PlayerContent(
                         tint = if (isRec) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary
                     )
                 },
-                colors = if (isRec) AssistChipDefaults.assistChipColors(containerColor = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.5f)) else AssistChipDefaults.assistChipColors()
+                colors = if (isRec) AssistChipDefaults.assistChipColors(containerColor = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.5f)) else AssistChipDefaults.assistChipColors(),
+                border = if (isRecFocused) BorderStroke(2.dp, MaterialTheme.colorScheme.primary) else null,
+                modifier = Modifier
+                    .onFocusChanged { isRecFocused = it.isFocused }
+                    .scale(if (isRecFocused) 1.08f else 1.0f)
             )
+            var isCastFocused by remember { mutableStateOf(false) }
             AssistChip(
                 onClick = { showAudioOutputDialog = true },
                 label = { Text(stringResource(R.string.audio_output_route)) },
-                leadingIcon = { Icon(Icons.Filled.Cast, null, modifier = Modifier.size(16.dp), tint = MaterialTheme.colorScheme.primary) }
+                leadingIcon = { Icon(Icons.Filled.Cast, null, modifier = Modifier.size(16.dp), tint = MaterialTheme.colorScheme.primary) },
+                border = if (isCastFocused) BorderStroke(2.dp, MaterialTheme.colorScheme.primary) else null,
+                modifier = Modifier
+                    .onFocusChanged { isCastFocused = it.isFocused }
+                    .scale(if (isCastFocused) 1.08f else 1.0f)
             )
         }
     }
