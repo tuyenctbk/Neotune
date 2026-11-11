@@ -703,7 +703,7 @@ fun ScreensaverScreen(
                             ) {
                                 Icon(
                                     imageVector = if (isPlaying) Icons.Filled.Pause else Icons.Filled.PlayArrow,
-                                    contentDescription = if (isPlaying) "Pause" else "Play",
+                                    contentDescription = stringResource(if (isPlaying) R.string.pause else R.string.play),
                                     tint = MaterialTheme.colorScheme.background,
                                     modifier = Modifier.size(28.dp)
                                 )

@@ -564,4 +564,22 @@
     <string name="post_op_recording_saved_card">Stream recorded successfully! Buy dev a coffee if this saved your day ☕</string>
     <string name="support_dev">Support</string>
     <string name="settings_support_dev_desc">Help keep NeoTune 100% free, open-source and ad-free</string>
+
+    <string name="volume_down">Abaixa el volum</string>
+    <string name="volume_up">Apuja el volum</string>
+    <string name="smart_picks_tab">Seleccions intel·ligents</string>
+    <string name="smart_picks_morning_title">Energia matinal</string>
+    <string name="smart_picks_morning_desc">Música energitzant, notícies i cafè acústic de matí</string>
+    <string name="smart_picks_afternoon_title">Concentració i estudi</string>
+    <string name="smart_picks_afternoon_desc">Lo-Fi de concentració, ritmes ambientals i jazz per treballar</string>
+    <string name="smart_picks_evening_title">Relax al capvespre</string>
+    <string name="smart_picks_evening_desc">Lounge suau, ritmes clàssics i ràdio chillout</string>
+    <string name="smart_picks_night_title">Ambient profund i son</string>
+    <string name="smart_picks_night_desc">Sons relaxants per dormir, piano i Lo-Fi de mitjanit</string>
+    <string name="voice_tuning_title">Sintonia per veu</string>
+    <string name="voice_tuning_prompt">Digueu una emissora o ordre (ex: \"Play Jazz\", \"Temporitzador 30\")…</string>
+    <string name="voice_tuning_hint">Cerca per veu i ordres</string>
+    <string name="voice_tuning_executed">Ordre de veu: %1$s</string>
+    <string name="voice_tuning_listening">Escoltant emissora o ordre…</string>
+    <string name="voice_tuning_not_available">El reconeixement de veu no està disponible en aquest dispositiu</string>
 </resources>

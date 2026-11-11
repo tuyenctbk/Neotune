@@ -581,4 +581,22 @@
     <string name="post_op_recording_saved_card">Aufnahme erfolgreich gespeichert! Spendieren Sie dem Entwickler einen Kaffee ☕</string>
     <string name="support_dev">Unterstützen</string>
     <string name="settings_support_dev_desc">Helfen Sie, NeoTune kostenlos, open-source und werbefrei zu halten</string>
+
+    <string name="volume_down">Lautstärke verringern</string>
+    <string name="volume_up">Lautstärke erhöhen</string>
+    <string name="smart_picks_tab">Smart-Tipps</string>
+    <string name="smart_picks_morning_title">Morgen-Kickstart</string>
+    <string name="smart_picks_morning_desc">Belebende Musik, Nachrichten &amp; akustische Morgenkaffee-Vibes</string>
+    <string name="smart_picks_afternoon_title">Fokus &amp; Lernen</string>
+    <string name="smart_picks_afternoon_desc">Konzentrations-Lo-Fi, Ambient-Beats &amp; Arbeits-Jazz</string>
+    <string name="smart_picks_evening_title">Abendlicher Ausklang</string>
+    <string name="smart_picks_evening_desc">Sanfter Lounge, klassische Grooves &amp; Chillout-Radio</string>
+    <string name="smart_picks_night_title">Deep Ambient &amp; Schlaf</string>
+    <string name="smart_picks_night_desc">Beruhigende Schlafklänge, Klavier &amp; Mitternachts-Lo-Fi</string>
+    <string name="voice_tuning_title">Sprachsteuerung</string>
+    <string name="voice_tuning_prompt">Sender oder Befehl sprechen (z. B. \"Play Jazz\", \"Sleep timer 30\")…</string>
+    <string name="voice_tuning_hint">Sprachsuche &amp; Befehle</string>
+    <string name="voice_tuning_executed">Sprachbefehl: %1$s</string>
+    <string name="voice_tuning_listening">Warte auf Sender oder Sprachbefehl…</string>
+    <string name="voice_tuning_not_available">Spracherkennung ist auf diesem Gerät nicht verfügbar</string>
 </resources>

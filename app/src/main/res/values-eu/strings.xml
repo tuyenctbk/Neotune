@@ -564,4 +564,22 @@
     <string name="post_op_recording_saved_card">Stream recorded successfully! Buy dev a coffee if this saved your day ☕</string>
     <string name="support_dev">Support</string>
     <string name="settings_support_dev_desc">Help keep NeoTune 100% free, open-source and ad-free</string>
+
+    <string name="volume_down">Jaitsi bolumena</string>
+    <string name="volume_up">Igo bolumena</string>
+    <string name="smart_picks_tab">Aukera adimendunak</string>
+    <string name="smart_picks_morning_title">Goizeko energia</string>
+    <string name="smart_picks_morning_desc">Musika bizia, albisteak eta goizeko kafe akustikoa</string>
+    <string name="smart_picks_afternoon_title">Fokua eta ikasketak</string>
+    <string name="smart_picks_afternoon_desc">Kontzentraziorako Lo-Fi-a, giro-erritmoak eta laneko jazza</string>
+    <string name="smart_picks_evening_title">Ilunabarreko erlaxazioa</string>
+    <string name="smart_picks_evening_desc">Lounge leuna, erritmo klasikoak eta chillout irratia</string>
+    <string name="smart_picks_night_title">Giro sakona eta loaldia</string>
+    <string name="smart_picks_night_desc">Lurreratzeko soinu lasaigarriak, pianoa eta gauerdiko Lo-Fi-a</string>
+    <string name="voice_tuning_title">Ahots bidezko sintonia</string>
+    <string name="voice_tuning_prompt">Esan kate bat edo komandoa (adib. \"Play Jazz\", \"Lo tenporizadorea 30\")…</string>
+    <string name="voice_tuning_hint">Ahots bidezko bilaketa eta komandoak</string>
+    <string name="voice_tuning_executed">Ahots komandoa: %1$s</string>
+    <string name="voice_tuning_listening">Katea edo komandoa entzuten…</string>
+    <string name="voice_tuning_not_available">Ahotsaren ezagutza ez dago erabilgarri gailu honetan</string>
 </resources>

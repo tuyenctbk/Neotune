@@ -24,8 +24,8 @@ android {
         applicationId = "com.neotune.radio"
         minSdk = 24
         targetSdk = 36
-        versionCode = 200070
-        versionName = "4.4.8"
+        versionCode = 200073
+        versionName = "4.5.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -57,7 +57,8 @@ android {
             signingConfig = signingConfigs.getByName("debugConfig")
         }
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
             signingConfig = signingConfigs.getByName("release")
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),

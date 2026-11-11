@@ -564,4 +564,22 @@
     <string name="post_op_recording_saved_card">Stream recorded successfully! Buy dev a coffee if this saved your day ☕</string>
     <string name="support_dev">Support</string>
     <string name="settings_support_dev_desc">Help keep NeoTune 100% free, open-source and ad-free</string>
+
+    <string name="volume_down">ভলিউম কমান</string>
+    <string name="volume_up">ভলিউম বাড়ান</string>
+    <string name="smart_picks_tab">স্মার্ট পছন্দ</string>
+    <string name="smart_picks_morning_title">সকালের সূচনা</string>
+    <string name="smart_picks_morning_desc">সতেজ সঙ্গীত, খবর এবং সকালের কফির স্নিগ্ধ পরিবেশ</string>
+    <string name="smart_picks_afternoon_title">মনোযোগ ও পড়াশোনা</string>
+    <string name="smart_picks_afternoon_desc">গভীর মনোযোগের লো-ফাই, অ্যাম্বিয়েন্ট বিট এবং কাজের জ্যাজ</string>
+    <string name="smart_picks_evening_title">সন্ধ্যার প্রশান্তি</string>
+    <string name="smart_picks_evening_desc">শান্ত লাউঞ্জ, ক্লাসিক সুর এবং রিল্যাক্স রেডিও</string>
+    <string name="smart_picks_night_title">গভীর ঘুম ও নিস্তব্ধতা</string>
+    <string name="smart_picks_night_desc">শান্ত ঘুমের সাউন্ডস্কেপ, পিয়ানো এবং মধ্যরাতের লো-ফাই</string>
+    <string name="voice_tuning_title">ভয়েস টিউনিং</string>
+    <string name="voice_tuning_prompt">স্টেশন বা কমান্ড বলুন (যেমন \"Play Jazz\", \"স্লিপ টাইমার ৩০\")…</string>
+    <string name="voice_tuning_hint">ভয়েস অনুসন্ধান ও কমান্ড</string>
+    <string name="voice_tuning_executed">ভয়েস কমান্ড: %1$s</string>
+    <string name="voice_tuning_listening">স্টেশন বা কমান্ড শোনার চেষ্টা করা হচ্ছে…</string>
+    <string name="voice_tuning_not_available">এই ডিভাইসে ভয়েস রিকগনিশন সমর্থিত নয়</string>
 </resources>

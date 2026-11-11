@@ -564,4 +564,22 @@
     <string name="post_op_recording_saved_card">Stream recorded successfully! Buy dev a coffee if this saved your day ☕</string>
     <string name="support_dev">Support</string>
     <string name="settings_support_dev_desc">Help keep NeoTune 100% free, open-source and ad-free</string>
+
+    <string name="volume_down">Volume af</string>
+    <string name="volume_up">Volume op</string>
+    <string name="smart_picks_tab">Slim keuses</string>
+    <string name="smart_picks_morning_title">Oggend skop</string>
+    <string name="smart_picks_morning_desc">Opgewekte musiek, nuus en akoestiese oggendkoffie-atmosfeer</string>
+    <string name="smart_picks_afternoon_title">Fokus en studie</string>
+    <string name="smart_picks_afternoon_desc">Diep fokus Lo-Fi, omringende ritmes en werk-jazz</string>
+    <string name="smart_picks_evening_title">Sonsondergang ontspanning</string>
+    <string name="smart_picks_evening_desc">Gladde sitkamer, klassieke ritmes en ontspanningsradio</string>
+    <string name="smart_picks_night_title">Diep omgewing en slaap</string>
+    <string name="smart_picks_night_desc">Rustige slaapklanke, klavier en middernagtelike Lo-Fi</string>
+    <string name="voice_tuning_title">Stemstemming</string>
+    <string name="voice_tuning_prompt">Praat stasie of opdrag (bv. \"Play Jazz\", \"Slaaptimer 30\")…</string>
+    <string name="voice_tuning_hint">Stemsoektog en opdragte</string>
+    <string name="voice_tuning_executed">Stemopdrag: %1$s</string>
+    <string name="voice_tuning_listening">Luister tans na stasie of opdrag…</string>
+    <string name="voice_tuning_not_available">Stemherkenning is nie op hierdie toestel beskikbaar nie</string>
 </resources>

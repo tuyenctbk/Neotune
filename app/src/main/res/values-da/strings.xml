@@ -564,4 +564,22 @@
     <string name="post_op_recording_saved_card">Stream recorded successfully! Buy dev a coffee if this saved your day ☕</string>
     <string name="support_dev">Support</string>
     <string name="settings_support_dev_desc">Help keep NeoTune 100% free, open-source and ad-free</string>
+
+    <string name="volume_down">Skru ned</string>
+    <string name="volume_up">Skru op</string>
+    <string name="smart_picks_tab">Smarte valg</string>
+    <string name="smart_picks_morning_title">Morgen kickstart</string>
+    <string name="smart_picks_morning_desc">Energisk musik, nyheder og akustisk morgenkaffe-stemning</string>
+    <string name="smart_picks_afternoon_title">Fokus &amp; studie</string>
+    <string name="smart_picks_afternoon_desc">Dyb fokus Lo-Fi, rolige rytmer og arbejdsjazz</string>
+    <string name="smart_picks_evening_title">Aftenhygge</string>
+    <string name="smart_picks_evening_desc">Blød lounge, klassiske rytmer og chillout-radio</string>
+    <string name="smart_picks_night_title">Dyb ambient &amp; søvn</string>
+    <string name="smart_picks_night_desc">Beroligende sovelyde, klaver og midnats-Lo-Fi</string>
+    <string name="voice_tuning_title">Stemmestyring</string>
+    <string name="voice_tuning_prompt">Sig en station eller kommando (f.eks. \"Play Jazz\", \"Sleep timer 30\")…</string>
+    <string name="voice_tuning_hint">Stemmesøgning &amp; kommandoer</string>
+    <string name="voice_tuning_executed">Stammekommando: %1$s</string>
+    <string name="voice_tuning_listening">Lytter efter station eller kommando…</string>
+    <string name="voice_tuning_not_available">Stemmegenkendelse er ikke tilgængelig på denne enhed</string>
 </resources>

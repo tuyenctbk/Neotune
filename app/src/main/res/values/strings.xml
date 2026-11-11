@@ -638,5 +638,24 @@
     <string name="post_op_recording_saved_card">Stream recorded successfully! Buy dev a coffee if this saved your day ☕</string>
     <string name="support_dev">Support</string>
     <string name="settings_support_dev_desc">Help keep NeoTune 100% free, open-source and ad-free</string>
+
+    <!-- Smart Time-of-Day On-Device Recommendations -->
+    <string name="smart_picks_tab">Smart Picks</string>
+    <string name="smart_picks_morning_title">Morning Kickstart</string>
+    <string name="smart_picks_morning_desc">Energizing tunes, news &amp; acoustic morning coffee vibes</string>
+    <string name="smart_picks_afternoon_title">Focus &amp; Study</string>
+    <string name="smart_picks_afternoon_desc">Deep focus Lo-Fi, ambient beats &amp; work jazz</string>
+    <string name="smart_picks_evening_title">Sunset Wind-Down</string>
+    <string name="smart_picks_evening_desc">Smooth lounge, classic grooves &amp; chillout radio</string>
+    <string name="smart_picks_night_title">Deep Ambient &amp; Sleep</string>
+    <string name="smart_picks_night_desc">Calming sleep soundscapes, piano &amp; midnight Lo-Fi</string>
+
+    <!-- On-Device Hands-Free Voice Tuning -->
+    <string name="voice_tuning_title">Voice Tuning</string>
+    <string name="voice_tuning_prompt">Speak station or command (e.g. \"Play Jazz\", \"Sleep timer 30\")…</string>
+    <string name="voice_tuning_hint">Voice Search &amp; Commands</string>
+    <string name="voice_tuning_executed">Voice command: %1$s</string>
+    <string name="voice_tuning_listening">Listening for station or command…</string>
+    <string name="voice_tuning_not_available">Voice recognition is not available on this device</string>
 </resources>
 

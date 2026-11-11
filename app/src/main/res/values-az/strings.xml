@@ -564,4 +564,22 @@
     <string name="post_op_recording_saved_card">Stream recorded successfully! Buy dev a coffee if this saved your day ☕</string>
     <string name="support_dev">Support</string>
     <string name="settings_support_dev_desc">Help keep NeoTune 100% free, open-source and ad-free</string>
+
+    <string name="volume_down">Səsi azalt</string>
+    <string name="volume_up">Səsi artır</string>
+    <string name="smart_picks_tab">Ağıllı Seçimlər</string>
+    <string name="smart_picks_morning_title">Səhər Enerjisi</string>
+    <string name="smart_picks_morning_desc">Canlandırıcı musiqi, xəbərlər və səhər qəhvəsi abu-havası</string>
+    <string name="smart_picks_afternoon_title">Fokus və Dərs</string>
+    <string name="smart_picks_afternoon_desc">Dərin fokus üçün Lo-Fi, ambient ritmlər və iş cazı</string>
+    <string name="smart_picks_evening_title">Axşam İstirahəti</string>
+    <string name="smart_picks_evening_desc">Mülayim launj, klassik ritmlər və relaks radiosu</string>
+    <string name="smart_picks_night_title">Dərin Ambient və Yuxu</string>
+    <string name="smart_picks_night_desc">Sakitləşdirici yuxu səsləri, piano və gecə Lo-Fi</string>
+    <string name="voice_tuning_title">Səslə Tənzimləmə</string>
+    <string name="voice_tuning_prompt">Stansiya və ya əmri deyin (məs. \"Play Jazz\", \"Yuxu taymeri 30\")…</string>
+    <string name="voice_tuning_hint">Səsli axtarış və əmrlər</string>
+    <string name="voice_tuning_executed">Səsli əmr: %1$s</string>
+    <string name="voice_tuning_listening">Stansiya və ya əmr dinlənilir…</string>
+    <string name="voice_tuning_not_available">Bu cihazda səs tanıma dəstəklənmir</string>
 </resources>

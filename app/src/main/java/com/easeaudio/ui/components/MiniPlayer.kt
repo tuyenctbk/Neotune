@@ -1,11 +1,15 @@
 package com.easeaudio.ui.components
 
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.*
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -239,9 +243,14 @@ fun MiniPlayer(
                         if (station.isPodcast && totalDuration > 0L && !isLoading) {
                             Spacer(modifier = Modifier.height(3.dp))
                             val progress = (currentPosition.toFloat() / totalDuration.toFloat()).coerceIn(0f, 1f)
+                            val animatedProgress by animateFloatAsState(
+                                targetValue = progress,
+                                animationSpec = spring(stiffness = Spring.StiffnessLow),
+                                label = "miniPlayerPodcastProgress"
+                            )
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 LinearProgressIndicator(
-                                    progress = { progress },
+                                    progress = { animatedProgress },
                                     modifier = Modifier
                                         .weight(1f)
                                         .height(3.dp)
@@ -257,13 +266,23 @@ fun MiniPlayer(
                                 )
                             }
                         } else {
-                            Text(
-                                text = if (isLoading) stringResource(R.string.buffering_stream) else (streamTitle ?: station.genre),
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = if (isLoading) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis
-                            )
+                            val displaySubtitle = if (isLoading) stringResource(R.string.buffering_stream) else (streamTitle ?: station.genre)
+                            AnimatedContent(
+                                targetState = displaySubtitle,
+                                transitionSpec = {
+                                    (fadeIn(tween(220)) + slideInVertically(tween(220)) { it / 3 }) togetherWith
+                                        (fadeOut(tween(150)) + slideOutVertically(tween(150)) { -it / 3 })
+                                },
+                                label = "miniPlayerSubtitleAnim"
+                            ) { currentSubtitle ->
+                                Text(
+                                    text = currentSubtitle,
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = if (isLoading) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
+                                )
+                            }
                         }
                     }
 
@@ -284,11 +303,18 @@ fun MiniPlayer(
                         )
                     }
 
-                    // Favorite Button
+                    // Favorite Button with spring bounce on toggle
                     var isFavFocused by remember { mutableStateOf(false) }
                     val favScale by animateFloatAsState(
-                        targetValue = if (isFavFocused) 1.15f else 1.0f,
-                        animationSpec = spring(stiffness = Spring.StiffnessMediumLow),
+                        targetValue = when {
+                            isFavFocused -> 1.18f
+                            station.isFavorite -> 1.06f
+                            else -> 1.0f
+                        },
+                        animationSpec = spring(
+                            dampingRatio = Spring.DampingRatioMediumBouncy,
+                            stiffness = Spring.StiffnessMediumLow
+                        ),
                         label = "favScale"
                     )
                     IconButton(
@@ -416,18 +442,31 @@ fun MiniPlayer(
                             }
                             .testTag("mini_player_play_pause")
                     ) {
-                        if (isLoading) {
-                            CircularProgressIndicator(
-                                modifier = Modifier.size(20.dp),
-                                color = playBtnContentColor,
-                                strokeWidth = 2.dp
-                            )
-                        } else {
-                            Icon(
-                                imageVector = if (isPlaying) Icons.Filled.Pause else Icons.Filled.PlayArrow,
-                                contentDescription = if (isPlaying) "Pause" else "Play",
-                                tint = playBtnContentColor
-                            )
+                        AnimatedContent(
+                            targetState = if (isLoading) 0 else if (isPlaying) 1 else 2,
+                            transitionSpec = {
+                                (scaleIn(spring(dampingRatio = Spring.DampingRatioMediumBouncy), initialScale = 0.7f) + fadeIn(tween(150))) togetherWith
+                                    (scaleOut(tween(120), targetScale = 0.7f) + fadeOut(tween(120)))
+                            },
+                            label = "miniPlayerPlayIconAnim"
+                        ) { playState ->
+                            when (playState) {
+                                0 -> CircularProgressIndicator(
+                                    modifier = Modifier.size(20.dp),
+                                    color = playBtnContentColor,
+                                    strokeWidth = 2.dp
+                                )
+                                1 -> Icon(
+                                    imageVector = Icons.Filled.Pause,
+                                    contentDescription = stringResource(R.string.pause),
+                                    tint = playBtnContentColor
+                                )
+                                else -> Icon(
+                                    imageVector = Icons.Filled.PlayArrow,
+                                    contentDescription = stringResource(R.string.play),
+                                    tint = playBtnContentColor
+                                )
+                            }
                         }
                     }
                 }

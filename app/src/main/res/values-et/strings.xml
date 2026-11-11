@@ -564,4 +564,22 @@
     <string name="post_op_recording_saved_card">Stream recorded successfully! Buy dev a coffee if this saved your day ☕</string>
     <string name="support_dev">Support</string>
     <string name="settings_support_dev_desc">Help keep NeoTune 100% free, open-source and ad-free</string>
+
+    <string name="volume_down">Vähenda helitugevust</string>
+    <string name="volume_up">Suurenda helitugevust</string>
+    <string name="smart_picks_tab">Nutikad valikud</string>
+    <string name="smart_picks_morning_title">Hommikune energiasüst</string>
+    <string name="smart_picks_morning_desc">Energiline muusika, uudised ja akustiline hommikukohv</string>
+    <string name="smart_picks_afternoon_title">Keskendumine ja õppimine</string>
+    <string name="smart_picks_afternoon_desc">Lo-Fi keskendumiseks, ambient-rütmid ja tööjazz</string>
+    <string name="smart_picks_evening_title">Õhtune lõõgastus</string>
+    <string name="smart_picks_evening_desc">Mõnus lounge, klassikalised rütmid ja chillout-raadio</string>
+    <string name="smart_picks_night_title">Sügav ambient ja uni</string>
+    <string name="smart_picks_night_desc">Rahustavad unehelid, klaver ja kesköine Lo-Fi</string>
+    <string name="voice_tuning_title">Häälega häälestamine</string>
+    <string name="voice_tuning_prompt">Öelge jaam või käsklus (nt \"Play Jazz\", \"Uneaeg 30\")…</string>
+    <string name="voice_tuning_hint">Häälotsing ja käsklused</string>
+    <string name="voice_tuning_executed">Häälkäsklus: %1$s</string>
+    <string name="voice_tuning_listening">Jaama või käskluse kuulamine…</string>
+    <string name="voice_tuning_not_available">Hääletuvastus pole selles seadmes saadaval</string>
 </resources>

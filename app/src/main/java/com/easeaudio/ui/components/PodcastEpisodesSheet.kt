@@ -267,7 +267,7 @@ fun PodcastEpisodesSheet(
                                             } else {
                                                 Icon(
                                                     imageVector = if (isEpisodePlaying) Icons.Filled.Pause else Icons.Filled.PlayArrow,
-                                                    contentDescription = if (isEpisodePlaying) "Pause" else "Play",
+                                                    contentDescription = stringResource(if (isEpisodePlaying) R.string.pause else R.string.play),
                                                     tint = if (isSelected) MaterialTheme.colorScheme.background else MaterialTheme.colorScheme.onSurface,
                                                     modifier = Modifier.size(24.dp)
                                                 )
@@ -384,16 +384,6 @@ fun PodcastEpisodeDetailView(
                 .getBoolean(episode.id, false)
         )
     }
-    
-    // Downloads state
-    var isDownloaded by remember(episode) {
-        mutableStateOf(
-            context.getSharedPreferences("neotune_downloaded_episodes", Context.MODE_PRIVATE)
-                .getBoolean(episode.id, false)
-        )
-    }
-    var downloadProgress by remember { mutableStateOf(-1f) }
-    val coroutineScope = rememberCoroutineScope()
     
     // Expandable description
     var descriptionExpanded by remember { mutableStateOf(false) }
@@ -531,52 +521,6 @@ fun PodcastEpisodeDetailView(
                     )
                 }
                 
-                // Download Button (Shows premium mock animation!)
-                IconButton(
-                    onClick = {
-                        if (isDownloaded) {
-                            isDownloaded = false
-                            context.getSharedPreferences("neotune_downloaded_episodes", Context.MODE_PRIVATE)
-                                .edit()
-                                .putBoolean(episode.id, false)
-                                .apply()
-                            Toast.makeText(context, context.getString(R.string.removed_from_downloads), Toast.LENGTH_SHORT).show()
-                        } else if (downloadProgress == -1f) {
-                            coroutineScope.launch {
-                                downloadProgress = 0f
-                                while (downloadProgress < 1f) {
-                                    delay(150)
-                                    downloadProgress += 0.1f
-                                }
-                                downloadProgress = -1f
-                                isDownloaded = true
-                                context.getSharedPreferences("neotune_downloaded_episodes", Context.MODE_PRIVATE)
-                                    .edit()
-                                    .putBoolean(episode.id, true)
-                                    .apply()
-                                Toast.makeText(context, context.getString(R.string.episode_downloaded), Toast.LENGTH_SHORT).show()
-                            }
-                        }
-                    },
-                    modifier = Modifier.size(40.dp)
-                ) {
-                    if (downloadProgress in 0f..1f) {
-                        CircularProgressIndicator(
-                            progress = { downloadProgress },
-                            modifier = Modifier.size(24.dp),
-                            color = MaterialTheme.colorScheme.primary,
-                            strokeWidth = 2.5.dp
-                        )
-                    } else {
-                        Icon(
-                            imageVector = if (isDownloaded) Icons.Filled.DownloadDone else Icons.Filled.ArrowCircleDown,
-                            contentDescription = stringResource(R.string.download_episode),
-                            tint = if (isDownloaded) Color(0xFF4CAF50) else MaterialTheme.colorScheme.onSurface,
-                            modifier = Modifier.size(26.dp)
-                        )
-                    }
-                }
-                
                 // Share Button
                 IconButton(
                     onClick = {
@@ -631,7 +575,7 @@ fun PodcastEpisodeDetailView(
                 } else {
                     Icon(
                         imageVector = if (isEpisodePlaying) Icons.Filled.Pause else Icons.Filled.PlayArrow,
-                        contentDescription = if (isEpisodePlaying) "Pause" else "Play",
+                        contentDescription = stringResource(if (isEpisodePlaying) R.string.pause else R.string.play),
                         modifier = Modifier.size(32.dp)
                     )
                 }

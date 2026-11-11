@@ -581,4 +581,22 @@
     <string name="post_op_recording_saved_card">¡Grabación guardada con éxito! Invita al dev a un café si esto te ayudó ☕</string>
     <string name="support_dev">Apoyar</string>
     <string name="settings_support_dev_desc">Ayuda a mantener NeoTune 100% gratuito, de código abierto y sin anuncios</string>
+
+    <string name="volume_down">Bajar volumen</string>
+    <string name="volume_up">Subir volumen</string>
+    <string name="smart_picks_tab">Sugerencias inteligentes</string>
+    <string name="smart_picks_morning_title">Energía matutina</string>
+    <string name="smart_picks_morning_desc">Música energizante, noticias y acústico para el café matutino</string>
+    <string name="smart_picks_afternoon_title">Enfoque y estudio</string>
+    <string name="smart_picks_afternoon_desc">Lo-Fi de concentración, ritmos ambientales y jazz para trabajar</string>
+    <string name="smart_picks_evening_title">Relax al atardecer</string>
+    <string name="smart_picks_evening_desc">Lounge suave, ritmos clásicos y radio chillout</string>
+    <string name="smart_picks_night_title">Ambiente profundo y descanso</string>
+    <string name="smart_picks_night_desc">Paisajes sonoros relajantes, piano y Lo-Fi nocturno</string>
+    <string name="voice_tuning_title">Sintonización por voz</string>
+    <string name="voice_tuning_prompt">Di una emisora o comando (ej. \"Play Jazz\", \"Sleep timer 30\")…</string>
+    <string name="voice_tuning_hint">Búsqueda por voz y comandos</string>
+    <string name="voice_tuning_executed">Comando de voz: %1$s</string>
+    <string name="voice_tuning_listening">Escuchando emisora o comando…</string>
+    <string name="voice_tuning_not_available">El reconocimiento de voz no está disponible en este dispositivo</string>
 </resources>

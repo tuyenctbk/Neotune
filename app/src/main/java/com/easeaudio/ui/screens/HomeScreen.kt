@@ -105,6 +105,15 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.Lifecycle
 import androidx.compose.material.icons.outlined.Coffee
+import androidx.compose.material.icons.filled.Mic
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import android.speech.RecognizerIntent
+import android.widget.Toast
+import com.easeaudio.util.VoiceTuningHelper
+import com.easeaudio.util.VoiceAction
+import com.easeaudio.data.SmartRecommendationEngine
+import com.easeaudio.data.TimeOfDayContext
 import com.easeaudio.engagement.SmartEngagementManager
 import com.easeaudio.engagement.EngagementPromptType
 import com.easeaudio.ui.components.DonationDialog
@@ -116,7 +125,7 @@ enum class HomeTab {
 }
 
 enum class ContinueListeningTab {
-    Recent, MostPlayed, Featured
+    Recent, MostPlayed, SmartPicks, Featured
 }
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
@@ -204,6 +213,65 @@ fun HomeScreen(
             }
         } else {
             uiState.stations.filter { it.isPodcast }.ifEmpty { uiState.stations }
+        }
+    }
+
+    val smartPicksList = remember(uiState.stations, uiState.favoriteStations, uiState.recentStations) {
+        SmartRecommendationEngine.computeSmartPicks(
+            availableStations = uiState.stations,
+            favorites = uiState.favoriteStations,
+            recentStations = uiState.recentStations
+        )
+    }
+
+    val voiceLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == android.app.Activity.RESULT_OK) {
+            val matches = result.data?.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
+            val voiceText = matches?.firstOrNull()
+            if (!voiceText.isNullOrBlank()) {
+                when (val action = VoiceTuningHelper.parseVoiceInput(voiceText)) {
+                    is VoiceAction.Play -> {
+                        val matched = uiState.stations.find {
+                            it.name.contains(action.query, ignoreCase = true) ||
+                            it.genre.contains(action.query, ignoreCase = true)
+                        }
+                        if (matched != null) {
+                            onStationSelect(matched)
+                            Toast.makeText(context, context.getString(R.string.voice_tuning_executed, matched.name), Toast.LENGTH_SHORT).show()
+                        } else {
+                            onSearchQueryChange(action.query)
+                            onSaveSearchQuery(action.query)
+                        }
+                    }
+                    is VoiceAction.Search -> {
+                        onSearchQueryChange(action.query)
+                        onSaveSearchQuery(action.query)
+                    }
+                    is VoiceAction.NextStation -> onNextStation()
+                    is VoiceAction.PreviousStation -> onPreviousStation()
+                    is VoiceAction.TogglePlayPause -> onPlayPause()
+                    is VoiceAction.ToggleFavorite -> {
+                        uiState.currentStation?.let { onToggleFavorite(it) }
+                    }
+                    is VoiceAction.SetSleepTimer -> {
+                        Toast.makeText(context, context.getString(R.string.voice_tuning_executed, "${action.minutes}m timer"), Toast.LENGTH_SHORT).show()
+                    }
+                    is VoiceAction.Unrecognized -> {
+                        onSearchQueryChange(action.rawText)
+                    }
+                }
+            }
+        }
+    }
+
+    fun triggerVoiceSearch() {
+        try {
+            val intent = VoiceTuningHelper.createSpeechIntent(context, context.getString(R.string.voice_tuning_prompt))
+            voiceLauncher.launch(intent)
+        } catch (_: Exception) {
+            Toast.makeText(context, context.getString(R.string.voice_tuning_not_available), Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -419,6 +487,18 @@ fun HomeScreen(
                                                         modifier = Modifier.size(18.dp)
                                                     )
                                                 }
+                                            } else {
+                                                IconButton(
+                                                    onClick = { triggerVoiceSearch() },
+                                                    modifier = Modifier.testTag("btn_voice_search")
+                                                ) {
+                                                    Icon(
+                                                        imageVector = Icons.Filled.Mic,
+                                                        contentDescription = stringResource(R.string.voice_tuning_hint),
+                                                        tint = MaterialTheme.colorScheme.primary,
+                                                        modifier = Modifier.size(20.dp)
+                                                    )
+                                                }
                                             }
                                         },
                                         singleLine = true,
@@ -484,8 +564,20 @@ fun HomeScreen(
                                                 color = if (uiState.searchQuery.isNotEmpty()) MaterialTheme.colorScheme.onSurface
                                                         else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
                                                 maxLines = 1,
-                                                overflow = TextOverflow.Ellipsis
+                                                overflow = TextOverflow.Ellipsis,
+                                                modifier = Modifier.weight(1f)
                                             )
+                                            IconButton(
+                                                onClick = { triggerVoiceSearch() },
+                                                modifier = Modifier.size(28.dp).testTag("btn_voice_search_pill")
+                                            ) {
+                                                Icon(
+                                                    imageVector = Icons.Filled.Mic,
+                                                    contentDescription = stringResource(R.string.voice_tuning_hint),
+                                                    tint = MaterialTheme.colorScheme.primary,
+                                                    modifier = Modifier.size(19.dp)
+                                                )
+                                            }
                                         }
                                     }
                                 }
@@ -677,11 +769,12 @@ fun HomeScreen(
 
                 // ── Continue & Discover Section (Recent, Most Played & Featured) ──
                 // Unified section with interactive toggle chips.
-                val hasContinueOrFeatured = displayedRecentList.isNotEmpty() || displayedMostPlayedList.isNotEmpty() || featuredList.isNotEmpty()
+                val hasContinueOrFeatured = displayedRecentList.isNotEmpty() || displayedMostPlayedList.isNotEmpty() || smartPicksList.isNotEmpty() || featuredList.isNotEmpty()
                 if (hasContinueOrFeatured && uiState.searchQuery.isEmpty() && uiState.selectedGenre == "All") {
                     val activeStreamList = when (continueListeningTab) {
                         ContinueListeningTab.Recent -> displayedRecentList
                         ContinueListeningTab.MostPlayed -> displayedMostPlayedList
+                        ContinueListeningTab.SmartPicks -> smartPicksList
                         ContinueListeningTab.Featured -> featuredList
                     }
 
@@ -709,6 +802,15 @@ fun HomeScreen(
                                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
+                                    ContinueTabChip(
+                                        label = stringResource(R.string.smart_picks_tab),
+                                        icon = TimeOfDayContext.current().icon,
+                                        isSelected = continueListeningTab == ContinueListeningTab.SmartPicks,
+                                        onClick = {
+                                            continueListeningTab = ContinueListeningTab.SmartPicks
+                                            homePrefs.edit().putString("saved_continue_tab", ContinueListeningTab.SmartPicks.name).apply()
+                                        }
+                                    )
                                     ContinueTabChip(
                                         label = stringResource(R.string.tab_recent),
                                         icon = Icons.Outlined.History,
@@ -763,6 +865,15 @@ fun HomeScreen(
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
                                     ContinueTabChip(
+                                        label = stringResource(R.string.smart_picks_tab),
+                                        icon = TimeOfDayContext.current().icon,
+                                        isSelected = continueListeningTab == ContinueListeningTab.SmartPicks,
+                                        onClick = {
+                                            continueListeningTab = ContinueListeningTab.SmartPicks
+                                            homePrefs.edit().putString("saved_continue_tab", ContinueListeningTab.SmartPicks.name).apply()
+                                        }
+                                    )
+                                    ContinueTabChip(
                                         label = stringResource(R.string.tab_recent),
                                         icon = Icons.Outlined.History,
                                         isSelected = continueListeningTab == ContinueListeningTab.Recent,
@@ -800,6 +911,10 @@ fun HomeScreen(
 
                         item(span = { GridItemSpan(maxLineSpan) }) {
                             val badgeText = when (continueListeningTab) {
+                                ContinueListeningTab.SmartPicks -> {
+                                    val timeCtx = TimeOfDayContext.current()
+                                    "${stringResource(timeCtx.titleResId)} • ${stringResource(R.string.smart_picks_tab)}"
+                                }
                                 ContinueListeningTab.Recent -> stringResource(if (uiState.selectedTab == HomeTab.Podcast) R.string.continue_listening_podcast else R.string.continue_listening_radio)
                                 ContinueListeningTab.MostPlayed -> {
                                     if (resumeStation.playCount > 0) {
@@ -812,6 +927,7 @@ fun HomeScreen(
                             }
 
                             val badgeIcon = when (continueListeningTab) {
+                                ContinueListeningTab.SmartPicks -> TimeOfDayContext.current().icon
                                 ContinueListeningTab.Recent -> Icons.Filled.PlayArrow
                                 ContinueListeningTab.MostPlayed -> Icons.AutoMirrored.Filled.TrendingUp
                                 ContinueListeningTab.Featured -> Icons.Filled.Star
@@ -878,6 +994,7 @@ fun HomeScreen(
                                 ) {
                                     Icon(
                                         imageVector = when (continueListeningTab) {
+                                            ContinueListeningTab.SmartPicks -> TimeOfDayContext.current().icon
                                             ContinueListeningTab.Recent -> Icons.Outlined.History
                                             ContinueListeningTab.MostPlayed -> Icons.AutoMirrored.Filled.TrendingUp
                                             ContinueListeningTab.Featured -> Icons.Filled.Star
@@ -889,6 +1006,7 @@ fun HomeScreen(
                                     Text(
                                         text = stringResource(
                                             when (continueListeningTab) {
+                                                ContinueListeningTab.SmartPicks -> R.string.no_featured_yet
                                                 ContinueListeningTab.Recent -> R.string.no_history_yet
                                                 ContinueListeningTab.MostPlayed -> R.string.no_most_played_yet
                                                 ContinueListeningTab.Featured -> R.string.no_featured_yet
@@ -1412,7 +1530,7 @@ fun QuickResumeCard(
                     } else {
                         Icon(
                             imageVector = if (isPlaying) Icons.Filled.Pause else Icons.Filled.PlayArrow,
-                            contentDescription = if (isPlaying) "Pause" else "Play",
+                            contentDescription = stringResource(if (isPlaying) R.string.pause else R.string.play),
                             tint = MaterialTheme.colorScheme.onPrimary,
                             modifier = Modifier.size(if (isExpanded) 26.dp else 22.dp)
                         )

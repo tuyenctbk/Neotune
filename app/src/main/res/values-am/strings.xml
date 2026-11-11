@@ -564,4 +564,22 @@
     <string name="post_op_recording_saved_card">Stream recorded successfully! Buy dev a coffee if this saved your day ☕</string>
     <string name="support_dev">Support</string>
     <string name="settings_support_dev_desc">Help keep NeoTune 100% free, open-source and ad-free</string>
+
+    <string name="volume_down">ድምጽ ቀንስ</string>
+    <string name="volume_up">ድምጽ ጨምር</string>
+    <string name="smart_picks_tab">ብልህ ምርጫዎች</string>
+    <string name="smart_picks_morning_title">የማለዳ ጅምር</string>
+    <string name="smart_picks_morning_desc">አነቃቂ ሙዚቃ፣ ዜና እና የማለዳ ቡና ድባብ</string>
+    <string name="smart_picks_afternoon_title">ትኩረት እና ጥናት</string>
+    <string name="smart_picks_afternoon_desc">ለትኩረት የሚሆኑ ዜማዎች እና የስራ ጃዝ</string>
+    <string name="smart_picks_evening_title">የምሽት እረፍት</string>
+    <string name="smart_picks_evening_desc">ረጋ ያለ ሙዚቃ እና ዘና የሚያደርግ ሬዲዮ</string>
+    <string name="smart_picks_night_title">የእንቅልፍ ድባብ</string>
+    <string name="smart_picks_night_desc">ለእንቅልፍ የሚረዱ ድምጾች፣ ፒያኖ እና የሌሊት ዜማዎች</string>
+    <string name="voice_tuning_title">የድምጽ ማስተካከያ</string>
+    <string name="voice_tuning_prompt">የጣቢያውን ስም ወይም ትዕዛዝ ይናገሩ (ምሳሌ \"Play Jazz\"፣ \"የእንቅልፍ ሰዓት 30\")…</string>
+    <string name="voice_tuning_hint">የድምጽ ፍለጋ እና ትዕዛዞች</string>
+    <string name="voice_tuning_executed">የድምጽ ትዕዛዝ: %1$s</string>
+    <string name="voice_tuning_listening">ጣቢያ ወይም ትዕዛዝ በማዳመጥ ላይ…</string>
+    <string name="voice_tuning_not_available">በዚህ መሳሪያ ላይ የድምጽ ማወቂያ አይገኝም</string>
 </resources>

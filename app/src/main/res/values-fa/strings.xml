@@ -564,4 +564,22 @@
     <string name="post_op_recording_saved_card">Stream recorded successfully! Buy dev a coffee if this saved your day ☕</string>
     <string name="support_dev">Support</string>
     <string name="settings_support_dev_desc">Help keep NeoTune 100% free, open-source and ad-free</string>
+
+    <string name="volume_down">کاهش صدا</string>
+    <string name="volume_up">افزایش صدا</string>
+    <string name="smart_picks_tab">انتخاب‌های هوشمند</string>
+    <string name="smart_picks_morning_title">انرژی صبحگاهی</string>
+    <string name="smart_picks_morning_desc">موسیقی پرانرژی، اخبار و آوای آکوستیک همراه با قهوه صبح</string>
+    <string name="smart_picks_afternoon_title">تمرکز و یادگیری</string>
+    <string name="smart_picks_afternoon_desc">موسیقی لوفای برای تمرکز، ریتم‌های ملایم و جاز کاری</string>
+    <string name="smart_picks_evening_title">آرامش غروب</string>
+    <string name="smart_picks_evening_desc">موسیقی لوانج ملایم، شیارهای کلاسیک و رادیو آرامش‌بخش</string>
+    <string name="smart_picks_night_title">آوای عمیق و خواب</string>
+    <string name="smart_picks_night_desc">صداهای آرامش‌بخش خواب، پیانو و لوفای نیمه‌شب</string>
+    <string name="voice_tuning_title">تنظیم صوتی</string>
+    <string name="voice_tuning_prompt">نام ایستگاه یا دستور را بگویید (مثال: \"Play Jazz\"، \"تایمر خواب ۳۰\")…</string>
+    <string name="voice_tuning_hint">جستجوی صوتی و دستورات</string>
+    <string name="voice_tuning_executed">دستور صوتی: %1$s</string>
+    <string name="voice_tuning_listening">در حال گوش دادن به ایستگاه یا دستور…</string>
+    <string name="voice_tuning_not_available">تشخیص صدا در این دستگاه در دسترس نیست</string>
 </resources>

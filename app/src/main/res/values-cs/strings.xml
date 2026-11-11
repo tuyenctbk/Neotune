@@ -564,4 +564,22 @@
     <string name="post_op_recording_saved_card">Stream recorded successfully! Buy dev a coffee if this saved your day ☕</string>
     <string name="support_dev">Support</string>
     <string name="settings_support_dev_desc">Help keep NeoTune 100% free, open-source and ad-free</string>
+
+    <string name="volume_down">Snížit hlasitost</string>
+    <string name="volume_up">Zvýšit hlasitost</string>
+    <string name="smart_picks_tab">Chytrý výběr</string>
+    <string name="smart_picks_morning_title">Ranní start</string>
+    <string name="smart_picks_morning_desc">Energická hudba, zprávy a akustická ranní káva</string>
+    <string name="smart_picks_afternoon_title">Soustředění a studium</string>
+    <string name="smart_picks_afternoon_desc">Lo-Fi pro koncentraci, ambientní rytmy a pracovní jazz</string>
+    <string name="smart_picks_evening_title">Večerní relaxace</string>
+    <string name="smart_picks_evening_desc">Klidný lounge, klasické rytmy a chillout rádio</string>
+    <string name="smart_picks_night_title">Hluboký ambient a spánek</string>
+    <string name="smart_picks_night_desc">Uklidňující zvuky na spaní, klavír a půlnoční Lo-Fi</string>
+    <string name="voice_tuning_title">Hlasové ladění</string>
+    <string name="voice_tuning_prompt">Vyslovte stanici nebo příkaz (např. \"Play Jazz\", \"Časovač spánku 30\")…</string>
+    <string name="voice_tuning_hint">Hlasové vyhledávání a příkazy</string>
+    <string name="voice_tuning_executed">Hlasový příkaz: %1$s</string>
+    <string name="voice_tuning_listening">Poslouchám stanici nebo příkaz…</string>
+    <string name="voice_tuning_not_available">Rozpoznávání hlasu není na tomto zařízení k dispozici</string>
 </resources>

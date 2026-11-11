@@ -2,7 +2,12 @@ package com.easeaudio.ui.screens
 
 import android.content.Context
 import android.media.AudioManager
+import android.speech.RecognizerIntent
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import com.easeaudio.util.VoiceTuningHelper
+import com.easeaudio.util.VoiceAction
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
@@ -45,6 +50,7 @@ import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -813,6 +819,52 @@ private fun AutomotiveHeroPlayer(
     var activeSideTab by remember { mutableStateOf(if (isPodcast) SideListTab.Episodes else SideListTab.Favorites) }
     var carVisualizerStyle by remember { mutableStateOf(VisualizerStyle.DUAL_MIRROR) }
 
+    val voiceLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == android.app.Activity.RESULT_OK) {
+            val matches = result.data?.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
+            val voiceText = matches?.firstOrNull()
+            if (!voiceText.isNullOrBlank()) {
+                when (val action = VoiceTuningHelper.parseVoiceInput(voiceText)) {
+                    is VoiceAction.Play -> {
+                        val matched = uiState.stations.find {
+                            it.name.contains(action.query, ignoreCase = true) ||
+                            it.genre.contains(action.query, ignoreCase = true)
+                        }
+                        if (matched != null) {
+                            onSelectStation(matched)
+                            Toast.makeText(context, context.getString(R.string.voice_tuning_executed, matched.name), Toast.LENGTH_SHORT).show()
+                        } else {
+                            Toast.makeText(context, context.getString(R.string.no_stations_found), Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                    is VoiceAction.NextStation -> onNextStation()
+                    is VoiceAction.PreviousStation -> onPreviousStation()
+                    is VoiceAction.TogglePlayPause -> onPlayPause()
+                    is VoiceAction.ToggleFavorite -> {
+                        currentStation?.let { onToggleFavorite(it) }
+                    }
+                    is VoiceAction.SetSleepTimer -> {
+                        onOpenSleepTimer?.invoke()
+                    }
+                    else -> {
+                        Toast.makeText(context, context.getString(R.string.voice_tuning_executed, voiceText), Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+        }
+    }
+
+    fun triggerVoiceSearch() {
+        try {
+            val intent = VoiceTuningHelper.createSpeechIntent(context, context.getString(R.string.voice_tuning_prompt))
+            voiceLauncher.launch(intent)
+        } catch (_: Exception) {
+            Toast.makeText(context, context.getString(R.string.voice_tuning_not_available), Toast.LENGTH_SHORT).show()
+        }
+    }
+
     // Auto switch side tab to episodes when playing a podcast
     LaunchedEffect(isPodcast) {
         if (isPodcast) {
@@ -1239,7 +1291,7 @@ private fun AutomotiveHeroPlayer(
                             } else {
                                 Icon(
                                     imageVector = if (isPlaying) Icons.Filled.Pause else Icons.Filled.PlayArrow,
-                                    contentDescription = if (isPlaying) "Pause" else "Play",
+                                    contentDescription = stringResource(if (isPlaying) R.string.pause else R.string.play),
                                     modifier = Modifier.size(40.dp)
                                 )
                             }
@@ -1280,6 +1332,28 @@ private fun AutomotiveHeroPlayer(
                                 contentDescription = stringResource(R.string.next_station),
                                 tint = MaterialTheme.colorScheme.onSurface,
                                 modifier = Modifier.size(30.dp)
+                            )
+                        }
+
+                        // Hands-Free Voice Tuning Mic Button
+                        FilledTonalIconButton(
+                            onClick = {
+                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                triggerVoiceSearch()
+                            },
+                            modifier = Modifier
+                                .size(50.dp)
+                                .testTag("btn_car_voice_tuning"),
+                            shape = CircleShape,
+                            colors = IconButtonDefaults.filledTonalIconButtonColors(
+                                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                                contentColor = MaterialTheme.colorScheme.primary
+                            )
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.Mic,
+                                contentDescription = stringResource(R.string.voice_tuning_hint),
+                                modifier = Modifier.size(24.dp)
                             )
                         }
                     }
@@ -1842,7 +1916,7 @@ private fun AutomotiveHeroPlayer(
                     ) {
                         Icon(
                             imageVector = if (isPlaying) Icons.Filled.Pause else Icons.Filled.PlayArrow,
-                            contentDescription = if (isPlaying) "Pause" else "Play",
+                            contentDescription = stringResource(if (isPlaying) R.string.pause else R.string.play),
                             modifier = Modifier.size(38.dp)
                         )
                     }
@@ -2622,7 +2696,7 @@ private fun CarMiniPlayer(
                     } else {
                         Icon(
                             imageVector = if (isPlaying) Icons.Filled.Pause else Icons.Filled.PlayArrow,
-                            contentDescription = if (isPlaying) "Pause" else "Play",
+                            contentDescription = stringResource(if (isPlaying) R.string.pause else R.string.play),
                             tint = MaterialTheme.colorScheme.onPrimary,
                             modifier = Modifier.size(24.dp)
                         )

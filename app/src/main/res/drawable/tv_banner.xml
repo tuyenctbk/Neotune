@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="320dp"
+    android:height="180dp"
+    android:viewportWidth="320"
+    android:viewportHeight="180">
+
+    <!-- 16:9 Full Bleed Canvas Background for TV Banner -->
+    <path android:pathData="M 0,0 h 320 v 180 h -320 z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:centerX="160"
+                android:centerY="40"
+                android:gradientRadius="260"
+                android:type="radial">
+                <item android:offset="0.0" android:color="#FF280F4A" />
+                <item android:offset="0.55" android:color="#FF120524" />
+                <item android:offset="1.0" android:color="#FF06020D" />
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- Subtle Rounded Frame Border for TV Focus State -->
+    <path
+        android:pathData="M 8,8 h 304 a 12,12 0 0 1 12,12 v 140 a 12,12 0 0 1 -12,12 h -304 a 12,12 0 0 1 -12,-12 v -140 a 12,12 0 0 1 12,-12 z"
+        android:strokeWidth="1.5"
+        android:strokeColor="#3D1863" />
+
+    <!-- Left side: Iconic Graphic Logo Mark -->
+    <group
+        android:pivotX="256"
+        android:pivotY="240"
+        android:scaleX="0.25"
+        android:scaleY="0.25"
+        android:translateX="-24"
+        android:translateY="30">
+
+        <!-- Outer Radio Wave Arch -->
+        <path
+            android:pathData="M 96,236 A 160,160 0 0,1 416,236"
+            android:strokeWidth="24"
+            android:strokeLineCap="round">
+            <aapt:attr name="android:strokeColor">
+                <gradient
+                    android:type="linear"
+                    android:startX="96"
+                    android:startY="236"
+                    android:endX="416"
+                    android:endY="236">
+                    <item android:offset="0.0" android:color="#FF00F0FF" />
+                    <item android:offset="0.45" android:color="#FFA855F7" />
+                    <item android:offset="1.0" android:color="#FFEC4899" />
+                </gradient>
+            </aapt:attr>
+        </path>
+
+        <!-- Inner Radio Wave Arch -->
+        <path
+            android:pathData="M 140,236 A 116,116 0 0,1 372,236"
+            android:strokeWidth="24"
+            android:strokeLineCap="round">
+            <aapt:attr name="android:strokeColor">
+                <gradient
+                    android:type="linear"
+                    android:startX="140"
+                    android:startY="236"
+                    android:endX="372"
+                    android:endY="236">
+                    <item android:offset="0.0" android:color="#FF00F0FF" />
+                    <item android:offset="0.45" android:color="#FFA855F7" />
+                    <item android:offset="1.0" android:color="#FFEC4899" />
+                </gradient>
+            </aapt:attr>
+        </path>
+
+        <!-- 5 Equalizer Pillar Bars -->
+        <!-- Bar 1 -->
+        <path
+            android:pathData="M 140,309 A 14,14 0 0,1 168,309 L 168,373 A 14,14 0 0,1 140,373 Z">
+            <aapt:attr name="android:fillColor">
+                <gradient
+                    android:type="linear"
+                    android:startX="140"
+                    android:startY="281"
+                    android:endX="140"
+                    android:endY="387">
+                    <item android:offset="0.0" android:color="#FF38BDF8" />
+                    <item android:offset="0.35" android:color="#FFC084FC" />
+                    <item android:offset="0.70" android:color="#FFE879F9" />
+                    <item android:offset="1.0" android:color="#FFF43F5E" />
+                </gradient>
+            </aapt:attr>
+        </path>
+
+        <!-- Bar 2 -->
+        <path
+            android:pathData="M 190,272 A 14,14 0 0,1 218,272 L 218,373 A 14,14 0 0,1 190,373 Z">
+            <aapt:attr name="android:fillColor">
+                <gradient
+                    android:type="linear"
+                    android:startX="190"
+                    android:startY="244"
+                    android:endX="190"
+                    android:endY="387">
+                    <item android:offset="0.0" android:color="#FF38BDF8" />
+                    <item android:offset="0.35" android:color="#FFC084FC" />
+                    <item android:offset="0.70" android:color="#FFE879F9" />
+                    <item android:offset="1.0" android:color="#FFF43F5E" />
+                </gradient>
+            </aapt:attr>
+        </path>
+
+        <!-- Bar 3 -->
+        <path
+            android:pathData="M 242,224 A 14,14 0 0,1 270,224 L 270,373 A 14,14 0 0,1 242,373 Z">
+            <aapt:attr name="android:fillColor">
+                <gradient
+                    android:type="linear"
+                    android:startX="242"
+                    android:startY="196"
+                    android:endX="242"
+                    android:endY="387">
+                    <item android:offset="0.0" android:color="#FF38BDF8" />
+                    <item android:offset="0.35" android:color="#FFC084FC" />
+                    <item android:offset="0.70" android:color="#FFE879F9" />
+                    <item android:offset="1.0" android:color="#FFF43F5E" />
+                </gradient>
+            </aapt:attr>
+        </path>
+
+        <!-- Bar 4 -->
+        <path
+            android:pathData="M 294,272 A 14,14 0 0,1 322,272 L 322,373 A 14,14 0 0,1 294,373 Z">
+            <aapt:attr name="android:fillColor">
+                <gradient
+                    android:type="linear"
+                    android:startX="294"
+                    android:startY="244"
+                    android:endX="294"
+                    android:endY="387">
+                    <item android:offset="0.0" android:color="#FF38BDF8" />
+                    <item android:offset="0.35" android:color="#FFC084FC" />
+                    <item android:offset="0.70" android:color="#FFE879F9" />
+                    <item android:offset="1.0" android:color="#FFF43F5E" />
+                </gradient>
+            </aapt:attr>
+        </path>
+
+        <!-- Bar 5 -->
+        <path
+            android:pathData="M 344,309 A 14,14 0 0,1 372,309 L 372,373 A 14,14 0 0,1 344,373 Z">
+            <aapt:attr name="android:fillColor">
+                <gradient
+                    android:type="linear"
+                    android:startX="344"
+                    android:startY="281"
+                    android:endX="344"
+                    android:endY="387">
+                    <item android:offset="0.0" android:color="#FF38BDF8" />
+                    <item android:offset="0.35" android:color="#FFC084FC" />
+                    <item android:offset="0.70" android:color="#FFE879F9" />
+                    <item android:offset="1.0" android:color="#FFF43F5E" />
+                </gradient>
+            </aapt:attr>
+        </path>
+
+        <!-- Transmitter Beacon Dot -->
+        <path
+            android:pathData="M 256,122 m -26,0 a 26,26 0 1,0 52,0 a 26,26 0 1,0 -52,0"
+            android:fillColor="#5900F0FF" />
+        <path
+            android:pathData="M 256,122 m -20,0 a 20,20 0 1,0 40,0 a 20,20 0 1,0 -40,0"
+            android:fillColor="#FF00F0FF" />
+        <path
+            android:pathData="M 256,122 m -10,0 a 10,10 0 1,0 20,0 a 10,10 0 1,0 -20,0"
+            android:fillColor="#FFFFFF" />
+    </group>
+
+    <!-- Right side: NeoTune HD Branding Typography -->
+    <!-- "Neo" in bold white -->
+    <path
+        android:pathData="M 130,68 L 130,94 H 135.5 L 142,77 V 94 H 146 V 68 H 140.5 L 134,85 V 68 Z
+                          M 152,81 C 152,88 155,94.5 161,94.5 C 166.5,94.5 169.5,88.5 169.5,81 C 169.5,73.5 166.5,67.5 161,67.5 C 155,67.5 152,73.5 152,81 Z M 156,81 C 156,75.5 157.8,71 161,71 C 164.2,71 165.5,75.5 165.5,81 C 165.5,86.5 164.2,91 161,91 C 157.8,91 156,86.5 156,81 Z"
+        android:fillColor="#FFFFFF" />
+
+    <!-- "Tune" in Cyan -->
+    <path
+        android:pathData="M 174,68 H 188 V 71.5 H 183 V 94 H 179 V 71.5 H 174 Z
+                          M 191,78 V 94 H 195 V 90.5 C 196.2,93 198.8,94.5 201.5,94.5 C 206,94.5 208,91.5 208,86 V 78 H 204 V 85.5 C 204,89.5 203,91 200,91 C 197,91 195,89 195,85.5 V 78 Z
+                          M 211,78 V 94 H 215 V 86.5 C 215,82.5 217,81 220,81 C 223,81 224,82.5 224,86.5 V 94 H 228 V 85.5 C 228,80 225.5,77.5 220.5,77.5 C 217.5,77.5 215.8,79 215,81 V 78 Z
+                          M 232,86 C 232,91 235,94.5 240.5,94.5 C 244.5,94.5 247,92.5 248,89.5 L 244.5,88.5 C 244,90.2 242.5,91.5 240.5,91.5 C 238,91.5 236,89.5 236,86.5 H 248.5 C 248.5,85.8 248.5,85 248.5,84.2 C 248.5,79.5 245.5,77.5 240.5,77.5 C 235,77.5 232,81 232,86 Z M 236,84 C 236.2,81.8 238,80.2 240.5,80.2 C 243,80.2 244.5,81.8 244.7,84 Z"
+        android:fillColor="#00F0FF" />
+
+    <!-- "HD" Pill Badge Frame -->
+    <path
+        android:pathData="M 258,70 h 26 a 8,8 0 0 1 8,8 v 8 a 8,8 0 0 1 -8,8 h -26 a 8,8 0 0 1 -8,-8 v -8 a 8,8 0 0 1 8,-8 z"
+        android:fillColor="#0A2239"
+        android:strokeWidth="1"
+        android:strokeColor="#8000F0FF" />
+
+    <!-- "HD" Pill Text -->
+    <path
+        android:pathData="M 262,75 v 14 h 2.2 v -5.5 h 3.6 v 5.5 h 2.2 v -14 h -2.2 v 6 h -3.6 v -6 z
+                          M 273,75 v 14 h 4 c 3,0 4.8,-1.8 4.8,-7 c 0,-5.2 -1.8,-7 -4.8,-7 z M 275.2,77 h 1.8 c 1.8,0 2.6,1.2 2.6,5 c 0,3.8 -0.8,5 -2.6,5 h -1.8 z"
+        android:fillColor="#00F0FF" />
+
+    <!-- Tagline: "RADIO & PODCASTS" in Soft Purple -->
+    <path
+        android:pathData="M 130,112 v 12 h 2 v -4.5 h 2.5 l 2.5,4.5 h 2.5 l -2.8,-4.8 c 1.5,-0.5 2.3,-1.5 2.3,-3.6 C 139,113.2 137.2,112 134.5,112 Z M 132,113.8 h 2.2 c 1.5,0 2.3,0.6 2.3,1.8 c 0,1.2 -0.8,1.8 -2.3,1.8 H 132 Z
+                          M 141,124 h 2 l 0.8,-2.5 h 3.4 l 0.8,2.5 h 2 l -3.5,-12 h -2 Z M 144.4,119.8 l 1.1,-3.8 1.1,3.8 Z
+                          M 151,112 v 12 h 3.5 c 3.2,0 5,-1.8 5,-6 c 0,-4.2 -1.8,-6 -5,-6 Z M 153,113.8 h 1.5 c 2,0 3,1.2 3,4.2 c 0,3 -1,4.2 -3,4.2 H 153 Z
+                          M 161,112 v 12 h 2 v -12 Z
+                          M 165,118 c 0,4.2 1.8,6.2 4.5,6.2 c 2.7,0 4.5,-2 4.5,-6.2 c 0,-4.2 -1.8,-6.2 -4.5,-6.2 C 166.8,111.8 165,113.8 165,118 Z M 167,118 c 0,-3 1,-4.4 2.5,-4.4 c 1.5,0 2.5,1.4 2.5,4.4 c 0,3 -1,4.4 -2.5,4.4 C 168,122.4 167,121 167,118 Z
+                          M 179,122.8 c 0.8,0.8 1.8,1.2 2.8,1.2 c 1.2,0 2,-0.6 2,-1.5 c 0,-2.2 -4.8,-1.2 -4.8,-4.8 C 179,113 180.8,111.8 183.2,111.8 c 1.4,0 2.4,0.4 3.2,1.2 l -1,1.2 c -0.6,-0.6 -1.4,-0.8 -2.2,-0.8 c -1,0 -1.6,0.5 -1.6,1.1 c 0,2 4.8,1 4.8,4.8 c 0,2.6 -1.8,3.7 -4.2,3.7 c -1.5,0 -2.8,-0.5 -3.6,-1.4 Z
+                          M 189,112 v 12 h 2 v -12 Z
+                          M 193,124 h 2 v -5 h 3 v 5 h 2 v -12 h -2 v 5 h -3 v -5 h -2 Z
+                          M 203,118 c 0,4.2 1.8,6.2 4.5,6.2 c 2.7,0 4.5,-2 4.5,-6.2 c 0,-4.2 -1.8,-6.2 -4.5,-6.2 C 204.8,111.8 203,113.8 203,118 Z M 205,118 c 0,-3 1,-4.4 2.5,-4.4 c 1.5,0 2.5,1.4 2.5,4.4 c 0,3 -1,4.4 -2.5,4.4 C 206,122.4 205,121 205,118 Z
+                          M 214,112 v 12 h 2 v -4.5 h 2.5 l 2.5,4.5 h 2.5 l -2.8,-4.8 c 1.5,-0.5 2.3,-1.5 2.3,-3.6 C 223,113.2 221.2,112 218.5,112 Z M 216,113.8 h 2.2 c 1.5,0 2.3,0.6 2.3,1.8 c 0,1.2 -0.8,1.8 -2.3,1.8 H 216 Z"
+        android:fillColor="#C084FC" />
+
+</vector>

@@ -949,7 +949,7 @@ private fun PlayerContent(
             ) {
                 Icon(
                     imageVector = if (isPlaying) Icons.Filled.Pause else Icons.Filled.PlayArrow,
-                    contentDescription = if (isPlaying) "Pause" else "Play",
+                    contentDescription = stringResource(if (isPlaying) R.string.pause else R.string.play),
                     tint = if (isPlayFocused) MaterialTheme.colorScheme.background else PlayButtonContent,
                     modifier = Modifier.size(40.dp)
                 )

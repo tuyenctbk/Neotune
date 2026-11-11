@@ -564,4 +564,22 @@
     <string name="post_op_recording_saved_card">Stream recorded successfully! Buy dev a coffee if this saved your day ☕</string>
     <string name="support_dev">Support</string>
     <string name="settings_support_dev_desc">Help keep NeoTune 100% free, open-source and ad-free</string>
+
+    <string name="volume_down">Намаляване на звука</string>
+    <string name="volume_up">Увеличаване на звука</string>
+    <string name="smart_picks_tab">Умни предложения</string>
+    <string name="smart_picks_morning_title">Сутрешен старт</string>
+    <string name="smart_picks_morning_desc">Енергизираща музика, новини и акустично сутрешно кафе</string>
+    <string name="smart_picks_afternoon_title">Фокус и учене</string>
+    <string name="smart_picks_afternoon_desc">Lo-Fi за дълбока концентрация, ембиънт и работен джаз</string>
+    <string name="smart_picks_evening_title">Вечерно отпускане</string>
+    <string name="smart_picks_evening_desc">Мек лаундж, класически ритми и чилаут радио</string>
+    <string name="smart_picks_night_title">Дълбок ембиънт и сън</string>
+    <string name="smart_picks_night_desc">Успокояващи звуци за сън, пиано и полунощен Lo-Fi</string>
+    <string name="voice_tuning_title">Гласова настройка</string>
+    <string name="voice_tuning_prompt">Кажете станция или команда (напр. \"Play Jazz\", \"Таймер за сън 30\")…</string>
+    <string name="voice_tuning_hint">Гласово търсене и команди</string>
+    <string name="voice_tuning_executed">Гласова команда: %1$s</string>
+    <string name="voice_tuning_listening">Слуша се станция или команда…</string>
+    <string name="voice_tuning_not_available">Гласовото разпознаване не е налично на това устройство</string>
 </resources>
